@@ -94,11 +94,24 @@ mswin_display_splash_window(BOOL show_ver)
     if (show_ver) {
         /* Show complete version information */
         dlb *f;
+        char verbuf[BUFSZ];
+        int verstrsize = 0;
+ 
+        getversionstring(verbuf);
+        verstrsize = strlen(verbuf);
+        if (verstrsize + strlen("\r\n\r\n") + 1  <  BUFSZ - 1)
+            strcat(verbuf, "\r\n\r\n");
+        verstrsize = strlen(verbuf);
 
-        getversionstring(buf + strsize);
-        strcat(buf, "\r\n\r\n");
+        if (strsize + verstrsize + 1 > bufsize) {
+            bufsize += BUFSZ;
+            buf = realloc(buf, bufsize);
+            if (buf == NULL)
+                panic("out of memory");
+        }
+        strcat(buf, verbuf);
         strsize = strlen(buf);
-
+            
         /* Add compile options */
         f = dlb_fopen(OPTIONS_USED, RDTMODE);
         if (f) {

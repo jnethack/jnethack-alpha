@@ -12,6 +12,7 @@
 #include "func_tab.h" /* for extended commands */
 #include "winMS.h"
 #include <assert.h>
+#include <mmsystem.h>
 #include "mhmap.h"
 #include "mhstatus.h"
 #include "mhtext.h"
@@ -1640,6 +1641,8 @@ mswin_getlin(const char *question, char *input)
                     if (len > 0)
                         len--;
                     input[len] = '\0';
+                } else if (len>=(BUFSZ-1)) {
+                    PlaySound((LPCSTR)SND_ALIAS_SYSTEMEXCLAMATION, NULL, SND_ALIAS_ID|SND_ASYNC);
                 } else {
                     input[len++] = c;
                     input[len] = '\0';
