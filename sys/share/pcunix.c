@@ -277,7 +277,10 @@ regularize(s)
  */
 register char *s;
 {
+/*JP
     register char *lp;
+*/
+    register unsigned char *lp;
 
     for (lp = s; *lp; lp++)
         if (*lp <= ' ' || *lp == '"' || (*lp >= '*' && *lp <= ',')
