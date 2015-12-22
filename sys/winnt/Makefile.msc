@@ -121,6 +121,7 @@ MSWSYS= ..\sys\winnt # mswin specific files
 TTY   = ..\win\tty   # window port files (tty)
 MSWIN = ..\win\win32 # window port files (WIN32)
 WSHR  = ..\win\share # Tile support files 
+JP    = ..\japanese  # JP
 
 #
 #  Object directory.
@@ -338,9 +339,9 @@ VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o
 VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o  
 VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
 VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
-VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
+VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monstj.o   
 VOBJ14 = $(O)monstr.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
-VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
+VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objectsj.o $(O)objnam.o  
 VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
 VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
 VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o    
@@ -353,6 +354,7 @@ VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
 VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o     
+JOBJ   = $(O)jlib.o     $(O)jconj.o
 
 DLBOBJ = $(O)dlb.o
 
@@ -394,7 +396,7 @@ SOUND = $(OBJ)\ntsound.o
 
 VVOBJ  = $(O)version.o
 
-ALLOBJ  = $(SOBJ) $(DLBOBJ)  $(WOBJ) $(OBJS) $(VVOBJ)
+ALLOBJ  = $(SOBJ) $(DLBOBJ)  $(WOBJ) $(OBJS) $(VVOBJ) $(JOBJ)
 
 OPTIONS_FILE = $(DAT)\options
 
@@ -498,6 +500,12 @@ DATABASE = $(DAT)\data.base
 {$(TTY)}.c{$(OBJ)}.o:
 	$(cc) $(cflagsBuild)  -Fo$@  $<
 
+#==========================================
+# Rules for files in japanese
+#==========================================
+
+{$(JP)}.c{$(OBJ)}.o:
+	$(cc) $(cflagsBuild)  -Fo$@  $<
 
 #==========================================
 # Rules for files in win\win32
@@ -1517,6 +1525,8 @@ $(O)music.o: music.c $(HACK_H) #interp.c
 $(O)o_init.o: o_init.c $(HACK_H) $(INCL)\lev.h
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
+$(O)objectsj.o: objectsj.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
+		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
 $(O)objnam.o: objnam.c $(HACK_H)
 $(O)options.o: options.c $(CONFIG_H) $(INCL)\objclass.h $(INCL)\flag.h \
 		$(HACK_H) $(INCL)\tcap.h
@@ -1567,6 +1577,14 @@ $(O)worm.o: worm.c $(HACK_H) $(INCL)\lev.h
 $(O)worn.o: worn.c $(HACK_H)
 $(O)write.o: write.c $(HACK_H)
 $(O)zap.o: zap.c $(HACK_H)
+
+#
+# from japanese
+#
+
+$(O)jlib.o:    $(PCH) $(JP)\jlib.c $(HACK_H)
+$(O)jconj.o:   $(PCH) $(JP)\jconj.c $(HACK_H)
+#$(O)jtrns.o:   $(PCH) $(JP)\jtrns.c $(HACK_H) $(INCL)\jdata.h
 
 # end of file
 

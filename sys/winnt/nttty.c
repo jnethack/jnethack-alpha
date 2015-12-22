@@ -486,6 +486,42 @@ char ch;
     xputc_core(ch);
 }
 
+#if 1 /*JP*/
+void
+xputc2_core(ch1, ch2)
+int ch1;
+int ch2;
+{
+    unsigned char buf[2];
+    WORD attrs[2];
+
+    buf[0] = ch1;
+    buf[1] = ch2;
+
+    attrs[0] = attrs[1] = attr;
+
+    WriteConsoleOutputAttribute(hConOut,&attrs,2,
+				cursor,&acount);
+    WriteConsoleOutputCharacter(hConOut,buf,2,
+				cursor,&ccount);
+    cursor.X += 2;
+}
+
+void
+xputc2(ch1, ch2)
+int ch1;
+int ch2;
+{
+    /* wintty.c では 1 バイト毎に curx を加算するが、ここは
+       2 バイトたまってから呼び出されるので、1 文字分先に進んで
+      しまっている。従って 1 を引く。 */
+    cursor.X = ttyDisplay->curx - 1;
+    cursor.Y = ttyDisplay->cury;
+
+    xputc2_core(ch1, ch2);
+}
+#endif
+
 void
 xputs(s)
 const char *s;
@@ -1022,7 +1058,20 @@ VA_DECL(const char *, fmt)
     if (redirect_stdout)
         fprintf(stdout, "%s", buf);
     else {
+#if 0 /*JP*/
         xputs(buf);
+#else
+	if(ttyDisplay){
+	    cursor.X = ttyDisplay->curx;
+	    cursor.Y = ttyDisplay->cury;
+	}
+	{
+	    char *str = buf;
+	    while(*str){
+		jbuffer(*(str++), NULL, NULL, xputc_core, xputc2_core);
+	    }
+	}
+#endif
         if (ttyDisplay)
             curs(BASE_WINDOW, cursor.X + 1, cursor.Y);
     }

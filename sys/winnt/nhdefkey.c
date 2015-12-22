@@ -169,6 +169,7 @@ int portdebug;
         else
             ch = M(tolower(keycode));
     }
+#if 0 /*JP*/
     /* Attempt to work better with international keyboards. */
     else {
         WORD chr[2];
@@ -188,6 +189,11 @@ int portdebug;
                 *valid = FALSE;
             }
     }
+#else
+	if(ch != 0){
+		*valid = TRUE;
+	}
+#endif
     if (ch == '\r')
         ch = '\n';
 #ifdef PORT_DEBUG
