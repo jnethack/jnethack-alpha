@@ -68,6 +68,16 @@ char ch;
     return;
 }
 
+#if 1 /*JP*/
+void
+xputc2(ch1, ch2)
+int ch1;
+int ch2;
+{
+    return;
+}
+#endif
+
 void
 xputs(s)
 const char *s;
