@@ -9,7 +9,10 @@
 
 #include "hack.h"
 #include "artifact.h"
+/*JP
 #include "artilist.h"
+*/
+#include "artilistj.h"
 
 /*
  * Note:  both artilist[] and artiexist[] have a dummy element #0,
