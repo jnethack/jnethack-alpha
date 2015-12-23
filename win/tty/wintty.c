@@ -1068,7 +1068,10 @@ int role, race, gend;
             any.a_int = i + 1;
         else
             any.a_string = aligns[i].adj;
+/*JP
         this_ch = *aligns[i].adj;
+*/
+        this_ch = lowc(*aligns[i].filecode);
         /* (see setup_racemenu for explanation of selector letters
            and setup_rolemenu for preselection) */
         add_menu(win, NO_GLYPH, &any,

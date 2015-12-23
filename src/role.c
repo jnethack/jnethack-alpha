@@ -1049,10 +1049,17 @@ const struct Gender genders[] = {
 
 /* Table of all alignments */
 const struct Align aligns[] = {
+#if 0 /*JP*/
     { "law", "lawful", "Law", ROLE_LAWFUL, A_LAWFUL },
     { "balance", "neutral", "Neu", ROLE_NEUTRAL, A_NEUTRAL },
     { "chaos", "chaotic", "Cha", ROLE_CHAOTIC, A_CHAOTIC },
     { "evil", "unaligned", "Una", 0, A_NONE }
+#else
+    { "’˜", "’˜‚Ì", "Law", ROLE_LAWFUL, A_LAWFUL },
+    { "’†—§", "’†—§‚Ì", "Neu", ROLE_NEUTRAL, A_NEUTRAL },
+    { "¬“×", "¬“×‚Ì", "Cha", ROLE_CHAOTIC, A_CHAOTIC },
+    { "–³S", "–³S‚Ì", "Una", 0, A_NONE }
+#endif
 };
 
 /* Filters */
