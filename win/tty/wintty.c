@@ -998,7 +998,10 @@ int role, gend, algn;
             any.a_int = i + 1;
         else
             any.a_string = races[i].noun;
+/*JP
         this_ch = *races[i].noun;
+*/
+        this_ch = lowc(*races[i].filecode);
         /* filtering: picking race, so choose by first letter, with
            capital letter as unseen accelerator;
            !filtering: resetting filter rather than picking, choose by

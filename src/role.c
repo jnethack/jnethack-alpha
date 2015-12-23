@@ -862,11 +862,21 @@ struct Role urole = {
 /* Table of all races */
 const struct Race races[] = {
     {
+#if 0 /*JP*/
         "human",
         "human",
         "humanity",
+#else
+        "人間",
+        "人間の",
+        "人間",
+#endif
         "Hum",
+#if 0 /*JP*/
         { "man", "woman" },
+#else
+        { "男", "女" },
+#endif
         PM_HUMAN,
         NON_PM,
         PM_HUMAN_MUMMY,
@@ -884,9 +894,15 @@ const struct Race races[] = {
         { 1, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
+#if 0 /*JP*/
         "elf",
         "elven",
         "elvenkind",
+#else
+        "エルフ",
+        "エルフの",
+        "エルフ",
+#endif
         "Elf",
         { 0, 0 },
         PM_ELF,
@@ -905,9 +921,15 @@ const struct Race races[] = {
         { 2, 0, 3, 0, 3, 0 }  /* Energy */
     },
     {
+#if 0 /*JP*/
         "dwarf",
         "dwarven",
         "dwarvenkind",
+#else
+        "ドワーフ",
+        "ドワーフの",
+        "ドワーフ",
+#endif
         "Dwa",
         { 0, 0 },
         PM_DWARF,
@@ -926,9 +948,15 @@ const struct Race races[] = {
         { 0, 0, 0, 0, 0, 0 }  /* Energy */
     },
     {
+#if 0 /*JP*/
         "gnome",
         "gnomish",
         "gnomehood",
+#else
+        "ノーム",
+        "ノームの",
+        "ノーム",
+#endif
         "Gno",
         { 0, 0 },
         PM_GNOME,
@@ -947,9 +975,15 @@ const struct Race races[] = {
         { 2, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
+#if 0 /*JP*/
         "orc",
         "orcish",
         "orcdom",
+#else
+        "オーク",
+        "オークの",
+        "オーク",
+#endif
         "Orc",
         { 0, 0 },
         PM_ORC,
