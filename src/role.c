@@ -24,6 +24,7 @@
  * God names use a leading underscore to flag goddesses.
  */
 const struct Role roles[] = {
+#if 0 /*JP*/
     { { "Archeologist", 0 },
       { { "Digger", 0 },
         { "Field Worker", 0 },
@@ -35,9 +36,27 @@ const struct Role roles[] = {
         { "Collector", 0 },
         { "Curator", 0 } },
       "Quetzalcoatl", "Camaxtli", "Huhetotl", /* Central American */
+#else
+    { { "lŒÃŠwÒ", 0 },
+      { { "zˆõ", 0 },
+        { "˜J“­Ò", 0 },
+        { "’²¸Ò", 0 },
+        { "”­Œ@Ò", 0 },
+        { "Œ@íÒ", 0 },
+        { "’TŒŸÒ", 0 },
+        { "“´ŒAŠwÒ", 0 },
+        { "”üpûWÒ", 0 },
+        { "ŠÙ’·", 0 } },
+      "Quetzalcoatl", "Camaxtli", "Huhetotl", /* Central American */
+#endif
       "Arc",
+#if 0 /*JP*/
       "the College of Archeology",
       "the Tomb of the Toltec Kings",
+#else
+      "lŒÃŠw‘åŠw",
+      "ƒgƒ‹ƒeƒJ‰¤‰Æ‚Ì•æ",
+#endif
       PM_ARCHEOLOGIST,
       NON_PM,
       NON_PM,
@@ -66,6 +85,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_MAGIC_MAPPING,
       -4 },
+#if 0 /*JP*/
     { { "Barbarian", 0 },
       { { "Plunderer", "Plunderess" },
         { "Pillager", 0 },
@@ -77,9 +97,27 @@ const struct Role roles[] = {
         { "Chieftain", "Chieftainess" },
         { "Conqueror", "Conqueress" } },
       "Mitra", "Crom", "Set", /* Hyborian */
+#else
+    { { "–ì”Øl", 0 },
+      { { "“‘¯", 0 },
+        { "—ª’DÒ", 0 },
+        { "ˆ«Š¿", 0 },
+        { "R‘¯", 0 },
+        { "N—ªÒ", 0 },
+        { "‹­“", 0 },
+        { "ECÒ", 0 },
+        { "ñ—Ì", 0 },
+        { "ª•Ò", 0 } },
+      "Mitra", "Crom", "Set", /* Hyborian */
+#endif
       "Bar",
+#if 0 /*JP*/
       "the Camp of the Duali Tribe",
       "the Duali Oasis",
+#else
+      "ƒfƒ…ƒAƒŠ‘°‚ÌƒLƒƒƒ“ƒv",
+      "ƒfƒ…ƒAƒŠ‘°‚ÌƒIƒAƒVƒX",
+#endif
       PM_BARBARIAN,
       NON_PM,
       NON_PM,
@@ -108,6 +146,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_HASTE_SELF,
       -4 },
+#if 0 /*JP*/
     { { "Caveman", "Cavewoman" },
       { { "Troglodyte", 0 },
         { "Aborigine", 0 },
@@ -119,9 +158,27 @@ const struct Role roles[] = {
         { "Rover", 0 },
         { "Pioneer", 0 } },
       "Anu", "_Ishtar", "Anshar", /* Babylonian */
+#else
+    { { "“´ŒAl", 0 },
+      { { "ŒŠ‹l", 0 },
+        { "Œ´Z–¯", 0 },
+        { "•ú˜QÒ", 0 },
+        { "•‚˜QÒ", 0 },
+        { "—·sÒ", 0 },
+        { "•ú—VÒ", 0 },
+        { "—V–q–¯", 0 },
+        { "—¬˜QÒ", 0 },
+        { "æ‹ìÒ", 0 } },
+      "Anu", "_Ishtar", "Anshar", /* Babylonian */
+#endif
       "Cav",
+#if 0 /*JP*/
       "the Caves of the Ancestors",
       "the Dragon's Lair",
+#else
+      "‘¾ŒÃ‚Ì“´ŒA",
+      "—³‚Ì‰B‚ê‰Æ",
+#endif
       PM_CAVEMAN,
       PM_CAVEWOMAN,
       PM_LITTLE_DOG,
@@ -150,6 +207,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_DIG,
       -4 },
+#if 0 /*JP*/
     { { "Healer", 0 },
       { { "Rhizotomist", 0 },
         { "Empiric", 0 },
@@ -161,9 +219,27 @@ const struct Role roles[] = {
         { "Physician", 0 },
         { "Chirurgeon", 0 } },
       "_Athena", "Hermes", "Poseidon", /* Greek */
+#else
+    { { "–òt", 0 },
+      { { "Œ©K‚¢", 0 },
+        { "ˆãtŒ©K‚¢", 0 },
+        { "ŠÅŒìt", "ŠÅŒì•w" },
+        { "ˆãt•è", 0 },
+        { "–ò•¨å”C", 0 },
+        { "Š¿•ûˆã", 0 },
+        { "ˆãtå”C", 0 },
+        { "“à‰Èˆã", 0 },
+        { "ŠO‰Èˆã", 0 } },
+      "_Athena", "Hermes", "Poseidon", /* Greek */
+#endif
       "Hea",
+#if 0 /*JP*/
       "the Temple of Epidaurus",
       "the Temple of Coeus",
+#else
+      "ƒGƒsƒ_ƒEƒƒX›‰@",
+      "ƒRƒCƒIƒX›‰@",
+#endif
       PM_HEALER,
       NON_PM,
       NON_PM,
@@ -191,6 +267,7 @@ const struct Role roles[] = {
       A_WIS,
       SPE_CURE_SICKNESS,
       -4 },
+#if 0 /*JP*/
     { { "Knight", 0 },
       { { "Gallant", 0 },
         { "Esquire", 0 },
@@ -202,9 +279,27 @@ const struct Role roles[] = {
         { "Seignieur", "Dame" },
         { "Paladin", 0 } },
       "Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
+#else
+    { { "‹Rm", 0 },
+      { { "Œ©K‚¢", 0 },
+        { "•à•º", 0 },
+        { "ím", 0 },
+        { "‹R•º", 0 },
+        { "dím", 0 },
+        { "‹Rm", 0 },
+        { "d‹Rm", 0 },
+        { "ŒM‹Rm", 0 },
+        { "¹‹Rm", 0 } },
+      "Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
+#endif
       "Kni",
+#if 0 /*JP*/
       "Camelot Castle",
       "the Isle of Glass",
+#else
+      "ƒLƒƒƒƒƒbƒgé",
+      "ƒKƒ‰ƒX‚Ì“‡",
+#endif
       PM_KNIGHT,
       NON_PM,
       PM_PONY,
@@ -232,6 +327,7 @@ const struct Role roles[] = {
       A_WIS,
       SPE_TURN_UNDEAD,
       -4 },
+#if 0 /*JP*/
     { { "Monk", 0 },
       { { "Candidate", 0 },
         { "Novice", 0 },
@@ -243,9 +339,27 @@ const struct Role roles[] = {
         { "Student of Fire", 0 },
         { "Master", 0 } },
       "Shan Lai Ching", "Chih Sung-tzu", "Huan Ti", /* Chinese */
+#else
+    { { "•“¬‰Æ", 0 },
+      { { "“ü–åŠó–]Ò", 0 },
+        { "‰SÒ", 0 },
+        { "“ü–åÒ“`", 0 },
+        { "“y‚ÌK‚¢è", 0 },
+        { "…‚ÌK‚¢è", 0 },
+        { "‹à‚ÌK‚¢è", 0 },
+        { "–Ø‚ÌK‚¢è", 0 },
+        { "‰Î‚ÌK‚¢è", 0 },
+        { "–Æ‹–ŠF“`", 0 } },
+      "Shan Lai Ching", "Chih Sung-tzu", "Huan Ti", /* Chinese */
+#endif
       "Mon",
+#if 0 /*JP*/
       "the Monastery of Chan-Sune",
       "the Monastery of the Earth-Lord",
+#else
+      "ƒ`ƒƒƒ“EƒX[C“¹‰@",
+      "’n‰¤‚ÌC“¹‰@",
+#endif
       PM_MONK,
       NON_PM,
       NON_PM,
@@ -274,6 +388,7 @@ const struct Role roles[] = {
       A_WIS,
       SPE_RESTORE_ABILITY,
       -4 },
+#if 0 /*JP*/
     { { "Priest", "Priestess" },
       { { "Aspirant", 0 },
         { "Acolyte", 0 },
@@ -285,9 +400,27 @@ const struct Role roles[] = {
         { "Patriarch", "Matriarch" },
         { "High Priest", "High Priestess" } },
       0, 0, 0, /* deities from a randomly chosen other role will be used */
+#else
+    { { "‘m—µ", "“ò‘m" },
+      { { "C“¹Ò", "C“¹—" },
+        { "˜Ò", 0 },
+        { "˜Õ", 0 },
+        { "‘m—µ", "“ò‘m" },
+        { "•”CiÕ", 0 },
+        { "¹Ò", "¹—" },
+        { "i‹³", 0 },
+        { "‘åi‹³", 0 },
+        { "‘å‘mã", 0 } },
+      0, 0, 0, /* deities from a randomly chosen other role will be used */
+#endif
       "Pri",
+#if 0 /*JP*/
       "the Great Temple",
       "the Temple of Nalzok",
+#else
+      "ˆÌ‘å‚È‚é›‰@",
+      "ƒiƒ‹ƒ]ƒN›‰@",
+#endif
       PM_PRIEST,
       PM_PRIESTESS,
       NON_PM,
@@ -318,6 +451,7 @@ const struct Role roles[] = {
       -4 },
     /* Note:  Rogue precedes Ranger so that use of `-R' on the command line
        retains its traditional meaning. */
+#if 0 /*JP*/
     { { "Rogue", 0 },
       { { "Footpad", 0 },
         { "Cutpurse", 0 },
@@ -329,9 +463,27 @@ const struct Role roles[] = {
         { "Magsman", "Magswoman" },
         { "Thief", 0 } },
       "Issek", "Mog", "Kos", /* Nehwon */
+#else
+    { { "“‘¯", 0 },
+      { { "’Ç‚¢‚Í‚¬", 0 },
+        { "‚Ğ‚Á‚½‚­‚è", 0 },
+        { "ƒXƒŠ", 0 },
+        { "‚²‚ë‚Â‚«", 0 },
+        { "‚±‚»‚Ç‚ë", 0 },
+        { "‹ó‘ƒ", 0 },
+        { "“D–_", 0 },
+        { "‹­“", 0 },
+        { "‘å“D–_", 0 } },
+      "Issek", "Mog", "Kos", /* Nehwon */
+#endif
       "Rog",
+#if 0 /*JP*/
       "the Thieves' Guild Hall",
       "the Assassins' Guild Hall",
+#else
+      "“‘¯ƒMƒ‹ƒh",
+      "ˆÃEÒƒMƒ‹ƒh",
+#endif
       PM_ROGUE,
       NON_PM,
       NON_PM,
@@ -359,6 +511,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_DETECT_TREASURE,
       -4 },
+#if 0 /*JP*/
     { { "Ranger", 0 },
       {
 #if 0 /* OBSOLETE */
@@ -384,9 +537,27 @@ const struct Role roles[] = {
         { "Sharpshooter", 0 },
         { "Marksman", "Markswoman" } },
       "Mercury", "_Venus", "Mars", /* Roman/planets */
+#else
+    { { "ƒŒƒ“ƒWƒƒ[", 0 },
+      { { "V•Ä", 0 },
+        { "Œ©’£‚è", 0 },
+        { "æ“±", 0 },
+        { "’ã@", 0 },
+        { "ËŒó", 0 },
+        { "‹|•º", 0 }, /* One skilled at crossbows */
+        { "’†‹‰‹|•º", 0 },
+        { "ã‹‰‹|•º", 0 },
+        { "ã‹‰‹|•º", 0 } },
+      "Mercury", "_Venus", "Mars", /* Roman/planets */
+#endif
       "Ran",
+#if 0 /*JP*/
       "Orion's camp",
       "the cave of the wumpus",
+#else
+      "ƒIƒŠƒIƒ“‚ÌƒLƒƒƒ“ƒv",
+      "ƒƒ“ƒpƒX‚Ì“´ŒA",
+#endif
       PM_RANGER,
       NON_PM,
       PM_LITTLE_DOG /* Orion & canis major */,
@@ -415,6 +586,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_INVISIBILITY,
       -4 },
+#if 0 /*JP*/
     { { "Samurai", 0 },
       { { "Hatamoto", 0 },       /* Banner Knight */
         { "Ronin", 0 },          /* no allegiance */
@@ -426,9 +598,27 @@ const struct Role roles[] = {
         { "Kuge", 0 },           /* Noble of the Court */
         { "Shogun", 0 } },       /* supreme commander, warlord */
       "_Amaterasu Omikami", "Raijin", "Susanowo", /* Japanese */
+#else
+    { { "˜", 0 },
+      { { "Šø–{", 0 },       /* Banner Knight */
+        { "˜Ql", 0 },          /* no allegiance */
+        { "”EÒ", "‚­ƒmˆê" }, /* secret society */
+        { "éå", 0 },          /* heads a castle */
+        { "—Ìå", 0 },         /* has a territory */
+        { "—Ìå", 0 },        /* heads a province */
+        { "‘å–¼", "˜Œ³" },         /* a samurai lord */
+        { "Œö‰Æ", 0 },           /* Noble of the Court */
+        { "Œö‰Æ", "‘å‰œ" } },       /* supreme commander, warlord */
+      "_Amaterasu Omikami", "Raijin", "Susanowo", /* Japanese */
+#endif
       "Sam",
+#if 0 /*JP*/
       "the Castle of the Taro Clan",
       "the Shogun's Castle",
+#else
+      "‘¾˜Yˆê‘°‚Ìé",
+      "«ŒR‚Ìé",
+#endif
       PM_SAMURAI,
       NON_PM,
       PM_LITTLE_DOG,
@@ -456,6 +646,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_CLAIRVOYANCE,
       -4 },
+#if 0 /*JP*/
     { { "Tourist", 0 },
       { { "Rambler", 0 },
         { "Sightseer", 0 },
@@ -467,9 +658,27 @@ const struct Role roles[] = {
         { "Explorer", 0 },
         { "Adventurer", 0 } },
       "Blind Io", "_The Lady", "Offler", /* Discworld */
+#else
+    { { "ŠÏŒõ‹q", 0 },
+      { { "ƒv[‘¾˜Y", "ƒv[q" },
+        { "ŠÏŒõ‹q", 0 },
+        { "ü—V—·sÒ", 0 },
+        { "•Õ—ğÒ", 0 },
+        { "—·sÒ", 0 },
+        { "—·l", 0 },
+        { "qŠCÒ", 0 },
+        { "’TŒŸ‰Æ", 0 },
+        { "–`Œ¯Ò", 0 } },
+      "Blind Io", "_The Lady", "Offler", /* Discworld */
+#endif
       "Tou",
+#if 0 /*JP*/
       "Ankh-Morpork",
       "the Thieves' Guild Hall",
+#else
+      "–`Œ¯Ò",
+      "“‘¯ƒMƒ‹ƒh",
+#endif
       PM_TOURIST,
       NON_PM,
       NON_PM,
@@ -497,6 +706,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_CHARM_MONSTER,
       -4 },
+#if 0 /*JP*/
     { { "Valkyrie", 0 },
       { { "Stripling", 0 },
         { "Skirmisher", 0 },
@@ -508,9 +718,27 @@ const struct Role roles[] = {
         { "Champion", 0 },
         { "Lord", "Lady" } },
       "Tyr", "Odin", "Loki", /* Norse */
+#else
+    { { "ƒƒ‹ƒLƒ…[ƒŒ", 0 },
+      { { "Œ©K‚¢", 0 },
+        { "•à•º", 0 },
+        { "ím", 0 },
+        { "‹R•º", 0 },
+        { "í“¬•º", 0 },
+        { "UŒ‚•º", 0 },
+        { "‰p—Y", 0 },
+        { "æ“±Ò", 0 },
+        { "ƒ[ƒh", "ƒŒƒfƒB" } },
+      "Tyr", "Odin", "Loki", /* Norse */
+#endif
       "Val",
+#if 0 /*JP*/
       "the Shrine of Destiny",
       "the cave of Surtur",
+#else
+      "‰^–½‚Ì¹“°",
+      "ƒXƒ‹ƒg‚Ì“´ŒA",
+#endif
       PM_VALKYRIE,
       NON_PM,
       NON_PM /*PM_WINTER_WOLF_CUB*/,
@@ -538,6 +766,7 @@ const struct Role roles[] = {
       A_WIS,
       SPE_CONE_OF_COLD,
       -4 },
+#if 0 /*JP*/
     { { "Wizard", 0 },
       { { "Evoker", 0 },
         { "Conjurer", 0 },
@@ -549,9 +778,27 @@ const struct Role roles[] = {
         { "Wizard", 0 },
         { "Mage", 0 } },
       "Ptah", "Thoth", "Anhur", /* Egyptian */
+#else
+    { { "–‚–@g‚¢", 0 },
+      { { "è•it", 0 },
+        { "Šïpt", 0 },
+        { "è‚¢t", 0 },
+        { "—ìŠ´t", 0 },
+        { "¢Š«t", 0 },
+        { "—dpt", 0 },
+        { "–‚pt", 0 },
+        { "–‚–@g‚¢", 0 },
+        { "‘å–‚–@g‚¢", 0 } },
+      "Ptah", "Thoth", "Anhur", /* Egyptian */
+#endif
       "Wiz",
+#if 0 /*JP*/
       "the Lonely Tower",
       "the Tower of Darkness",
+#else
+      "ŒÇ‚‚Ì“ƒ",
+      "ˆÃ•‚Ì“ƒ",
+#endif
       PM_WIZARD,
       NON_PM,
       PM_KITTEN,

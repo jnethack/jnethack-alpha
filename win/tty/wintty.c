@@ -952,7 +952,10 @@ int race, gend, algn; /* all ROLE_NONE for !filtering case */
             any.a_int = i + 1;
         else
             any.a_string = roles[i].name.m;
+/*JP
         thisch = lowc(*roles[i].name.m);
+*/
+        thisch = lowc(*roles[i].filecode);
         if (thisch == lastch)
             thisch = highc(thisch);
         Strcpy(rolenamebuf, roles[i].name.m);
