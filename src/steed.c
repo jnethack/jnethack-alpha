@@ -354,7 +354,12 @@ exercise_steed()
 void
 kick_steed()
 {
+#if 0 /*JP*/
     char He[4];
+#else
+	/* role.c Gender.he の値がコピーされる */
+	char He[16];
+#endif
     if (!u.usteed)
         return;
 

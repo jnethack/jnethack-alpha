@@ -1034,7 +1034,10 @@ int role, race, algn;
             any.a_int = i + 1;
         else
             any.a_string = genders[i].adj;
+/*JP
         this_ch = *genders[i].adj;
+*/
+        this_ch = lowc(*genders[i].filecode);
         /* (see setup_racemenu for explanation of selector letters
            and setup_rolemenu for preselection) */
         add_menu(win, NO_GLYPH, &any,

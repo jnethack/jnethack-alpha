@@ -1031,10 +1031,20 @@ struct Race urace = {
 };
 
 /* Table of all genders */
+/*JP:
+- steed.c kick_steed() He[] に値がコピーされるので長さを変えたときには
+  該当部も要修正。
+*/
 const struct Gender genders[] = {
+#if 0 /*JP*/
     { "male", "he", "him", "his", "Mal", ROLE_MALE },
     { "female", "she", "her", "her", "Fem", ROLE_FEMALE },
     { "neuter", "it", "it", "its", "Ntr", ROLE_NEUTER }
+#else
+    { "男性", "彼", "彼", "彼の", "Mal", ROLE_MALE },
+    { "女性", "彼女", "彼女", "彼女の", "Fem", ROLE_FEMALE },
+    { "中性", "それ", "それ", "その", "Ntr", ROLE_NEUTER }
+#endif
 };
 
 /* Table of all alignments */
