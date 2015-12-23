@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 #include "lev.h"
 
@@ -82,7 +87,11 @@ char *engr;
 int cnt;
 unsigned seed; /* for semi-controlled randomization */
 {
+#if 0 /*JP*/
     char *s;
+#else
+    unsigned char *s;
+#endif
     int i, j, nxt, use_rubout, lth = (int) strlen(engr);
 
     if (lth && cnt > 0) {
@@ -100,7 +109,22 @@ unsigned seed; /* for semi-controlled randomization */
                 seed *= 31, seed %= (BUFSZ - 1);
                 use_rubout = seed & 3;
             }
+#if 0 /*JP*/
             s = &engr[nxt];
+#else /*JP: 日本語の場合はjrubout()を使って消す*/
+            if (!seed)
+                j = rn2(2);
+            else {
+                seed *= 31,  seed %= (BUFSZ-1);
+                j = seed % 2;
+            }
+
+            if(jrubout(engr, nxt, use_rubout, j)){
+                continue;
+            }
+
+            s = (unsigned char *)&engr[nxt];
+#endif
             if (*s == ' ')
                 continue;
 
@@ -181,28 +205,61 @@ register int x, y;
     register struct rm *lev = &levl[x][y];
 
     if (x == u.ux && y == u.uy && u.uswallow && is_animal(u.ustuck->data))
+/*JP
         return "maw";
+*/
+        return "胃袋";
     else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz))
+/*JP
         return "air";
+*/
+        return "空中";
     else if (is_pool(x, y))
+/*JP
         return (Underwater && !Is_waterlevel(&u.uz)) ? "bottom" : "water";
+*/
+        return (Underwater && !Is_waterlevel(&u.uz)) ? "水の底" : "水中";
     else if (is_ice(x, y))
+/*JP
         return "ice";
+*/
+        return "氷";
     else if (is_lava(x, y))
+/*JP
         return "lava";
+*/
+        return "溶岩";
     else if (lev->typ == DRAWBRIDGE_DOWN)
+/*JP
         return "bridge";
+*/
+        return "橋";
     else if (IS_ALTAR(levl[x][y].typ))
+/*JP
         return "altar";
+*/
+        return "祭壇";
     else if (IS_GRAVE(levl[x][y].typ))
+/*JP
         return "headstone";
+*/
+        return "墓石";
     else if (IS_FOUNTAIN(levl[x][y].typ))
+/*JP
         return "fountain";
+*/
+        return "泉";
     else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
              || IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
+/*JP
         return "floor";
+*/
+        return "床";
     else
+/*JP
         return "ground";
+*/
+        return "地面";
 }
 
 const char *
@@ -216,23 +273,47 @@ register int x, y;
      * see check_special_room()
      */
     if (*in_rooms(x, y, VAULT))
+/*JP
         what = "vault's ceiling";
+*/
+        what = "倉庫の天井";
     else if (*in_rooms(x, y, TEMPLE))
+/*JP
         what = "temple's ceiling";
+*/
+        what = "寺院の天井";
     else if (*in_rooms(x, y, SHOPBASE))
+/*JP
         what = "shop's ceiling";
+*/
+        what = "店の天井";
     else if (Is_waterlevel(&u.uz))
         /* water plane has no surface; its air bubbles aren't below sky */
+/*JP
         what = "water above";
+*/
+        what = "水の上方";
     else if (IS_AIR(lev->typ))
+/*JP
         what = "sky";
+*/
+        what = "空";
     else if (Underwater)
+/*JP
         what = "water's surface";
+*/
+        what = "水面";
     else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
              || IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
+/*JP
         what = "ceiling";
+*/
+        what = "天井";
     else
+/*JP
         what = "rock cavern";
+*/
+        what = "洞窟の天井";
 
     return what;
 }
@@ -321,29 +402,46 @@ int x, y;
         case DUST:
             if (!Blind) {
                 sensed = 1;
+#if 0 /*JP*/
                 pline("%s is written here in the %s.", Something,
                       is_ice(x, y) ? "frost" : "dust");
+#else
+                pline("何かの文字が%sに書いてある．",
+                      is_ice(x, y) ? "霜" : "ほこり");
+#endif
             }
             break;
         case ENGRAVE:
         case HEADSTONE:
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
+/*JP
                 pline("%s is engraved here on the %s.", Something,
+*/
+                pline("何かの文字が%sに刻まれている．",
                       surface(x, y));
             }
             break;
         case BURN:
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
+#if 0 /*JP*/
                 pline("Some text has been %s into the %s here.",
                       is_ice(x, y) ? "melted" : "burned", surface(x, y));
+#else
+                pline("何かの文字が%s%sいる．",
+                      surface(x,y),
+                      is_ice(x,y) ? "に刻まれて" : "に焼き付けられて");
+#endif
             }
             break;
         case MARK:
             if (!Blind) {
                 sensed = 1;
+/*JP
                 pline("There's some graffiti on the %s here.", surface(x, y));
+*/
+                pline("%sに落書がある．", surface(x,y));
             }
             break;
         case ENGR_BLOOD:
@@ -353,7 +451,10 @@ int x, y;
              */
             if (!Blind) {
                 sensed = 1;
+/*JP
                 You_see("a message scrawled in blood here.");
+*/
+                You("血文字がなぐり書きされているのを見つけた．");
             }
             break;
         default:
@@ -362,14 +463,20 @@ int x, y;
         }
         if (sensed) {
             char *et;
+/*JP
             unsigned maxelen = BUFSZ - sizeof("You feel the words: \"\". ");
+*/
+            unsigned maxelen = BUFSZ - sizeof("あなたは次のように感じた：「」");
             if (strlen(ep->engr_txt) > maxelen) {
                 (void) strncpy(buf, ep->engr_txt, (int) maxelen);
                 buf[maxelen] = '\0';
                 et = buf;
             } else
                 et = ep->engr_txt;
+/*JP
             You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
+*/
+            You("%s：「%s」", (Blind) ? "次のように感じた" : "読んだ",  et);
             if (context.run > 1)
                 nomul(0);
         }
@@ -414,7 +521,7 @@ int x, y;
 }
 
 /*
- *	freehand - returns true if player has a free hand
+ *      freehand - returns true if player has a free hand
  */
 int
 freehand()
@@ -429,30 +536,30 @@ static NEARDATA const char styluses[] = { ALL_CLASSES, ALLOW_NONE,
                                           RING_CLASS,  0 };
 
 /* Mohs' Hardness Scale:
- *  1 - Talc		 6 - Orthoclase
- *  2 - Gypsum		 7 - Quartz
- *  3 - Calcite		 8 - Topaz
- *  4 - Fluorite	 9 - Corundum
- *  5 - Apatite		10 - Diamond
+ *  1 - Talc             6 - Orthoclase
+ *  2 - Gypsum           7 - Quartz
+ *  3 - Calcite          8 - Topaz
+ *  4 - Fluorite         9 - Corundum
+ *  5 - Apatite         10 - Diamond
  *
  * Since granite is an igneous rock hardness ~ 7, anything >= 8 should
  * probably be able to scratch the rock.
  * Devaluation of less hard gems is not easily possible because obj struct
  * does not contain individual oc_cost currently. 7/91
  *
- * steel     -	5-8.5	(usu. weapon)
- * diamond    - 10			* jade	     -	5-6	 (nephrite)
- * ruby       -  9	(corundum)	* turquoise  -	5-6
- * sapphire   -  9	(corundum)	* opal	     -	5-6
- * topaz      -  8			* glass      - ~5.5
- * emerald    -  7.5-8	(beryl)		* dilithium  -	4-5??
- * aquamarine -  7.5-8	(beryl)		* iron	     -	4-5
- * garnet     -  7.25	(var. 6.5-8)	* fluorite   -	4
- * agate      -  7	(quartz)	* brass      -	3-4
- * amethyst   -  7	(quartz)	* gold	     -	2.5-3
- * jasper     -  7	(quartz)	* silver     -	2.5-3
- * onyx       -  7	(quartz)	* copper     -	2.5-3
- * moonstone  -  6	(orthoclase)	* amber      -	2-2.5
+ * steel     -  5-8.5   (usu. weapon)
+ * diamond    - 10                      * jade       -  5-6      (nephrite)
+ * ruby       -  9      (corundum)      * turquoise  -  5-6
+ * sapphire   -  9      (corundum)      * opal       -  5-6
+ * topaz      -  8                      * glass      - ~5.5
+ * emerald    -  7.5-8  (beryl)         * dilithium  -  4-5??
+ * aquamarine -  7.5-8  (beryl)         * iron       -  4-5
+ * garnet     -  7.25   (var. 6.5-8)    * fluorite   -  4
+ * agate      -  7      (quartz)        * brass      -  3-4
+ * amethyst   -  7      (quartz)        * gold       -  2.5-3
+ * jasper     -  7      (quartz)        * silver     -  2.5-3
+ * onyx       -  7      (quartz)        * copper     -  2.5-3
+ * moonstone  -  6      (orthoclase)    * amber      -  2-2.5
  */
 
 /* return 1 if action took 1 (or more) moves, 0 if error or aborted */
@@ -497,7 +604,10 @@ doengrave()
 
     if (u.uswallow) {
         if (is_animal(u.ustuck->data)) {
+/*JP
             pline("What would you write?  \"Jonah was here\"?");
+*/
+            pline("何を書くんだい？「ヨナはここにいる」？");
             return 0;
         } else if (is_whirly(u.ustuck->data)) {
             cant_reach_floor(u.ux, u.uy, FALSE, FALSE);
@@ -505,22 +615,37 @@ doengrave()
         } else
             jello = TRUE;
     } else if (is_lava(u.ux, u.uy)) {
+/*JP
         You_cant("write on the %s!", surface(u.ux, u.uy));
+*/
+        You("%sに届かない．", surface(u.ux,u.uy));
         return 0;
     } else if (is_pool(u.ux, u.uy) || IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
+/*JP
         You_cant("write on the %s!", surface(u.ux, u.uy));
+*/
+        You("%sには書けない！", surface(u.ux, u.uy));
         return 0;
     }
     if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) /* in bubble */) {
+/*JP
         You_cant("write in thin air!");
+*/
+        You("空中には書けない！");
         return 0;
     } else if (!accessible(u.ux, u.uy)) {
         /* stone, tree, wall, secret corridor, pool, lava, bars */
+/*JP
         You_cant("write here.");
+*/
+        You_cant("ここには書けない．");
         return 0;
     }
     if (cantwield(youmonst.data)) {
+/*JP
         You_cant("even hold anything!");
+*/
+        You("何かを持つことすらできない！");
         return 0;
     }
     if (check_capacity((char *) 0))
@@ -544,13 +669,22 @@ doengrave()
      * while both your hands are tied up.
      */
     if (!freehand() && otmp != uwep && !otmp->owornmask) {
+/*JP
         You("have no free %s to write with!", body_part(HAND));
+*/
+        pline("%sの自由が効かないので書けない！", body_part(HAND));
         return 0;
     }
 
     if (jello) {
+/*JP
         You("tickle %s with %s.", mon_nam(u.ustuck), writer);
+*/
+                You("%sで%sをくすぐった．", writer, mon_nam(u.ustuck));
+/*JP
         Your("message dissolves...");
+*/
+                Your("メッセージは消えた．．．");
         return 0;
     }
     if (otmp->oclass != WAND_CLASS && !can_reach_floor(TRUE)) {
@@ -558,17 +692,26 @@ doengrave()
         return 0;
     }
     if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
+/*JP
         You("make a motion towards the altar with %s.", writer);
+*/
+        You("%sを使って祭壇に書こうとした．", writer);
         altar_wrath(u.ux, u.uy);
         return 0;
     }
     if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
         if (otmp == &zeroobj) { /* using only finger */
+/*JP
             You("would only make a small smudge on the %s.",
+*/
+            You("は%sに小さなしみをつけることしかできなかった．",
                 surface(u.ux, u.uy));
             return 0;
         } else if (!levl[u.ux][u.uy].disturbed) {
+/*JP
             You("disturb the undead!");
+*/
+            You("不死の者の眠りを妨げた！");
             levl[u.ux][u.uy].disturbed = 1;
             (void) makemon(&mons[PM_GHOUL], u.ux, u.uy, NO_MM_FLAGS);
             exercise(A_WIS, FALSE);
@@ -603,15 +746,23 @@ doengrave()
     /* Objects too large to engrave with */
     case BALL_CLASS:
     case ROCK_CLASS:
+/*JP
         You_cant("engrave with such a large object!");
+*/
+        pline("そんな大きなものを使って文字を刻めない！");
         ptext = FALSE;
         break;
     /* Objects too silly to engrave with */
     case FOOD_CLASS:
     case SCROLL_CLASS:
     case SPBOOK_CLASS:
+#if 0 /*JP*/
         pline("%s would get %s.", Yname2(otmp),
               is_ice(u.ux, u.uy) ? "all frosty" : "too dirty");
+#else
+        Your("%sは%sなった．", xname(otmp),
+             is_ice(u.ux,u.uy) ? "霜だらけに" : "汚なく");
+#endif
         ptext = FALSE;
         break;
     case RANDOM_CLASS: /* This should mean fingers */
@@ -653,17 +804,26 @@ doengrave()
              */
             case WAN_STRIKING:
                 Strcpy(post_engr_text,
+/*JP
                     "The wand unsuccessfully fights your attempt to write!");
+*/
+                       "あなたが書こうとすると杖は抵抗した！");
                 break;
             case WAN_SLOW_MONSTER:
                 if (!Blind) {
+/*JP
                     Sprintf(post_engr_text, "The bugs on the %s slow down!",
+*/
+                    Sprintf(post_engr_text, "%sの上の虫の動きが遅くなった！",
                             surface(u.ux, u.uy));
                 }
                 break;
             case WAN_SPEED_MONSTER:
                 if (!Blind) {
+/*JP
                     Sprintf(post_engr_text, "The bugs on the %s speed up!",
+*/
+                    Sprintf(post_engr_text, "%sの上の虫の動きが速くなった！",
                             surface(u.ux, u.uy));
                 }
                 break;
@@ -687,7 +847,10 @@ doengrave()
                 ptext = TRUE;
                 if (!Blind) {
                     Sprintf(post_engr_text,
+/*JP
                             "The %s is riddled by bullet holes!",
+*/
+                            "%sは散弾で細かい穴だらけになった！",
                             surface(u.ux, u.uy));
                 }
                 break;
@@ -695,21 +858,30 @@ doengrave()
             case WAN_SLEEP:
             case WAN_DEATH:
                 if (!Blind) {
+/*JP
                     Sprintf(post_engr_text, "The bugs on the %s stop moving!",
+*/
+                    Sprintf(post_engr_text, "%sの上の虫の動きが止まった！",
                             surface(u.ux, u.uy));
                 }
                 break;
             case WAN_COLD:
                 if (!Blind)
                     Strcpy(post_engr_text,
+/*JP
                            "A few ice cubes drop from the wand.");
+*/
+                           "氷のかけらが杖からこぼれ落ちた．");
                 if (!oep || (oep->engr_type != BURN))
                     break;
             case WAN_CANCELLATION:
             case WAN_MAKE_INVISIBLE:
                 if (oep && oep->engr_type != HEADSTONE) {
                     if (!Blind)
+/*JP
                         pline_The("engraving on the %s vanishes!",
+*/
+                        pline("%sの上の文字は消えた！",
                                   surface(u.ux, u.uy));
                     dengr = TRUE;
                 }
@@ -717,7 +889,10 @@ doengrave()
             case WAN_TELEPORTATION:
                 if (oep && oep->engr_type != HEADSTONE) {
                     if (!Blind)
+/*JP
                         pline_The("engraving on the %s vanishes!",
+*/
+                        pline("%sの上の文字は消えた！",
                                   surface(u.ux, u.uy));
                     teleengr = TRUE;
                 }
@@ -728,9 +903,13 @@ doengrave()
                 type = ENGRAVE;
                 if (!objects[otmp->otyp].oc_name_known) {
                     if (flags.verbose)
+/*JP
                         pline("This %s is a wand of digging!", xname(otmp));
+*/
+                        pline("これは穴掘りの杖だ！");
                     doknown = TRUE;
                 }
+#if 0 /*JP*/
                 Strcpy(post_engr_text,
                        Blind
                           ? "You hear drilling!"
@@ -742,6 +921,19 @@ doengrave()
                                    == DRAWBRIDGE_DOWN)
                                    ? "Splinters fly up from the bridge."
                                    : "Gravel flies up from the floor.");
+#else
+                Strcpy(post_engr_text,
+                       Blind
+                          ? "穴が開く音を聞いた！"
+                          : IS_GRAVE(levl[u.ux][u.uy].typ)
+                             ? "墓石から破片が飛び散った．"
+                             : is_ice(u.ux,u.uy)
+                                ? "氷の表面から氷のかけらが飛び散った．"
+                                : (level.locations[u.ux][u.uy].typ
+                                   == DRAWBRIDGE_DOWN)
+                                   ? "破片が橋から舞いあがった．"
+                                   : "砂利が床から飛び散った．");
+#endif
                 break;
             /* type = BURN wands */
             case WAN_FIRE:
@@ -749,25 +941,42 @@ doengrave()
                 type = BURN;
                 if (!objects[otmp->otyp].oc_name_known) {
                     if (flags.verbose)
+/*JP
                         pline("This %s is a wand of fire!", xname(otmp));
+*/
+                        pline("これは炎の杖だ！");
                     doknown = TRUE;
                 }
+#if 0 /*JP*/
                 Strcpy(post_engr_text, Blind ? "You feel the wand heat up."
                                              : "Flames fly from the wand.");
+#else
+                Strcpy(post_engr_text, Blind ? "杖が暖かくなったような気がした．"
+                                             : "炎が杖から飛び散った．");
+#endif
                 break;
             case WAN_LIGHTNING:
                 ptext = TRUE;
                 type = BURN;
                 if (!objects[otmp->otyp].oc_name_known) {
                     if (flags.verbose)
+/*JP
                         pline("This %s is a wand of lightning!", xname(otmp));
+*/
+                        pline("これは雷の杖だ！");
                     doknown = TRUE;
                 }
                 if (!Blind) {
+/*JP
                     Strcpy(post_engr_text, "Lightning arcs from the wand.");
+*/
+                    Strcpy(post_engr_text, "火花が杖から飛び散った．");
                     doblind = TRUE;
                 } else
+/*JP
                     Strcpy(post_engr_text, "You hear crackling!");
+*/
+                    Strcpy(post_engr_text, "パチパチという音を聞いた！");
                 break;
 
             /* type = MARK wands */
@@ -784,7 +993,10 @@ doengrave()
                     zapwand = TRUE;
                 /* empty wand just doesn't write */
                 else
+/*JP
                     pline_The("wand is too worn out to engrave.");
+*/
+                    pline_The("杖は文字を刻むには使いすぎている．");
             }
         }
         break;
@@ -794,20 +1006,29 @@ doengrave()
             if ((int) otmp->spe > -3)
                 type = ENGRAVE;
             else
+/*JP
                 pline("%s too dull for engraving.", Yobjnam2(otmp, "are"));
+*/
+                pline("%sは刃がボロボロで，文字を彫れない．", xname(otmp));
         }
         break;
 
     case TOOL_CLASS:
         if (otmp == ublindf) {
             pline(
+/*JP
                 "That is a bit difficult to engrave with, don't you think?");
+*/
+                "ちょっとそれで彫るのは大変だろう，そう思わない？");
             return 0;
         }
         switch (otmp->otyp) {
         case MAGIC_MARKER:
             if (otmp->spe <= 0)
+/*JP
                 Your("marker has dried out.");
+*/
+                Your("マーカは乾ききった．");
             else
                 type = MARK;
             break;
@@ -821,16 +1042,32 @@ doengrave()
                     if (is_wet_towel(otmp))
                         dry_a_towel(otmp, -1, TRUE);
                     if (!Blind)
+/*JP
                         You("wipe out the message here.");
+*/
+                        You("メッセージを拭きとった．");
                     else
+#if 0 /*JP*/
                         pline("%s %s.", Yobjnam2(otmp, "get"),
                               is_ice(u.ux, u.uy) ? "frosty" : "dusty");
+#else
+                        pline("%sは%sになった．", xname(otmp),
+                              is_ice(u.ux,u.uy) ? "霜だらけ" : "ほこりまみれ");
+#endif
                     dengr = TRUE;
                 } else
+/*JP
                     pline("%s can't wipe out this engraving.", Yname2(otmp));
+*/
+                    pline("この文字は%sでは拭きとれない．", xname(otmp));
             else
+#if 0 /*JP*/
                 pline("%s %s.", Yobjnam2(otmp, "get"),
                       is_ice(u.ux, u.uy) ? "frosty" : "dusty");
+#else
+                pline("%sは%sになった．", xname(otmp),
+                      is_ice(u.ux,u.uy) ? "霜だらけ" : "ほこりまみれ");
+#endif
             break;
         default:
             break;
@@ -839,7 +1076,10 @@ doengrave()
 
     case VENOM_CLASS:
         if (wizard) {
+/*JP
             pline("Writing a poison pen letter??");
+*/
+            pline("ふむ．これこそ本当の毒舌だ．");
             break;
         }
         /*FALLTHRU*/
@@ -881,16 +1121,30 @@ doengrave()
     /* Something has changed the engraving here */
     if (*buf) {
         make_engr_at(u.ux, u.uy, buf, moves, type);
+/*JP
         pline_The("engraving now reads: \"%s\".", buf);
+*/
+        pline("刻まれた文字を読んだ：「%s」．", buf);
         ptext = FALSE;
     }
     if (zapwand && (otmp->spe < 0)) {
+#if 0 /*JP*/
         pline("%s %sturns to dust.", The(xname(otmp)),
               Blind ? "" : "glows violently, then ");
+#else
+        pline("%sは%sちりとなった．", xname(otmp),
+              Blind ? "" : "激しく輝き，");
+#endif
         if (!IS_GRAVE(levl[u.ux][u.uy].typ))
+#if 0 /*JP*/
             You(
     "are not going to get anywhere trying to write in the %s with your dust.",
                 is_ice(u.ux, u.uy) ? "frost" : "dust");
+#else
+            You(
+                "塵で%sに何か書こうとしたが，できなかった．",
+                is_ice(u.ux,u.uy) ? "氷" : "ほこり");
+#endif
         useup(otmp);
         otmp = 0; /* wand is now gone */
         ptext = FALSE;
@@ -915,7 +1169,10 @@ doengrave()
         } else if (type == oep->engr_type
                    && (!Blind || oep->engr_type == BURN
                        || oep->engr_type == ENGRAVE)) {
+/*JP
             c = yn_function("Do you want to add to the current engraving?",
+*/
+            c = yn_function("何か書き加えますか？",
                             ynqchars, 'y');
             if (c == 'q') {
                 pline1(Never_mind);
@@ -928,12 +1185,21 @@ doengrave()
                 || oep->engr_type == ENGR_BLOOD
                 || oep->engr_type == MARK) {
                 if (!Blind) {
+#if 0 /*JP*/
                     You("wipe out the message that was %s here.",
                         (oep->engr_type == DUST)
                             ? "written in the dust"
                             : (oep->engr_type == ENGR_BLOOD)
                                 ? "scrawled in blood"
                                 : "written");
+#else
+                    You("%sメッセージを拭きとった．",
+                        (oep->engr_type == DUST)
+                            ? "ほこりに書かれている"
+                            : (oep->engr_type == BLOOD)
+                                ? "血文字でなぐり書きされている"
+                                : "書かれている");
+#endif
                     del_engr(oep);
                     oep = (struct engr *) 0;
                 } else
@@ -941,15 +1207,25 @@ doengrave()
                      */
                     eow = TRUE;
             } else if (type == DUST || type == MARK || type == ENGR_BLOOD) {
+#if 0 /*JP*/
                 You("cannot wipe out the message that is %s the %s here.",
                     oep->engr_type == BURN
                         ? (is_ice(u.ux, u.uy) ? "melted into" : "burned into")
                         : "engraved in",
                     surface(u.ux, u.uy));
+#else
+                You("%sメッセージを拭きとれなかった．",
+                    oep->engr_type == BURN
+                        ? (is_ice(u.ux, u.uy) ? "刻まれている" : "焼き付けられている")
+                        : "刻まれている");
+#endif
                 return 1;
             } else if (type != oep->engr_type || c == 'n') {
                 if (!Blind || can_reach_floor(TRUE))
+/*JP
                     You("will overwrite the current message.");
+*/
+                    You("メッセージを上書きしようとした．");
                 eow = TRUE;
             }
         }
@@ -958,42 +1234,84 @@ doengrave()
     eloc = surface(u.ux, u.uy);
     switch (type) {
     default:
+/*JP
         everb = (oep && !eow ? "add to the weird writing on"
+*/
+        everb = (oep && !eow ? "奇妙な文字列に書き加える"
+/*JP
                              : "write strangely on");
+*/
+                             : "奇妙な文字列を書く");
         break;
     case DUST:
+/*JP
         everb = (oep && !eow ? "add to the writing in" : "write in");
+*/
+        everb = (oep && !eow ? "書き加える" : "書く");
+/*JP
         eloc = is_ice(u.ux, u.uy) ? "frost" : "dust";
+*/
+        eloc = is_ice(u.ux,u.uy) ? "霜" : "ほこり";
         break;
     case HEADSTONE:
+/*JP
         everb = (oep && !eow ? "add to the epitaph on" : "engrave on");
+*/
+        everb = (oep && !eow ? "墓碑銘を刻み加える" : "墓碑銘を刻む");
         break;
     case ENGRAVE:
+/*JP
         everb = (oep && !eow ? "add to the engraving in" : "engrave in");
+*/
+        everb = (oep && !eow ? "刻み加える" : "刻む");
         break;
     case BURN:
+#if 0 /*JP*/
         everb = (oep && !eow
                      ? (is_ice(u.ux, u.uy) ? "add to the text melted into"
                                            : "add to the text burned into")
                      : (is_ice(u.ux, u.uy) ? "melt into" : "burn into"));
+#else
+        everb = (oep && !eow
+                 ? ( is_ice(u.ux,u.uy) ? "刻み加える"
+                                       : "燃えている文字に書き加える")
+                 : ( is_ice(u.ux,u.uy) ? "刻む" : "焼印をいれる"));
+#endif
         break;
     case MARK:
+/*JP
         everb = (oep && !eow ? "add to the graffiti on" : "scribble on");
+*/
+        everb = (oep && !eow ? "落書に書き加える" : "はしり書きする");
         break;
     case ENGR_BLOOD:
+/*JP
         everb = (oep && !eow ? "add to the scrawl on" : "scrawl on");
+*/
+        everb = (oep && !eow ? "なぐり書きに書き加える" : "なぐり書きする");
         break;
     }
 
     /* Tell adventurer what is going on */
     if (otmp != &zeroobj)
+/*JP
         You("%s the %s with %s.", everb, eloc, doname(otmp));
+*/
+        You("%sで%sに%s．", doname(otmp), eloc, jpast(everb));
     else
+#if 0 /*JP*/
         You("%s the %s with your %s.", everb, eloc,
             makeplural(body_part(FINGER)));
+#else
+        You("%sで%sに%s．", body_part(FINGER),
+            eloc, jpast(everb));
+#endif
 
     /* Prompt for engraving! */
+/*JP
     Sprintf(qbuf, "What do you want to %s the %s here?", everb, eloc);
+*/
+    Sprintf(qbuf,"%sに何と%sか？", eloc, jpolite(everb));
     getlin(qbuf, ebuf);
     /* convert tabs to spaces and condense consecutive spaces to one */
     mungspaces(ebuf);
@@ -1007,8 +1325,12 @@ doengrave()
     if (len == 0 || index(ebuf, '\033')) {
         if (zapwand) {
             if (!Blind)
+#if 0 /*JP*/
                 pline("%s, then %s.", Tobjnam(otmp, "glow"),
                       otense(otmp, "fade"));
+#else
+                pline("%sは輝いたが，すぐに消えた．", xname(otmp));
+#endif
             return 1;
         } else {
             pline1(Never_mind);
@@ -1028,8 +1350,19 @@ doengrave()
         if (((type == DUST || type == ENGR_BLOOD) && !rn2(25))
             || (Blind && !rn2(11)) || (Confusion && !rn2(7))
             || (Stunned && !rn2(4)) || (Hallucination && !rn2(2)))
+#if 0 /*JP*/
             *sp = ' ' + rnd(96 - 2); /* ASCII '!' thru '~'
                                         (excludes ' ' and DEL) */
+#else /*JP:日本語でランダム化 */
+            {
+                if(is_kanji1(ebuf, sp-ebuf))
+                    jrndm_replace(sp);
+                else if(is_kanji2(ebuf, sp-ebuf))
+                    jrndm_replace(sp-1);
+                else
+                    *sp = '!' + rn2(93); /* ASCII-code only */
+            }
+#endif
     }
 
     /* Previous engraving is overwritten */
@@ -1045,12 +1378,18 @@ doengrave()
     default:
         multi = -(len / 10);
         if (multi)
+/*JP
             nomovemsg = "You finish your weird engraving.";
+*/
+            nomovemsg = "あなたは奇妙な刻みを終えた．";
         break;
     case DUST:
         multi = -(len / 10);
         if (multi)
+/*JP
             nomovemsg = "You finish writing in the dust.";
+*/
+            nomovemsg = "あなたはほこりに書き終えた．";
         break;
     case HEADSTONE:
     case ENGRAVE:
@@ -1064,7 +1403,10 @@ doengrave()
              * to engrave "Elbereth" all at once.
              * However, you can engrave "Elb", then "ere", then "th".
              */
+/*JP
             pline("%s dull.", Yobjnam2(otmp, "get"));
+*/
+            Your("%sは刃こぼれした．", xname(otmp));
             costly_alteration(otmp, COST_DEGRD);
             if (len > maxelen) {
                 multi = -maxelen;
@@ -1077,21 +1419,33 @@ doengrave()
             multi = -len;
         }
         if (multi)
+/*JP
             nomovemsg = "You finish engraving.";
+*/
+            nomovemsg = "あなたは刻み終えた．";
         break;
     case BURN:
         multi = -(len / 10);
         if (multi)
             nomovemsg = is_ice(u.ux, u.uy)
+/*JP
                           ? "You finish melting your message into the ice."
+*/
+                          ? "氷へメッセージを刻み終えた．"
+/*JP
                           : "You finish burning your message into the floor.";
+*/
+                          : "床へメッセージを焼きいれ終えた．";
         break;
     case MARK:
         multi = -(len / 10);
         if (otmp->otyp == MAGIC_MARKER) {
             maxelen = otmp->spe * 2; /* one charge / 2 letters */
             if (len > maxelen) {
+/*JP
                 Your("marker dries out.");
+*/
+                Your("マーカは乾ききった．");
                 otmp->spe = 0;
                 multi = -(maxelen / 10);
             } else if (len > 1)
@@ -1100,12 +1454,18 @@ doengrave()
                 otmp->spe -= 1; /* Prevent infinite graffiti */
         }
         if (multi)
+/*JP
             nomovemsg = "You finish defacing the dungeon.";
+*/
+            nomovemsg = "あなたは迷宮への落書を書き終えた．";
         break;
     case ENGR_BLOOD:
         multi = -(len / 10);
         if (multi)
+/*JP
             nomovemsg = "You finish scrawling.";
+*/
+            nomovemsg = "はしり書きを書き終えた．";
         break;
     }
 
@@ -1115,10 +1475,20 @@ doengrave()
             if (*sp == ' ')
                 maxelen--;
         if (!maxelen && *sp) {
+#if 1 /*JP*//*漢字の1バイト目だけが残らないように*/
+            if(is_kanji2(ebuf, sp - ebuf))
+                --sp;
+#endif
             *sp = '\0';
             if (multi)
+/*JP
                 nomovemsg = "You cannot write any more.";
+*/
+                nomovemsg = "これ以上何も書けなかった．";
+/*JP
             You("are only able to write \"%s\".", ebuf);
+*/
+            You("「%s」とまでしか書けなかった．", ebuf);
         }
     }
 
@@ -1131,7 +1501,10 @@ doengrave()
     if (post_engr_text[0])
         pline("%s", post_engr_text);
     if (doblind && !resists_blnd(&youmonst)) {
+/*JP
         You("are blinded by the flash!");
+*/
+        You("まばゆい光で目がくらんだ！");
         make_blinded((long) rnd(50), FALSE);
         if (!Blind)
             Your1(vision_clears);

@@ -948,10 +948,22 @@ init_dungeons()
     /*
      *  I hate hardwiring these names. :-(
      */
+/*JP
     quest_dnum = dname_to_dnum("The Quest");
+*/
+    quest_dnum = dname_to_dnum("クエスト");
+/*JP
     sokoban_dnum = dname_to_dnum("Sokoban");
+*/
+    sokoban_dnum = dname_to_dnum("倉庫番");
+/*JP
     mines_dnum = dname_to_dnum("The Gnomish Mines");
+*/
+    mines_dnum = dname_to_dnum("ノームの鉱山");
+/*JP
     tower_dnum = dname_to_dnum("Vlad's Tower");
+*/
+    tower_dnum = dname_to_dnum("ヴラド侯の塔");
 
     /* one special fixup for dummy surface level */
     if ((x = find_level("dummy")) != 0) {
@@ -2280,7 +2292,10 @@ recalc_mapseen()
     /* flags.castle, flags.valley, flags.msanctum retain previous value */
     mptr->flags.forgot = 0;
     /* flags.quest_summons disabled once quest finished */
+/*JP
     mptr->flags.quest_summons = (at_dgn_entrance("The Quest")
+*/
+    mptr->flags.quest_summons = (at_dgn_entrance("クエスト")
                                  && u.uevent.qcalled
                                  && !(u.uevent.qcompleted
                                       || u.uevent.qexpelled

@@ -243,151 +243,373 @@ static struct Comp_Opt {
                * a different format */
     int optflags;
 } compopt[] = {
+/*JP
     { "align", "your starting alignment (lawful, neutral, or chaotic)", 8,
+*/
+    { "align",    "ゲームスタート時の属性 (lawful, neutral, or chaoticのいずれか)", 8,
       DISP_IN_GAME },
+#if 0 /*JP*/
     { "align_message", "message window alignment", 20, DISP_IN_GAME }, /*WC*/
-    { "align_status", "status window alignment", 20, DISP_IN_GAME },   /*WC*/
-    { "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
-#ifdef BACKWARD_COMPAT
-    { "boulder", "deprecated (use S_boulder in sym file instead)", 1,
-      SET_IN_FILE },
-#endif
-    { "catname", "the name of your (first) cat (e.g., catname:Tabby)",
-      PL_PSIZ, DISP_IN_GAME },
-    { "disclose", "the kinds of information to disclose at end of game",
-      sizeof(flags.end_disclose) * 2, SET_IN_GAME },
-    { "dogname", "the name of your (first) dog (e.g., dogname:Fang)", PL_PSIZ,
-      DISP_IN_GAME },
-    { "dungeon", "the symbols to use in drawing the dungeon map",
-      MAXDCHARS + 1, SET_IN_FILE },
-    { "effects", "the symbols to use in drawing special effects",
-      MAXECHARS + 1, SET_IN_FILE },
-    { "font_map", "the font to use in the map window", 40,
-      DISP_IN_GAME },                                              /*WC*/
-    { "font_menu", "the font to use in menus", 40, DISP_IN_GAME }, /*WC*/
-    { "font_message", "the font to use in the message window", 40,
-      DISP_IN_GAME },                                                  /*WC*/
-    { "font_size_map", "the size of the map font", 20, DISP_IN_GAME }, /*WC*/
-    { "font_size_menu", "the size of the menu font", 20,
-      DISP_IN_GAME }, /*WC*/
-    { "font_size_message", "the size of the message font", 20,
-      DISP_IN_GAME }, /*WC*/
-    { "font_size_status", "the size of the status font", 20,
-      DISP_IN_GAME }, /*WC*/
-    { "font_size_text", "the size of the text font", 20,
-      DISP_IN_GAME }, /*WC*/
-    { "font_status", "the font to use in status window", 40,
-      DISP_IN_GAME }, /*WC*/
-    { "font_text", "the font to use in text windows", 40,
-      DISP_IN_GAME }, /*WC*/
-    { "fruit", "the name of a fruit you enjoy eating", PL_FSIZ, SET_IN_GAME },
-    { "gender", "your starting gender (male or female)", 8, DISP_IN_GAME },
-    { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
-      PL_PSIZ, DISP_IN_GAME },
-    { "map_mode", "map display mode under Windows", 20, DISP_IN_GAME }, /*WC*/
-    { "menustyle", "user interface for object selection", MENUTYPELEN,
-      SET_IN_GAME },
-    { "menu_deselect_all", "deselect all items in a menu", 4, SET_IN_FILE },
-    { "menu_deselect_page", "deselect all items on this page of a menu", 4,
-      SET_IN_FILE },
-    { "menu_first_page", "jump to the first page in a menu", 4, SET_IN_FILE },
-    { "menu_headings", "text attribute for menu headings", 9, SET_IN_GAME },
-    { "menu_invert_all", "invert all items in a menu", 4, SET_IN_FILE },
-    { "menu_invert_page", "invert all items on this page of a menu", 4,
-      SET_IN_FILE },
-    { "menu_last_page", "jump to the last page in a menu", 4, SET_IN_FILE },
-    { "menu_next_page", "goto the next menu page", 4, SET_IN_FILE },
-    { "menu_previous_page", "goto the previous menu page", 4, SET_IN_FILE },
-    { "menu_search", "search for a menu item", 4, SET_IN_FILE },
-    { "menu_select_all", "select all items in a menu", 4, SET_IN_FILE },
-    { "menu_select_page", "select all items on this page of a menu", 4,
-      SET_IN_FILE },
-    { "monsters", "the symbols to use for monsters", MAXMCLASSES,
-      SET_IN_FILE },
-    { "msghistory", "number of top line messages to save", 5, DISP_IN_GAME },
-#ifdef TTY_GRAPHICS
-    { "msg_window", "the type of message window required", 1, SET_IN_GAME },
 #else
-    { "msg_window", "the type of message window required", 1, SET_IN_FILE },
+    { "align_message", "メッセージウィンドウの揃え", 20, DISP_IN_GAME }, /*WC*/
 #endif
-    { "name", "your character's name (e.g., name:Merlin-W)", PL_NSIZ,
+#if 0 /*JP*/
+    { "align_status", "status window alignment", 20, DISP_IN_GAME },   /*WC*/
+#else
+    { "align_status", "状況ウィンドウの揃え", 20, DISP_IN_GAME }, /*WC*/
+#endif
+/*JP
+    { "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
+*/
+    { "altkeyhandler", "ALTキーハンドラ", 20, DISP_IN_GAME },
+#ifdef BACKWARD_COMPAT
+/*JP
+    { "boulder", "deprecated (use S_boulder in sym file instead)", 1,
+*/
+    { "boulder",  "巨岩を表示するシンボル文字", 1,
+      SET_IN_FILE },
+#endif
+/*JP
+    { "catname", "the name of your (first) cat (e.g., catname:Tabby)",
+*/
+    { "catname",  "冒険を供にする(最初の)猫の名前 (例 catname:たま)",
+      PL_PSIZ, DISP_IN_GAME },
+/*JP
+    { "disclose", "the kinds of information to disclose at end of game",
+*/
+    { "disclose", "ゲーム終了時に見る情報の種類",
+      sizeof(flags.end_disclose) * 2, SET_IN_GAME },
+/*JP
+    { "dogname", "the name of your (first) dog (e.g., dogname:Fang)", PL_PSIZ,
+*/
+    { "dogname",  "冒険を供にする(最初の)犬の名前 (例 dogname:ポチ)", PL_PSIZ,
       DISP_IN_GAME },
+/*JP
+    { "dungeon", "the symbols to use in drawing the dungeon map",
+*/
+    { "dungeon",  "ダンジョンを描画するシンボル文字",
+      MAXDCHARS + 1, SET_IN_FILE },
+/*JP
+    { "effects", "the symbols to use in drawing special effects",
+*/
+    { "effects",  "特殊効果を描画するシンボル文字",
+      MAXECHARS + 1, SET_IN_FILE },
+/*JP
+    { "font_map", "the font to use in the map window", 40,
+*/
+    { "font_map", "マップウィンドウに使用するフォント", 40,
+      DISP_IN_GAME },                                              /*WC*/
+#if 0 /*JP*/
+    { "font_menu", "the font to use in menus", 40, DISP_IN_GAME }, /*WC*/
+#else
+    { "font_menu", "メニューに使用するフォント", 40, DISP_IN_GAME }, /*WC*/
+#endif
+/*JP
+    { "font_message", "the font to use in the message window", 40,
+*/
+    { "font_message", "メッセージウィンドウに使用するフォント", 40,
+      DISP_IN_GAME },                                                  /*WC*/
+#if 0 /*JP*/
+    { "font_size_map", "the size of the map font", 20, DISP_IN_GAME }, /*WC*/
+#else
+    { "font_size_map", "マップフォントのサイズ", 20, DISP_IN_GAME }, /*WC*/
+#endif
+/*JP
+    { "font_size_menu", "the size of the menu font", 20,
+*/
+    { "font_size_menu", "メニューフォントのサイズ", 20,
+      DISP_IN_GAME }, /*WC*/
+/*JP
+    { "font_size_message", "the size of the message font", 20,
+*/
+    { "font_size_message", "メッセージフォントのサイズ", 20,
+      DISP_IN_GAME }, /*WC*/
+/*JP
+    { "font_size_status", "the size of the status font", 20,
+*/
+    { "font_size_status", "状況フォントのサイズ", 20,
+      DISP_IN_GAME }, /*WC*/
+/*JP
+    { "font_size_text", "the size of the text font", 20,
+*/
+    { "font_size_text", "テキストフォントのサイズ", 20,
+      DISP_IN_GAME }, /*WC*/
+/*JP
+    { "font_status", "the font to use in status window", 40,
+*/
+    { "font_status", "状況ウィンドウに使用するフォント", 40,
+      DISP_IN_GAME }, /*WC*/
+/*JP
+    { "font_text", "the font to use in text windows", 40,
+*/
+    { "font_text", "テキストウィンドウに使用するフォント", 40,
+      DISP_IN_GAME }, /*WC*/
+/*JP
+    { "fruit", "the name of a fruit you enjoy eating", PL_FSIZ, SET_IN_GAME },
+*/
+    { "fruit", "好物の果物の名前", PL_FSIZ, SET_IN_GAME },
+/*JP
+    { "gender", "your starting gender (male or female)", 8, DISP_IN_GAME },
+*/
+    { "gender", "ゲーム開始時の性別(male または female)", 8, DISP_IN_GAME },
+/*JP
+    { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
+*/
+    { "horsename", "冒険を供にする(最初の)馬の名前 (例 ghoulname:シルバー)",
+      PL_PSIZ, DISP_IN_GAME },
+#if 0 /*JP*/
+    { "map_mode", "map display mode under Windows", 20, DISP_IN_GAME }, /*WC*/
+#else
+    { "map_mode", "ウィンドウ表示時のマップの表示モード", 20, DISP_IN_GAME }, /*WC*/
+#endif
+/*JP
+    { "menustyle", "user interface for object selection", MENUTYPELEN,
+*/
+    { "menustyle", "オブジェクトを選択するときのユーザーインタフェース", MENUTYPELEN,
+      SET_IN_GAME },
+/*JP
+    { "menu_deselect_all", "deselect all items in a menu", 4, SET_IN_FILE },
+*/
+    { "menu_deselect_all", "全てのアイテムを非選択", 4, SET_IN_FILE },
+/*JP
+    { "menu_deselect_page", "deselect all items on this page of a menu", 4,
+*/
+    { "menu_deselect_page", "現在表示されているページのアイテムを非選択", 4,
+      SET_IN_FILE },
+/*JP
+    { "menu_first_page", "jump to the first page in a menu", 4, SET_IN_FILE },
+*/
+    { "menu_first_page", "メニューの最初のページへ", 4, SET_IN_FILE },
+/*JP
+    { "menu_headings", "text attribute for menu headings", 9, SET_IN_GAME },
+*/
+    { "menu_headings", "強調，反転または下線で種類を表示する", 9, SET_IN_GAME },
+/*JP
+    { "menu_invert_all", "invert all items in a menu", 4, SET_IN_FILE },
+*/
+    { "menu_invert_all", "全てのアイテムを反転", 4, SET_IN_FILE },
+/*JP
+    { "menu_invert_page", "invert all items on this page of a menu", 4,
+*/
+    { "menu_invert_page", "現在表示されているページのアイテムを反転",
+      SET_IN_FILE },
+/*JP
+    { "menu_last_page", "jump to the last page in a menu", 4, SET_IN_FILE },
+*/
+    { "menu_last_page", "メニューの最後のページへ", 4, SET_IN_FILE },
+/*JP
+    { "menu_next_page", "goto the next menu page", 4, SET_IN_FILE },
+*/
+    { "menu_next_page", "次のメニューのページへ", 4, SET_IN_FILE },
+/*JP
+    { "menu_previous_page", "goto the previous menu page", 4, SET_IN_FILE },
+*/
+    { "menu_previous_page", "前のメニューのページへ", 4, SET_IN_FILE },
+/*JP
+    { "menu_search", "search for a menu item", 4, SET_IN_FILE },
+*/
+    { "menu_search", "メニューの検索", 4, SET_IN_FILE },
+/*JP
+    { "menu_select_all", "select all items in a menu", 4, SET_IN_FILE },
+*/
+    { "menu_select_all", "全てのアイテムを選択", 4, SET_IN_FILE },
+/*JP
+    { "menu_select_page", "select all items on this page of a menu", 4,
+*/
+    { "menu_select_page", "現在表示されている全てのアイテムを選択", 4,
+      SET_IN_FILE },
+/*JP
+    { "monsters", "the symbols to use for monsters", MAXMCLASSES,
+*/
+    { "monsters", "モンスターに使用されるシンボル文字", MAXMCLASSES,
+      SET_IN_FILE },
+/*JP
+    { "msghistory", "number of top line messages to save", 5, DISP_IN_GAME },
+*/
+    { "msghistory", "先頭行に表示されたメッセージ履歴の保存数", 5, DISP_IN_GAME },
+#ifdef TTY_GRAPHICS
+/*JP
+    { "msg_window", "the type of message window required", 1, SET_IN_GAME },
+*/
+    {"msg_window", "メッセージウィンドウのタイプを設定",1, SET_IN_GAME },
+#else
+/*JP
+    { "msg_window", "the type of message window required", 1, SET_IN_FILE },
+*/
+    {"msg_window", "メッセージウィンドウのタイプを設定", 1, SET_IN_FILE },
+#endif
+/*JP
+    { "name", "your character's name (e.g., name:Merlin-W)", PL_NSIZ,
+*/
+    { "name", "あなたの名前 (例 name:マーリン-W)", PL_NSIZ,
+      DISP_IN_GAME },
+/*JP
     { "number_pad", "use the number pad for movement", 1, SET_IN_GAME },
+*/
+    { "number_pad", "ナンバーパッドを使用する", 1, SET_IN_GAME },
+/*JP
     { "objects", "the symbols to use for objects", MAXOCLASSES, SET_IN_FILE },
+*/
+    { "objects",  "アイテムに使用されるシンボル文字", MAXOCLASSES, SET_IN_FILE },
+/*JP
     { "packorder", "the inventory order of the items in your pack",
+*/
+    { "packorder", "背負い袋内の物の順番",
       MAXOCLASSES, SET_IN_GAME },
 #ifdef CHANGE_COLOR
     { "palette",
 #ifndef WIN32
+/*JP
       "palette (00c/880/-fff is blue/yellow/reverse white)", 15,
+*/
+      "パレット (00c/880/-fffはそれぞれ青/黄/反転白を示す)", 15,
       SET_IN_GAME },
 #else
+/*JP
       "palette (adjust an RGB color in palette (color-R-G-B)", 15,
+*/
+      "パレット (パレットのRGB色を調整する (色-R-G-B)", 15,
       SET_IN_FILE },
 #endif
 #if defined(MAC)
+/*JP
     { "hicolor", "same as palette, only order is reversed", 15, SET_IN_FILE },
+*/
+    { "hicolor",  "パレットが同じとき、指示したものだけ反転させる", 15, SET_IN_FILE },
 #endif
 #endif
     { "paranoid_confirmation", "extra prompting in certain situations", 28,
       SET_IN_GAME },
+/*JP
     { "pettype", "your preferred initial pet type", 4, DISP_IN_GAME },
+*/
+    { "pettype",  "あなたの選択した初期ペットの種類", 4, DISP_IN_GAME },
+/*JP
     { "pickup_burden", "maximum burden picked up before prompt", 20,
+*/
+    { "pickup_burden",  "拾うときに最大荷重になる手前で確認する", 20,
       SET_IN_GAME },
+/*JP
     { "pickup_types", "types of objects to pick up automatically",
+*/
+    { "pickup_types", "自動で拾いあげる物のシンボル",
       MAXOCLASSES, SET_IN_GAME },
     { "pile_limit", "threshold for \"there are many objects here\"", 24,
       SET_IN_GAME },
     { "playmode", "normal play, non-scoring explore mode, or debug mode", 8,
       DISP_IN_GAME },
+/*JP
     { "player_selection", "choose character via dialog or prompts", 12,
+*/
+    { "player_selection", "キャラクター選択にダイアログや確認画面を使う", 12,
       DISP_IN_GAME },
+/*JP
     { "race", "your starting race (e.g., Human, Elf)", PL_CSIZ,
+*/
+    { "race",     "ゲーム開始時の種族 (例 Human, Elf)", PL_CSIZ,
       DISP_IN_GAME },
+/*JP
     { "role", "your starting role (e.g., Barbarian, Valkyrie)", PL_CSIZ,
+*/
+    { "role",     "ゲーム開始時の職業 (例 Barbarian, Valkyrie)", PL_CSIZ,
       DISP_IN_GAME },
+/*JP
     { "runmode", "display frequency when `running' or `travelling'",
+*/
+    { "runmode", "トラベルコマンド等での連続移動時の描画頻度",
       sizeof "teleport", SET_IN_GAME },
+/*JP
     { "scores", "the parts of the score list you wish to see", 32,
+*/
+    { "scores",   "ゲーム終了時に見るスコアの種類", 32,
       SET_IN_GAME },
+/*JP
     { "scroll_amount", "amount to scroll map when scroll_margin is reached",
+*/
+    { "scroll_amount", "scroll_marginに届いたときのマップスクロール量",
       20, DISP_IN_GAME }, /*WC*/
+/*JP
     { "scroll_margin", "scroll map when this far from the edge", 20,
+*/
+    { "scroll_margin", "マップ端からのマップスクロール開始距離", 20,
       DISP_IN_GAME }, /*WC*/
     { "sortloot", "sort object selection lists by description", 4,
       SET_IN_GAME },
 #ifdef MSDOS
+/*JP
     { "soundcard", "type of sound card to use", 20, SET_IN_FILE },
+*/
+    { "soundcard", "使用しているサウンドカードの種類", 20, SET_IN_FILE },
 #endif
     { "symset", "load a set of display symbols from the symbols file", 70,
       SET_IN_GAME },
     { "roguesymset",
       "load a set of rogue display symbols from the symbols file", 70,
       SET_IN_GAME },
+/*JP
     { "suppress_alert", "suppress alerts about version-specific features", 8,
+*/
+    { "suppress_alert", "バージョン間の違いに関する警告メッセージの無効化", 8,
       SET_IN_GAME },
+#if 0 /*JP*/
     { "tile_width", "width of tiles", 20, DISP_IN_GAME },   /*WC*/
+#else
+    { "tile_width", "タイルの幅", 20, DISP_IN_GAME }, /*WC*/
+#endif
+#if 0 /*JP*/
     { "tile_height", "height of tiles", 20, DISP_IN_GAME }, /*WC*/
+#else
+    { "tile_height", "タイルの高さ", 20, DISP_IN_GAME }, /*WC*/
+#endif
+#if 0 /*JP*/
     { "tile_file", "name of tile file", 70, DISP_IN_GAME }, /*WC*/
+#else
+    { "tile_file", "タイルファイルの名前", 70, DISP_IN_GAME }, /*WC*/
+#endif
+/*JP
     { "traps", "the symbols to use in drawing traps", MAXTCHARS + 1,
+*/
+    { "traps", "罠を描画するシンボル文字", MAXTCHARS + 1,
       SET_IN_FILE },
+/*JP
     { "vary_msgcount", "show more old messages at a time", 20,
+*/
+    { "vary_msgcount", "一度に表示するメッセージの数", 20,
       DISP_IN_GAME }, /*WC*/
 #ifdef MSDOS
+/*JP
     { "video", "method of video updating", 20, SET_IN_FILE },
+*/
+    { "video", "使用するビデオモードを設定する", 20, SET_IN_FILE },
 #endif
 #ifdef VIDEOSHADES
+/*JP
     { "videocolors", "color mappings for internal screen routines", 40,
+*/
+    { "videocolors", "内蔵スクリーンルーチン用のカラーマップを用いる", 40,
       DISP_IN_GAME },
+/*JP
     { "videoshades", "gray shades to map to black/gray/white", 32,
+*/
+    { "videoshades", "表示にグレイスケールを用いる", 32,
       DISP_IN_GAME },
 #endif
 #ifdef WIN32
+/*JP
     { "subkeyvalue", "override keystroke value", 7, SET_IN_FILE },
+*/
+    {"subkeyvalue", "キーマッピングを変更する", 7, SET_IN_FILE },
 #endif
+#if 0 /*JP*/
     { "windowcolors", "the foreground/background colors of windows", /*WC*/
+#else
+    { "windowcolors",  "ウィンドウを指定した前景色/背景色で表示する", /*WC*/
+#endif
       80, DISP_IN_GAME },
+/*JP
     { "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
+*/
+    { "windowtype", "使用するウインドウシステム", WINTYPELEN, DISP_IN_GAME },
 #ifdef WINCHAIN
     { "windowchain", "window processor to use", WINTYPELEN, SET_IN_SYS },
 #endif
@@ -397,6 +619,9 @@ static struct Comp_Opt {
 #ifdef MAC_GRAPHICS_ENV
     { "Macgraphics", "load MACGraphics display symbols", 70, SET_IN_FILE },
 #endif
+#endif
+#if 1 /*JP*/
+    { "kcode", "端末の漢字コード,", 4, SET_IN_FILE },
 #endif
     { (char *) 0, (char *) 0, 0, 0 }
 };
@@ -1887,7 +2112,11 @@ boolean tinitial, tfrom_file;
                     preferred_pet = '\0';
                     break;
                 default:
+#if 0 /*JP*/
                     pline("Unrecognized pet type '%s'.", op);
+#else
+                    pline("'%s'はペットの種類として受け付けられません．", op);
+#endif
                     break;
                 }
         } else if (negated)
@@ -2290,7 +2519,10 @@ boolean tinitial, tfrom_file;
                 }
             }
             if (!forig && num >= 100) {
+/*JP
                 pline("Doing that so many times isn't very fruitful.");
+*/
+                pline("そんなに何回もやってもほとんど意味はない．");
                 return;
             }
         }
@@ -2579,8 +2811,13 @@ boolean tinitial, tfrom_file;
             if (flags.menu_style == MENU_TRADITIONAL
                 || flags.menu_style == MENU_COMBINATION) {
                 use_menu = FALSE;
+#if 0 /*JP*/
                 Sprintf(qbuf, "New pickup_types: [%s am] (%s)", ocl,
                         *tbuf ? tbuf : "all");
+#else
+                Sprintf(qbuf, "新しいpickup_typeを入力してください：[%s am] (%s)", ocl,
+                        *tbuf ? tbuf : "all");
+#endif
                 getlin(qbuf, abuf);
                 op = mungspaces(abuf);
                 if (abuf[0] == '\0' || abuf[0] == '\033')
@@ -2589,8 +2826,13 @@ boolean tinitial, tfrom_file;
                     use_menu = TRUE;
             }
             if (use_menu) {
+#if 0 /*JP*/
                 (void) choose_classes_menu("Auto-Pickup what?", 1, TRUE, ocl,
                                            tbuf);
+#else
+                (void) choose_classes_menu("どれを自動拾いに設定する？", 1, TRUE, ocl,
+                                           tbuf);
+#endif
                 op = tbuf;
             }
         }
@@ -2763,6 +3005,14 @@ boolean tinitial, tfrom_file;
             badoption(opts);
         return;
     }
+#if 1 /*JP*/
+    if (!strncmpi(opts, "kcode", 3)){
+        if ((op = string_for_env_opt("kcode", opts, FALSE)) != 0){
+            setkcode(*op);
+        }
+        return;
+    }
+#endif
 
     /* scores:5t[op] 5a[round] o[wn] */
     if (match_optname(opts, "scores", 4, TRUE)) {
@@ -3516,7 +3766,10 @@ doset()
 
     any = zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+/*JP
              "Booleans (selecting will toggle value):", MENU_UNSELECTED);
+*/
+             "真偽オプション (選択すると値が切り替わります)：", MENU_UNSELECTED);
     any.a_int = 0;
     /* first list any other non-modifiable booleans, then modifiable ones */
     for (pass = 0; pass <= 1; pass++)
@@ -3551,9 +3804,15 @@ doset()
     indexoffset = boolcount;
     any = zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+#if 0 /*JP*/
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
              "Compounds (selecting will prompt for new value):",
              MENU_UNSELECTED);
+#else
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+             "文字列オプション (選択すると新しい値の入力を求めます)：",
+             MENU_UNSELECTED);
+#endif
 
 #ifdef notyet /* SYSCF */
     /* XXX I think this is still fragile.  Fixing initial/from_file and/or
@@ -3642,7 +3901,10 @@ doset()
     for (i = 0; i < PREFIX_COUNT; i++)
         doset_add_menu(tmpwin, fqn_prefix_names[i], 0);
 #endif
+/*JP
     end_menu(tmpwin, "Set what options?");
+*/
+    end_menu(tmpwin, "どのオプションを設定しますか？");
     need_redraw = FALSE;
     if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
         /*
@@ -3688,7 +3950,10 @@ doset()
 
                 if (!special_handling(compopt[opt_indx].name, setinitial,
                                       fromfile)) {
+/*JP
                     Sprintf(buf, "Set %s to what?", compopt[opt_indx].name);
+*/
+                    Sprintf(buf, "%sに何を設定する？", compopt[opt_indx].name);
                     getlin(buf, buf2);
                     if (buf2[0] == '\033')
                         continue;
@@ -3726,10 +3991,26 @@ int numtotal;
         char letr;
         const char *desc;
     } action_titles[] = {
+#if 0 /*JP*/
         { 'a', "add new %s" },         /* [0] */
+#else
+        { 'a', "新しい%sを追加" },     /* [0] */
+#endif
+#if 0 /*JP*/
         { 'l', "list %s" },            /* [1] */
+#else
+        { 'l', "%sを一覧表示" },       /* [1] */
+#endif
+#if 0 /*JP*/
         { 'r', "remove existing %s" }, /* [2] */
+#else
+        { 'r', "既にある%sを削除" },   /* [2] */
+#endif
+#if 0 /*JP*/
         { 'x', "exit this menu" },     /* [3] */
+#else
+        { 'x', "このメニューを閉じる" }, /* [3] */
+#endif
     };
 
     opt_idx = 0;
@@ -3751,7 +4032,10 @@ int numtotal;
 #endif
                  MENU_UNSELECTED);
     }
+/*JP
     end_menu(tmpwin, "Do what?");
+*/
+    end_menu(tmpwin, "どうする？");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
         for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
             opt_idx = pick_list[pick_idx].item.a_int - 1;
@@ -3798,7 +4082,10 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, &any, *style_name, 0, ATR_NONE,
                      style_name, MENU_UNSELECTED);
         }
+/*JP
         end_menu(tmpwin, "Select menustyle:");
+*/
+        end_menu(tmpwin, "メニュースタイルを選択してください：");
         if (select_menu(tmpwin, PICK_ONE, &style_pick) > 0) {
             flags.menu_style = style_pick->item.a_int - 1;
             free((genericptr_t) style_pick);
@@ -3848,7 +4135,10 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, &any, burden_letters[i], 0, ATR_NONE,
                      burden_name, MENU_UNSELECTED);
         }
+/*JP
         end_menu(tmpwin, "Select encumbrance level:");
+*/
+        end_menu(tmpwin, "警告を出す荷重レベルを選択してください：");
         if (select_menu(tmpwin, PICK_ONE, &burden_pick) > 0) {
             flags.pickup_burden = burden_pick->item.a_int - 1;
             free((genericptr_t) burden_pick);
@@ -3879,7 +4169,10 @@ boolean setinitial, setfromfile;
                      ATR_NONE, buf, MENU_UNSELECTED);
             disc_cat[i] = 0;
         }
+/*JP
         end_menu(tmpwin, "Change which disclosure options categories:");
+*/
+        end_menu(tmpwin, "どのカテゴリの表示情報オプションを変更しますか：");
         pick_cnt = select_menu(tmpwin, PICK_ANY, &disclosure_pick);
         if (pick_cnt > 0) {
             for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
@@ -3893,7 +4186,10 @@ boolean setinitial, setfromfile;
 
         for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
             if (disc_cat[i]) {
+/*JP
                 Sprintf(buf, "Disclosure options for %s:",
+*/
+                Sprintf(buf, "%sの出力形式：",
                         disclosure_names[i]);
                 tmpwin = create_nhwindow(NHW_MENU);
                 start_menu(tmpwin);
@@ -3901,19 +4197,31 @@ boolean setinitial, setfromfile;
                 /* 'y','n',and '+' work as alternate selectors; '-' doesn't */
                 any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
                 add_menu(tmpwin, NO_GLYPH, &any, 'a', any.a_char, ATR_NONE,
+/*JP
                          "Never disclose, without prompting",
+*/
+                         "確認せずに出力もしない",
                          MENU_UNSELECTED);
                 any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
                 add_menu(tmpwin, NO_GLYPH, &any, 'b', any.a_char, ATR_NONE,
+/*JP
                          "Always disclose, without prompting",
+*/
+                         "確認せずに出力する",
                          MENU_UNSELECTED);
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
                 add_menu(tmpwin, NO_GLYPH, &any, 'c', any.a_char, ATR_NONE,
+/*JP
                          "Prompt, with default answer of \"No\"",
+*/
+                         "確認する，デフォルトは「出力しない」",
                          MENU_UNSELECTED);
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
                 add_menu(tmpwin, NO_GLYPH, &any, 'd', any.a_char, ATR_NONE,
+/*JP
                          "Prompt, with default answer of \"Yes\"",
+*/
+                         "確認する，デフォルトは「出力する」",
                          MENU_UNSELECTED);
                 end_menu(tmpwin, buf);
                 if (select_menu(tmpwin, PICK_ONE, &disclosure_pick) > 0) {
@@ -3936,7 +4244,10 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, &any, *mode_name, 0, ATR_NONE,
                      mode_name, MENU_UNSELECTED);
         }
+/*JP
         end_menu(tmpwin, "Select run/travel display mode:");
+*/
+        end_menu(tmpwin, "走行/トラベルの表示モードを選択してください：");
         if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
             flags.runmode = mode_pick->item.a_int - 1;
             free((genericptr_t) mode_pick);
@@ -3962,7 +4273,10 @@ boolean setinitial, setfromfile;
         any.a_char = 'r';
         add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "reversed",
                  MENU_UNSELECTED);
+/*JP
         end_menu(tmpwin, "Select message history display type:");
+*/
+        end_menu(tmpwin, "メッセージ履歴の表示方法を選択してください：");
         if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
             iflags.prevmsg_window = window_pick->item.a_char;
             free((genericptr_t) window_pick);
@@ -4009,8 +4323,13 @@ boolean setinitial, setfromfile;
         any.a_int = ALIGN_RIGHT;
         add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "right",
                  MENU_UNSELECTED);
+#if 0 /*JP*/
         Sprintf(abuf, "Select %s window placement relative to the map:",
                 msg ? "message" : "status");
+#else
+        Sprintf(abuf, "%sウィンドウのマップに対する表示位置を選択してください：",
+                msg ? "メッセージ" : "状態");
+#endif
         end_menu(tmpwin, abuf);
         if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
             if (msg)
@@ -4022,10 +4341,22 @@ boolean setinitial, setfromfile;
         destroy_nhwindow(tmpwin);
     } else if (!strcmp("number_pad", optname)) {
         static const char *npchoices[] = {
+/*JP
             " 0 (off)", " 1 (on)", " 2 (on, MSDOS compatible)",
+*/
+            "0 (無効)", "1 (有効)", "2 (有効，MSDOS互換)",
+/*JP
             " 3 (on, phone-style digit layout)",
+*/
+            " 3 (有効，電話式の数字配置)",
+/*JP
             " 4 (on, phone-style layout, MSDOS compatible)",
+*/
+            " 4 (有効，電話式の配置，MSDOS 互換)",
+/*JP
             "-1 (off, 'z' to move upper-left, 'y' to zap wands)"
+*/
+            "-1 (無効，'z' で左上に移動，'y' で杖を振る)"
         };
         menu_item *mode_pick = (menu_item *) 0;
 
@@ -4037,7 +4368,10 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, &any, 'a' + i, 0, ATR_NONE,
                      npchoices[i], MENU_UNSELECTED);
         }
+/*JP
         end_menu(tmpwin, "Select number_pad mode:");
+*/
+        end_menu(tmpwin, "number_padモードを選択してください：");
         if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
             switch (mode_pick->item.a_int - 1) {
             case 0:
@@ -4072,7 +4406,10 @@ boolean setinitial, setfromfile;
         }
         destroy_nhwindow(tmpwin);
     } else if (!strcmp("menu_headings", optname)) {
+/*JP
         int mhattr = query_attr("How to highlight menu headings:");
+*/
+        int mhattr = query_attr("メニューヘッダの強調方法を選択してください：");
 
         if (mhattr != -1)
             iflags.menu_headings = mhattr;
@@ -4205,7 +4542,10 @@ boolean setinitial, setfromfile;
         if (opt_idx == 3) {
             ;                      /* done--fall through to function exit */
         } else if (opt_idx == 0) { /* add new */
+/*JP
             getlin("What new autopickup exception pattern?", &apebuf[1]);
+*/
+            getlin("新しい自動拾い例外のパターンを入力してください：", &apebuf[1]);
             mungspaces(&apebuf[1]); /* regularize whitespace */
             if (apebuf[1] == '\033') {
                 ; /* fall through to function exit */
@@ -4233,7 +4573,10 @@ boolean setinitial, setfromfile;
                 ape = iflags.autopickup_exceptions[pass];
                 any = zeroany;
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+/*JP
                          (pass == 0) ? "Never pickup" : "Always pickup",
+*/
+                         (pass == 0) ? "常に拾わない" : "常に拾う",
                          MENU_UNSELECTED);
                 for (i = 0; i < numapes[pass] && ape; i++) {
                     any.a_void = (opt_idx == 1) ? 0 : ape;
@@ -4243,8 +4586,14 @@ boolean setinitial, setfromfile;
                     ape = ape->next;
                 }
             }
+#if 0 /*JP*/
             Sprintf(apebuf, "%s autopickup exceptions",
                     (opt_idx == 1) ? "List of" : "Remove which");
+#else
+            Sprintf(apebuf, "%s自動拾い例外%s",
+                    (opt_idx == 1) ? "" : "どの",
+                    (opt_idx == 1) ? "の一覧" : "を削除しますか？");
+#endif
             end_menu(tmpwin, apebuf);
             pick_cnt = select_menu(tmpwin,
                                    (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -4449,13 +4798,20 @@ const char *optname;
 char *buf;
 {
     char ocl[MAXOCLASSES + 1];
+#if 0 /*JP*/
     static const char none[] = "(none)", randomrole[] = "random",
                       to_be_done[] = "(to be done)", defopt[] = "default",
                       defbrief[] = "def";
+#else
+    static const char none[] = "(なし)", randomrole[] = "ランダム",
+                      to_be_done[] = "(未設定)", defopt[] = "デフォルト",
+                      defbrief[] = "def";
+#endif
     int i;
 
     buf[0] = '\0';
     if (!strcmp(optname, "align_message"))
+#if 0 /*JP*/
         Sprintf(buf, "%s",
                 iflags.wc_align_message == ALIGN_TOP
                     ? "top"
@@ -4466,7 +4822,19 @@ char *buf;
                                 : iflags.wc_align_message == ALIGN_RIGHT
                                       ? "right"
                                       : defopt);
+#else
+        Sprintf(buf, "%s",
+                iflags.wc_align_message == ALIGN_TOP
+                    ? "上側"
+                    : iflags.wc_align_message == ALIGN_LEFT
+                          ? "左側"
+                          : iflags.wc_align_message == ALIGN_BOTTOM
+                                ? "下側"
+                                : iflags.wc_align_message == ALIGN_RIGHT
+                                      ? "右側" : defopt);
+#endif
     else if (!strcmp(optname, "align_status"))
+#if 0 /*JP*/
         Sprintf(buf, "%s",
                 iflags.wc_align_status == ALIGN_TOP
                     ? "top"
@@ -4477,12 +4845,27 @@ char *buf;
                                 : iflags.wc_align_status == ALIGN_RIGHT
                                       ? "right"
                                       : defopt);
+#else
+        Sprintf(buf, "%s",
+                iflags.wc_align_status == ALIGN_TOP
+                    ? "上側"
+                    : iflags.wc_align_status == ALIGN_LEFT
+                          ? "左側"
+                          : iflags.wc_align_status == ALIGN_BOTTOM
+                                ? "下側"
+                                : iflags.wc_align_status == ALIGN_RIGHT
+                                      ? "右側"
+                                      : defopt);
+#endif
     else if (!strcmp(optname, "align"))
         Sprintf(buf, "%s", rolestring(flags.initalign, aligns, adj));
 #ifdef WIN32
     else if (!strcmp(optname, "altkeyhandler"))
         Sprintf(buf, "%s",
+/*JP
                 iflags.altkeyhandler[0] ? iflags.altkeyhandler : "default");
+*/
+                iflags.altkeyhandler[0] ? iflags.altkeyhandler : defopt);
 #endif
 #ifdef BACKWARD_COMPAT
     else if (!strcmp(optname, "boulder"))
@@ -4624,10 +5007,23 @@ char *buf;
         Sprintf(buf, "%s", plname);
     } else if (!strcmp(optname, "number_pad")) {
         static const char *numpadmodes[] = {
+/*JP
             "0=off", "1=on", "2=on, MSDOS compatible",
+*/
+            "0=無効", "1=有効", "2=有効，DOS互換",
+/*JP
             "3=on, phone-style layout",
+*/
+            "3=有効，電話式の数字配置",
+/*JP
             "4=on, phone layout, MSDOS compatible",
+*/
+            "4=有効，電話式の配置，MSDOS 互換",
+#if 0 /*JP*/
             "-1=off, y & z swapped", /*[5]*/
+#else
+            "-1=無効，yとzを入れ替え", /*[5]*/
+#endif
         };
         int indx = Cmd.num_pad
                        ? (Cmd.phone_layout ? (Cmd.pcHack_compat ? 4 : 3)
@@ -4664,11 +5060,19 @@ char *buf;
             Strcat(tmpbuf, " Remove");
         Strcpy(buf, tmpbuf[0] ? &tmpbuf[1] : "none");
     } else if (!strcmp(optname, "pettype")) {
+#if 0 /*JP*/
         Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat"
                            : (preferred_pet == 'd') ? "dog"
                              : (preferred_pet == 'h') ? "horse"
                                : (preferred_pet == 'n') ? "none"
                                  : "random");
+#else
+        Sprintf(buf, "%s", (preferred_pet == 'c') ? "猫"
+                           : (preferred_pet == 'd') ? "犬"
+                             : (preferred_pet == 'h') ? "馬"
+                               : (preferred_pet == 'n') ? "なし"
+                                 : "ランダム");
+#endif
     } else if (!strcmp(optname, "pickup_burden")) {
         Sprintf(buf, "%s", burdentype[flags.pickup_burden]);
     } else if (!strcmp(optname, "pickup_types")) {
@@ -4709,7 +5113,11 @@ char *buf;
                 break;
             }
     } else if (!strcmp(optname, "player_selection")) {
+#if 0 /*JP*/
         Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");
+#else
+        Sprintf(buf, "%s入力", iflags.wc_player_selection ? "プロンプト" : "ダイアログ");
+#endif
 #ifdef MSDOS
     } else if (!strcmp(optname, "soundcard")) {
         Sprintf(buf, "%s", to_be_done);
@@ -4787,7 +5195,10 @@ char *buf;
     if (buf[0])
         return buf;
     else
+/*JP
         return "unknown";
+*/
+        return "不明";
 }
 
 int
@@ -4798,6 +5209,7 @@ dotogglepickup()
     flags.pickup = !flags.pickup;
     if (flags.pickup) {
         oc_to_str(flags.pickup_types, ocl);
+#if 0 /*JP*/
         Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
                 (iflags.autopickup_exceptions[AP_LEAVE]
                  || iflags.autopickup_exceptions[AP_GRAB])
@@ -4805,10 +5217,23 @@ dotogglepickup()
                            ? ", with one exception"
                            : ", with some exceptions")
                     : "");
+#else
+        Sprintf(buf, "%sアイテムについてオン%s", ocl[0] ? ocl : "全ての",
+                (iflags.autopickup_exceptions[AP_LEAVE]
+                 || iflags.autopickup_exceptions[AP_GRAB])
+                    ? "，例外あり"
+                    : "");
+#endif
     } else {
+/*JP
         Strcpy(buf, "OFF");
+*/
+        Strcpy(buf, "オフ");
     }
+/*JP
     pline("Autopickup: %s.", buf);
+*/
+    pline("自動拾い：%s．", buf);
     return 0;
 }
 
@@ -5022,25 +5447,49 @@ char *strval;
 
 /* data for option_help() */
 static const char *opt_intro[] = {
+/*JP
     "", "                 NetHack Options Help:", "",
+*/
+    "", "               NetHackオプションヘルプ：", "",
 #define CONFIG_SLOT 3 /* fill in next value at run-time */
     (char *) 0,
 #if !defined(MICRO) && !defined(MAC)
+/*JP
     "or use `NETHACKOPTIONS=\"<options>\"' in your environment",
+*/
+    "または環境変数に`NETHACKOPTIONS=\"<options>\"'と定義できます",
 #endif
+/*JP
     "(<options> is a list of options separated by commas)",
+*/
+    "(<options>はカンマで区切ったオプションです)",
 #ifdef VMS
+/*JP
     "-- for example, $ DEFINE NETHACKOPTIONS \"noautopickup,fruit:kumquat\"",
+*/
+    "-- 例えば次のようにします：$ DEFINE NETHACKOPTIONS \"noautopickup,fruit:kumquat\"",
 #endif
+/*JP
     "or press \"O\" while playing and use the menu.", "",
+*/
+    "もしくはゲームプレイ中に\"O\"ボタンを押すことで設定可能です．",
+/*JP
  "Boolean options (which can be negated by prefixing them with '!' or \"no\"):",
+*/
+ "真偽値オプション (否定の値を指定する場合，'!'もしくは\"no\"を先頭に付加します):",
     (char *) 0
 };
 
 static const char *opt_epilog[] = {
     "",
+/*JP
     "Some of the options can be set only before the game is started; those",
+*/
+    "オプションにはゲーム開始前のみにしか設定できないものがあります．",
+/*JP
     "items will not be selectable in the 'O' command's menu.", (char *) 0
+*/
+    "それらは'O'コマンドのメニューでは選択することができません．", (char *) 0
 };
 
 void
@@ -5051,7 +5500,10 @@ option_help()
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);
+/*JP
     Sprintf(buf, "Set options as OPTIONS=<options> in %s", lastconfigfile);
+*/
+    Sprintf(buf, "オプションは%sの中でOPTIONS=<options>と設定します", lastconfigfile);
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
         putstr(datawin, 0, opt_intro[i]);
@@ -5069,7 +5521,10 @@ option_help()
     next_opt(datawin, "");
 
     /* Compound options */
+/*JP
     putstr(datawin, 0, "Compound options:");
+*/
+    putstr(datawin, 0, "文字列オプション:");
     for (i = 0; compopt[i].name; i++) {
         Sprintf(buf2, "`%s'", compopt[i].name);
         Sprintf(buf, "%-20s - %s%c", buf2, compopt[i].descr,

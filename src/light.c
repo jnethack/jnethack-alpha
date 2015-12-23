@@ -666,15 +666,30 @@ struct obj *obj;
 {
     switch (arti_light_radius(obj)) {
     case 3:
+#if 0 /*JP*/
         return "brilliantly"; /* blessed */
+#else
+        return "キラキラと"; /* blessed */
+#endif
     case 2:
+#if 0 /*JP*/
         return "brightly"; /* uncursed */
+#else
+        return "明るく"; /* uncursed */
+#endif
     case 1:
+#if 0 /*JP*/
         return "dimly"; /* cursed */
+#else
+        return "薄暗く"; /* cursed */
+#endif
     default:
         break;
     }
+/*JP
     return "strangely";
+*/
+    return "不思議に";
 }
 
 int

@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 
 /* for UNIX, Rand #def'd to (long)lrand48() or (long)random() */
@@ -474,7 +479,10 @@ static NEARDATA const char *trap_engravings[TRAPNUM] = {
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0,
     /* 14..16: trap door, teleport, level-teleport */
+/*JP
     "Vlad was here", "ad aerarium", "ad aerarium", (char *) 0, (char *) 0,
+*/
+    "ヴラドはここにいる", "ad aerarium", "ad aerarium", (char *) 0, (char *) 0,
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
 };
 
@@ -1494,7 +1502,10 @@ struct mkroom *croom;
     } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
 
     /* Put a grave at m.x, m.y */
+/*JP
     make_grave(m.x, m.y, dobell ? "Saved by the bell!" : (char *) 0);
+*/
+    make_grave(m.x, m.y, dobell ? "ベルに救われた！" : (char *) 0);
 
     /* Possibly fill it with objects */
     if (!rn2(3))
@@ -1535,8 +1546,14 @@ mkinvokearea()
     xchar ymin = inv_pos.y, ymax = inv_pos.y;
     register xchar i;
 
+/*JP
     pline_The("floor shakes violently under you!");
+*/
+    pline("あなたの下の床が突然揺れた！");
+/*JP
     pline_The("walls around you begin to bend and crumble!");
+*/
+    pline("そしてまわりの壁がねじれ，砕けた！");
     display_nhwindow(WIN_MESSAGE, TRUE);
 
     /* any trap hero is stuck in will be going away now */
@@ -1571,7 +1588,10 @@ mkinvokearea()
         delay_output();
     }
 
+/*JP
     You("are standing at the top of a stairwell leading down!");
+*/
+    You("下に続く吹き抜け階段の上に立っている！");
     mkstairs(u.ux, u.uy, 0, (struct mkroom *) 0); /* down */
     newsym(u.ux, u.uy);
     vision_full_recalc = 1; /* everything changed */
@@ -1673,7 +1693,10 @@ xchar x, y;
     branch *br;
     schar u_depth;
 
+/*JP
     br = dungeon_branch("Fort Ludios");
+*/
+    br = dungeon_branch("ローディオス砦");
     if (on_level(&knox_level, &br->end1)) {
         source = &br->end2;
     } else {
@@ -1688,7 +1711,11 @@ xchar x, y;
         return;
 
     if (!(u.uz.dnum == oracle_level.dnum      /* in main dungeon */
+#if 0 /*JP*/
           && !at_dgn_entrance("The Quest")    /* but not Quest's entry */
+#else
+          && !at_dgn_entrance("クエスト")     /* but not Quest's entry */
+#endif
           && (u_depth = depth(&u.uz)) > 10    /* beneath 10 */
           && u_depth < depth(&medusa_level))) /* and above Medusa */
         return;

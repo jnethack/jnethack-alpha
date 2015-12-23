@@ -47,7 +47,7 @@ const struct Role roles[] = {
         { "洞窟学者", 0 },
         { "美術収集者", 0 },
         { "館長", 0 } },
-      "Quetzalcoatl", "Camaxtli", "Huhetotl", /* Central American */
+      "ケツアルカトル", "カマキシトリ", "フヘトトル", /* Central American */
 #endif
       "Arc",
 #if 0 /*JP*/
@@ -108,7 +108,7 @@ const struct Role roles[] = {
         { "殺戮者", 0 },
         { "首領", 0 },
         { "征服者", 0 } },
-      "Mitra", "Crom", "Set", /* Hyborian */
+      "ミトラ", "クロム", "セト", /* Hyborian */
 #endif
       "Bar",
 #if 0 /*JP*/
@@ -169,7 +169,7 @@ const struct Role roles[] = {
         { "遊牧民", 0 },
         { "流浪者", 0 },
         { "先駆者", 0 } },
-      "Anu", "_Ishtar", "Anshar", /* Babylonian */
+      "アヌ", "_イシュタル", "アンシャル", /* Babylonian */
 #endif
       "Cav",
 #if 0 /*JP*/
@@ -230,7 +230,7 @@ const struct Role roles[] = {
         { "医師主任", 0 },
         { "内科医", 0 },
         { "外科医", 0 } },
-      "_Athena", "Hermes", "Poseidon", /* Greek */
+      "_アテナ", "ヘルメス", "ポセイドン", /* Greek */
 #endif
       "Hea",
 #if 0 /*JP*/
@@ -290,7 +290,7 @@ const struct Role roles[] = {
         { "重騎士", 0 },
         { "勲騎士", 0 },
         { "聖騎士", 0 } },
-      "Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
+      "ルーフ", "_ブリジット", "マナンナン・マクリール", /* Celtic */
 #endif
       "Kni",
 #if 0 /*JP*/
@@ -350,7 +350,7 @@ const struct Role roles[] = {
         { "木の習い手", 0 },
         { "火の習い手", 0 },
         { "免許皆伝", 0 } },
-      "Shan Lai Ching", "Chih Sung-tzu", "Huan Ti", /* Chinese */
+      "山雷精", "赤松子", "黄帝", /* Chinese */
 #endif
       "Mon",
 #if 0 /*JP*/
@@ -474,7 +474,7 @@ const struct Role roles[] = {
         { "泥棒", 0 },
         { "強盗", 0 },
         { "大泥棒", 0 } },
-      "Issek", "Mog", "Kos", /* Nehwon */
+      "イセック", "モグ", "コス", /* Nehwon */
 #endif
       "Rog",
 #if 0 /*JP*/
@@ -609,7 +609,7 @@ const struct Role roles[] = {
         { "大名", "腰元" },         /* a samurai lord */
         { "公家", 0 },           /* Noble of the Court */
         { "公家", "大奥" } },       /* supreme commander, warlord */
-      "_Amaterasu Omikami", "Raijin", "Susanowo", /* Japanese */
+      "_天照大神", "雷神", "須佐之男", /* Japanese */
 #endif
       "Sam",
 #if 0 /*JP*/
@@ -669,7 +669,7 @@ const struct Role roles[] = {
         { "航海者", 0 },
         { "探検家", 0 },
         { "冒険者", 0 } },
-      "Blind Io", "_The Lady", "Offler", /* Discworld */
+      "盲目のイロ", "_＜女神＞", "オフラー", /* Discworld */
 #endif
       "Tou",
 #if 0 /*JP*/
@@ -729,7 +729,7 @@ const struct Role roles[] = {
         { "英雄", 0 },
         { "先導者", 0 },
         { "ロード", "レディ" } },
-      "Tyr", "Odin", "Loki", /* Norse */
+      "チュール", "オーディン", "ロキ", /* Norse */
 #endif
       "Val",
 #if 0 /*JP*/
@@ -789,7 +789,7 @@ const struct Role roles[] = {
         { "魔術師", 0 },
         { "魔法使い", 0 },
         { "大魔法使い", 0 } },
-      "Ptah", "Thoth", "Anhur", /* Egyptian */
+      "プタハ", "トート", "アンフル", /* Egyptian */
 #endif
       "Wiz",
 #if 0 /*JP*/
@@ -1074,7 +1074,10 @@ STATIC_DCL int FDECL(role_gendercount, (int));
 STATIC_DCL int FDECL(race_alignmentcount, (int));
 
 /* used by str2XXX() */
+/*JP
 static char NEARDATA randomstr[] = "random";
+*/
+static char NEARDATA randomstr[] = "ランダム";
 
 boolean
 validrole(rolenum)
@@ -1702,6 +1705,7 @@ promptsep(buf, num_post_attribs)
 char *buf;
 int num_post_attribs;
 {
+#if 0 /*JP*/
     const char *conjuct = "and ";
 
     if (num_post_attribs > 1 && post_attribs < num_post_attribs
@@ -1711,6 +1715,13 @@ int num_post_attribs;
     --post_attribs;
     if (!post_attribs && num_post_attribs > 1)
         Strcat(buf, conjuct);
+#else
+    /*JP: 日本語では "A, B, and C" という処理は不要 */
+    if(num_post_attribs > post_attribs){
+        Strcat(buf, "，");
+    }
+    --post_attribs;
+#endif
     return buf;
 }
 
@@ -1756,7 +1767,10 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 {
     int k, gendercount = 0, aligncount = 0;
     char buf[BUFSZ];
+/*JP
     static char err_ret[] = " character's";
+*/
+    static char err_ret[] = "キャラクターの";
     boolean donefirst = FALSE;
 
     if (!suppliedbuf || buflen < 1)
@@ -1777,13 +1791,17 @@ int buflen, rolenum, racenum, gendnum, alignnum;
         && ok_align(rolenum, racenum, gendnum, alignnum)) {
         /* if race specified, and multiple choice of alignments for it */
         if ((racenum >= 0) && (aligncount > 1)) {
+#if 0 /*JP*/
             if (donefirst)
                 Strcat(buf, " ");
+#endif
             Strcat(buf, aligns[alignnum].adj);
             donefirst = TRUE;
         } else {
+#if 0 /*JP*/
             if (donefirst)
                 Strcat(buf, " ");
+#endif
             Strcat(buf, aligns[alignnum].adj);
             donefirst = TRUE;
         }
@@ -1814,14 +1832,18 @@ int buflen, rolenum, racenum, gendnum, alignnum;
                and name of role itself does not distinguish gender */
             if ((rolenum != ROLE_NONE) && (gendercount > 1)
                 && !roles[rolenum].name.f) {
+#if 0 /*JP*/
                 if (donefirst)
                     Strcat(buf, " ");
+#endif
                 Strcat(buf, genders[gendnum].adj);
                 donefirst = TRUE;
             }
         } else {
+#if 0 /*JP*/
             if (donefirst)
                 Strcat(buf, " ");
+#endif
             Strcat(buf, genders[gendnum].adj);
             donefirst = TRUE;
         }
@@ -1840,14 +1862,18 @@ int buflen, rolenum, racenum, gendnum, alignnum;
     if (racenum != ROLE_NONE && racenum != ROLE_RANDOM) {
         if (validrole(rolenum)
             && ok_race(rolenum, racenum, gendnum, alignnum)) {
+#if 0 /*JP*/
             if (donefirst)
                 Strcat(buf, " ");
+#endif
             Strcat(buf, (rolenum == ROLE_NONE) ? races[racenum].noun
                                                : races[racenum].adj);
             donefirst = TRUE;
         } else if (!validrole(rolenum)) {
+#if 0 /*JP*/
             if (donefirst)
                 Strcat(buf, " ");
+#endif
             Strcat(buf, races[racenum].noun);
             donefirst = TRUE;
         } else {
@@ -1861,8 +1887,10 @@ int buflen, rolenum, racenum, gendnum, alignnum;
     /* <your lawful female gnomish> || <your lawful female gnome> */
 
     if (validrole(rolenum)) {
+#if 0 /*JP*/
         if (donefirst)
             Strcat(buf, " ");
+#endif
         if (gendnum != ROLE_NONE) {
             if (gendnum == 1 && roles[rolenum].name.f)
                 Strcat(buf, roles[rolenum].name.f);
@@ -1884,9 +1912,14 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 
     if ((racenum == ROLE_NONE || racenum == ROLE_RANDOM)
         && !validrole(rolenum)) {
+#if 0 /*JP*/
         if (donefirst)
             Strcat(buf, " ");
+#endif
+/*JP
         Strcat(buf, "character");
+*/
+        Strcat(buf, "キャラクター");
         donefirst = TRUE;
     }
     /* <your lawful female gnomish cavewoman> || <your lawful female gnome>
@@ -1904,30 +1937,43 @@ build_plselection_prompt(buf, buflen, rolenum, racenum, gendnum, alignnum)
 char *buf;
 int buflen, rolenum, racenum, gendnum, alignnum;
 {
+/*JP
     const char *defprompt = "Shall I pick a character for you? [ynaq] ";
+*/
+    const char *defprompt = "適当にキャラクターを選んでよいですか？[ynaq] ";
     int num_post_attribs = 0;
     char tmpbuf[BUFSZ], *p;
 
     if (buflen < QBUFSZ)
         return (char *) defprompt;
 
+#if 0 /*JP*/
     Strcpy(tmpbuf, "Shall I pick ");
     if (racenum != ROLE_NONE || validrole(rolenum))
         Strcat(tmpbuf, "your ");
     else {
         Strcat(tmpbuf, "a ");
     }
+#else
+    Strcpy(tmpbuf, "");
+#endif
     /* <your> */
 
     (void) root_plselection_prompt(eos(tmpbuf), buflen - strlen(tmpbuf),
                                    rolenum, racenum, gendnum, alignnum);
+#if 0 /*JP*/
     Sprintf(buf, "%s", s_suffix(tmpbuf));
+#else
+    Sprintf(buf, "%sの", tmpbuf);
+#endif
+#if 0 /*JP:日本語では不要*/
     /* don't bother splitting caveman/cavewoman or priest/priestess
        in order to apply possessive suffix to both halves, but do
        change "priest/priestess'" to "priest/priestess's" */
     if ((p = strstri(buf, "priest/priestess'")) != 0
         && p[sizeof "priest/priestess'" - sizeof ""] == '\0')
         strkitten(buf, 's');
+#endif
 
     /* buf should now be:
      *    <your lawful female gnomish cavewoman's>
@@ -1940,22 +1986,37 @@ int buflen, rolenum, racenum, gendnum, alignnum;
     if (post_attribs) {
         if (pa[BP_RACE]) {
             (void) promptsep(eos(buf), num_post_attribs);
+/*
             Strcat(buf, "race");
+*/
+	    Strcat(buf, "種族");
         }
         if (pa[BP_ROLE]) {
             (void) promptsep(eos(buf), num_post_attribs);
+/*
             Strcat(buf, "role");
+*/
+	    Strcat(buf, "職業");
         }
         if (pa[BP_GEND]) {
             (void) promptsep(eos(buf), num_post_attribs);
+/*JP
             Strcat(buf, "gender");
+*/
+	    Strcat(buf, "性別");
         }
         if (pa[BP_ALIGN]) {
             (void) promptsep(eos(buf), num_post_attribs);
+/*JP
             Strcat(buf, "alignment");
+*/
+	    Strcat(buf, "属性");
         }
     }
+/*JP
     Strcat(buf, " for you? [ynaq] ");
+*/
+    Strcat(buf, "を適当に選んでよろしいですか？[ynq] ");
     return buf;
 }
 
@@ -2023,9 +2084,18 @@ role_selection_prolog(which, where)
 int which;
 winid where;
 {
+/*JP
     static const char NEARDATA choosing[] = " choosing now",
+*/
+    static const char NEARDATA choosing[] = " 現在選択中",
+/*JP
                                not_yet[] = " not yet specified",
+*/
+                               not_yet[] = " 未選択",
+/*JP
                                rand_choice[] = " random";
+*/
+                               rand_choice[] = " ランダム";
     char buf[BUFSZ];
     int r, c, g, a, allowmask;
 
@@ -2082,26 +2152,39 @@ winid where;
             Sprintf(eos(buf), "/%s", roles[r].name.f);
     }
     putstr(where, 0, buf);
+/*JP
     Sprintf(buf, "%12s ", "race:");
+*/
+    Sprintf(buf, "%12s ", "種族:");
     Strcat(buf, (which == RS_RACE) ? choosing : (c == ROLE_NONE)
                                                     ? not_yet
                                                     : (c == ROLE_RANDOM)
                                                           ? rand_choice
                                                           : races[c].noun);
     putstr(where, 0, buf);
+/*JP
     Sprintf(buf, "%12s ", "gender:");
+*/
+    Sprintf(buf, "%12s ", "性別:");
     Strcat(buf, (which == RS_GENDER) ? choosing : (g == ROLE_NONE)
                                                       ? not_yet
                                                       : (g == ROLE_RANDOM)
                                                             ? rand_choice
                                                             : genders[g].adj);
     putstr(where, 0, buf);
+/*JP
     Sprintf(buf, "%12s ", "alignment:");
+*/
+    Sprintf(buf, "%12s ", "属性:");
     Strcat(buf, (which == RS_ALGNMNT) ? choosing : (a == ROLE_NONE)
                                                        ? not_yet
                                                        : (a == ROLE_RANDOM)
                                                              ? rand_choice
+#if 0 /*JP:日本語では名詞が自然*/
                                                              : aligns[a].adj);
+#else
+                                                             : aligns[a].noun);
+#endif
     putstr(where, 0, buf);
 }
 
@@ -2390,6 +2473,7 @@ const char *
 Hello(mtmp)
 struct monst *mtmp;
 {
+#if 0 /*JP*/
     switch (Role_switch) {
     case PM_KNIGHT:
         return "Salutations"; /* Olde English */
@@ -2408,11 +2492,38 @@ struct monst *mtmp;
     default:
         return "Hello";
     }
+#else
+/*
+  あいさつは日本語として自然になるよう大きく仕様を変更
+*/
+    static char helo_buf[BUFSZ];
+
+    switch (Role_switch) {
+    case PM_KNIGHT:
+        Sprintf(helo_buf, "よくぞ参った%sよ", plname);
+        break;
+    case PM_SAMURAI:
+        Sprintf(helo_buf, "よくぞ参られた%sよ", plname);
+        break;
+    case PM_TOURIST:
+        Sprintf(helo_buf, "アローハ%s", plname);
+        break;
+    case PM_VALKYRIE:
+        Sprintf(helo_buf, "魂の守護者%sよ", plname);
+        break;
+    default:
+        Sprintf(helo_buf, "ようこそ%s", plname);
+        break;
+    }
+
+    return helo_buf;
+#endif
 }
 
 const char *
 Goodbye()
 {
+#if 0 /*JP*/
     switch (Role_switch) {
     case PM_KNIGHT:
         return "Fare thee well"; /* Olde English */
@@ -2425,6 +2536,29 @@ Goodbye()
     default:
         return "Goodbye";
     }
+#else
+    static char helo_buf[BUFSZ];
+
+    switch (Role_switch) {
+    case PM_KNIGHT:
+        Sprintf(helo_buf, "さらば敬虔なる");
+        break;
+    case PM_SAMURAI:
+        Sprintf(helo_buf, "さらば武士道を志す");
+        break;
+    case PM_TOURIST:
+        Sprintf(helo_buf, "アローハ");
+        break;
+    case PM_VALKYRIE:
+        Sprintf(helo_buf, "さらば魂の守護者");
+        break;
+    default:
+        Sprintf(helo_buf, "さようなら");
+        break;
+    }
+
+    return helo_buf;
+#endif
 }
 
 /* role.c */

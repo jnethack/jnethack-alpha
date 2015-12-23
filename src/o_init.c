@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 #include "lev.h" /* save & restore info */
 
@@ -418,7 +423,10 @@ dodiscovered() /* free after Robert Viduya */
     winid tmpwin;
 
     tmpwin = create_nhwindow(NHW_MENU);
+/*JP
     putstr(tmpwin, 0, "Discoveries");
+*/
+    putstr(tmpwin, 0, "発見物一覧");
     putstr(tmpwin, 0, "");
 
     /* gather "unique objects" into a pseudo-class; note that they'll
@@ -426,7 +434,10 @@ dodiscovered() /* free after Robert Viduya */
     for (i = dis = 0; i < SIZE(uniq_objs); i++)
         if (objects[uniq_objs[i]].oc_name_known) {
             if (!dis++)
+/*JP
                 putstr(tmpwin, iflags.menu_headings, "Unique items");
+*/
+                putstr(tmpwin, iflags.menu_headings, "特殊アイテム");
             Sprintf(buf, "  %s", OBJ_NAME(objects[uniq_objs[i]]));
             putstr(tmpwin, 0, buf);
             ++ct;
@@ -462,7 +473,10 @@ dodiscovered() /* free after Robert Viduya */
         }
     }
     if (ct == 0) {
+/*JP
         You("haven't discovered anything yet...");
+*/
+        You("まだ何も発見していない．．．");
     } else
         display_nhwindow(tmpwin, TRUE);
     destroy_nhwindow(tmpwin);

@@ -346,11 +346,17 @@ struct obj *corpse;
     if (fd >= 0) {
         (void) nhclose(fd);
         if (wizard) {
+/*JP
             if (yn("Bones file already exists.  Replace it?") == 'y') {
+*/
+            if (yn("骨ファイルが既に存在してるよ．  置き換える？") == 'y') {
                 if (delete_bonesfile(&u.uz))
                     goto make_bones;
                 else
+/*JP
                     pline("Cannot unlink old bones.");
+*/
+                    pline("古い骨を削除できなかった．");
             }
         }
         /* compression can change the file's name, so must
@@ -524,7 +530,10 @@ make_bones:
         bflush(fd);
         if (bytes_counted > freediskspace(bones)) { /* not enough room */
             if (wizard)
+/*JP
                 pline("Insufficient space to create bones file.");
+*/
+                pline("骨ファイルを生成するための充分な領域がない．");
             (void) nhclose(fd);
             cancel_bonesfile();
             return;
@@ -569,12 +578,18 @@ getbones()
 
     if (validate(fd, bones) != 0) {
         if (!wizard)
+/*JP
             pline("Discarding unuseable bones; no need to panic...");
+*/
+            pline("使えない骨を捨てた．慌てる必要はない．．．");
         ok = FALSE;
     } else {
         ok = TRUE;
         if (wizard) {
+/*JP
             if (yn("Get bones?") == 'n') {
+*/
+            if (yn("骨を拾う？") == 'n') {
                 (void) nhclose(fd);
                 compress_bonesfile();
                 return 0;
@@ -585,7 +600,10 @@ getbones()
         if (strcmp(bonesid, oldbonesid) != 0) {
             char errbuf[BUFSZ];
 
+/*JP
             Sprintf(errbuf, "This is bones level '%s', not '%s'!", oldbonesid,
+*/
+            Sprintf(errbuf, "この骨のレベルは'%s'であって、'%s'ではない！", oldbonesid,
                     bonesid);
             if (wizard) {
                 pline1(errbuf);
@@ -626,7 +644,10 @@ getbones()
     u.uroleplay.numbones++;
 
     if (wizard) {
+/*JP
         if (yn("Unlink bones?") == 'n') {
+*/
+        if (yn("骨を消す？") == 'n') {
             compress_bonesfile();
             return ok;
         }

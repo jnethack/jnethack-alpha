@@ -147,14 +147,21 @@ boolean exclude_cookie;
             Strcat(rumor_buf, xcrypt(line, xbuf));
         } while (
             count++ < 50 && exclude_cookie
+#if 0 /*JP*/
             && (strstri(rumor_buf, "fortune") || strstri(rumor_buf, "pity")));
+#else
+            && (strstri(rumor_buf, "占") || strstri(rumor_buf, "なんてことだ")));
+#endif
         (void) dlb_fclose(rumors);
         if (count >= 50)
             impossible("Can't find non-cookie rumor?");
         else if (!in_mklev) /* avoid exercizing wisdom for graffiti */
             exercise(A_WIS, (adjtruth > 0));
     } else {
+/*JP
         pline("Can't open rumors file!");
+*/
+        pline("rumorsファイルが開けない！");
         true_rumor_size = -1; /* don't try to open it again */
     }
 /* this is safe either way, so do it always since we can't get the definition
@@ -324,7 +331,10 @@ int truth; /* 1=true, -1=false, 0=either */
 int mechanism;
 {
     static const char fortune_msg[] =
+/*JP
         "This cookie has a scrap of paper inside.";
+*/
+        "このクッキーには紙切が入っている．";
     const char *line;
     char buf[BUFSZ];
     boolean reading = (mechanism == BY_COOKIE || mechanism == BY_PAPER);
@@ -336,20 +346,33 @@ int mechanism;
         else if (Blind) {
             if (mechanism == BY_COOKIE)
                 pline(fortune_msg);
+/*JP
             pline("What a pity that you cannot read it!");
+*/
+            pline("それを読めないなんて気の毒な！");
             return;
         }
     }
     line = getrumor(truth, buf, reading ? FALSE : TRUE);
     if (!*line)
+/*JP
         line = "NetHack rumors file closed for renovation.";
+*/
+        line = "噂の真相は刷新のため休刊している．";
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
+#if 0 /*JP*/
         pline("True to her word, the Oracle %ssays: ",
               (!rn2(4) ? "offhandedly "
                        : (!rn2(3) ? "casually "
                                   : (rn2(2) ? "nonchalantly " : ""))));
+#else
+        pline("約束どおりに，賢者は%s述べた:",
+              (!rn2(4) ? "無造作に"
+                       : (!rn2(3) ? "何気なく"
+                                  : (rn2(2) ? "無頓着に" : ""))));
+#endif
         verbalize1(line);
         /* [WIS exercized by getrumor()] */
         return;
@@ -357,7 +380,10 @@ int mechanism;
         pline(fortune_msg);
     /* FALLTHRU */
     case BY_PAPER:
+/*JP
         pline("It reads:");
+*/
+        pline("それを読んだ:");
         break;
     }
     pline1(line);
@@ -453,10 +479,19 @@ boolean delphi;
         if (delphi)
             putstr(tmpwin, 0,
                    special
+/*JP
                      ? "The Oracle scornfully takes all your money and says:"
+*/
+                     ? "賢者は軽蔑したようにあなたの全てのお金を受けとり，述べた："
+/*JP
                      : "The Oracle meditates for a moment and then intones:");
+*/
+                     : "賢者はしばらく冥想し，歌うように話した：");
         else
+/*JP
             putstr(tmpwin, 0, "The message reads:");
+*/
+            putstr(tmpwin, 0, "メッセージ:");
         putstr(tmpwin, 0, "");
 
         while (dlb_fgets(line, COLNO, oracles) && strcmp(line, "---\n")) {
@@ -468,7 +503,10 @@ boolean delphi;
         destroy_nhwindow(tmpwin);
         (void) dlb_fclose(oracles);
     } else {
+/*JP
         pline("Can't open oracles file!");
+*/
+        pline("oraclesファイルを開けない！");
         oracle_flg = -1; /* don't try to open it again */
     }
 }
@@ -486,17 +524,29 @@ struct monst *oracl;
     umoney = money_cnt(invent);
 
     if (!oracl) {
+/*JP
         There("is no one here to consult.");
+*/
+        pline("ここには神託を述べる人はいない．");
         return 0;
     } else if (!oracl->mpeaceful) {
+/*JP
         pline("%s is in no mood for consultations.", Monnam(oracl));
+*/
+        pline("賢者は神託を告げてくれる雰囲気ではない．");
         return 0;
     } else if (!umoney) {
+/*JP
         You("have no money.");
+*/
+        You("お金がない．");
         return 0;
     }
 
+/*JP
     Sprintf(qbuf, "\"Wilt thou settle for a minor consultation?\" (%d %s)",
+*/
+    Sprintf(qbuf, "「汝，低位の神託を受けるか？」(%d%s)",
             minor_cost, currency((long) minor_cost));
     switch (ynq(qbuf)) {
     default:
@@ -504,7 +554,10 @@ struct monst *oracl;
         return 0;
     case 'y':
         if (umoney < (long) minor_cost) {
+/*JP
             You("don't even have enough money for that!");
+*/
+            You("これに払えるだけのお金すら持っていない！");
             return 0;
         }
         u_pay = minor_cost;
@@ -513,7 +566,7 @@ struct monst *oracl;
         if (umoney <= (long) minor_cost /* don't even ask */
             || (oracle_cnt == 1 || oracle_flg < 0))
             return 0;
-        Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
+        Sprintf(qbuf, "「ならば汝，高位の神託を受けるか？」(%d%s)",
                 major_cost, currency((long) major_cost));
         if (yn(qbuf) != 'y')
             return 0;

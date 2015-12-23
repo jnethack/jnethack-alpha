@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 #include "lev.h"
 #include "tcap.h" /* for TERMLIB and ASCIIGRAPH */
@@ -133,7 +138,10 @@ boolean quietly;
         otmp2 = otmp->nobj;
         if (otmp->in_use) {
             if (!quietly)
+/*JP
                 pline("Finishing off %s...", xname(otmp));
+*/
+                pline("%sを使い終えた．．．", xname(otmp));
             useup(otmp);
         }
     }
@@ -526,7 +534,10 @@ unsigned int *stuckid, *steedid;
         && uid != (unsigned long) getuid()) { /* strange ... */
         /* for wizard mode, issue a reminder; for others, treat it
            as an attempt to cheat and refuse to restore this file */
+/*JP
         pline("Saved game was not yours.");
+*/
+        pline("セーブされたゲームはあなたのものではない．");
         if (!wizard)
             return FALSE;
     }
@@ -579,7 +590,11 @@ unsigned int *stuckid, *steedid;
 #endif
     if (u.uhp <= 0 && (!Upolyd || u.mh <= 0)) {
         u.ux = u.uy = 0; /* affects pline() [hence You()] */
+#if 0 /*JP*/
         You("were not healthy enough to survive restoration.");
+#else
+        You("再開できるほど健康ではなかった．");
+#endif
         /* wiz1_level.dlevel is used by mklev.c to see if lots of stuff is
          * uninitialized, so we only have to set it and not the other stuff.
          */
@@ -718,7 +733,10 @@ xchar ltmp;
         /* The savelev can't proceed because the size required
          * is greater than the available disk space.
          */
+/*JP
         pline("Not enough space on `%s' to restore your game.", levels);
+*/
+        pline("ゲームを再開するための'%s'のためのスペースがない．", levels);
 
         /* Remove levels and bones that may have been created.
          */
@@ -743,7 +761,10 @@ xchar ltmp;
             return dorecover(fd);            /* 0 or 1 */
         }
 #endif /* ?AMIGA */
+/*JP
         pline("Be seeing you...");
+*/
+        pline("また会いましょう．．．");
         terminate(EXIT_SUCCESS);
     }
 #endif /* MFLOPPY */
@@ -802,10 +823,17 @@ register int fd;
         clear_nhwindow(WIN_MAP);
 #endif
     clear_nhwindow(WIN_MESSAGE);
+#if 0 /*JP*/
     You("return to level %d in %s%s.", depth(&u.uz),
         dungeons[u.uz.dnum].dname,
         flags.debug ? " while in debug mode"
                     : flags.explore ? " while in explore mode" : "");
+#else
+    You("%s%sの地下%d階に戻ってきた．",
+        flags.debug ? "ウィザードモード中の"
+                    : flags.explore ? "探検モード中の" : "",
+        dungeons[u.uz.dnum].dname, depth(&u.uz));
+#endif
     curs(WIN_MAP, 1, 1);
     dotcnt = 0;
     dotrow = 2;
@@ -959,9 +987,18 @@ void
 trickery(reason)
 char *reason;
 {
+/*JP
     pline("Strange, this map is not as I remember it.");
+*/
+    pline("妙だ，この地図は私が覚えていたものと違う．");
+/*JP
     pline("Somebody is trying some trickery here...");
+*/
+    pline("だれかがここでいかさまをしようとしたようだ．．．");
+/*JP
     pline("This game is void.");
+*/
+    pline("このゲームは無効となる．");
     Strcpy(killer.name, reason ? reason : "");
     done(TRICKED);
 }

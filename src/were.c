@@ -21,17 +21,26 @@ register struct monst *mon;
 
                 switch (monsndx(mon->data)) {
                 case PM_WEREWOLF:
+/*JP
                     howler = "wolf";
+*/
+                    howler = "狼";
                     break;
                 case PM_WEREJACKAL:
+/*JP
                     howler = "jackal";
+*/
+                    howler = "ジャッカル";
                     break;
                 default:
                     howler = (char *) 0;
                     break;
                 }
                 if (howler)
+/*JP
                     You_hear("a %s howling at the moon.", howler);
+*/
+                    You_hear("月夜に%sが吠える声を聞いた．", howler);
             }
         }
     } else if (!rn2(30) || Protection_from_shape_changers) {
@@ -101,8 +110,13 @@ register struct monst *mon;
     }
 
     if (canseemon(mon) && !Hallucination)
+#if 0 /*JP*/
         pline("%s changes into a %s.", Monnam(mon),
               is_human(&mons[pm]) ? "human" : mons[pm].mname + 4);
+#else
+        pline("%sは%sの姿になった．", Monnam(mon),
+              is_human(&mons[pm]) ? "人間" : mons[pm].mname + 4);
+#endif
 
     set_mon_data(mon, &mons[pm], 0);
     if (mon->msleeping || !mon->mcanmove) {
@@ -139,19 +153,28 @@ char *genbuf;
             typ =
                 rn2(3) ? PM_SEWER_RAT : rn2(3) ? PM_GIANT_RAT : PM_RABID_RAT;
             if (genbuf)
+/*JP
                 Strcpy(genbuf, "rat");
+*/
+                Strcpy(genbuf, "ネズミ");
             break;
         case PM_WEREJACKAL:
         case PM_HUMAN_WEREJACKAL:
             typ = PM_JACKAL;
             if (genbuf)
+/*JP
                 Strcpy(genbuf, "jackal");
+*/
+                Strcpy(genbuf, "ジャッカル");
             break;
         case PM_WEREWOLF:
         case PM_HUMAN_WEREWOLF:
             typ = rn2(5) ? PM_WOLF : PM_WINTER_WOLF;
             if (genbuf)
+/*JP
                 Strcpy(genbuf, "wolf");
+*/
+                Strcpy(genbuf, "狼");
             break;
         default:
             continue;
@@ -177,9 +200,14 @@ you_were()
     if (Unchanging || (u.umonnum == u.ulycn))
         return;
     if (controllable_poly) {
+#if 0 /*JP*/
         /* `+4' => skip "were" prefix to get name of beast */
         Sprintf(qbuf, "Do you want to change into %s?",
                 an(mons[u.ulycn].mname + 4));
+#else /*JP: 日本語ではそこまでしない */
+        Sprintf(qbuf,"%sに変化しますか？",
+                mons[u.ulycn].mname + 4);
+#endif
         if (yn(qbuf) == 'n')
             return;
     }
@@ -193,11 +221,17 @@ boolean purify;
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
     if (purify) {
+/*JP
         You_feel("purified.");
+*/
+        You("浄められたような気がした．");
         u.ulycn = NON_PM; /* cure lycanthropy */
     }
     if (!Unchanging && is_were(youmonst.data)
+/*JP
         && (!controllable_poly || yn("Remain in beast form?") == 'n'))
+*/
+        && (!controllable_poly || yn("獣の姿のままでいる？") == 'n'))
         rehumanize();
 }
 

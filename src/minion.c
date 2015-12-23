@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 
 void
@@ -194,10 +199,19 @@ boolean talk;
     }
     if (mon) {
         if (talk) {
+/*JP
             pline_The("voice of %s booms:", align_gname(alignment));
+*/
+            pline("%sの声が響いた:", align_gname(alignment));
+/*JP
             verbalize("Thou shalt pay for thine indiscretion!");
+*/
+            verbalize("汝，無分別なる行いの罰を受けるべし！");
             if (!Blind)
+/*JP
                 pline("%s appears before you.", Amonnam(mon));
+*/
+                pline("%sがあなたの前に現われた．", Amonnam(mon));
             mon->mstrategy &= ~STRAT_APPEARMSG;
         }
         mon->mpeaceful = FALSE;
@@ -215,7 +229,10 @@ register struct monst *mtmp;
     long cash, demand, offer;
 
     if (uwep && uwep->oartifact == ART_EXCALIBUR) {
+/*JP
         pline("%s looks very angry.", Amonnam(mtmp));
+*/
+        pline("%sはとても怒っているように見える．", Amonnam(mtmp));
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);
         newsym(mtmp->mx, mtmp->my);
@@ -238,14 +255,22 @@ register struct monst *mtmp;
 
         mtmp->minvis = mtmp->perminvis = 0;
         if (wasunseen && canspotmon(mtmp)) {
+/*JP
             pline("%s appears before you.", Amonnam(mtmp));
+*/
+            pline("%sが目の前に現われた．", Amonnam(mtmp));
             mtmp->mstrategy &= ~STRAT_APPEARMSG;
         }
         newsym(mtmp->mx, mtmp->my);
     }
     if (youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
+#if 0 /*JP*/
         pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
               flags.female ? "Sister" : "Brother");
+#else
+        pline("%sは言った「よう兄%s！」．そして消えた．", Amonnam(mtmp),
+              flags.female ? "妹" : "弟");
+#endif
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, TRUE);
         return (1);
@@ -266,17 +291,31 @@ register struct monst *mtmp;
         if (mon_has_amulet(mtmp))
             demand = cash + (long) rn1(1000, 40);
 
+#if 0 /*JP*/
         pline("%s demands %ld %s for safe passage.", Amonnam(mtmp), demand,
               currency(demand));
+#else
+        pline("%sは通行料として%ld%s要求した．", Amonnam(mtmp), demand,
+              currency(demand));
+#endif
 
         if ((offer = bribe(mtmp)) >= demand) {
+/*JP
             pline("%s vanishes, laughing about cowardly mortals.",
+*/
+            pline("臆病な定命のものを笑いながら，%sは消えた．",
                   Amonnam(mtmp));
         } else if (offer > 0L && (long) rnd(40) > (demand - offer)) {
+/*JP
             pline("%s scowls at you menacingly, then vanishes.",
+*/
+            pline("%sはあなたを威嚇し，消えた．",
                   Amonnam(mtmp));
         } else {
+/*JP
             pline("%s gets angry...", Amonnam(mtmp));
+*/
+            pline("%sは怒った．．．", Amonnam(mtmp));
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             return 0;
@@ -294,23 +333,38 @@ struct monst *mtmp;
     long offer;
     long umoney = money_cnt(invent);
 
+/*JP
     getlin("How much will you offer?", buf);
+*/
+    getlin("お金をいくら与える？", buf);
     if (sscanf(buf, "%ld", &offer) != 1)
         offer = 0L;
 
     /*Michael Paddon -- fix for negative offer to monster*/
     /*JAR880815 - */
     if (offer < 0L) {
+/*JP
         You("try to shortchange %s, but fumble.", mon_nam(mtmp));
+*/
+        You("%sをだまそうとしたが，失敗した．", mon_nam(mtmp));
         return 0L;
     } else if (offer == 0L) {
+/*JP
         You("refuse.");
+*/
+        You("拒んだ．");
         return 0L;
     } else if (offer >= umoney) {
+/*JP
         You("give %s all your gold.", mon_nam(mtmp));
+*/
+        You("%sにお金を全て与えた．", mon_nam(mtmp));
         offer = umoney;
     } else {
+/*JP
         You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
+*/
+        You("%sに%ld%s与えた．", mon_nam(mtmp), offer, currency(offer));
     }
     (void) money2mon(mtmp, offer);
     context.botl = 1;
@@ -400,10 +454,19 @@ struct monst *mon; /* if null, angel hasn't been created yet */
     if (mon) {
         if (canspotmon(mon)) {
             if (!Deaf) {
+/*JP
                 pline("%s rebukes you, saying:", Monnam(mon));
+*/
+                pline("%sはあなたを非難した：", Monnam(mon));
+/*JP
                 verbalize("Since you desire conflict, have some more!");
+*/
+                verbalize("闘争を望んでいるようだから，もっと与えてやろう！");
             } else {
+/*JP
                 pline("%s vanishes!", Monnam(mon));
+*/
+                pline("%sは消えた！", Monnam(mon));
             }
         }
         mongone(mon);
@@ -429,13 +492,25 @@ gain_guardian_angel()
     Hear_again(); /* attempt to cure any deafness now (divine
                      message will be heard even if that fails) */
     if (Conflict) {
+/*JP
         pline("A voice booms:");
+*/
+        pline("声が響いた:");
+/*JP
         verbalize("Thy desire for conflict shall be fulfilled!");
+*/
+        verbalize("「汝の闘争への望み，かなえられるべし！」");
         /* send in some hostile angels instead */
         lose_guardian_angel((struct monst *) 0);
     } else if (u.ualign.record > 8) { /* fervent */
+/*JP
         pline("A voice whispers:");
+*/
+        pline("ささやき声が聞こえた:");
+/*JP
         verbalize("Thou hast been worthy of me!");
+*/
+        verbalize("「汝，我が評価を得たり！」");
         mm.x = u.ux;
         mm.y = u.uy;
         if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL])
@@ -443,9 +518,15 @@ gain_guardian_angel()
                                  TRUE)) != 0) {
             mtmp->mstrategy &= ~STRAT_APPEARMSG;
             if (!Blind)
+/*JP
                 pline("An angel appears near you.");
+*/
+                pline("天使があなたのそばに現われた．");
             else
+/*JP
                 You_feel("the presence of a friendly angel near you.");
+*/
+                You("近くに友好的な天使の存在を感じた．");
             /* guardian angel -- the one case mtame doesn't
              * imply an edog structure, so we don't want to
              * call tamedog().

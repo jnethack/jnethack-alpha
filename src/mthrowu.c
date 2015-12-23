@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 
 STATIC_DCL int FDECL(drop_throw, (struct obj *, BOOLEAN_P, int, int));
@@ -15,9 +20,15 @@ STATIC_DCL int FDECL(drop_throw, (struct obj *, BOOLEAN_P, int, int));
  * Keep consistent with breath weapons in zap.c, and AD_* in monattk.h.
  */
 STATIC_OVL NEARDATA const char *breathwep[] = {
+#if 0 /*JP*/
     "fragments", "fire", "frost", "sleep gas", "a disintegration blast",
     "lightning", "poison gas", "acid", "strange breath #8",
     "strange breath #9"
+#else
+    "破片", "炎", "冷気", "睡眠ガス", "分解の息",
+    "稲妻", "毒の息", "酸", "strange breath #8",
+    "strange breath #9"
+#endif
 };
 
 extern boolean notonhead; /* for long worms */
@@ -42,12 +53,19 @@ const char *name; /* if null, then format `obj' */
         knm = strcpy(knmbuf, killer_xname(obj));
         kprefix = KILLED_BY; /* killer_name supplies "an" if warranted */
     } else {
+#if 0 /*JP*/
         knm = name;
         /* [perhaps ought to check for plural here to] */
         if (!strncmpi(name, "the ", 4) || !strncmpi(name, "an ", 3)
             || !strncmpi(name, "a ", 2))
             kprefix = KILLED_BY;
+#else
+        knm = strcpy(knmbuf, name);
+#endif
     }
+#if 1 /*JP*/
+    strcat(knmbuf, "に当たって");
+#endif
     onm = (obj && obj_is_pname(obj)) ? the(name) : (obj && obj->quan > 1L)
                                                        ? name
                                                        : an(name);
@@ -55,26 +73,47 @@ const char *name; /* if null, then format `obj' */
 
     if (u.uac + tlev <= rnd(20)) {
         if (Blind || !flags.verbose)
+/*JP
             pline("It misses.");
+*/
+            pline("それははずれた．");
         else
+/*JP
             You("are almost hit by %s.", onm);
+*/
+            pline("もう少しで%sに命中するところだった！",onm);
         return 0;
     } else {
         if (Blind || !flags.verbose)
+/*JP
             You("are hit%s", exclam(dam));
+*/
+            pline("何かがあなたに命中した！");
         else
+/*JP
             You("are hit by %s%s", onm, exclam(dam));
+*/
+            pline("%sがあなたに命中した！", onm);
 
         if (obj && objects[obj->otyp].oc_material == SILVER && Hate_silver) {
             /* extra damage already applied by dmgval() */
+/*JP
             pline_The("silver sears your flesh!");
+*/
+            pline("あなたの体は銀で焼かれた！");
             exercise(A_CON, FALSE);
         }
         if (is_acid && Acid_resistance)
+/*JP
             pline("It doesn't seem to hurt you.");
+*/
+            pline("あなたは傷つかなかった．");
         else {
             if (is_acid)
+/*JP
                 pline("It burns!");
+*/
+                pline("酸で焼かれた！");
             losehp(dam, knm, kprefix); /* acid damage */
             exercise(A_STR, FALSE);
         }
@@ -113,8 +152,13 @@ int x, y;
         if (down_gate(x, y) != -1)
             objgone = ship_object(obj, x, y, FALSE);
         if (!objgone) {
+#if 0 /*JP*/
             if (!flooreffects(obj, x, y,
                               "fall")) { /* don't double-dip on damage */
+#else
+            if (!flooreffects(obj, x, y,
+                              "落ちる")) { /* don't double-dip on damage */
+#endif
                 place_object(obj, x, y);
                 if (!mtmp && x == u.ux && y == u.uy)
                     mtmp = &youmonst;
@@ -154,7 +198,10 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
             if (vis)
                 miss(distant_name(otmp, mshot_xname), mtmp);
             else if (verbose)
+/*JP
                 pline("It is missed.");
+*/
+                pline("何かがかすめた．");
         }
         if (!range) { /* Last position; object drops */
             (void) drop_throw(otmp, 0, mtmp->mx, mtmp->my);
@@ -178,19 +225,28 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         if (vis)
             hit(distant_name(otmp, mshot_xname), mtmp, exclam(damage));
         else if (verbose)
+/*JP
             pline("%s is hit%s", Monnam(mtmp), exclam(damage));
+*/
+            pline("%sに命中した%s", Monnam(mtmp), exclam(damage));
 
         if (otmp->opoisoned && is_poisonable(otmp)) {
             if (resists_poison(mtmp)) {
                 if (vis)
+/*JP
                     pline_The("poison doesn't seem to affect %s.",
+*/
+                    pline("%sは毒の影響を受けないようだ．",
                               mon_nam(mtmp));
             } else {
                 if (rn2(30)) {
                     damage += rnd(6);
                 } else {
                     if (vis)
+/*JP
                         pline_The("poison was deadly...");
+*/
+                        pline("毒は致死量だった．．．");
                     damage = mtmp->mhp;
                 }
             }
@@ -198,30 +254,53 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         if (objects[otmp->otyp].oc_material == SILVER
             && mon_hates_silver(mtmp)) {
             if (vis)
+/*JP
                 pline_The("silver sears %s flesh!", s_suffix(mon_nam(mtmp)));
+*/
+                pline("%sの体は銀で焼かれた！", s_suffix(mon_nam(mtmp)));
             else if (verbose)
+/*JP
                 pline("Its flesh is seared!");
+*/
+                pline("何者かの体は焼かれた！");
         }
         if (otmp->otyp == ACID_VENOM && cansee(mtmp->mx, mtmp->my)) {
             if (resists_acid(mtmp)) {
                 if (vis || verbose)
+/*JP
                     pline("%s is unaffected.", Monnam(mtmp));
+*/
+                    pline("%sは影響を受けない．", Monnam(mtmp));
                 damage = 0;
             } else {
                 if (vis)
+/*JP
                     pline_The("acid burns %s!", mon_nam(mtmp));
+*/
+                    pline("%sは酸で焼かれた！", mon_nam(mtmp));
                 else if (verbose)
+/*JP
                     pline("It is burned!");
+*/
+                    pline("何かは焼かれた！");
             }
         }
         mtmp->mhp -= damage;
         if (mtmp->mhp < 1) {
             if (vis || verbose)
+#if 0 /*JP*/
                 pline("%s is %s!", Monnam(mtmp),
                       (nonliving(mtmp->data) || is_vampshifter(mtmp)
                        || !canspotmon(mtmp))
                           ? "destroyed"
                           : "killed");
+#else
+                pline("%sは%s！", Monnam(mtmp),
+                      (nonliving(mtmp->data) || is_vampshifter(mtmp)
+                       || !canspotmon(mtmp))
+                          ? "倒された"
+                          : "死んだ");
+#endif
             /* don't blame hero for unknown rolling boulder trap */
             if (!context.mon_moving
                 && (otmp->otyp != BOULDER || range >= 0 || otmp->otrapped))
@@ -235,7 +314,10 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                                                            : AT_WEAP),
                      otmp)) {
             if (vis && mtmp->mcansee)
+/*JP
                 pline("%s is blinded by %s.", Monnam(mtmp), the(xname(otmp)));
+*/
+                pline("%sは%sによって目が見えなくなった．", Monnam(mtmp), the(xname(otmp)));
             mtmp->mcansee = 0;
             tmp = (int) mtmp->mblinded + rnd(25) + 20;
             if (tmp > 127)
@@ -296,10 +378,18 @@ struct obj *obj;         /* missile (or stack providing it) */
     if ((singleobj->cursed || singleobj->greased) && (dx || dy) && !rn2(7)) {
         if (canseemon(mon) && flags.verbose) {
             if (is_ammo(singleobj))
+/*JP
                 pline("%s misfires!", Monnam(mon));
+*/
+                pline("%sははずした！", Monnam(mon));
             else
+#if 0 /*JP*/
                 pline("%s as %s throws it!", Tobjnam(singleobj, "slip"),
                       mon_nam(mon));
+#else
+                pline("%sが投げようとしたとたん%sが滑った！",
+                          mon_nam(mon), xname(singleobj));
+#endif
         }
         dx = rn2(3) - 1;
         dy = rn2(3) - 1;
@@ -343,18 +433,33 @@ struct obj *obj;         /* missile (or stack providing it) */
                 && singleobj->otyp <= LAST_GEM + 9 /* 9 glass colors */
                 && is_unicorn(youmonst.data)) {
                 if (singleobj->otyp > LAST_GEM) {
+/*JP
                     You("catch the %s.", xname(singleobj));
+*/
+                    You("%sをつかまえた．", xname(singleobj));
+/*JP
                     You("are not interested in %s junk.",
+*/
+                    You("%sのガラクタに興味はない．",
                         s_suffix(mon_nam(mon)));
                     makeknown(singleobj->otyp);
                     dropy(singleobj);
                 } else {
                     You(
+/*JP
                      "accept %s gift in the spirit in which it was intended.",
+*/
+                     "これが欲しかったんだと思いながら%sの贈り物を受けとった．",
                         s_suffix(mon_nam(mon)));
+#if 0 /*JP*/
                     (void) hold_another_object(
                         singleobj, "You catch, but drop, %s.",
                         xname(singleobj), "You catch:");
+#else
+                    (void) hold_another_object(
+                        singleobj, "あなたは%sをつかまえたが，落した．",
+                        xname(singleobj), "をつかまえた．");
+#endif
                 }
                 break;
             }
@@ -417,11 +522,20 @@ struct obj *obj;         /* missile (or stack providing it) */
                 blindinc = rnd(25);
                 if (singleobj->otyp == CREAM_PIE) {
                     if (!Blind)
+/*JP
                         pline("Yecch!  You've been creamed.");
+*/
+                        pline("ウェー．クリームをかぶった．");
                     else
+#if 0 /*JP*/
                         pline("There's %s sticky all over your %s.",
                               something, body_part(FACE));
+#else
+                        pline("あなたは%sにべとつくものを感じた．",
+                              body_part(FACE));
+#endif
                 } else if (singleobj->otyp == BLINDING_VENOM) {
+#if 0 /*JP*/
                     const char *eyes = body_part(EYE);
 
                     if (eyecount(youmonst.data) != 1)
@@ -431,6 +545,12 @@ struct obj *obj;         /* missile (or stack providing it) */
                         pline_The("venom blinds you.");
                     else
                         Your("%s %s.", eyes, vtense(eyes, "sting"));
+#else
+                    if(!Blind)
+                        pline("毒で目が見えなくなった．");
+                    else
+                        Your("%sはちくちくした．", body_part(EYE));
+#endif
                 }
             }
             if (hitu && singleobj->otyp == EGG) {
@@ -542,8 +662,12 @@ struct monst *mtmp;
 
         if (canseemon(mtmp)) {
             onm = xname(otmp);
+#if 0 /*JP*/
             pline("%s thrusts %s.", Monnam(mtmp),
                   obj_is_pname(otmp) ? the(onm) : an(onm));
+#else
+            pline("%sは%sを突き刺した．", Monnam(mtmp), onm);
+#endif
         }
 
         dam = dmgval(otmp, &youmonst);
@@ -637,7 +761,10 @@ struct monst *mtmp;
         if (multishot > 1) {
             /* "N arrows"; multishot > 1 implies otmp->quan > 1, so
                xname()'s result will already be pluralized */
+/*JP
             Sprintf(onmbuf, "%d %s", multishot, xname(otmp));
+*/
+            Sprintf(onmbuf, "%d%sの%s", multishot, numeral(otmp), xname(otmp));
             onm = onmbuf;
         } else {
             /* "an arrow" */
@@ -645,7 +772,10 @@ struct monst *mtmp;
             onm = obj_is_pname(otmp) ? the(onm) : an(onm);
         }
         m_shot.s = ammo_and_launcher(otmp, mwep) ? TRUE : FALSE;
+/*JP
         pline("%s %s %s!", Monnam(mtmp), m_shot.s ? "shoots" : "throws", onm);
+*/
+        pline("%sは%sを%s!", Monnam(mtmp), onm, m_shot.s ? "撃った" : "投げた");
         m_shot.o = otmp->otyp;
     } else {
         m_shot.o = STRANGE_OBJECT; /* don't give multishot feedback */
@@ -682,7 +812,10 @@ struct attack *mattk;
 
     if (mtmp->mcan) {
         if (!Deaf)
+/*JP
             pline("A dry rattle comes from %s throat.",
+*/
+            pline("%sの喉がガラガラと鳴った．",
                   s_suffix(mon_nam(mtmp)));
         return 0;
     }
@@ -702,7 +835,10 @@ struct attack *mattk;
         if (!rn2(BOLT_LIM
                  - distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy))) {
             if (canseemon(mtmp))
+/*JP
                 pline("%s spits venom!", Monnam(mtmp));
+*/
+                pline("%sは毒を吐いた！", Monnam(mtmp));
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
                     distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
             nomul(0);
@@ -728,17 +864,28 @@ struct attack *mattk;
         if (mtmp->mcan) {
             if (!Deaf) {
                 if (canseemon(mtmp))
+/*JP
                     pline("%s coughs.", Monnam(mtmp));
+*/
+                    pline("%sはせきをした．", Monnam(mtmp));
                 else
+/*JP
                     You_hear("a cough.");
+*/
+                    You_hear("せきの音を聞いた．");
             }
             return 0;
         }
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
                 if (canseemon(mtmp))
+#if 0 /*JP*/
                     pline("%s breathes %s!", Monnam(mtmp),
                           breathwep[typ - 1]);
+#else
+                    pline("%sは%sを吐いた！", Monnam(mtmp),
+                          breathwep[typ - 1]);
+#endif
                 buzz((int) (-20 - (typ - 1)), (int) mattk->damn, mtmp->mx,
                      mtmp->my, sgn(tbx), sgn(tby));
                 nomul(0);
@@ -889,13 +1036,22 @@ int whodidit;   /* 1==hero, 0=other, -1==just check whether it'll pass thru */
             *obj_p = otmp = 0; /* object is now gone */
         /* breakage makes its own noises */
         else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
+/*JP
             pline("Whang!");
+*/
+            pline("ぐわーん！");
         else if (otmp->oclass == COIN_CLASS
                  || objects[obj_type].oc_material == GOLD
                  || objects[obj_type].oc_material == SILVER)
+/*JP
             pline("Clink!");
+*/
+            pline("チャリン！");
         else
+/*JP
             pline("Clonk!");
+*/
+            pline("ゴツン！");
     }
 
     return hits;

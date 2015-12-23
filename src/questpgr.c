@@ -177,8 +177,12 @@ ldrname()
 {
     int i = urole.ldrnum;
 
+#if 0 /*JP*/
     Sprintf(nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
             mons[i].mname);
+#else
+    Strcpy(nambuf, mons[i].mname);
+#endif
     return nambuf;
 }
 
@@ -202,8 +206,12 @@ neminame()
 {
     int i = urole.neminum;
 
+#if 0 /*JP*/
     Sprintf(nambuf, "%s%s", type_is_pname(&mons[i]) ? "" : "the ",
             mons[i].mname);
+#else
+    Strcpy(nambuf, mons[i].mname);
+#endif
     return nambuf;
 }
 
@@ -294,10 +302,16 @@ char c;
         str = rank_of(MIN_QUEST_LEVEL, Role_switch, flags.female);
         break;
     case 's':
+/*JP
         str = (flags.female) ? "sister" : "brother";
+*/
+        str = (flags.female) ? "ñÖ" : "íÌ";
         break;
     case 'S':
+/*JP
         str = (flags.female) ? "daughter" : "son";
+*/
+        str = (flags.female) ? "ñ∫" : "ëßéq";
         break;
     case 'l':
         str = ldrname();
@@ -342,16 +356,28 @@ char c;
         str = align_gname(A_LAWFUL);
         break;
     case 'C':
+/*JP
         str = "chaotic";
+*/
+        str = "ç¨ì◊";
         break;
     case 'N':
+/*JP
         str = "neutral";
+*/
+        str = "íÜóß";
         break;
     case 'L':
+/*JP
         str = "lawful";
+*/
+        str = "íÅèò";
         break;
     case 'x':
+/*JP
         str = Blind ? "sense" : "see";
+*/
+        str = Blind ? "ä¥Ç∂" : "å©";
         break;
     case 'Z':
         str = dungeons[0].dname;

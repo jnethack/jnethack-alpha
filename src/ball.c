@@ -16,7 +16,10 @@ boolean showmsg;
 {
     if (carried(uball)) {
         if (showmsg)
+/*JP
             pline("Startled, you drop the iron ball.");
+*/
+            pline("‹Á‚¢‚Ä‚ ‚È‚½‚Í“S‹…‚ğ—‚µ‚½D");
         if (uwep == uball)
             setuwep((struct obj *) 0);
         if (uswapwep == uball)
@@ -39,16 +42,29 @@ ballfall()
     ballrelease(TRUE);
     if (gets_hit) {
         int dmg = rn1(7, 25);
+/*JP
         pline_The("iron ball falls on your %s.", body_part(HEAD));
+*/
+        pline("“S‹…‚Í‚ ‚È‚½‚Ì%s‚Ìã‚É—‚¿‚½D", body_part(HEAD));
         if (uarmh) {
             if (is_metallic(uarmh)) {
+/*JP
                 pline("Fortunately, you are wearing a hard helmet.");
+*/
+                pline("K‰^‚É‚àC‚ ‚È‚½‚ÍŒÅ‚¢Š•‚ğg‚É‚Â‚¯‚Ä‚¢‚½D");
                 dmg = 3;
             } else if (flags.verbose)
+/*JP
                 pline("%s does not protect you.", Yname2(uarmh));
+*/
+                Your("%s‚Å‚Íç‚ê‚È‚¢D", Yname2(uarmh));
         }
+#if 0 /*JP*/
         losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",
                NO_KILLER_PREFIX);
+#else
+        losehp(Maybe_Half_Phys(dmg), "“S‹…‚Å“ª‚ğ‘Å‚Á‚Ä", KILLED_BY);
+#endif
     }
 }
 
@@ -586,8 +602,13 @@ boolean allow_drag;
 drag:
 
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
+#if 0 /*JP*/
         You("cannot %sdrag the heavy iron ball.",
             invent ? "carry all that and also " : "");
+#else
+        You("%sd‚¢“S‹…‚ğ‚Ğ‚«‚¸‚é‚±‚Æ‚ª‚Å‚«‚È‚¢D",
+            invent ? "‚»‚ê‚¾‚¯‚Ì‰×•¨‚ğ‚Á‚½‚Ü‚Ü" : "");
+#endif
         nomul(0);
         return FALSE;
     }
@@ -601,13 +622,19 @@ drag:
             && (t->ttyp == PIT || t->ttyp == SPIKED_PIT || t->ttyp == HOLE
                 || t->ttyp == TRAPDOOR))) {
         if (Levitation) {
+/*JP
             You_feel("a tug from the iron ball.");
+*/
+            You("“S‹…‚Éˆø‚Á‚Ï‚ç‚ê‚½D");
             if (t)
                 t->tseen = 1;
         } else {
             struct monst *victim;
 
+/*JP
             You("are jerked back by the iron ball!");
+*/
+            You("“S‹…‚É‚®‚¢‚Æˆø‚Á‚Ï‚ç‚ê‚½I");
             if ((victim = m_at(uchain->ox, uchain->oy)) != 0) {
                 int tmp;
 
@@ -702,33 +729,63 @@ xchar x, y;
 
     if (x != u.ux || y != u.uy) {
         struct trap *t;
+/*JP
         const char *pullmsg = "The ball pulls you out of the %s!";
+*/
+        const char *pullmsg = "“S‹…‚Í%s‚©‚ç‚ ‚È‚½‚ğˆø‚Á‚Ï‚èo‚µ‚½I";
 
         if (u.utrap && u.utraptype != TT_INFLOOR
             && u.utraptype != TT_BURIEDBALL) {
             switch (u.utraptype) {
             case TT_PIT:
+/*JP
                 pline(pullmsg, "pit");
+*/
+                pline(pullmsg, "—‚µŒŠ");
                 break;
             case TT_WEB:
+/*JP
                 pline(pullmsg, "web");
+*/
+                pline(pullmsg, "‚­‚à‚Ì‘ƒ");
+/*JP
                 pline_The("web is destroyed!");
+*/
+                pline("‚­‚à‚Ì‘ƒ‚Í‚±‚í‚ê‚½I");
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
+/*JP
                 pline(pullmsg, "lava");
+*/
+                pline(pullmsg, "—nŠâ");
                 break;
             case TT_BEARTRAP: {
                 register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
+/*JP
                 pline(pullmsg, "bear trap");
+*/
+                pline(pullmsg, "ŒF‚Ìã©");
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
+#if 0 /*JP*/
                     Your("%s %s is severely damaged.",
                          (side == LEFT_SIDE) ? "left" : "right",
                          body_part(LEG));
+#else
+                    Your("%s%s‚Í‚Ğ‚Ç‚¢‚ğ•‰‚Á‚½D",
+                         (side == LEFT_SIDE) ? "¶" : "‰E",
+                         body_part(LEG));
+#endif
+#if 0 /*JP*/
                     losehp(Maybe_Half_Phys(2),
                            "leg damage from being pulled out of a bear trap",
                            KILLED_BY);
+#else
+                    losehp(Maybe_Half_Phys(2),
+                           "ŒF‚Ìã©‚©‚ç”²‚¯‚æ‚¤‚Æ‘«‚ğˆø‚Á‚Ï‚Á‚Ä",
+                           KILLED_BY);
+#endif
                 }
                 break;
             }
@@ -782,7 +839,10 @@ litter()
         nextobj = otmp->nobj;
         if ((otmp != uball) && (rnd(capacity) <= (int) otmp->owt)) {
             if (canletgo(otmp, "")) {
+/*JP
                 pline("%s you down the stairs.", Yobjnam2(otmp, "follow"));
+*/
+                You("%s‚Æˆê‚ÉŠK’i‚ğ~‚è‚½D", xname(otmp));
                 dropx(otmp);
             }
         }
@@ -807,27 +867,48 @@ drag_down()
     forward = carried(uball) && (uwep == uball || !uwep || !rn2(3));
 
     if (carried(uball))
+/*JP
         You("lose your grip on the iron ball.");
+*/
+        You("“S‹…‚ğè‚©‚ç—‚µ‚Ä‚µ‚Ü‚Á‚½D");
 
     if (forward) {
         if (rn2(6)) {
+/*JP
             pline_The("iron ball drags you downstairs!");
+*/
+            You("“S‹…‚É‚æ‚Á‚ÄŠK’i‚ğ‚±‚ë‚ª‚è—‚¿‚½I");
             losehp(Maybe_Half_Phys(rnd(6)),
+/*JP
                    "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
+*/
+                   "“S‹…‚É‚æ‚èŠK’i‚ğ‚±‚ë‚ª‚è—‚¿‚Ä", KILLED_BY);
             litter();
         }
     } else {
         if (rn2(2)) {
+/*JP
             pline_The("iron ball smacks into you!");
+*/
+            pline("“S‹…‚Í‚ ‚È‚½‚ÉƒSƒcƒ“‚Æ‚Ô‚Â‚©‚Á‚½I");
+/*JP
             losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
+*/
+            losehp(Maybe_Half_Phys(rnd(20)), "“S‹…‚ÌÕ“Ë‚Å",
                    KILLED_BY_AN);
             exercise(A_STR, FALSE);
             dragchance -= 2;
         }
         if ((int) dragchance >= rnd(6)) {
+/*JP
             pline_The("iron ball drags you downstairs!");
+*/
+            You("“S‹…‚É‚æ‚Á‚ÄŠK’i‚ğ‚±‚ë‚ª‚è—‚¿‚½I");
             losehp(Maybe_Half_Phys(rnd(3)),
+/*JP
                    "dragged downstairs by an iron ball", NO_KILLER_PREFIX);
+*/
+                   "“S‹…‚É‚æ‚èŠK’i‚ğ‚±‚ë‚ª‚è—‚¿‚Ä", KILLED_BY);
             exercise(A_STR, FALSE);
             litter();
         }

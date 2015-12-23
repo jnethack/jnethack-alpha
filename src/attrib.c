@@ -2,6 +2,12 @@
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
+
 /*  attribute modification routines. */
 
 #include "hack.h"
@@ -9,11 +15,22 @@
 
 /* part of the output on gain or loss of attribute */
 static const char
+#if 0 /*JP*/
     *const plusattr[] = { "strong", "smart", "wise",
                           "agile",  "tough", "charismatic" },
+#else
+    *const plusattr[] = { "強い", "賢明だ", "賢い",
+                          "機敏だ", "頑丈だ", "魅力的だ" },
+#endif
+#if 0 /*JP*/
     *const minusattr[] = { "weak",    "stupid",
                            "foolish", "clumsy",
                            "fragile", "repulsive" };
+#else
+    *const minusattr[] = { "弱い", "愚かだ",
+                           "間抜けだ", "不器用だ",
+                           "ひ弱だ","醜い" };
+#endif
 
 static const struct innate {
     schar ulevel;
@@ -21,69 +38,147 @@ static const struct innate {
     const char *gainstr, *losestr;
 } arc_abil[] = { { 1, &(HStealth), "", "" },
                  { 1, &(HFast), "", "" },
+/*JP
                  { 10, &(HSearching), "perceptive", "" },
+*/
+                 { 10, &(HSearching), "知覚力を得た", "知覚力を失った" },
                  { 0, 0, 0, 0 } },
 
   bar_abil[] = { { 1, &(HPoison_resistance), "", "" },
+/*JP
                  { 7, &(HFast), "quick", "slow" },
+*/
+                 { 7, &(HFast), "素早さを得た", "遅くなった" },
+/*JP
                  { 15, &(HStealth), "stealthy", "" },
+*/
+                 { 15, &(HStealth), "人目を盗む力を得た", "人目を盗む力を失った" },
                  { 0, 0, 0, 0 } },
 
+/*JP
   cav_abil[] = { { 7, &(HFast), "quick", "slow" },
+*/
+  cav_abil[] = { { 7, &(HFast), "素早さを得た", "遅くなった" },
+/*JP
                  { 15, &(HWarning), "sensitive", "" },
+*/
+                 { 15, &(HWarning), "敏感になった", "鈍感になった" },
                  { 0, 0, 0, 0 } },
 
   hea_abil[] = { { 1, &(HPoison_resistance), "", "" },
+/*JP
                  { 15, &(HWarning), "sensitive", "" },
+*/
+                 { 15, &(HWarning), "敏感になった", "鈍感になった" },
                  { 0, 0, 0, 0 } },
 
+/*JP
   kni_abil[] = { { 7, &(HFast), "quick", "slow" }, { 0, 0, 0, 0 } },
+*/
+  kni_abil[] = { { 7, &(HFast), "素早さを得た", "遅くなった" }, { 0, 0, 0, 0 } },
 
   mon_abil[] = { { 1, &(HFast), "", "" },
                  { 1, &(HSleep_resistance), "", "" },
                  { 1, &(HSee_invisible), "", "" },
+/*JP
                  { 3, &(HPoison_resistance), "healthy", "" },
+*/
+                 { 3, &(HPoison_resistance), "健康になった", "不健康になった" },
+/*JP
                  { 5, &(HStealth), "stealthy", "" },
+*/
+                 { 5, &(HStealth), "人目を盗む力を得た", "人目を盗む力を失った" },
+/*JP
                  { 7, &(HWarning), "sensitive", "" },
+*/
+                 { 7, &(HWarning), "敏感になった", "鈍感になった" },
+/*JP
                  { 9, &(HSearching), "perceptive", "unaware" },
+*/
+                 { 9, &(HSearching), "知覚力を得た", "知覚力を失った" },
+/*JP
                  { 11, &(HFire_resistance), "cool", "warmer" },
+*/
+                 { 11, &(HFire_resistance), "冷たくなった", "暖かくなった" },
+/*JP
                  { 13, &(HCold_resistance), "warm", "cooler" },
+*/
+                 { 13, &(HCold_resistance), "暖かくなった", "冷たくなった"},
+/*JP
                  { 15, &(HShock_resistance), "insulated", "conductive" },
+*/
+                 { 15, &(HShock_resistance), "絶縁された", "導電された" },
+/*JP
                  { 17, &(HTeleport_control), "controlled", "uncontrolled" },
+*/
+                 { 17, &(HTeleport_control), "制御力を得た","制御力を失った" },
                  { 0, 0, 0, 0 } },
 
+/*JP
   pri_abil[] = { { 15, &(HWarning), "sensitive", "" },
+*/
+  pri_abil[] = { { 15, &(HWarning), "敏感になった", "鈍感になった" },
+/*JP
                  { 20, &(HFire_resistance), "cool", "warmer" },
+*/
+                 { 20, &(HFire_resistance), "冷たくなった", "暖かくなった" },
                  { 0, 0, 0, 0 } },
 
   ran_abil[] = { { 1, &(HSearching), "", "" },
+/*JP
                  { 7, &(HStealth), "stealthy", "" },
+*/
+                 { 7, &(HStealth), "人目を盗む力を得た", "人目を盗む力を失った" },
                  { 15, &(HSee_invisible), "", "" },
                  { 0, 0, 0, 0 } },
 
   rog_abil[] = { { 1, &(HStealth), "", "" },
+/*JP
                  { 10, &(HSearching), "perceptive", "" },
+*/
+                 { 10, &(HSearching), "知覚力を得た", "知覚力を失った" },
                  { 0, 0, 0, 0 } },
 
   sam_abil[] = { { 1, &(HFast), "", "" },
+/*JP
                  { 15, &(HStealth), "stealthy", "" },
+*/
+                 { 15, &(HStealth), "人目を盗む力を得た", "人目を盗む力を失った" },
                  { 0, 0, 0, 0 } },
 
+/*JP
   tou_abil[] = { { 10, &(HSearching), "perceptive", "" },
+*/
+  tou_abil[] = { { 10, &(HSearching), "知覚力を得た", "知覚力を失った" },
+/*JP
                  { 20, &(HPoison_resistance), "hardy", "" },
+*/
+                 { 20, &(HPoison_resistance), "免疫力を得た", "免疫力を失った" },
                  { 0, 0, 0, 0 } },
 
   val_abil[] = { { 1, &(HCold_resistance), "", "" },
                  { 1, &(HStealth), "", "" },
+/*JP
                  { 7, &(HFast), "quick", "slow" },
+*/
+                 { 7, &(HFast), "素早さを得た", "遅くなった" },
                  { 0, 0, 0, 0 } },
 
+/*JP
   wiz_abil[] = { { 15, &(HWarning), "sensitive", "" },
+*/
+  wiz_abil[] = { { 15, &(HWarning), "敏感になった", "鈍感になった" },
+/*JP
                  { 17, &(HTeleport_control), "controlled", "uncontrolled" },
+*/
+                 { 17, &(HTeleport_control), "制御力を得た","制御力を失った" },
                  { 0, 0, 0, 0 } },
 
   /* Intrinsics conferred by race */
+/*JP
     elf_abil[] = { { 4, &(HSleep_resistance), "awake", "tired" },
+*/
+    elf_abil[] = { { 4, &(HSleep_resistance), "目が覚めた", "眠くなった" },
                    { 0, 0, 0, 0 } },
 
   orc_abil[] = { { 1, &(HPoison_resistance), "", "" }, { 0, 0, 0, 0 } };
@@ -108,7 +203,10 @@ int msgflg; /* positive => no message, zero => message, and */
 
     if ((ndx == A_INT || ndx == A_WIS) && uarmh && uarmh->otyp == DUNCE_CAP) {
         if (msgflg == 0)
+/*JP
             Your("cap constricts briefly, then relaxes again.");
+*/
+            Your("帽子がしばらくの間キュっと締めつけ，そしてゆるんだ．");
         return FALSE;
     }
 
@@ -138,13 +236,21 @@ int msgflg; /* positive => no message, zero => message, and */
     }
     if (ACURR(ndx) == old_acurr) {
         if (msgflg == 0 && flags.verbose)
+#if 0 /*JP*/
             pline("You're %s as %s as you can get.",
                   abonflg ? "currently" : "already", attrstr);
+#else
+            You("%s十分に%s．",
+                  abonflg ? "今のところ" : "既に", attrstr);
+#endif
         return FALSE;
     }
 
     if (msgflg <= 0)
+/*JP
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
+*/
+        You("%s%sなったような気がした！", (incr > 1 || incr < -1) ? "とても" : "", jconj_adj(attrstr));
     context.botl = 1;
     if (moves > 1 && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
@@ -229,20 +335,38 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     /* inform player about being poisoned unless that's already been done;
        "blast" has given a "blast of poison gas" message; "poison arrow",
        "poison dart", etc have implicitly given poison messages too... */
+#if 0 /*JP*/
     if (strcmp(reason, "blast") && !strstri(reason, "poison")) {
+#else
+    if (strcmp(reason, "風") && strcmp(reason, "息") && !strstri(reason, "毒")) {
+#endif
+#if 0 /*JP*/
         boolean plural = (reason[strlen(reason) - 1] == 's') ? 1 : 0;
+#endif
 
         /* avoid "The" Orcus's sting was poisoned... */
+#if 0 /*JP*/
         pline("%s%s %s poisoned!", isupper(*reason) ? "" : "The ", reason,
               plural ? "were" : "was");
+#else
+        pline("%sは毒におかされている！", reason);
+#endif
     }
     if (Poison_resistance) {
+#if 0 /*JP*/
         if (!strcmp(reason, "blast"))
+#else
+        if (!strcmp(reason, "風") || !strcmp(reason, "息"))
+#endif
             shieldeff(u.ux, u.uy);
+/*JP
         pline_The("poison doesn't seem to affect you.");
+*/
+        pline("毒は効かなかったようだ．");
         return;
     }
 
+#if 0 /*JP*//*日本語では不要*/
     /* suppress killer prefix if it already has one */
     i = name_to_mon(pkiller);
     if (i >= LOW_PM && (mons[i].geno & G_UNIQ)) {
@@ -254,12 +378,16 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
         /*[ does this need a plural check too? ]*/
         kprefix = KILLED_BY;
     }
+#endif
 
     i = !fatal ? 1 : rn2(fatal + (thrown_weapon ? 20 : 0));
     if (i == 0 && typ != A_CHA) {
         /* instant kill */
         u.uhp = -1;
+/*JP
         pline_The("poison was deadly...");
+*/
+        pline("毒は致死量だった．．．");
     } else if (i > 5) {
         /* HP damage; more likely--but less severe--with missiles */
         loss = thrown_weapon ? rnd(6) : rn1(10, 6);
@@ -276,8 +404,12 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     if (u.uhp < 1) {
         killer.format = kprefix;
         Strcpy(killer.name, pkiller);
+#if 0 /*JP*/
         /* "Poisoned by a poisoned ___" is redundant */
         done(strstri(pkiller, "poison") ? DIED : POISONING);
+#else /*JP:日本語では区別していない*/
+        done(POISONING);
+#endif
     }
     (void) encumber_msg();
 }
@@ -454,12 +586,21 @@ exerper()
 /* exercise/abuse text (must be in attribute order, not botl order);
    phrased as "You must have been [][0]." or "You haven't been [][1]." */
 static NEARDATA const char *const exertext[A_MAX][2] = {
+#if 0 /*JP*/
     { "exercising diligently", "exercising properly" },           /* Str */
     { 0, 0 },                                                     /* Int */
     { "very observant", "paying attention" },                     /* Wis */
     { "working on your reflexes", "working on reflexes lately" }, /* Dex */
     { "leading a healthy life-style", "watching your health" },   /* Con */
     { 0, 0 },                                                     /* Cha */
+#else
+    { "念入りに運動していた", "適切に運動していなかった" },       /* Str */
+    { 0, 0 },                                                     /* Int */
+    { "慎重に行動していた", "注意不足だった" },                   /* Wis */
+    { "反射神経を使っていた", "最近反射神経を使っていなかった" }, /* Dex */
+    { "健康的な生活をしていた", "健康管理を怠っていた" },         /* Con */
+    { 0, 0 },                                                     /* Cha */
+#endif
 };
 
 void
@@ -535,9 +676,14 @@ exerchk()
                 /* if you actually changed an attrib - zero accumulation */
                 AEXE(i) = ax = 0;
                 /* then print an explanation */
+#if 0 /*JP*/
                 You("%s %s.",
                     (mod_val > 0) ? "must have been" : "haven't been",
                     exertext[i][(mod_val > 0) ? 0 : 1]);
+#else
+                You("%sに違いない．",
+                    exertext[i][(mod_val > 0) ? 0 : 1]);
+#endif
             }
         nextattrib:
             /* this used to be ``AEXE(i) /= 2'' but that would produce

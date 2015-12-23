@@ -1730,16 +1730,28 @@ struct monst *mtmp, *victim;
         ptr = &mons[newtype];
         if (mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
+#if 0 /*JP*/
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
                       an(ptr->mname), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
+#else
+                pline("%s‚ª¬’·‚µ‚Ä%s‚É‚È‚é‚Æ%s‚µ‚Ü‚Á‚½I", mon_nam(mtmp),
+                      ptr->mname,
+                      nonliving(ptr) ? "Á‚¦‚Ä" : "Ž€‚ñ‚Å");
+#endif
             set_mon_data(mtmp, ptr, -1); /* keep mvitals[] accurate */
             mondied(mtmp);
             return (struct permonst *) 0;
         } else if (canspotmon(mtmp)) {
+#if 0 /*JP*/
             pline("%s %s %s.", Monnam(mtmp),
                   humanoid(ptr) ? "becomes" : "grows up into",
                   an(ptr->mname));
+#else
+            pline("%s‚Í%s‚É%sD", Monnam(mtmp),
+                  ptr->mname,
+                  humanoid(ptr) ? "‚È‚Á‚½" : "¬’·‚µ‚½");
+#endif
         }
         set_mon_data(mtmp, ptr, 1);    /* preserve intrinsics */
         newsym(mtmp->mx, mtmp->my);    /* color may change */

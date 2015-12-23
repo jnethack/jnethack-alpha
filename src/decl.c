@@ -211,14 +211,22 @@ NEARDATA struct monst *migrating_mons = (struct monst *) 0;
 
 NEARDATA struct mvitals mvitals[NUMMONS];
 
+#if 0 /*JP*/
 NEARDATA struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"
 };
+#else
+NEARDATA struct c_color_names c_color_names = {
+    "黒い",   "琥珀色の", "金色の", "水色の", "赤い", "緑色の",
+    "銀色の", "青い",     "紫色の", "白い",   "橙色の"
+};
+#endif
 
 struct menucoloring *menu_colorings = NULL;
 
 const char *c_obj_colors[] = {
+#if 0 /*JP*/
     "black",          /* CLR_BLACK */
     "red",            /* CLR_RED */
     "green",          /* CLR_GREEN */
@@ -235,8 +243,27 @@ const char *c_obj_colors[] = {
     "bright magenta", /* CLR_BRIGHT_MAGENTA */
     "bright cyan",    /* CLR_BRIGHT_CYAN */
     "white",          /* CLR_WHITE */
+#else
+    "黒い",           /* CLR_BLACK */
+    "赤い",           /* CLR_RED */
+    "緑色の",         /* CLR_GREEN */
+    "茶色の",         /* CLR_BROWN */
+    "青い",           /* CLR_BLUE */
+    "マゼンタ色の",   /* CLR_MAGENTA */
+    "シアン色の",     /* CLR_CYAN */
+    "灰色の",         /* CLR_GRAY */
+    "透明な",         /* no_color */
+    "橙色の",         /* CLR_ORANGE */
+    "明るい緑色の",   /* CLR_BRIGHT_GREEN */
+    "黄色の",         /* CLR_YELLOW */
+    "明るい青色の",   /* CLR_BRIGHT_BLUE */
+    "明るいマゼンタ色の", /* CLR_BRIGHT_MAGENTA */
+    "明るいシアン色の", /* CLR_BRIGHT_CYAN */
+    "白い",           /* CLR_WHITE */
+#endif
 };
 
+#if 0 /*JP*/
 struct c_common_strings c_common_strings = { "Nothing happens.",
                                              "That's enough tries!",
                                              "That is a silly thing to %s.",
@@ -247,15 +274,36 @@ struct c_common_strings c_common_strings = { "Nothing happens.",
                                              "Never mind.",
                                              "vision quickly clears.",
                                              { "the", "your" } };
+#else
+struct c_common_strings c_common_strings = { "何も起きなかった．",
+                                             "いい加減にしろ！",
+                                             "%s？そりゃばかげている．",
+                                             "一瞬震えた．",
+                                             "何か",
+                                             "何か",
+                                             "また動けるようになった．",
+                                             "え？",
+                                             "視界がはっきりした．",
+                                             { "", "あなたの" } };
+#endif
 
 /* NOTE: the order of these words exactly corresponds to the
    order of oc_material values #define'd in objclass.h. */
+#if 0 /*JP*/
 const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
                              "flesh",      "paper",   "cloth",      "leather",
                              "wooden",     "bone",    "dragonhide", "iron",
                              "metal",      "copper",  "silver",     "gold",
                              "platinum",   "mithril", "plastic",    "glass",
                              "gemstone",   "stone" };
+#else
+const char *materialnm[] = { "神秘", "液状", "蝋",   "有機",
+                             "肉",   "紙",   "布",   "革",
+                             "木",   "骨",   "竜皮", "鉄",
+                             "金属", "銅",   "白銀", "金",
+                             "プラチナ", "ミスリル", "プラスチック", "ガラス",
+                             "宝石", "石" };
+#endif
 
 /* Vision */
 NEARDATA boolean vision_full_recalc = 0;

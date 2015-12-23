@@ -159,7 +159,10 @@ VA_DECL(const char *, line)
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
+/*JP
     vpline(YouMessage(tmp, "You ", line), VA_ARGS);
+*/
+    vpline(YouMessage(tmp, "あなたは", line), VA_ARGS);
     VA_END();
 }
 
@@ -170,7 +173,10 @@ VA_DECL(const char *, line)
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
+/*JP
     vpline(YouMessage(tmp, "Your ", line), VA_ARGS);
+*/
+    vpline(YouMessage(tmp, "あなたの", line), VA_ARGS);
     VA_END();
 }
 
@@ -182,9 +188,15 @@ VA_DECL(const char *, line)
     VA_START(line);
     VA_INIT(line, const char *);
     if (Unaware)
+/*JP
         YouPrefix(tmp, "You dream that you feel ", line);
+*/
+        YouPrefix(tmp, "あなたは夢の中で", line);
     else
+/*JP
         YouPrefix(tmp, "You feel ", line);
+*/
+        YouPrefix(tmp, "あなたは", line);
     vpline(strcat(tmp, line), VA_ARGS);
     VA_END();
 }
@@ -196,7 +208,10 @@ VA_DECL(const char *, line)
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
+/*JP
     vpline(YouMessage(tmp, "You can't ", line), VA_ARGS);
+*/
+    vpline(YouMessage(tmp, "あなたは", line), VA_ARGS);
     VA_END();
 }
 
@@ -207,7 +222,10 @@ VA_DECL(const char *, line)
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
+/*JP
     vpline(YouMessage(tmp, "The ", line), VA_ARGS);
+*/
+    vpline(YouMessage(tmp, "", line), VA_ARGS);
     VA_END();
 }
 
@@ -218,7 +236,10 @@ VA_DECL(const char *, line)
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
+/*JP
     vpline(YouMessage(tmp, "There ", line), VA_ARGS);
+*/
+    vpline(YouMessage(tmp, "", line), VA_ARGS);
     VA_END();
 }
 
@@ -227,11 +248,16 @@ void You_hear
 VA_DECL(const char *, line)
 {
     char *tmp;
+#if 1 /*JP*/
+        char *adj;
+        char *p;
+#endif
 
     if (Deaf || !flags.acoustics)
         return;
     VA_START(line);
     VA_INIT(line, const char *);
+#if 0 /*JP*/
     if (Underwater)
         YouPrefix(tmp, "You barely hear ", line);
     else if (Unaware)
@@ -239,6 +265,29 @@ VA_DECL(const char *, line)
     else
         YouPrefix(tmp, "You hear ", line);
     vpline(strcat(tmp, line), VA_ARGS);
+#else
+    if (Underwater)
+        adj = "かすかに";
+    else if (Unaware)
+        adj = "夢の中で";
+    else
+        adj = "";
+    tmp = You_buf(strlen(adj) + strlen(line) + sizeof("あなたは   "));
+
+    p = (char *)strstr(line, "聞こ") ;
+    if (p == NULL)
+        Strcpy(tmp, "あなたは");
+    else
+        Strcpy(tmp, "");
+    if (p != NULL || (p = (char *)strstr(line, "聞い")) != NULL){
+        strncat(tmp, line, (p - line));
+        strcat(tmp, adj);
+        strcat(tmp, p);
+    } else {
+        Strcat(tmp, line);
+    }
+    vpline(tmp, VA_ARGS);
+#endif
     VA_END();
 }
 
@@ -251,11 +300,19 @@ VA_DECL(const char *, line)
     VA_START(line);
     VA_INIT(line, const char *);
     if (Unaware)
+/*JP
         YouPrefix(tmp, "You dream that you see ", line);
+*/
+        YouPrefix(tmp, "あなたは夢の中で", line);
+#if 0 /*JP*//*ここは呼び出し元で処理する?*/
     else if (Blind) /* caller should have caught this... */
         YouPrefix(tmp, "You sense ", line);
+#endif
     else
+/*JP
         YouPrefix(tmp, "You see ", line);
+*/
+        YouPrefix(tmp, "あなたは", line);
     vpline(strcat(tmp, line), VA_ARGS);
     VA_END();
 }
@@ -272,10 +329,17 @@ VA_DECL(const char *, line)
 
     VA_START(line);
     VA_INIT(line, const char *);
+#if 0 /*JP*/
     tmp = You_buf((int) strlen(line) + sizeof "\"\"");
     Strcpy(tmp, "\"");
     Strcat(tmp, line);
     Strcat(tmp, "\"");
+#else
+    tmp = You_buf((int) strlen(line) + sizeof "「」");
+    Strcpy(tmp, "「");
+    Strcat(tmp, line);
+    Strcat(tmp, "」");
+#endif
     vpline(tmp, VA_ARGS);
     VA_END();
 }
@@ -348,7 +412,10 @@ VA_DECL(const char *, s)
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
     pline("%s", pbuf);
+/*JP
     pline("Program in disorder - perhaps you'd better #quit.");
+*/
+    pline("プログラムに障害発生 - #quitしたほうがよさそうだ．");
     program_state.in_impossible = 0;
     VA_END();
 }
@@ -359,15 +426,30 @@ aligntyp alignment;
 {
     switch ((int) alignment) {
     case A_CHAOTIC:
+/*JP
         return "chaotic";
+*/
+        return "混沌";
     case A_NEUTRAL:
+/*JP
         return "neutral";
+*/
+        return "中立";
     case A_LAWFUL:
+/*JP
         return "lawful";
+*/
+        return "秩序";
     case A_NONE:
+/*JP
         return "unaligned";
+*/
+        return "無心";
     }
+/*JP
     return "unknown";
+*/
+    return "不明";
 }
 
 void
@@ -379,7 +461,10 @@ register struct monst *mtmp;
 
     info[0] = 0;
     if (mtmp->mtame) {
+/*JP
         Strcat(info, ", tame");
+*/
+        Strcat(info, ", 飼いならされている");
         if (wizard) {
             Sprintf(eos(info), " (%d", mtmp->mtame);
             if (!mtmp->isminion)
@@ -388,14 +473,23 @@ register struct monst *mtmp;
             Strcat(info, ")");
         }
     } else if (mtmp->mpeaceful)
+/*JP
         Strcat(info, ", peaceful");
+*/
+        Strcat(info, ", 友好的");
     if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])
         /* don't reveal the innate form (chameleon, vampire, &c),
            just expose the fact that this current form isn't it */
+/*JP
         Strcat(info, ", shapechanger");
+*/
+      
     /* pets eating mimic corpses mimic while eating, so this comes first */
     if (mtmp->meating)
+/*JP
         Strcat(info, ", eating");
+*/
+        Strcat(info, ", 食事中");
     /* a stethoscope exposes mimic before getting here so this
        won't be relevant for it, but wand of probing doesn't */
     if (mtmp->m_ap_type)
@@ -410,38 +504,78 @@ register struct monst *mtmp;
                                 ? an(mons[mtmp->mappearance].mname)
                                 : something); /* impossible... */
     if (mtmp->mcan)
+/*JP
         Strcat(info, ", cancelled");
+*/
+        Strcat(info, ", 無力");
     if (mtmp->mconf)
+/*JP
         Strcat(info, ", confused");
+*/
+        Strcat(info, ", 混乱状態");
     if (mtmp->mblinded || !mtmp->mcansee)
+/*JP
         Strcat(info, ", blind");
+*/
+        Strcat(info, ", 盲目");
     if (mtmp->mstun)
+/*JP
         Strcat(info, ", stunned");
+*/
+        Strcat(info, ", くらくら状態");
     if (mtmp->msleeping)
+/*JP
         Strcat(info, ", asleep");
+*/
+        Strcat(info, ", 睡眠状態");
 #if 0 /* unfortunately mfrozen covers temporary sleep and being busy \
          (donning armor, for instance) as well as paralysis */
-	else if (mtmp->mfrozen)	  Strcat(info, ", paralyzed");
+        else if (mtmp->mfrozen)   Strcat(info, ", paralyzed");
 #else
     else if (mtmp->mfrozen || !mtmp->mcanmove)
+/*JP
         Strcat(info, ", can't move");
+*/
+        Strcat(info, ", 動けない");
 #endif
     /* [arbitrary reason why it isn't moving] */
     else if (mtmp->mstrategy & STRAT_WAITMASK)
+/*JP
         Strcat(info, ", meditating");
+*/
+        Strcat(info, ", 冥想中");
     if (mtmp->mflee)
+/*JP
         Strcat(info, ", scared");
+*/
+        Strcat(info, ", 怯えている");
     if (mtmp->mtrapped)
+/*JP
         Strcat(info, ", trapped");
+*/
+        Strcat(info, ", 罠にかかっている");
     if (mtmp->mspeed)
+#if 0 /*JP:T*/
         Strcat(info, mtmp->mspeed == MFAST ? ", fast" : mtmp->mspeed == MSLOW
                                                             ? ", slow"
                                                             : ", ???? speed");
+#else
+        Strcat(info, mtmp->mspeed == MFAST ? ", 素早い" : mtmp->mspeed == MSLOW
+                                                            ? ", 遅い"
+                                                            : ", 速度不明");
+#endif
     if (mtmp->mundetected)
+/*JP
         Strcat(info, ", concealed");
+*/
+        Strcat(info, ", 隠れている");
     if (mtmp->minvis)
+/*JP
         Strcat(info, ", invisible");
+*/
+        Strcat(info, ", 不可視");
     if (mtmp == u.ustuck)
+#if 0 /*JP:T*/
         Strcat(info, sticks(youmonst.data)
                          ? ", held by you"
                          : !u.uswallow ? ", holding you"
@@ -451,15 +585,32 @@ register struct monst *mtmp;
                                              : is_animal(u.ustuck->data)
                                                    ? ", swallowing you"
                                                    : ", engulfing you");
+#else
+      Strcat(info,  sticks(youmonst.data)
+                         ? ", あなたが掴まえている"
+                         : !u.uswallow ? ", 掴まえている"
+                                       : attacktype_fordmg(u.ustuck->data,
+                                                           AT_ENGL, AD_DGST)
+                                             ? ", 消化している"
+                                             : is_animal(u.ustuck->data)
+                                                   ? ", 飲み込んでいる"
+                                                   : ", 巻き込んでいる");
+#endif
     if (mtmp == u.usteed)
+/*JP
         Strcat(info, ", carrying you");
+*/
+        Strcat(info, ", あなたを乗せている");
 
     /* avoid "Status of the invisible newt ..., invisible" */
     /* and unlike a normal mon_nam, use "saddled" even if it has a name */
     Strcpy(monnambuf, x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                                (SUPPRESS_IT | SUPPRESS_INVISIBLE), FALSE));
 
+/*JP
     pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", monnambuf,
+*/
+    pline("%sの状態 (%s)： Level %d  HP %d(%d)  AC %d%s", monnambuf,
           align_str(alignment), mtmp->m_lev, mtmp->mhp, mtmp->mhpmax,
           find_mac(mtmp), info);
 }
@@ -471,6 +622,7 @@ ustatusline()
 
     info[0] = '\0';
     if (Sick) {
+#if 0 /*JP*/
         Strcat(info, ", dying from");
         if (u.usick_type & SICK_VOMITABLE)
             Strcat(info, " food poisoning");
@@ -479,18 +631,46 @@ ustatusline()
                 Strcat(info, " and");
             Strcat(info, " illness");
         }
+#else
+        Strcat(info, ", ");
+        if (u.usick_type & SICK_VOMITABLE)
+            Strcat(info, "食中毒");
+        if (u.usick_type & SICK_NONVOMITABLE) {
+            if (u.usick_type & SICK_VOMITABLE)
+                Strcat(info, "と");
+            Strcat(info, "病気");
+        }
+        Strcat(info, "で死につつある");
+#endif
     }
     if (Stoned)
+/*JP
         Strcat(info, ", solidifying");
+*/
+        Strcat(info, ", 石化しつつある");
     if (Slimed)
+/*JP
         Strcat(info, ", becoming slimy");
+*/
+        Strcat(info, ", スライムになりつつある");
     if (Strangled)
+/*JP
         Strcat(info, ", being strangled");
+*/
+        Strcat(info, ", 首を絞められている");
     if (Vomiting)
+#if 0 /*JP*/
         Strcat(info, ", nauseated"); /* !"nauseous" */
+#else
+        Strcat(info, ", 吐き気がする");
+#endif
     if (Confusion)
+/*JP
         Strcat(info, ", confused");
+*/
+        Strcat(info, ", 混乱状態");
     if (Blind) {
+#if 0 /*JP*/
         Strcat(info, ", blind");
         if (u.ucreamed) {
             if ((long) u.ucreamed < Blinded || Blindfolded
@@ -498,49 +678,113 @@ ustatusline()
                 Strcat(info, ", cover");
             Strcat(info, "ed by sticky goop");
         } /* note: "goop" == "glop"; variation is intentional */
+#else
+        Strcat(info, ", ");
+        if (u.ucreamed) {
+            Strcat(info, "ねばねばべとつくもので");
+            if ((long)u.ucreamed < Blinded || Blindfolded
+                || !haseyes(youmonst.data))
+              Strcat(info, "覆われて");
+        }
+        Strcat(info, "盲目状態");
+#endif
     }
     if (Stunned)
+/*JP
         Strcat(info, ", stunned");
+*/
+        Strcat(info, ", くらくら状態");
     if (!u.usteed && Wounded_legs) {
         const char *what = body_part(LEG);
         if ((Wounded_legs & BOTH_SIDES) == BOTH_SIDES)
             what = makeplural(what);
+/*JP
         Sprintf(eos(info), ", injured %s", what);
+*/
+        Sprintf(eos(info), ", %sにけがをしている", what);
     }
     if (Glib)
+/*JP
         Sprintf(eos(info), ", slippery %s", makeplural(body_part(HAND)));
+*/
+        Sprintf(eos(info), ", %sがぬるぬる", makeplural(body_part(HAND)));
     if (u.utrap)
+/*JP
         Strcat(info, ", trapped");
+*/
+        Strcat(info, ", 罠にかかっている");
     if (Fast)
+/*JP
         Strcat(info, Very_fast ? ", very fast" : ", fast");
+*/
+        Strcat(info, Very_fast ? ", とても素早い" : ", 素早い");
     if (u.uundetected)
+/*JP
         Strcat(info, ", concealed");
+*/
+        Strcat(info, ", 隠れている");
     if (Invis)
+/*JP
         Strcat(info, ", invisible");
+*/
+        Strcat(info, ", 不可視");
     if (u.ustuck) {
+#if 0 /*JP*/
         if (sticks(youmonst.data))
             Strcat(info, ", holding ");
         else
             Strcat(info, ", held by ");
         Strcat(info, mon_nam(u.ustuck));
+#else
+        Strcat(info, ", ");
+        Strcat(info, mon_nam(u.ustuck));
+        if (sticks(youmonst.data))
+            Strcat(info, "を掴まえている");
+        else
+            Strcat(info, "に掴まえられている");
+#endif
     }
 
+/*JP
     pline("Status of %s (%s%s):  Level %d  HP %d(%d)  AC %d%s.", plname,
+*/
+    pline("%sの状態 (%s %s)： Level %d  HP %d(%d)  AC %d%s", plname,
           (u.ualign.record >= 20)
+/*JP
               ? "piously "
+*/
+              ? "敬虔" 
               : (u.ualign.record > 13)
+/*JP
                     ? "devoutly "
+*/
+                    ? "信心深い" 
                     : (u.ualign.record > 8)
+/*JP
                           ? "fervently "
+*/
+                          ? "熱烈" 
                           : (u.ualign.record > 3)
+/*JP
                                 ? "stridently "
+*/
+                                ? "声のかん高い" 
                                 : (u.ualign.record == 3)
                                       ? ""
                                       : (u.ualign.record >= 1)
+/*JP
                                             ? "haltingly "
+*/
+                                            ? "有名無実" 
                                             : (u.ualign.record == 0)
+/*JP
                                                   ? "nominally "
+*/
+                                                  ? "迷惑" 
+/*JP
                                                   : "insufficiently ",
+*/
+                                                  : "不適当",
           align_str(u.ualign.type),
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
@@ -549,10 +793,17 @@ ustatusline()
 void
 self_invis_message()
 {
+#if 0 /*JP:T*/
     pline("%s %s.",
           Hallucination ? "Far out, man!  You" : "Gee!  All of a sudden, you",
           See_invisible ? "can see right through yourself"
                         : "can't see yourself");
+#else
+    pline("%sあなたは%s．",
+          Hallucination ? "ワーオ！" : "げ！突然",
+          See_invisible ? "自分自身がちゃんと見えなくなった"
+                        : "自分自身が見えなくなった");
+#endif
 }
 
 void

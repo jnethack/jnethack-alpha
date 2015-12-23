@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 
 #ifdef MAIL
@@ -249,8 +254,13 @@ coord *startp; /* starting position (read only) */
 }
 
 /* Let the mail daemon have a larger vocabulary. */
+#if 0 /*JP*/
 static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
                                             "Pardon me!" };
+#else
+static NEARDATA const char *mail_text[] = { "どいたどいた！", "気をつけろ！",
+                                            "じゃまするよ！" };
+#endif
 #define md_exclamations() (mail_text[rn2(3)])
 
 /*
@@ -312,7 +322,10 @@ register int tx, ty; /* destination of mail daemon */
         if ((mon = m_at(fx, fy)) != 0) /* save monster at this position */
             verbalize1(md_exclamations());
         else if (fx == u.ux && fy == u.uy)
+/*JP
             verbalize("Excuse me.");
+*/
+            verbalize("ちょっとしつれい．");
 
         place_monster(md, fx, fy); /* put md down */
         newsym(fx, fy);            /* see it */
@@ -337,7 +350,10 @@ register int tx, ty; /* destination of mail daemon */
     if ((mon = m_at(fx, fy)) != 0) {
         place_monster(md, fx, fy); /* display md with text below */
         newsym(fx, fy);
+/*JP
         verbalize("This place's too crowded.  I'm outta here.");
+*/
+        verbalize("ここは混みすぎ．ここで待ってるよ．");
 
         if ((mon->mx != fx) || (mon->my != fy)) /* put mon back */
             place_worm_seg(mon, fx, fy);
@@ -377,7 +393,11 @@ struct mail_info *info;
         goto go_back;
 
     message_seen = TRUE;
+#if 0 /*JP*/
     verbalize("%s, %s!  %s.", Hello(md), plname, info->display_txt);
+#else
+    verbalize("%s！%s．", Hello(md), info->display_txt);
+#endif
 
     if (info->message_typ) {
         struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
@@ -388,10 +408,18 @@ struct mail_info *info;
             new_omailcmd(obj, info->response_cmd);
 
         if (distu(md->mx, md->my) > 2)
+/*JP
             verbalize("Catch!");
+*/
+            verbalize("ほらよ！");
         display_nhwindow(WIN_MESSAGE, FALSE);
+#if 0 /*JP*/
         obj = hold_another_object(obj, "Oops!", (const char *) 0,
                                   (const char *) 0);
+#else
+        obj = hold_another_object(obj, "おっと！", (const char *) 0,
+                                  (const char *) 0);
+#endif
     }
 
 /* zip back to starting location */
@@ -401,7 +429,10 @@ go_back:
 /* deliver some classes of messages even if no daemon ever shows up */
 give_up:
     if (!message_seen && info->message_typ == MSG_OTHER)
+/*JP
         pline("Hark!  \"%s.\"", info->display_txt);
+*/
+        pline("「%s．」と言うことだ！", info->display_txt);
 }
 
 #if !defined(UNIX) && !defined(VMS)
@@ -419,7 +450,10 @@ ckmailstatus()
     }
     if (--mustgetmail <= 0) {
         static struct mail_info deliver = { MSG_MAIL,
+/*JP
                                             "I have some mail for you", 0,
+*/
+                                            "メールを持ってきたよ", 0,
                                             0 };
         newmail(&deliver);
         mustgetmail = -1;
@@ -433,7 +467,10 @@ struct obj *otmp;
 {
     static char *junk[] = {
         NULL, /* placeholder for "Report bugs to <devteam@nethack.org>.", */
+/*JP
         "Please disregard previous letter.", "Welcome to NetHack.",
+*/
+        "前のメールは忘れてください．", "NetHackへようこそ！",
 #ifdef AMIGA
         "Only Amiga makes it possible.", "CATS have all the answers.",
 #endif
@@ -455,9 +492,15 @@ struct obj *otmp;
 #undef BUGS_FORMAT
     }
     if (Blind) {
+/*JP
         pline("Unfortunately you cannot see what it says.");
+*/
+        pline("残念ながら何と書いてあるのか見ることができない．");
     } else
+/*JP
         pline("It reads:  \"%s\"", junk[rn2(SIZE(junk))]);
+*/
+        pline("それを読んだ：\"%s\"", junk[rn2(SIZE(junk))]);
 }
 
 #endif /* !UNIX && !VMS */
@@ -486,10 +529,16 @@ ckmailstatus()
         if (nmstat.st_size) {
             static struct mail_info deliver = {
 #ifndef NO_MAILREADER
+/*JP
                 MSG_MAIL, "I have some mail for you",
+*/
+                MSG_MAIL, "メイルを持ってきたよ",
 #else
                 /* suppress creation and delivery of scroll of mail */
+/*JP
                 MSG_OTHER, "You have some mail in the outside world",
+*/
+                MSG_OTHER, "外の世界からのメールだ",
 #endif
                 0, 0
             };

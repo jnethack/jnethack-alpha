@@ -255,6 +255,13 @@ int bufsz;
             *op++ = *sp;
             *op = '\0';
             cnt++;
+#if 1 /*JP*/
+        } else if (is_kanji1(s, sp - s)) {
+            *op++ = *sp++;
+            *op++ = *sp;
+            *op = '\0';
+            cnt += 2;
+#endif
         } else {
             (void) sprintf(op, "%c%02X", quotechar, *sp);
             op += 3;
@@ -541,8 +548,13 @@ char errbuf[];
        settle for `lock' instead of `fq_lock' because the latter
        might end up being too big for nethack's BUFSZ */
     if (fd < 0 && errbuf)
+#if 0 /*JP*/
         Sprintf(errbuf, "Cannot open file \"%s\" for level %d (errno %d).",
                 lock, lev, errno);
+#else
+        Sprintf(errbuf, "地下%d階のファイル\"%s\"を開けない(errno %d)．",
+                lev, lock, errno);
+#endif
 
     return fd;
 }
@@ -1946,6 +1958,16 @@ int src;
         return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
+#if 1 /*JP*//*".jnethackrc"を優先して読み込み*/
+    if (!envp)
+        Strcpy(tmp_config, ".jnethackrc");
+    else
+        Sprintf(tmp_config, "%s/%s", envp, ".jnethackrc");
+
+    (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
+    if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
+        return fp;
+#endif
     if (!envp)
         Strcpy(tmp_config, ".nethackrc");
     else

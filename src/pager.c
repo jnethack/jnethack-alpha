@@ -52,8 +52,13 @@ const char *new_str;
         return 0;
 
     space_left = BUFSZ - strlen(buf) - 1;
+#if 0 /*JP*/
     (void) strncat(buf, " or ", space_left);
     (void) strncat(buf, new_str, space_left - 4);
+#else
+    (void) strncat(buf, "または", space_left);
+    (void) strncat(buf, new_str, space_left - 6);
+#endif
     return 1;
 }
 
@@ -67,13 +72,26 @@ char *outbuf;
     /* include race with role unless polymorphed */
     race[0] = '\0';
     if (!Upolyd)
+/*JP
         Sprintf(race, "%s ", urace.adj);
+*/
+        Sprintf(race, "%s", urace.adj);
+#if 0 /*JP*/
     Sprintf(outbuf, "%s%s%s called %s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
             mons[u.umonnum].mname, plname);
+#else
+    Sprintf(outbuf, "%s%s%sという名の%s",
+            (Invis && (senseself() || !Blind)) ? "姿の見えない" : "", race,
+            plname,
+            mons[u.umonnum].mname);
+#endif
     if (u.usteed)
+/*JP
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
+*/
+        Sprintf(eos(outbuf), "，%sに乗っている", y_monnam(u.usteed));
     return outbuf;
 }
 
@@ -135,15 +153,32 @@ int x, y, glyph;
         Strcpy(buf, something); /* sanity precaution */
 
     if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
+/*JP
         Strcat(buf, " embedded in stone");
+*/
+        Strcat(buf, "，岩に埋めこまれている");
     else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
+/*JP
         Strcat(buf, " embedded in a wall");
+*/
+        Strcat(buf, "，壁に埋めこまれている");
     else if (closed_door(x, y))
+/*JP
         Strcat(buf, " embedded in a door");
+*/
+        Strcat(buf, "，扉に埋めこまれている");
     else if (is_pool(x, y))
+      /*JP 3.4.3 この部分は物体にしか使われない */
+/*JP
         Strcat(buf, " in water");
+*/
+        Strcat(buf, "，水中にある");
     else if (is_lava(x, y))
+#if 0 /*JP*/
         Strcat(buf, " in molten lava"); /* [can this ever happen?] */
+#else
+        Strcat(buf, "，溶岩の中にある");        /* [can this ever happen?] */
+#endif
     return;
 }
 
@@ -161,6 +196,7 @@ int x, y;
     else
         name = distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
 
+#if 0 /*JP*/
     Sprintf(buf, "%s%s%s",
             (mtmp->mx != x || mtmp->my != y)
                 ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
@@ -171,11 +207,26 @@ int x, y;
                     ? "peaceful "
                     : "",
             name);
+#else
+    Sprintf(buf, "%s%s%s",
+            (mtmp->mtame && accurate) ? "手なずけられた" :
+            (mtmp->mpeaceful && accurate) ? "友好的な" : "",
+            name,
+            (mtmp->mx != x || mtmp->my != y) ?
+            ((mtmp->isshk && accurate)
+             ? "の尻尾" : "の尻尾") : "");
+#endif
     if (u.ustuck == mtmp)
         Strcat(buf, (Upolyd && sticks(youmonst.data))
+/*JP
                      ? ", being held" : ", holding you");
+*/
+                     ? "，あなたが掴まえている" : "，あなたを掴まえている");
     if (mtmp->mleashed)
+/*JP
         Strcat(buf, ", leashed to you");
+*/
+        Strcat(buf, "，紐で結ばれている");
 
     if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
@@ -183,7 +234,10 @@ int x, y;
 
         /* newsym lets you know of the trap, so mention it here */
         if (tt == BEAR_TRAP || tt == PIT || tt == SPIKED_PIT || tt == WEB)
+/*JP
             Sprintf(eos(buf), ", trapped in %s",
+*/
+            Sprintf(eos(buf), ", %sに捕まっている",
                     an(defsyms[trap_to_defsym(tt)].explanation));
     }
 
@@ -193,48 +247,72 @@ int x, y;
         monbuf[0] = '\0';
         if (how_seen != 0 && how_seen != MONSEEN_NORMAL) {
             if (how_seen & MONSEEN_NORMAL) {
+/*JP
                 Strcat(monbuf, "normal vision");
+*/
+                Strcat(monbuf, "通常の視覚");
                 how_seen &= ~MONSEEN_NORMAL;
                 /* how_seen can't be 0 yet... */
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_SEEINVIS) {
+/*JP
                 Strcat(monbuf, "see invisible");
+*/
+                Strcat(monbuf, "見えないものを見る視覚");
                 how_seen &= ~MONSEEN_SEEINVIS;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_INFRAVIS) {
+/*JP
                 Strcat(monbuf, "infravision");
+*/
+                Strcat(monbuf, "赤外線が見える視覚");
                 how_seen &= ~MONSEEN_INFRAVIS;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_TELEPAT) {
+/*JP
                 Strcat(monbuf, "telepathy");
+*/
+                Strcat(monbuf, "テレパシー");
                 how_seen &= ~MONSEEN_TELEPAT;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_XRAYVIS) {
                 /* Eyes of the Overworld */
+/*JP
                 Strcat(monbuf, "astral vision");
+*/
+                Strcat(monbuf, "精神による視覚");
                 how_seen &= ~MONSEEN_XRAYVIS;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_DETECT) {
+/*JP
                 Strcat(monbuf, "monster detection");
+*/
+                Strcat(monbuf, "怪物を発見する能力");
                 how_seen &= ~MONSEEN_DETECT;
                 if (how_seen)
                     Strcat(monbuf, ", ");
             }
             if (how_seen & MONSEEN_WARNMON) {
                 if (Hallucination)
+/*JP
                     Strcat(monbuf, "paranoid delusion");
+*/
+                    Strcat(monbuf, "偏執的妄想");
                 else
+/*JP
                     Sprintf(eos(monbuf), "warned of %s",
+*/
+                    Sprintf(eos(monbuf), "%sを警告している",
                             makeplural(mtmp->data->mname));
                 how_seen &= ~MONSEEN_WARNMON;
                 if (how_seen)
@@ -300,8 +378,13 @@ char *buf, *monbuf;
         }
     } else if (u.uswallow) {
         /* all locations when swallowed other than the hero are the monster */
+#if 0 /*JP*/
         Sprintf(buf, "interior of %s",
                 Blind ? "a monster" : a_monnam(u.ustuck));
+#else
+        Sprintf(buf, "%sの内部",
+                Blind ? "怪物" : a_monnam(u.ustuck));
+#endif
         pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
         bhitpos.x = x;
@@ -317,40 +400,70 @@ char *buf, *monbuf;
 
         Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
     } else if (!glyph_is_cmap(glyph)) {
+/*JP
         Strcpy(buf, "unexplored area");
+*/
+        Strcpy(buf, "未探索の場所");
     } else
         switch (glyph_to_cmap(glyph)) {
         case S_altar:
+/*JP
             Sprintf(buf, "%s %saltar",
+*/
+            Sprintf(buf, "%s%s祭壇",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
                     (Is_astralevel(&u.uz) && distu(x, y) > 2)
+/*JP
                         ? "aligned"
+*/
+                        ? "属性の"
                         : align_str(
                               Amask2align(levl[x][y].altarmask & ~AM_SHRINE)),
                     ((levl[x][y].altarmask & AM_SHRINE)
                      && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
+/*JP
                         ? "high "
+*/
+                        ? "高位の"
                         : "");
             break;
         case S_ndoor:
             if (is_drawbridge_wall(x, y) >= 0)
+/*JP
                 Strcpy(buf, "open drawbridge portcullis");
+*/
+                Strcpy(buf,"開いている跳ね橋");
             else if ((levl[x][y].doormask & ~D_TRAPPED) == D_BROKEN)
+/*JP
                 Strcpy(buf, "broken door");
+*/
+                Strcpy(buf,"壊れた扉");
             else
+/*JP
                 Strcpy(buf, "doorway");
+*/
+                Strcpy(buf,"出入り口");
             break;
         case S_cloud:
             Strcpy(buf,
+/*JP
                    Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
+*/
+                   Is_airlevel(&u.uz) ? "曇っている場所" : "霧/蒸気の雲");
             break;
         case S_stone:
             if (!levl[x][y].seenv) {
+/*JP
                 Strcpy(buf, "unexplored");
+*/
+                Strcpy(buf, "未探索");
                 break;
             } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
+/*JP
                 Strcpy(buf, "stone");
+*/
+                Strcpy(buf, "石");
                 break;
             }
             /*else FALLTHRU*/
@@ -388,7 +501,11 @@ boolean user_typed_name, without_asking;
 
     fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
+#if 0 /*JP*/
         pline("Cannot open data file!");
+#else
+        pline("データファイルを開けない！");
+#endif
         return;
     }
 
@@ -513,10 +630,16 @@ boolean user_typed_name, without_asking;
             return;
         }
 
+/*JP
         if (user_typed_name || without_asking || yn("More info?") == 'y') {
+*/
+        if (user_typed_name || without_asking || yn("詳細を見る？") == 'y') {
             if (dlb_fseek(fp, (long) txt_offset + entry_offset, SEEK_SET)
                 < 0) {
+/*JP
                 pline("? Seek error on 'data' file!");
+*/
+                pline("'data'ファイルのシークエラー！");
                 (void) dlb_fclose(fp);
                 return;
             }
@@ -534,7 +657,10 @@ boolean user_typed_name, without_asking;
             destroy_nhwindow(datawin);
         }
     } else if (user_typed_name)
+/*JP
         pline("I don't have any information on those things.");
+*/
+        pline("そんな名前は聞いたことがない．");
 
     (void) dlb_fclose(fp);
 }
@@ -556,7 +682,10 @@ const char **firstmatch;
     int skipped_venom = 0;
     boolean hit_trap;
     const char *x_str;
+/*JP
     static const char *mon_interior = "the interior of a monster";
+*/
+    static const char *mon_interior = "怪物の内部";
 
     if (looked) {
         int oc;
@@ -613,7 +742,11 @@ const char **firstmatch;
                    && cc.x == u.ux && cc.y == u.uy)
                 : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
         && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
+#if 0 /*JP*/
         found += append_str(out_str, "you"); /* tack on "or you" */
+#else
+        found += append_str(out_str, "あなた"); /* tack on "or you" */
+#endif
 
     /* Now check for objects */
     for (i = 1; i < MAXOCLASSES; i++) {
@@ -662,6 +795,7 @@ const char **firstmatch;
             /* alt_i is now 3 or more and no longer of interest */
         }
         if (sym == (looked ? showsyms[i] : defsyms[i].sym) && *x_str) {
+#if 0 /*JP*//*日本語には関係ない*/
             /* avoid "an unexplored", "an stone", "an air", "a water",
                "a floor of a room", "a dark part of a room";
                article==2 => "the", 1 => "an", 0 => (none) */
@@ -670,14 +804,22 @@ const char **firstmatch;
                               || strcmp(x_str, "air") == 0
                               || strcmp(x_str, "water") == 0);
 
+#endif
             if (!found) {
                 if (is_cmap_trap(i)) {
+/*JP
                     Sprintf(out_str, "%sa trap", prefix);
+*/
+                    Sprintf(out_str, "%s罠", prefix);
                     hit_trap = TRUE;
                 } else {
+#if 0 /*JP*/
                     Sprintf(out_str, "%s%s", prefix,
                             article == 2 ? the(x_str)
                             : article == 1 ? an(x_str) : x_str);
+#else
+                    Sprintf(out_str, "%s%s", prefix, x_str);
+#endif
                 }
                 *firstmatch = x_str;
                 found++;
@@ -688,9 +830,13 @@ const char **firstmatch;
                        && (i != S_vibrating_square || Inhell
                            || (looked && glyph_is_trap(glyph)
                                && glyph_to_trap(glyph) == VIBRATING_SQUARE))) {
+#if 0 /*JP*/
                 found += append_str(out_str, (article == 2) ? the(x_str)
                                              : (article == 1) ? an(x_str)
                                                : x_str);
+#else
+                found += append_str(out_str, x_str);
+#endif
                 if (is_cmap_trap(i))
                     hit_trap = TRUE;
             }
@@ -734,11 +880,17 @@ const char **firstmatch;
     /* handle optional boulder symbol as a special case */
     if (iflags.bouldersym && sym == iflags.bouldersym) {
         if (!found) {
+/*JP
             *firstmatch = "boulder";
+*/
+            *firstmatch = "岩";
             Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
             found++;
         } else {
+/*JP
             found += append_str(out_str, "boulder");
+*/
+            found += append_str(out_str, "岩");
         }
     }
 
@@ -778,7 +930,10 @@ const char **firstmatch;
 #define LOOK_VERBOSE 3     /* ':' -- show more info w/o asking */
 
 /* also used by getpos hack in do_name.c */
+/*JP
 const char what_is_an_unknown_object[] = "an unknown object";
+*/
+const char what_is_an_unknown_object[] = "謎の物体";
 
 int
 do_look(mode, click_cc)
@@ -890,7 +1045,10 @@ coord *click_cc;
           }
         case '?':
             from_screen = FALSE;
+/*JP
             getlin("Specify what? (type the word)", out_str);
+*/
+            getlin("何を調べる？(文字を入れてね)", out_str);
             if (out_str[0] == '\0' || out_str[0] == '\033')
                 return 0;
 
@@ -935,10 +1093,17 @@ coord *click_cc;
         if (from_screen || clicklook) {
             if (from_screen) {
                 if (flags.verbose)
+#if 0 /*JP*/
                     pline("Please move the cursor to %s.",
                           what_is_an_unknown_object);
+#else
+                    pline("カーソルを物体に移動してください．");
+#endif
                 else
+/*JP
                     pline("Pick an object.");
+*/
+                    pline("物体を指定してください．");
 
                 ans = getpos(&cc, quick, what_is_an_unknown_object);
                 if (ans < 0 || cc.x < 0) {
@@ -969,7 +1134,10 @@ coord *click_cc;
                           (boolean) (ans == LOOK_VERBOSE));
             }
         } else {
+/*JP
             pline("I've never heard of such things.");
+*/
+            pline("そんな名前は聞いたことがない．");
         }
 
     } while (from_screen && !quick && ans != LOOK_ONCE && !clicklook);
@@ -1100,6 +1268,7 @@ doidtrap()
                     break;
             }
             tt = what_trap(tt);
+#if 0 /*JP*/
             pline("That is %s%s%s.",
                   an(defsyms[trap_to_defsym(tt)].explanation),
                   !trap->madeby_u
@@ -1113,9 +1282,23 @@ doidtrap()
                            ? " dug"
                            : " set",
                   !trap->madeby_u ? "" : " by you");
+#else
+            pline("それは%s%sだ．",
+                  !trap->madeby_u
+                     ? ""
+                     : (tt == WEB)
+                        ? "あなたが張った"
+                        : (tt == HOLE || tt == PIT)
+                           ? "あなたが掘った"
+                           : "あなたが仕掛けた",
+                  defsyms[trap_to_defsym(tt)].explanation);
+#endif
             return 0;
         }
+/*JP
     pline("I can't see a trap there.");
+*/
+    pline("そこには罠はみあたらない．");
     return 0;
 }
 
@@ -1130,7 +1313,11 @@ char *cbuf;
 
     fp = dlb_fopen(CMDHELPFILE, "r");
     if (!fp) {
+#if 0 /*JP*/
         pline("Cannot open data file!");
+#else
+        pline("データファイルを開けない！");
+#endif
         return 0;
     }
 
@@ -1174,7 +1361,10 @@ dowhatdoes()
 #if defined(UNIX) || defined(VMS)
     introff();
 #endif
+/*JP
     q = yn_function("What command?", (char *) 0, '\0');
+*/
+    q = yn_function("どういうコマンド？", (char *) 0, '\0');
 #if defined(UNIX) || defined(VMS)
     intron();
 #endif
@@ -1182,7 +1372,10 @@ dowhatdoes()
     if (reslt)
         pline1(reslt);
     else
+/*JP
         pline("I've never heard of such commands.");
+*/
+        pline("そんなコマンドは聞いたことがない．");
     return 0;
 }
 
@@ -1218,6 +1411,7 @@ docontact()
 
 /* data for help_menu() */
 static const char *help_menu_items[] = {
+#if 0 /*JP*/
     /*  0*/ "About NetHack (version information).",
     /*  1*/ "Long description of the game and commands.",
     /*  2*/ "List of game commands.",
@@ -1237,6 +1431,27 @@ static const char *help_menu_items[] = {
 #define WIZHLP_SLOT 11
 #endif
     "List of wizard-mode commands.", "", (char *) 0
+#else /*JP*/
+    /*  0*/ "NetHackについて(バージョン情報)",
+    /*  1*/ "ゲームおよびコマンドの解説(長文)",
+    /*  2*/ "コマンド一覧",
+    /*  3*/ "NetHackの簡単な歴史",
+    /*  4*/ "画面に表示される文字の説明",
+    /*  5*/ "このキーが何を意味するかの説明",
+    /*  6*/ "ゲームのオプション一覧",
+    /*  7*/ "ゲームのオプション一覧(長文)",
+    /*  8*/ "拡張コマンド一覧",
+    /*  9*/ "NetHackのライセンス",
+    /* 10*/ "サポート情報",
+#ifdef PORT_HELP
+    "%sに特有のヘルプおよびコマンド",
+#define PORT_HELP_ID 100
+#define WIZHLP_SLOT 12
+#else
+#define WIZHLP_SLOT 11
+#endif
+    "ウィザードモードのコマンド一覧", "", (char *) 0
+#endif /*JP*/
 };
 
 STATIC_OVL boolean
@@ -1271,7 +1486,10 @@ int *sel;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      help_menu_items[i], MENU_UNSELECTED);
         }
+/*JP
     end_menu(tmpwin, "Select one item:");
+*/
+    end_menu(tmpwin, "選んでください：");
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
     if (n > 0) {
