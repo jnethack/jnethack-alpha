@@ -181,6 +181,9 @@ E NEARDATA struct kinfo {
 #define KILLED_BY_AN 0
 #define KILLED_BY 1
 #define NO_KILLER_PREFIX 2
+#if 1 /*JP*/
+#define KILLED_SUFFIX	 3
+#endif
     char name[BUFSZ]; /* actual killer name */
 } killer;
 
@@ -411,6 +414,15 @@ E struct plinemsg_type *plinemsg_types;
 
 #ifdef PANICTRACE
 E char *ARGV0;
+#endif
+
+#if 1 /*JP*/
+struct trans_verb {
+    const char *en;
+    const char *what;
+    const char *particle;
+    const char *jp;
+};
 #endif
 
 #undef E
