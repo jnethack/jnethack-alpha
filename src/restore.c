@@ -568,13 +568,10 @@ unsigned int *stuckid, *steedid;
     foo = time_from_yyyymmddhhmmss(timebuf);
 
     ReadTimebuf(ubirthday);
-    mread(fd, &urealtime.realtime, sizeof(urealtime.realtime));
-    ReadTimebuf(urealtime.restored);
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *) &urealtime.restored);
-#else
-    (void) time(&urealtime.restored);
-#endif
+    mread(fd, &urealtime.realtime, sizeof urealtime.realtime);
+    ReadTimebuf(urealtime.start_timing); /** [not used] **/
+    /* current time is the time to use for next urealtime.realtime update */
+    urealtime.start_timing = getnow();
 
     set_uasmon();
 #ifdef CLIPPING

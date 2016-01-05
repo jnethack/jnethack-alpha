@@ -587,17 +587,12 @@ newgame()
         com_pager(1);
     }
 
+    urealtime.realtime = 0L;
+    urealtime.start_timing = getnow();
 #ifdef INSURANCE
     save_currentstate();
 #endif
     program_state.something_worth_saving++; /* useful data now exists */
-
-    urealtime.realtime = 0L;
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *) &urealtime.restored);
-#else
-    (void) time(&urealtime.restored);
-#endif
 
     /* Success! */
     welcome(TRUE);

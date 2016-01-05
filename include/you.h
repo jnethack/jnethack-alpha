@@ -68,10 +68,11 @@ struct u_achieve {
 };
 
 struct u_realtime {
-    long
-        realtime; /* actual playing time up until the last restore, seconds */
-    time_t restored; /* time the game was started or restored */
-    time_t endtime;
+    long   realtime;     /* accumulated playing time in seconds */
+    time_t start_timing; /* time game was started or restored or 'realtime'
+                            was last updated (savegamestate for checkpoint) */
+    time_t finish_time;  /* end of 'realtime' interval: time of save or
+                            end of game; used for topten/logfile/xlogfile */
 };
 
 /* KMH, conduct --
