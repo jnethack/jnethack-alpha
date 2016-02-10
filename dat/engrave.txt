@@ -2,45 +2,47 @@
 #
 Elbereth
 # trap engravings
-Vlad was here
+ヴラドはここにいる
 ad aerarium
 
 # take-offs and other famous engravings
 Owlbreath
 Galadriel
-Kilroy was here
+キルロイ参上
 
 # Journey to the Center of the Earth
 A.S. ->
 <- A.S.
 # Adventure
-You won't get it up the steps
+それはできません．
 # Inferno
-Lasciate ogni speranza o voi ch'entrate.
+# 神曲:地獄編, ダンテ
+ここから入らんとするものは全て希望を捨てよ．
 # Prisoner
-Well Come
+よく来たな
 # So Long...
-We apologize for the inconvenience.
-# Thriller
-See you next Wednesday
+ご迷惑をおかけしたことを深くお詫びいたします．
+# アメリカ横断ウルトラクイズ
+早く来い来い木曜日
 # Smokey Stover
-notary sojak
+# 古いアニメつながり
+のらくろ
 
-For a good time call 8?7-5309
+バイア☆ラ 8?7-5309
 # Various zoos around the world
-Please don't feed the animals.
+動物にエサを与えないでください．
 # A palindrome
-Madam, in Eden, I'm Adam.
+私負けましたわ
 # Siskel & Ebert
-Two thumbs up!
+イチ推し！
 # The First C Program
 Hello, World!
 ^?MAIL
 # AOL
-You've got mail!
+ユー・ガッタ・メール！
 ^.
 # Clueless
-As if!
+冗談じゃない！
 # 200x incarnation of Dr.Who
 BAD WOLF
 
