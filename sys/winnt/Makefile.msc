@@ -533,7 +533,7 @@ default : install
 
 all :	install
 
-install: envchk $(O)obj.tag $(O)utility.tag $(GAMEDIR)\NetHack.exe $(GAMEDIR)\NetHackW.exe $(O)install.tag
+install: envchk $(O)obj.tag $(O)utility.tag $(GAMEDIR)\JNetHack.exe $(GAMEDIR)\JNetHackW.exe $(O)install.tag
 	 @echo Done.
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
@@ -552,8 +552,8 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
-	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
-	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
+	@if exist $(GAMEDIR)\JNetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/JNetHack.PDB to conserve space
+	@if exist $(GAMEDIR)\JNetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/JNetHackW.PDB to conserve space
 	-copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
 	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	echo install done > $@
@@ -664,7 +664,7 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 #    objs: $(GAMEOBJ) $(TTYOBJ) $(O)tile.o $(O)guistub.o
 
 
-$(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
+$(GAMEDIR)\JNetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)console.res $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
         @echo Linking $(@:\=/)
@@ -687,7 +687,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
 #    libs: $(LIBS) $(guilibs) $(COMCTRL)
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
-$(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
+$(GAMEDIR)\JNetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winhack.res $(O)gamedir.tag $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
@@ -1145,8 +1145,8 @@ spotless: clean
 	if exist $(GAMEDIR)\nhdefkey.dll del $(GAMEDIR)\nhdefkey.dll
 	if exist $(GAMEDIR)\nh340key.dll del $(GAMEDIR)\nh340key.dll
 	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
-	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
-	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
+	if exist $(GAMEDIR)\JNetHack.exe del $(GAMEDIR)\JNetHack.exe
+	if exist $(GAMEDIR)\JNetHack.pdb del $(GAMEDIR)\JNetHack.pdb
 	if exist $(GAMEDIR)\nhdat        del $(GAMEDIR)\nhdat
 ! ENDIF
 	if exist $(INCL)\date.h    del $(INCL)\date.h
