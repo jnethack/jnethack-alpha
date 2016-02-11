@@ -10,6 +10,13 @@
  * Currently, only one status window (of any type) is _ever_ made.
  */
 
+/*
+**	Japanese version Copyright (C) Issei Numata, 1994-1999
+**	changing point is marked `JP' (94/6/7) or XI18N (96/7/19)
+**	For 3.4.0, Copyright (c) Kentaro Shirakata, 2002
+**	JNetHack may be freely redistributed.  See license for details. 
+*/
+
 #ifndef SYSV
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
 #endif
@@ -47,10 +54,16 @@ struct xwindow *wp; /* window pointer */
 boolean create_popup;
 Widget parent;
 {
+#if 0 /*JP*/
     XFontStruct *fs;
+#endif
     Arg args[8];
     Cardinal num_args;
     Position top_margin, bottom_margin, left_margin, right_margin;
+#ifdef XI18N
+    XFontSet fontset;
+    XFontSetExtents *extent;
+#endif
 
     wp->type = NHW_STATUS;
 
@@ -94,6 +107,11 @@ Widget parent;
              XawtextScrollWhenNeeded);
     num_args++;
 
+/*JP*/
+#if defined(X11R6) && defined(XI18N)
+    XtSetArg(args[num_args], XtNinternational, True);
+    num_args++;
+#endif
     wp->w = XtCreateManagedWidget("status", /* name */
                                   asciiTextWidgetClass,
                                   parent,    /* parent widget */
@@ -107,7 +125,11 @@ Widget parent;
 
     /* Get the font and margin information. */
     num_args = 0;
+#ifndef XI18N
     XtSetArg(args[num_args], XtNfont, &fs);
+#else
+    XtSetArg(args[num_args], XtNfontSet, &fontset);
+#endif
     num_args++;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), &top_margin);
     num_args++;
@@ -119,9 +141,16 @@ Widget parent;
     num_args++;
     XtGetValues(wp->w, args, num_args);
 
+#ifndef XI18N
     wp->pixel_height = 2 * nhFontHeight(wp->w) + top_margin + bottom_margin;
     wp->pixel_width =
         COLNO * fs->max_bounds.width + left_margin + right_margin;
+#else
+    extent = XExtentsOfFontSet(fontset);
+    wp->pixel_height = 2 * extent->max_logical_extent.height + top_margin + bottom_margin;
+    wp->pixel_width  =
+        COLNO / 2 * extent->max_logical_extent.width + left_margin + right_margin;
+#endif
 
     /* Set the new width and height. */
     num_args = 0;
@@ -154,9 +183,9 @@ struct xwindow *wp;
 
 /*
  * This assumes several things:
- *	+ Status has only 2 lines
- *	+ That both lines are updated in succession in line order.
- *	+ We didn't set stringInPlace on the widget.
+ *      + Status has only 2 lines
+ *      + That both lines are updated in succession in line order.
+ *      + We didn't set stringInPlace on the widget.
  */
 void
 adjust_status(wp, str)
@@ -256,6 +285,7 @@ static Widget FDECL(init_info_form, (Widget, Widget, Widget));
  * + Blank value is 0 and should never change.
  */
 static struct X_status_value shown_stats[NUM_STATS] = {
+#if 0 /*JP*/
     { "Strength", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /* 0*/
     { "Dexterity", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Constitution", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
@@ -284,6 +314,36 @@ static struct X_status_value shown_stats[NUM_STATS] = {
     { "Stunned", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
     { "Hallucinating", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
     { "", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*encumbr*/
+#else /*JP*/
+    { "強さ",   SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },    /* 0*/
+    { "素早さ", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "耐久力", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "知力",   SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "賢さ",   SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "魅力",   SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },    /* 5*/
+
+    { "",               SV_LABEL, (Widget) 0, -1, 0, FALSE, FALSE }, /* name */
+    { "",               SV_LABEL, (Widget) 0, -1, 0, FALSE, FALSE }, /* dlvl */
+    { "金",             SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "体力",           SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "最大体力",       SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },    /*10*/
+    { "魔力",           SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "最大魔力",       SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "鎧",             SV_VALUE, (Widget) 0,256, 0, FALSE, FALSE },
+    { "レベル",         SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "経験",           SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },    /*15*/
+    { "属性",           SV_VALUE, (Widget) 0, -2, 0, FALSE, FALSE },
+    { "時間",           SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+    { "スコア",         SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
+
+    { "",               SV_NAME,  (Widget) 0, -1, 0, FALSE, TRUE }, /* hunger*/
+    { "　混乱　",       SV_NAME,  (Widget) 0,  0, 0, FALSE, TRUE },     /*20*/
+    { "　病気　",       SV_NAME,  (Widget) 0,  0, 0, FALSE, TRUE },
+    { "　盲目　",       SV_NAME,  (Widget) 0,  0, 0, FALSE, TRUE },
+    { "  眩暈  ",       SV_NAME,  (Widget) 0,  0, 0, FALSE, TRUE },
+    { "　幻覚　",       SV_NAME,  (Widget) 0,  0, 0, FALSE, TRUE },
+    { "",               SV_NAME,  (Widget) 0,  0, 0, FALSE, TRUE }, /*encumbr*/
+#endif /*JP*/
 };
 
 /*
@@ -347,18 +407,25 @@ long new_value;
             Strcpy(buf, plname);
             if ('a' <= buf[0] && buf[0] <= 'z')
                 buf[0] += 'A' - 'a';
+/*JP
             Strcat(buf, " the ");
+*/
+            Strcat(buf, " ");
             if (u.mtimedone) {
                 char mname[BUFSZ];
+#if 0 /*JP*/
                 int k = 0;
+#endif
 
                 Strcpy(mname, mons[u.umonnum].mname);
+#if 0 /*JP*/
                 while (mname[k] != 0) {
                     if ((k == 0 || (k > 0 && mname[k - 1] == ' '))
                         && 'a' <= mname[k] && mname[k] <= 'z')
                         mname[k] += 'A' - 'a';
                     k++;
                 }
+#endif
                 Strcat(buf, mname);
             } else
                 Strcat(buf, rank_of(u.ulevel, pl_character[0], flags.female));
@@ -366,7 +433,10 @@ long new_value;
         } else if (attr_rec == &shown_stats[F_DLEVEL]) {
             if (!describe_level(buf)) {
                 Strcpy(buf, dungeons[u.uz.dnum].dname);
+/*JP
                 Sprintf(eos(buf), ", level %d", depth(&u.uz));
+*/
+                Sprintf(eos(buf), " 地下%d階", depth(&u.uz));
             }
         } else {
             impossible("update_val: unknown label type \"%s\"",
@@ -398,11 +468,17 @@ long new_value;
             buf[0] = 0;
             if (Sick) {
                 if (u.usick_type & SICK_VOMITABLE)
+/*JP
                     Strcat(buf, "FoodPois");
+*/
+                    Strcat(buf, "食毒");
                 if (u.usick_type & SICK_NONVOMITABLE) {
                     if (u.usick_type & SICK_VOMITABLE)
                         Strcat(buf, " ");
+/*JP
                     Strcat(buf, "Ill");
+*/
+                    Strcat(buf, "病気");
                 }
             }
             XtSetArg(args[0], XtNlabel, buf);
@@ -524,10 +600,18 @@ long new_value;
                 Sprintf(buf, "%ld", new_value);
             }
         } else if (attr_rec == &shown_stats[F_ALIGN]) {
+#if 0 /*JP*/
             Strcpy(buf,
                    (new_value == A_CHAOTIC)
                        ? "Chaotic"
                        : (new_value == A_NEUTRAL) ? "Neutral" : "Lawful");
+#else
+            Strcpy(buf,
+                   (new_value == A_CHAOTIC)
+                   ? "混沌"
+                   : (new_value == A_NEUTRAL)
+                   ? "中立" : "秩序");
+#endif
         } else {
             Sprintf(buf, "%ld", new_value);
         }
@@ -561,11 +645,11 @@ long new_value;
  * the other.  So only do our update when we update the second line.
  *
  * Information on the first line:
- *	name, attributes, alignment, score
+ *      name, attributes, alignment, score
  *
  * Information on the second line:
- *	dlvl, gold, hp, power, ac, {level & exp or HD **}
- *	status (hunger, conf, halu, stun, sick, blind), time, encumbrance
+ *      dlvl, gold, hp, power, ac, {level & exp or HD **}
+ *      status (hunger, conf, halu, stun, sick, blind), time, encumbrance
  *
  * [**] HD is shown instead of level and exp if mtimedone is non-zero.
  */
@@ -677,8 +761,8 @@ struct xwindow *wp;
             /*
              * There is a possible infinite loop that occurs with:
              *
-             * 	impossible->pline->flush_screen->bot->bot{1,2}->
-             * 	putstr->adjust_status->update_other->impossible
+             *  impossible->pline->flush_screen->bot->bot{1,2}->
+             *  putstr->adjust_status->update_other->impossible
              *
              * Break out with this.
              */
@@ -804,6 +888,11 @@ int sv_index;
         num_args++;
         XtSetArg(args[num_args], XtNinternalHeight, 0);
         num_args++;
+/*JP*/
+#if defined(X11R6) && defined(XI18N)
+        XtSetArg(args[num_args], XtNinternational, True);
+        num_args++;
+#endif
         sv->w =
             XtCreateManagedWidget(sv_index == F_NAME ? "name" : "dlevel",
                                   labelWidgetClass, parent, args, num_args);
@@ -814,6 +903,11 @@ int sv_index;
         num_args++;
         XtSetArg(args[num_args], XtNinternalHeight, 0);
         num_args++;
+/*JP*/
+#if defined(X11R6) && defined(XI18N)
+        XtSetArg(args[num_args], XtNinternational, True);
+        num_args++;
+#endif
         sv->w = XtCreateManagedWidget(sv->name, labelWidgetClass, parent,
                                       args, num_args);
         break;
@@ -946,13 +1040,13 @@ static int col1_indices[] = { F_HP,    F_AC, F_GOLD, F_LEVEL, F_POWER,
 /*
  * Produce a form that looks like the following:
  *
- *		   name
- *		  dlevel
- * col1_indices[0]	col2_indices[0]
- * col1_indices[1]	col2_indices[1]
- *    .		    .
- *    .		    .
- * col1_indices[n]	col2_indices[n]
+ *                 name
+ *                dlevel
+ * col1_indices[0]      col2_indices[0]
+ * col1_indices[1]      col2_indices[1]
+ *    .             .
+ *    .             .
+ * col1_indices[n]      col2_indices[n]
  */
 static Widget
 init_info_form(parent, top, left)

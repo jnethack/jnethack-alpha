@@ -25,7 +25,9 @@
 #include <X11/Xaw/Cardinals.h>
 #include <X11/Xaw/Scrollbar.h>
 #include <X11/Xaw/Viewport.h>
+#include <X11/Xaw/Label.h>
 #include <X11/Xatom.h>
+#include <X11/keysym.h>
 
 #ifdef PRESERVE_NO_SYSV
 #ifdef SYSV
@@ -66,6 +68,17 @@ static void FDECL(set_gc, (Widget, Font, const char *, Pixel, GC *, GC *));
 static void FDECL(get_text_gc, (struct xwindow *, Font));
 static void FDECL(get_char_info, (struct xwindow *));
 static void FDECL(display_cursor, (struct xwindow *));
+
+#ifdef X11LARGETILE
+struct pxm_slot_t {
+    int fg;
+    int bg;
+    int age;
+    Pixmap pixmap;
+};
+#define MAX_PXM_SLOTS 100
+    struct pxm_slot_t pxm_slot[MAX_PXM_SLOTS]; 
+#endif
 
 /* Global functions ======================================================= */
 
@@ -167,10 +180,22 @@ int x, y;
  * or just keep it on a per-window basis.
  */
 Pixmap tile_pixmap = None;
+#ifdef X11LARGETILE
+Pixmap tile_clipmask = None;
+GC     tile_gc;
+/*JP #ifdef USE_XPM*/
+XpmImage tile_image;
+/* #endif*/
+
+#define TILE_WIDTH      appResources.tile_width
+#define TILE_HEIGHT     appResources.tile_height
+int     TILE_PER_COL;
+#else
 static int tile_width;
 static int tile_height;
 static int tile_count;
 static XImage *tile_image = 0;
+#endif
 
 /*
  * This structure is used for small bitmaps that are used for annotating
@@ -220,6 +245,7 @@ void
 post_process_tiles()
 {
     Display *dpy = XtDisplay(toplevel);
+#if 0 /*JP*/
     unsigned int width, height;
 
     if (tile_image == 0)
@@ -237,6 +263,46 @@ post_process_tiles()
 
     XDestroyImage(tile_image); /* data bytes free'd also */
     tile_image = 0;
+#else
+    Colormap cmap;
+# ifdef USE_XPM
+    XpmAttributes attributes;
+# endif
+    Arg args[16];
+    XGCValues val;
+
+# ifdef USE_XPM
+    if(tile_image.data){
+      XtSetArg(args[0], XtNcolormap, &cmap);
+      XtGetValues(toplevel, args, ONE);
+      
+      attributes.valuemask = XpmCloseness | XpmColormap;
+      attributes.colormap = cmap;
+      attributes.closeness = 25000;
+
+      XpmCreatePixmapFromXpmImage(
+                dpy,
+                XtWindow(toplevel),
+                &tile_image,
+                &tile_pixmap,
+                &tile_clipmask,
+                &attributes
+                );
+
+      val.function = GXcopy;
+      val.clip_mask = tile_clipmask;
+
+      tile_gc = XCreateGC(
+                dpy,
+                XtWindow(toplevel),
+                GCFunction | GCClipMask,
+                &val
+                );
+                
+      XpmFreeXpmImage(&tile_image);
+    }
+# endif
+#endif /*JP*/
 
     init_annotation(&pet_annotation, appResources.pet_mark_bitmap,
                     appResources.pet_mark_color);
@@ -296,9 +362,15 @@ struct xwindow *wp;
     attributes.valuemask = XpmCloseness;
     attributes.closeness = 25000;
 
+# if 0 /*JP*/
     errorcode = XpmReadFileToImage(dpy, appResources.tile_file, &tile_image,
                                    0, &attributes);
+# else
+    errorcode = XpmReadFileToXpmImage(appResources.tile_file, &tile_image,
+                    NULL);
+# endif
 
+# if 0 /*JP*/
     if (errorcode == XpmColorFailed) {
         Sprintf(buf, "Insufficient colors available to load %s.",
                 appResources.tile_file);
@@ -309,6 +381,7 @@ struct xwindow *wp;
         errorcode = XpmReadFileToImage(dpy, appResources.tile_file,
                                        &tile_image, 0, &attributes);
     }
+# endif
 
     if (errorcode != XpmSuccess) {
         if (errorcode == XpmColorFailed) {
@@ -325,6 +398,9 @@ struct xwindow *wp;
         goto tiledone;
     }
 
+# ifdef X11LARGETILE
+        TILE_PER_COL = tile_image.width / TILE_WIDTH;
+# else
     /* assume a fixed number of tiles per row */
     if (tile_image->width % TILES_PER_ROW != 0
         || tile_image->width <= TILES_PER_ROW) {
@@ -348,6 +424,7 @@ struct xwindow *wp;
     }
     tile_width = image_width / TILES_PER_ROW;
     tile_height = image_height / (tile_count / TILES_PER_ROW);
+# endif
 #else /* !USE_XPM */
     /* any less than 16 colours makes tiles useless */
     ddepth = DefaultDepthOfScreen(screen);
@@ -523,8 +600,14 @@ ntiles %ld\n",
     values.graphics_exposures = False;
     values.foreground =
         WhitePixelOfScreen(screen)
+# ifndef X11LARGETILE
         ^ XGetPixel(tile_image, 0,
                     tile_height * glyph2tile[cmap_to_glyph(S_corr)]);
+# else
+        ^ XGetPixel(tile_image, 
+                tile_width*(glyph2tile[cmap_to_glyph(S_corr)]%TILE_PER_COL),
+                tile_height*(glyph2tile[cmap_to_glyph(S_corr)]/TILE_PER_COL));
+# endif
     values.function = GXxor;
     tile_info->white_gc = XtGetGC(wp->w, mask, &values);
 
@@ -544,11 +627,26 @@ tiledone:
         free((genericptr_t) tile_bytes);
     if (colors)
         free((genericptr_t) colors);
+# ifdef X11LARGETILE
+    {
+        int i;
+        for(i = 0; i < MAX_PXM_SLOTS; i++){
+            pxm_slot[i].age = 0;
+            pxm_slot[i].bg = pxm_slot[i].fg = -99;
+            pxm_slot[i].pixmap=0;
+        }
+    }
+# endif
 #endif
 
     if (result) { /* succeeded */
+#ifndef X11LARGETILE
         tile_info->square_height = tile_height;
         tile_info->square_width = tile_width;
+#else
+        tile_info->square_height = TILE_HEIGHT;
+        tile_info->square_width = TILE_WIDTH;
+#endif
         tile_info->square_ascent = 0;
         tile_info->square_lbearing = 0;
         tile_info->image_width = image_width;
@@ -1017,6 +1115,9 @@ Cardinal *num_params;
     Cardinal in_nparams = (num_params ? *num_params : 0);
     char c;
     char keystring[MAX_KEY_STRING];
+#if 1 /*JP*/
+    KeySym keysym = 0;
+#endif
 
     switch (event->type) {
     case ButtonPress:
@@ -1059,9 +1160,57 @@ Cardinal *num_params;
              * Assume that mod1 is really the meta key.
              */
             meta = !!(key->state & Mod1Mask);
+#if 0 /*JP*/
             nbytes = XLookupString(key, keystring, MAX_KEY_STRING,
                                    (KeySym *) 0, (XComposeStatus *) 0);
+#else
+            nbytes = XLookupString(key, keystring, MAX_KEY_STRING,
+                                  &keysym, (XComposeStatus *) 0);
+#endif
         }
+#if 1 /*JP*/
+        /*
+              ‹­ˆø‚É
+         */
+        if(!iflags.num_pad){
+            if(keysym == XK_KP_1 || keysym == XK_KP_End){
+                keystring[0] = 'b';
+                nbytes = 1;
+            }
+            else if(keysym == XK_KP_2 || keysym == XK_KP_Down){
+                keystring[0] = 'j';
+                nbytes = 1;
+            }
+            else if(keysym == XK_KP_3 || keysym == XK_KP_Page_Down){
+                keystring[0] = 'n';
+                nbytes = 1;
+            }
+            else if(keysym == XK_KP_4 || keysym == XK_KP_Left){
+                keystring[0] = 'h';
+                nbytes = 1;
+            }
+            else if(keysym == XK_KP_5 || keysym == XK_KP_Begin){
+                keystring[0] = '.';
+                nbytes = 1;
+            }
+            else if(keysym == XK_KP_6 || keysym == XK_KP_Right){
+                keystring[0] = 'l';
+                nbytes = 1;
+            }
+            else if(keysym == XK_KP_7 || keysym == XK_KP_Home){
+                keystring[0] = 'y';
+                nbytes = 1;
+            }
+            else if(keysym == XK_KP_8 || keysym == XK_KP_Up){
+                keystring[0] = 'k';
+                nbytes = 1;
+            }
+            else if(keysym == XK_KP_9 || keysym == XK_KP_Page_Up){
+                keystring[0] = 'u';
+                nbytes = 1;
+            }
+        }
+#endif
     key_events:
         /* Modifier keys return a zero length string when pressed. */
         if (nbytes) {
@@ -1255,8 +1404,18 @@ boolean inverted;
         Display *dpy = XtDisplay(wp->w);
         Screen *screen = DefaultScreenOfDisplay(dpy);
 
+#ifdef X11LARGETILE
+        /* each slots ages */
+        {
+            int i;
+
+            for(i = 0; i < MAX_PXM_SLOTS; i++)
+                pxm_slot[i].age++;
+        }
+#endif
         for (row = start_row; row <= stop_row; row++) {
             for (cur_col = start_col; cur_col <= stop_col; cur_col++) {
+#ifndef X11LARGETILE
                 int glyph = tile_map->glyphs[row][cur_col].glyph;
                 int tile = glyph2tile[glyph];
                 int src_x, src_y;
@@ -1269,6 +1428,89 @@ boolean inverted;
                           tile_map->black_gc, /* no grapics_expose */
                           src_x, src_y, tile_width, tile_height, dest_x,
                           dest_y);
+#else
+                struct rm *lev = &levl[cur_col][row];
+                int glyph = tile_map->glyphs[row][cur_col].glyph;
+                int bg = back_to_glyph(cur_col, row);
+                int tile = 0;
+                int bgtile = 0;
+                int dest_x = 0;
+                int dest_y = 0;
+                int src_x;
+                int src_y;
+                int bgsrc_x;
+                int bgsrc_y;
+                
+                if(tile_pixmap){
+                    if(youmonst.data && (Blind || (viz_array && !cansee(cur_col, row))))
+                        bg = lev->glyph;
+
+                    bgtile = glyph2tile[bg];
+                    tile = glyph2tile[glyph];
+                    dest_x = cur_col * tile_map->square_width;
+                    dest_y = row * tile_map->square_height;
+                    bgsrc_x = (bgtile % TILE_PER_COL) * TILE_WIDTH;
+                    bgsrc_y = (bgtile / TILE_PER_COL) * TILE_HEIGHT;
+                    src_x = (tile % TILE_PER_COL) * TILE_WIDTH;
+                    src_y = (tile / TILE_PER_COL) * TILE_HEIGHT;
+                    {
+                        int i, match;
+                        int maxage = 0;
+                        
+                        if(bgtile != -1){
+                            match = -1;
+                            for(i = 0; i < MAX_PXM_SLOTS; i++){
+                                if(tile == pxm_slot[i].fg && bgtile == pxm_slot[i].bg){
+                                    match = i;
+                                    break;
+                                }
+                            }
+                            if(match == -1){
+                                /* no match found:dispose the oldest slot and compose pixmap */
+                                for(i = 0; i < MAX_PXM_SLOTS; i++)
+                                    if(maxage < pxm_slot[i].age){
+                                        match = i;
+                                        maxage = pxm_slot[i].age;
+                                    }
+                                if(!pxm_slot[match].pixmap) 
+                                    pxm_slot[match].pixmap = XCreatePixmap(
+                                        dpy, XtWindow(toplevel),
+                                        TILE_WIDTH, TILE_HEIGHT, DefaultDepth(dpy, DefaultScreen(dpy)));
+                                XCopyArea(dpy, tile_pixmap, pxm_slot[match].pixmap,
+                                          tile_map->black_gc,
+                                          bgsrc_x, bgsrc_y,
+                                          TILE_WIDTH, TILE_HEIGHT,
+                                          0,0);
+                                
+                                XSetClipOrigin(dpy, tile_gc, 0 - src_x, 0 - src_y);
+                                
+                                XCopyArea(dpy, tile_pixmap, pxm_slot[match].pixmap,
+                                          tile_gc,
+                                          src_x, src_y,
+                                          TILE_WIDTH, TILE_HEIGHT,
+                                          0,0);
+                                pxm_slot[match].fg = tile;
+                                pxm_slot[match].bg = bgtile;
+                            }
+                            /* slot ready */
+                            pxm_slot[match].age = 0;
+                            XCopyArea(dpy, pxm_slot[match].pixmap, XtWindow(wp->w),
+                                      tile_map->black_gc,
+                                      0, 0,
+                                      TILE_WIDTH, TILE_HEIGHT,
+                                      dest_x, dest_y);
+                        }
+                        else{
+                            /* no clip mask */
+                            XCopyArea(dpy, tile_pixmap, XtWindow(wp->w),
+                                      tile_map->black_gc,
+                                      src_x, src_y,
+                                      TILE_WIDTH, TILE_HEIGHT,
+                                      dest_x, dest_y);
+                        }
+                    }
+                }
+#endif /* X11LARGETILE */
 
                 if (glyph_is_pet(glyph) && iflags.hilite_pet) {
                     /* draw pet annotation (a heart) */
@@ -1466,7 +1708,11 @@ Widget parent;
         XtSetArg(args[num_args], XtNinput, False);
         num_args++;
 
+#if 0 /*JP*/
         wp->popup = parent = XtCreatePopupShell("nethack",
+#else
+        wp->popup = parent = XtCreatePopupShell("jnethack",
+#endif
                                                 topLevelShellWidgetClass,
                                                 toplevel, args, num_args);
         /*

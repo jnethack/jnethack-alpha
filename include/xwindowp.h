@@ -57,6 +57,10 @@ typedef struct {
     Pixel bright_cyan;
     Pixel white;
     XFontStruct *font;
+/* JP: this cannot work because winX11/Window.c does not include config.h */
+/* #ifdef XI18N*/
+    XFontSet	   fontset;
+/* #endif */
     XtCallbackList expose_callback;
     XtCallbackList input_callback;
     XtCallbackList resize_callback;

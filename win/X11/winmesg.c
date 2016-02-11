@@ -37,7 +37,9 @@
 
 static struct line_element *FDECL(get_previous, (struct line_element *));
 static void FDECL(set_circle_buf, (struct mesg_info_t *, int));
+#ifndef XI18N
 static char *FDECL(split, (char *, XFontStruct *, DIMENSION_P));
+#endif
 static void FDECL(add_line, (struct mesg_info_t *, const char *));
 static void FDECL(redraw_message_window, (struct xwindow *));
 static void FDECL(mesg_check_size_change, (struct xwindow *));
@@ -46,7 +48,7 @@ static void FDECL(get_gc, (Widget, struct mesg_info_t *));
 static void FDECL(mesg_resized, (Widget, XtPointer, XtPointer));
 
 static char mesg_translations[] = "#override\n\
- <Key>:		input()	\
+ <Key>:         input() \
 ";
 
 /* Move the message window's vertical scrollbar's slider to the bottom. */
@@ -75,6 +77,9 @@ Widget parent;
     Cardinal num_args;
     Widget viewport;
     struct mesg_info_t *mesg_info;
+#ifdef XI18N
+    XFontSetExtents *extent;
+#endif
 
     wp->type = NHW_MESSAGE;
 
@@ -153,14 +158,28 @@ Widget parent;
     num_args = 0;
     XtSetArg(args[num_args], XtNfont, &mesg_info->fs);
     num_args++;
+#ifdef XI18N
+    XtSetArg(args[num_args], XtNfontSet, &mesg_info->fontset);
+    num_args++;
+#endif
     XtGetValues(wp->w, args, num_args);
+#ifdef XI18N
+    extent = XExtentsOfFontSet(mesg_info->fontset);
+#endif
 
     /* Save character information for fast use later. */
+#ifndef XI18N
     mesg_info->char_width = mesg_info->fs->max_bounds.width;
     mesg_info->char_height =
         mesg_info->fs->max_bounds.ascent + mesg_info->fs->max_bounds.descent;
     mesg_info->char_ascent = mesg_info->fs->max_bounds.ascent;
     mesg_info->char_lbearing = -mesg_info->fs->min_bounds.lbearing;
+#else
+    mesg_info->char_width    = extent->max_logical_extent.width;
+    mesg_info->char_height   = extent->max_logical_extent.height;
+    mesg_info->char_ascent   = -extent->max_logical_extent.y;
+    mesg_info->char_lbearing = extent->max_logical_extent.x;
+#endif
 
     get_gc(wp->w, mesg_info);
 
@@ -241,6 +260,32 @@ append_message(wp, str)
 struct xwindow *wp;
 const char *str;
 {
+#if defined(XI18N)
+    int len;
+    XRectangle ink_ext, lgc_ext;
+    char ss[1024],s1[1024],s2[1024]; /* may be enough */
+
+    Strcpy(ss, str);
+    while(1){
+      len = strlen(ss);
+      while(1){
+        XmbTextExtents(wp->mesg_information->fontset, ss, len,
+                       &ink_ext,&lgc_ext);
+        if(lgc_ext.width < wp->pixel_width)
+          break;
+        --len;
+      }
+      if( len >= strlen(ss)){
+        add_line(wp->mesg_information, ss);
+        break;
+      }
+      split_japanese(ss, s1, s2, len);
+      add_line(wp->mesg_information, s1);
+      if(!*s2)
+        break;
+      Strcpy(ss,s2);
+    }
+#else
     char *mark, *remainder, buf[BUFSZ];
 
     if (!str)
@@ -254,6 +299,10 @@ const char *str;
         remainder = split(mark, wp->mesg_information->fs, wp->pixel_width);
         add_line(wp->mesg_information, mark);
     } while (remainder);
+# if 1 /*JP*/
+    add_line(wp->mesg_information, buf);
+# endif
+#endif /*XI18N*/
 }
 
 /* private functions =======================================================
@@ -360,6 +409,7 @@ int count;
  * Make sure the given string is shorter than the given pixel width.  If
  * not, back up from the end by words until we find a place to split.
  */
+#ifndef XI18N
 static char *
 split(s, fs, pixel_width)
 char *s;
@@ -386,6 +436,7 @@ Dimension pixel_width;
     }
     return remainder;
 }
+#endif
 
 /*
  * Add a line of text to the window.  The first line in the curcular list
@@ -477,9 +528,19 @@ struct xwindow *wp;
     /* For now, just update the whole shootn' match. */
     for (y_base = row = 0, curr = mesg_info->head; row < mesg_info->num_lines;
          row++, y_base += mesg_info->char_height, curr = curr->next) {
+#ifndef XI18N
         XDrawString(XtDisplay(wp->w), XtWindow(wp->w), mesg_info->gc,
                     mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
                     curr->line, curr->str_length);
+#else
+        XmbDrawString(XtDisplay(wp->w), XtWindow(wp->w),
+                      mesg_info->fontset,
+                      mesg_info->gc,
+                      mesg_info->char_lbearing,
+                      mesg_info->char_ascent + y_base,
+                      curr->line,
+                      curr->str_length);
+#endif
         /*
          * This draws a line at the _top_ of the line of text pointed to by
          * mesg_info->last_pause.

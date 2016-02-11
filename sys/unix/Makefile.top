@@ -150,8 +150,8 @@ beostiles: $(GAME)
 	( cd util ; $(MAKE) tile2beos )
 	( cd dat ; $(MAKE) beostiles )
 
-NetHack.ad: $(GAME)
-	( cd dat ; $(MAKE) NetHack.ad )
+JNetHack.ad: $(GAME)
+	( cd dat ; $(MAKE) JNetHack.ad )
 
 pet_mark.xbm:
 	( cd dat ; $(MAKE) pet_mark.xbm )

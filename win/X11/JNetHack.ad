@@ -1,0 +1,175 @@
+! The display_file, tombstone, and menu windows are all formatted assuming
+! a fixed width font.  Text windows may or may not be formatted as above.
+! The rip window applies if the GRAPHIC_TOMBSTONE option is turned on, and
+! requires a 12 pixel font for correct appearance.
+!
+JNetHack*colormap:			install
+!
+JNetHack*font:				variable
+JNetHack*display_file*font:		fixed
+JNetHack*tombstone*font:		fixed
+JNetHack*rip*font:			-*-times-medium-r-*-*-12-*-*-*-*-*-*-*
+JNetHack*menu*font:			fixed
+JNetHack*text*font:			fixed
+!JNetHack*map*font:			nh10
+JNetHack*map*font:			fixed
+
+! To use full-color tiles for the map, uncomment the tile file name.
+! If you use a 100dpi (or greater) monitor you may wish to double the
+! tile size so you can see the figures.  If JNetHack was compiled to
+! use XPM (USE_XPM in config.h), the tile_file is a standard XPM file.
+! Otherwise, it is a custom format.  double_tile_size only applies to
+! the custom format - to enlarge an XPM file, use processing tools
+! such as XV or preferably PBMplus.
+!
+!JNetHack.tile_file: x11tiles32j
+JNetHack.tile_file: t32-1024.xpm
+JNetHack.tile_width: 32
+JNetHack.tile_height: 32
+!JNetHack.double_tile_size: True
+!
+! The annotation of pets.
+JNetHack.pet_mark_bitmap: pet_mark.xbm
+JNetHack.pet_mark_color: Red
+
+! Tombstone
+! The image file
+JNetHack.tombstone: rip.xpm
+! Text starts at (tombtext_x, tombtext_y) and subsequent lines
+! are displaced by (tombtext_dx, tombtext_dy) pixels.  If you
+!JNetHack.tombtext_x: 155
+!JNetHack.tombtext_y: 78
+!JNetHack.tombtext_dx: 0
+!JNetHack.tombtext_dy: 13
+! The color to use for the text on the hero's tombstone
+JNetHack*rip*foreground: black
+
+! Translation tables.  There are currently several actions in JNetHack, but
+! the only one you should be using is "input()", which, with no parameters,
+! uses XLookupString to translate your keypress into a command.  You
+! can optionally give it parameters to change the behavior, see the example
+! below.  Note that you have to specify the translations in every appropriate
+! window.
+JNetHack*message*translations:	<KeyPress>: input()
+!
+! Example extra translations for the map window.
+!
+!JNetHack*map*translations:	#override \
+!				!<Key>Left: input(h) \n\
+!				!<Key>Right: input(l) \n\
+!				!<Key>Up: input(k) \n\
+!				!<Key>Down: input(j)
+!
+! The icon to use; supported values are nh72, nh56, and nh32; nh72 is the
+! default.  Some window managers may not support the larger icon sizes.
+! It is not guaranteed that the window manager will honor the icon selection.
+!JNetHack*icon: nh56
+!
+! If True, a popup for y/n questions is _not_ used.
+!JNetHack*slow: True
+!
+! The number of lines the message window will show without scrolling.
+!JNetHack*message_lines: 12
+!
+! If True, the message window has a line that seperates old and new messages.
+!JNetHack*message_line: True
+!
+! If True, force keyboard to attach to popup windows.  Some window managers
+! enforce a click-to-focus-keyboard policy (e.g. the DECwindows wm).  JNetHack
+! has a lot of popups and is almost unplayable without some kind of autofocus.
+! If your window manager does click-to-focus, you'll probably want this False.
+!JNetHack*autofocus: True
+!
+! Specify the number of rows and columns of the map window.  The default
+! is the standard 80x21 window.  Note: this _does_not_ change JNetHack's
+! level size, only what you see of it.
+!JNetHack*map*rows:	21
+!JNetHack*map*columns:	80
+
+! Parts of the fancy status display.
+!
+JNetHack*status_condition.borderWidth:	0
+JNetHack*status_info*borderWidth:	0
+
+!
+! Sample color screen entries.
+!
+JNetHack*foreground:		black
+JNetHack*background:		white
+JNetHack*border:		black
+
+JNetHack*jnethack.background: 	wheat
+
+JNetHack*map*yellow:		gold
+JNetHack*map*brown:		tan
+JNetHack*map*gray:		grey85
+JNetHack*map*foreground:		wheat
+JNetHack*map*background:		grey40
+
+JNetHack*fancy_status.skipAdjust:        True
+JNetHack*fancy_status.background:	wheat
+JNetHack*status_info*foreground:		Sienna
+JNetHack*status_info*background:		wheat
+JNetHack*status_info.background:		wheat
+JNetHack*status_attributes*foreground:	black
+JNetHack*status_attributes*background:	white
+JNetHack*status_condition*foreground:	red
+JNetHack*status_condition*background:	wheat
+JNetHack*Scrollbar*foreground:		Sienna
+JNetHack*Scrollbar*background:		wheat
+JNetHack*status_info*showGrip:		False
+JNetHack*status_attributes*showGrip:	False
+
+JNetHack*player_selection*random.borderColor:	blue
+JNetHack*player_selection*random.borderWidth:    2
+JNetHack*player_selection*random.foreground:	blue
+JNetHack*player_selection*random.accelerators: #override\n\
+				<Key>Return:	set() notify() unset()
+JNetHack*player_selection*quit.borderColor:	blue
+JNetHack*player_selection*quit.foreground:	blue
+JNetHack*player_selection*Command.borderColor:	red
+JNetHack*player_selection*Command.foreground:	red
+JNetHack*player_selection*quit.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+
+JNetHack*extended_commands*dismiss.borderColor:	blue
+JNetHack*extended_commands*dismiss.foreground:	blue
+JNetHack*extended_commands*help.borderColor:	blue
+JNetHack*extended_commands*help.foreground:	blue
+JNetHack*extended_commands*Command.borderColor:	red
+JNetHack*extended_commands*Command.foreground:	red
+JNetHack*extended_commands*help.accelerators: #override\n\
+				:<Key>?:	set() notify() unset()
+JNetHack*extended_commands*dismiss.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+!
+!
+! The following are the default 15 colors that the JNetHack map uses.
+! If they don't look good on your screen, change them.
+!
+! The foreground color is used as "no color".
+!
+!JNetHack*map*black:		black
+!JNetHack*map*red:		red
+!JNetHack*map*green:		pale green
+!JNetHack*map*brown:		brown
+!JNetHack*map*blue:		blue
+!JNetHack*map*magenta:		magenta
+!JNetHack*map*cyan:		light cyan
+!JNetHack*map*gray:		gray
+!JNetHack*map*orange:		orange
+!JNetHack*map*bright_green:	green
+!JNetHack*map*yellow:		yellow
+!JNetHack*map*bright_blue:	royal blue
+!JNetHack*map*bright_magenta:	violet
+!JNetHack*map*bright_cyan:	cyan
+!JNetHack*map*white:		white
+!
+!
+!
+!JNetHack*fontSet: -*-fixed-medium-r-normal--14-*-iso8859-1,\
+!                  -*-fixed-medium-r-normal--14-*-iso8859-1,\
+!                  -*-fixed-medium-r-*--14-*-jisx0208.1983-*
+!                  -*-fixed-medium-r-*--14-*-jisx0208.1983-*
+JNetHack*fontSet:	*--14-*
+JNetHack*international:	True

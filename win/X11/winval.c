@@ -26,6 +26,10 @@
 #endif
 
 #include "hack.h" /* #define for const for non __STDC__ compilers */
+/*JP*/
+#ifdef XAW_I18N
+#include <X11/Xaw/Xawi18n.h>
+#endif
 #include "winX.h"
 
 #define WNAME "name"
@@ -55,6 +59,11 @@ const char *name_value;
     num_args++;
     XtSetArg(args[num_args], XtNlabel, name_value);
     num_args++;
+/*JP*/
+#if defined(X11R6) && defined(XI18N)
+    XtSetArg(args[num_args], XtNinternational, True);
+    num_args++;
+#endif
     XtSetArg(args[num_args], XtNinternalHeight, 0);
     num_args++;
     name =
@@ -67,6 +76,11 @@ const char *name_value;
     num_args++;
     XtSetArg(args[num_args], nhStr(XtNfromHoriz), name);
     num_args++;
+/*JP*/
+#if defined(X11R6) && defined(XI18N)
+    XtSetArg(args[num_args], XtNinternational, True);
+    num_args++;
+#endif
     XtSetArg(args[num_args], XtNinternalHeight, 0);
     num_args++;
     (void) XtCreateManagedWidget(WVALUE, labelWidgetClass, form, args,
@@ -155,7 +169,7 @@ Widget w;
 }
 
 /* Swap foreground and background colors (this is the best I can do with */
-/* a label widget, unless I can get some init hook in there).		 */
+/* a label widget, unless I can get some init hook in there).            */
 void
 hilight_value(w)
 Widget w;

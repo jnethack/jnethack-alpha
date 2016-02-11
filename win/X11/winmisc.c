@@ -8,6 +8,13 @@
  *	+ Global functions: player_selection() and get_ext_cmd().
  */
 
+/*
+**	Japanese version Copyright (C) Issei Numata, 1994-1999
+**	changing point is marked `JP' (94/6/7) or XI18N (96/7/19)
+**	For 3.4.0, Copyright (c) Kentaro Shirakata, 2002
+**	JNetHack may be freely redistributed.  See license for details. 
+*/
+
 #ifndef SYSV
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
 #endif
@@ -297,6 +304,11 @@ X11_player_selection()
     const char **choices;
     char qbuf[QBUFSZ], plbuf[QBUFSZ];
 
+#ifdef XI18N
+    char **jroles;
+    char jtmp[256];
+#endif
+
     /* avoid unnecessary prompts further down */
     rigid_role_checks();
 
@@ -339,11 +351,21 @@ X11_player_selection()
             else
                 panic("no available ROLE+race+gender+alignment combinations");
         }
+#if 0 /*JP*/
         Sprintf(qbuf, "Choose your %s Role", s_suffix(plbuf));
+#else
+        Sprintf(qbuf, "%s職業を選択してください．", s_suffix(plbuf));
+#endif
         popup =
+#if 0 /*JP*/
             make_menu("player_selection", qbuf, player_select_translations,
                       "quit", ps_quit, "random", ps_random, num_roles,
                       choices, (Widget **) 0, ps_select, &player_form);
+#else
+            make_menu("player_selection", qbuf, player_select_translations,
+                      "抜ける", ps_quit, "ランダム", ps_random, num_roles,
+                      choices, (Widget **) 0, ps_select, &player_form);
+#endif
 
         ps_selected = -1;
         positionpopup(popup, FALSE);
@@ -408,11 +430,22 @@ X11_player_selection()
             flags.initrace = availindex;
             free((genericptr_t) choices), choices = 0;
         } else {
+#if 0 /*JP*/
             Sprintf(qbuf, "Pick your %s race", s_suffix(plbuf));
+#else
+            Sprintf(qbuf, "%s種族を選択してください．", s_suffix(plbuf));
+#endif
+#if 0 /*JP*/
             popup =
                 make_menu("race_selection", qbuf, race_select_translations,
                           "quit", ps_quit, "random", ps_random, num_races,
                           choices, (Widget **) 0, ps_select, &player_form);
+#else
+            popup =
+                make_menu("race_selection", qbuf, race_select_translations,
+                          "抜ける", ps_quit, "ランダム", ps_random, num_races,
+                          choices, (Widget **) 0, ps_select, &player_form);
+#endif
 
             ps_selected = -1;
             positionpopup(popup, FALSE);
@@ -476,11 +509,21 @@ X11_player_selection()
             flags.initgend = availindex;
             free((genericptr_t) choices), choices = 0;
         } else {
+/*JP
             Sprintf(qbuf, "Your %s gender?", s_suffix(plbuf));
+*/
+            Sprintf(qbuf, "%s性別を選んでください．", s_suffix(plbuf));
+#if 0 /*JP*/
             popup =
                 make_menu("gender_selection", qbuf, gend_select_translations,
                           "quit", ps_quit, "random", ps_random, num_gends,
                           choices, (Widget **) 0, ps_select, &player_form);
+#else
+            popup =
+                make_menu("gender_selection", qbuf, gend_select_translations,
+                          "抜ける", ps_quit, "ランダム", ps_random, num_gends,
+                          choices, (Widget **) 0, ps_select, &player_form);
+#endif
 
             ps_selected = -1;
             positionpopup(popup, FALSE);
@@ -542,11 +585,21 @@ X11_player_selection()
             flags.initalign = availindex;
             free((genericptr_t) choices), choices = 0;
         } else {
+/*JP
             Sprintf(qbuf, "Your %s alignment?", s_suffix(plbuf));
+*/
+            Sprintf(qbuf, "%s属性を選択してください．", s_suffix(plbuf));
+#if 0 /*JP*/
             popup = make_menu("alignment_selection", qbuf,
                               algn_select_translations, "quit", ps_quit,
                               "random", ps_random, num_algns, choices,
                               (Widget **) 0, ps_select, &player_form);
+#else
+            popup = make_menu("alignment_selection", qbuf,
+                              algn_select_translations, "抜ける", ps_quit,
+                              "ランダム", ps_random, num_algns, choices,
+                              (Widget **) 0, ps_select, &player_form);
+#endif
 
             ps_selected = -1;
             positionpopup(popup, FALSE);
@@ -796,11 +849,19 @@ init_extended_commands_popup()
     for (i = 0; i < num_commands; i++)
         command_list[i] = extcmdlist[i].ef_txt;
 
+#if 0 /*JP*/
     extended_command_popup =
         make_menu("extended_commands", "Extended Commands",
                   extended_command_translations, "dismiss", extend_dismiss,
                   "help", extend_help, num_commands, command_list,
                   &extended_commands, extend_select, &extended_command_form);
+#else
+    extended_command_popup =
+        make_menu("extended_commands", "拡張コマンド",
+                  extended_command_translations, "取消", extend_dismiss,
+                  "ヘルプ", extend_help, num_commands, command_list,
+                  &extended_commands, extend_select, &extended_command_form);
+#endif
 
     free((char *) command_list);
 }
@@ -880,6 +941,10 @@ Widget *formp; /* return */
      * Create the label.
      */
     num_args = 0;
+#if defined(X11R6) && defined(XI18N)
+    XtSetArg(args[num_args], XtNinternational, True);
+    num_args++;
+#endif
     XtSetArg(args[num_args], XtNborderWidth, 0);
     num_args++;
     label = XtCreateManagedWidget(popup_label, labelWidgetClass, form, args,
@@ -914,6 +979,10 @@ Widget *formp; /* return */
         XtSetArg(args[num_args], nhStr(XtNshapeStyle),
                                     XmuShapeRoundedRectangle);	num_args++;
     */
+#if defined(X11R6) && defined(XI18N)
+    XtSetArg(args[num_args], XtNinternational, True);
+    num_args++;
+#endif
     right = XtCreateManagedWidget(right_name, commandWidgetClass, form, args,
                                   num_args);
     XtAddCallback(right, XtNcallback, right_callback, (XtPointer) 0);
@@ -936,6 +1005,10 @@ Widget *formp; /* return */
             num_args++;
         }
 
+#if defined(X11R6) && defined(XI18N)
+        XtSetArg(args[num_args], XtNinternational, True);
+        num_args++;
+#endif
         *curr = XtCreateManagedWidget(widget_names[i], commandWidgetClass,
                                       form, args, num_args);
         XtAddCallback(*curr, XtNcallback, name_callback, (XtPointer) i);

@@ -7,6 +7,13 @@
  * drawing canvas with 16 colors and one font.
  */
 
+/*
+**	Japanese version Copyright (C) Issei Numata, 1994-1999
+**	changing point is marked `JP' (94/6/7) or XI18N (96/7/19)
+**	For 3.4.0, Copyright (c) Kentaro Shirakata, 2002
+**	JNetHack may be freely redistributed.  See license for details. 
+*/
+
 #ifndef SYSV
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
 #endif
@@ -77,6 +84,10 @@ static XtResource resources[] = {
 
     { nhStr(XtNfont), XtCFont, XtRFontStruct, sizeof(XFontStruct *),
       offset(font), XtRString, (XtPointer) XtDefaultFont },
+#ifdef XI18N
+    { XtNfontSet, XtCFontSet, XtRFontSet, sizeof(XFontSet *),
+        offset(fontset), XtRString, XtDefaultFontSet },
+#endif
     { nhStr(XtNexposeCallback), XtCCallback, XtRCallback,
       sizeof(XtCallbackList), offset(expose_callback), XtRCallback,
       (char *) 0 },
@@ -121,7 +132,11 @@ Region region; /* unused */
     nhUse(region);
 
     /* This isn't correct - we need to call the callback with region. */
+#if 0 /*JP*/
     XtCallCallbacks(w, XtNexposeCallback, (caddr_t) event);
+#else
+    XtCallCallbacks(w, XtNexposeCallback, (XtPointer) event);
+#endif
 }
 
 /* ARGSUSED */
@@ -129,7 +144,11 @@ static void
 Resize(w)
 Widget w;
 {
+#if 0 /*JP*/
     XtCallCallbacks(w, XtNresizeCallback, (caddr_t) 0);
+#else
+    XtCallCallbacks(w, XtNresizeCallback, (XtPointer) 0);
+#endif
 }
 
 WindowClassRec windowClassRec = {
@@ -185,3 +204,12 @@ Widget w;
 {
     return ((WindowWidget) w)->window.font;
 }
+
+#ifdef XI18N
+XFontSet
+WindowFontSet(w)
+Widget w;
+{
+    return ((WindowWidget) w)->window.fontset;
+}
+#endif

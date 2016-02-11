@@ -52,6 +52,10 @@
  * $NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $
  */
 
+/*
+** marked as XI18N for i18n by issei (1994/1/10)
+*/
+
 #ifndef SYSV
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
 #endif
@@ -74,11 +78,22 @@
 
 #include "config.h" /* #define for const for non __STDC__ compilers */
 #include "lint.h"   /* for nethack's nhStr() macro */
+#if 1 /*JP*/
+#ifdef XAW_I18N
+#include <X11/Xaw/Xawi18n.h>
+#endif
+#endif
 
 /* ":" added to both translations below to allow limited redefining of
  * keysyms before testing for keysym values -- dlc */
+#if 0 /*JP*/
 static const char okay_accelerators[] = "#override\n\
      :<Key>Return: set() notify() unset()\n";
+#else
+static const char okay_accelerators[] = "#override\n\
+     :<Key>Return: set() notify() unset()\n\
+     :<Ctrl>m: set() notify() unset()\n";
+#endif
 
 static const char cancel_accelerators[] = "#override\n\
      :<Key>Escape: set() notify() unset()\n\
@@ -132,6 +147,10 @@ XtCallbackProc cancel_callback;
     num_args++;
     XtSetArg(args[num_args], nhStr(XtNborderWidth), 0);
     num_args++;
+#if defined(X11R6) && defined(XI18N)
+    XtSetArg(args[num_args], XtNinternational, True);
+    num_args++;
+#endif
     prompt = XtCreateManagedWidget("prompt", labelWidgetClass, form, args,
                                    num_args);
 
@@ -162,6 +181,10 @@ XtCallbackProc cancel_callback;
     num_args++;
     XtSetArg(args[num_args], nhStr(XtNstring), "");
     num_args++;
+#if defined(X11R6) && defined(XI18N)
+    XtSetArg(args[num_args], XtNinternational, True);
+    num_args++;
+#endif
     response = XtCreateManagedWidget("response", asciiTextWidgetClass, form,
                                      args, num_args);
 
@@ -189,7 +212,14 @@ XtCallbackProc cancel_callback;
     XtSetArg(args[num_args], nhStr(XtNaccelerators),
              XtParseAcceleratorTable(okay_accelerators));
     num_args++;
+#if defined(X11R6) && defined(XI18N)
+    XtSetArg(args[num_args], XtNinternational, True);
+    num_args++;
+#endif
+/*JP
     okay = XtCreateManagedWidget("okay", commandWidgetClass, form, args,
+*/
+    okay = XtCreateManagedWidget("OK", commandWidgetClass, form, args,
                                  num_args);
     XtAddCallback(okay, XtNcallback, okay_callback, form);
 
@@ -221,7 +251,14 @@ XtCallbackProc cancel_callback;
         XtSetArg(args[num_args], nhStr(XtNaccelerators),
                  XtParseAcceleratorTable(cancel_accelerators));
         num_args++;
+#if defined(X11R6) && defined(XI18N)
+        XtSetArg(args[num_args], XtNinternational, True);
+        num_args++;
+#endif
+/*JP
         cancel = XtCreateManagedWidget("cancel", commandWidgetClass, form,
+*/
+        cancel = XtCreateManagedWidget("ƒLƒƒƒ“ƒZƒ‹", commandWidgetClass, form,
                                        args, num_args);
         XtAddCallback(cancel, XtNcallback, cancel_callback, form);
         XtInstallAccelerators(response, cancel);
@@ -287,19 +324,35 @@ SetDialogResponse(w, s)
 Widget w;
 String s;
 {
+#ifndef XI18N
     Arg args[4];
+#else
+    Arg args[5];
+#endif
     Widget response;
     XFontStruct *font;
     Dimension width, nwidth, leftMargin, rightMargin;
+#ifdef XI18N
+    XFontSet fontset;
+    XFontSetExtents *extent;
+#endif
 
     response = XtNameToWidget(w, "response");
     XtSetArg(args[0], nhStr(XtNfont), &font);
     XtSetArg(args[1], nhStr(XtNleftMargin), &leftMargin);
     XtSetArg(args[2], nhStr(XtNrightMargin), &rightMargin);
     XtSetArg(args[3], nhStr(XtNwidth), &width);
+#ifndef XI18N
     XtGetValues(response, args, FOUR);
     /* width includes margins as per Xaw documentation */
     nwidth = (font->max_bounds.width * strlen(s)) + leftMargin + rightMargin;
+#else
+    XtSetArg(args[4], XtNfontSet, &fontset);
+    XtGetValues(response, args, FIVE);
+    extent = XExtentsOfFontSet(fontset);
+    nwidth = ((extent->max_logical_extent.width * strlen(s)) + leftMargin
+              + rightMargin);
+#endif
     if (nwidth < width)
         nwidth = width;
 

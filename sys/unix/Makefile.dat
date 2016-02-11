@@ -47,8 +47,8 @@ nhtiles.bmp: ../util/tile2bmp ../win/share/monsters.txt \
 				../win/share/other.txt
 	../util/tile2bmp $@
 
-NetHack.ad: ../win/X11/NetHack.ad
-	cp ../win/X11/NetHack.ad NetHack.ad
+JNetHack.ad: ../win/X11/JNetHack.ad
+	cp ../win/X11/JNetHack.ad JNetHack.ad
 
 pet_mark.xbm: ../win/X11/pet_mark.xbm
 	cp ../win/X11/pet_mark.xbm pet_mark.xbm
