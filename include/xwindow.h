@@ -78,6 +78,9 @@
 
 extern XFontStruct *WindowFontStruct(/* Widget */);
 extern Font WindowFont(/* Widget */);
+#ifdef XI18N
+extern XFontSet WindowFontSet(/* Widget */);
+#endif
 
 #define XtCWindowResource "WindowResource"
 #define XtCRows "Rows"
