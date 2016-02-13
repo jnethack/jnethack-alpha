@@ -245,7 +245,11 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     case MSNH_MSG_PUTSTR: {
         PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr) lParam;
         SCROLLINFO si;
+#if 0 /*JP*/
         char *p;
+#else
+        unsigned char *p;
+#endif
 
         if (msg_data->append == 1) {
             /* Forcibly append to line, even if we pass the edge */
