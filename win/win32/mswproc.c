@@ -2,6 +2,10 @@
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* For 3.6-, Copyright (c) SHIRAKATA Kentaro, 2016                 */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 /*
  * This file implements the interface between the window port specific
  * code in the mswin port and the rest of the nethack game engine.
@@ -1606,7 +1610,11 @@ mswin_getlin(const char *question, char *input)
     logDebug("mswin_getlin(%s, %p)\n", question, input);
 
     if (!iflags.wc_popup_dialog) {
+#if 0 /*JP*/
         char c;
+#else
+        int c;
+#endif
         int len;
         int done;
         int createcaret;
@@ -1640,11 +1648,21 @@ mswin_getlin(const char *question, char *input)
                 if (c == VK_BACK) {
                     if (len > 0)
                         len--;
+#if 1 /*JP*//*2バイト文字ならもう1バイト消す*/
+                    if (len > 0 && is_kanji2(input, len))
+                        len--;
+#endif
                     input[len] = '\0';
                 } else if (len>=(BUFSZ-1)) {
                     PlaySound((LPCSTR)SND_ALIAS_SYSTEMEXCLAMATION, NULL, SND_ALIAS_ID|SND_ASYNC);
                 } else {
                     input[len++] = c;
+#if 1 /*JP*//*2バイト文字ならその場でもう1バイト読み込む*/
+                    if (is_kanji(c)){
+                        c = mswin_nhgetch();
+                        input[len++] = c;
+                    }
+#endif
                     input[len] = '\0';
                 }
                 mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, 1);
