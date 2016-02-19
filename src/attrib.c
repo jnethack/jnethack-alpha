@@ -890,8 +890,13 @@ int propidx; /* special cases can have negative values */
     /*
      * Restrict the source of the attributes just to debug mode for now
      */
+/*JP:「あなたはあなたの…によって」となると不自然なのでsimpleonames()を使う*/
+/*JP: 本来はminimal_xname()を使うべきだがstaticなので代用*/
     if (wizard) {
+/*JP
         static NEARDATA const char because_of[] = " because of %s";
+*/
+        static NEARDATA const char because_of[] = "%sによって";
 
         if (propidx >= 0) {
             char *p;
@@ -899,25 +904,42 @@ int propidx; /* special cases can have negative values */
             int innate = is_innate(propidx);
 
             if (innate == 2)
+/*JP
                 Strcpy(buf, " because of your experience");
+*/
+                Strcpy(buf, "経験によって");
             else if (innate == 1)
+/*JP
                 Strcpy(buf, " innately");
+*/
+                Strcpy(buf, "生まれながらに");
             else if (wizard
                      && (obj = what_gives(&u.uprops[propidx].extrinsic)))
                 Sprintf(buf, because_of, obj->oartifact
                                              ? bare_artifactname(obj)
+/*JP
                                              : ysimple_name(obj));
+*/
+                                             : simpleonames(obj));
             else if (propidx == BLINDED && u.uroleplay.blind)
+/*JP
                 Sprintf(buf, " from birth");
+*/
+                Sprintf(buf, "生まれてからずっと");
             else if (propidx == BLINDED && Blindfolded_only)
+/*JP
                 Sprintf(buf, because_of, ysimple_name(ublindf));
+*/
+                Sprintf(buf, because_of, simpleonames(ublindf));
 
+#if 0 /*JP*//*不要*/
             /* remove some verbosity and/or redundancy */
             if ((p = strstri(buf, " pair of ")) != 0)
                 copynchars(p + 1, p + 9, BUFSZ); /* overlapping buffers ok */
             else if (propidx == STRANGLED
                      && (p = strstri(buf, " of strangulation")) != 0)
                 *p = '\0';
+#endif
 
         } else { /* negative property index */
             /* if more blocking capabilities get implemented we'll need to
@@ -931,12 +953,20 @@ int propidx; /* special cases can have negative values */
             case INVIS:
                 if (u.uprops[INVIS].blocked & W_ARMC)
                     Sprintf(buf, because_of,
+#if 0 /*JP*/
                             ysimple_name(uarmc)); /* mummy wrapping */
+#else
+                            simpleonames(uarmc)); /* mummy wrapping */
+#endif
                 break;
             case CLAIRVOYANT:
                 if (wizard && (u.uprops[CLAIRVOYANT].blocked & W_ARMH))
                     Sprintf(buf, because_of,
+#if 0 /*JP*/
                             ysimple_name(uarmh)); /* cornuthaum */
+#else
+                            simpleonames(uarmh)); /* cornuthaum */
+#endif
                 break;
             }
         }
