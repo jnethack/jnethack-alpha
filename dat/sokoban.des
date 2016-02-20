@@ -510,8 +510,8 @@ TRAP:"hole",(21,01)
 TRAP:"hole",(22,01)
 TRAP:"hole",(23,01)
 
-MONSTER:('m',"giant mimic"), random, m_object "boulder"
-MONSTER:('m',"giant mimic"), random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "Šâ"
+MONSTER:('m',"giant mimic"), random, m_object "Šâ"
 
 # Random objects
 OBJECT:'%',random
@@ -611,8 +611,8 @@ TRAP:"hole",(20,01)
 TRAP:"hole",(21,01)
 TRAP:"hole",(22,01)
 
-MONSTER:('m',"giant mimic"), random, m_object "boulder"
-MONSTER:('m',"giant mimic"), random, m_object "boulder"
+MONSTER:('m',"giant mimic"), random, m_object "Šâ"
+MONSTER:('m',"giant mimic"), random, m_object "Šâ"
 
 # Random objects
 OBJECT:'%',random
