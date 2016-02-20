@@ -2573,14 +2573,24 @@ const char *obj;
     /* players are computer scientists: 0, 1, 2, n */
     switch (x) {
     case 0:
+/*JP:‚±‚±‚É‚Í—ˆ‚È‚¢‚Í‚¸*/
         return "no";
     /* an() returns too much.  index is ok in this case */
     case 1:
+/*JP
         return index(vowels, *obj) ? "an" : "a";
+*/
+	return "";
     case 2:
+/*JP
         return "some";
+*/
+        return "“ñ‚Â‚Ì";
     case 3:
+/*JP
         return "many";
+*/
+        return "‘½‚­‚Ì";
     }
 
     return "(unknown)";
@@ -2597,13 +2607,25 @@ branch *br;
 
     switch (br->type) {
     case BR_PORTAL:
+/*JP
         return closed_portal ? "Sealed portal" : "Portal";
+*/
+        return closed_portal ? "••ˆó‚³‚ê‚½–‚–@‚Ì“üŒû" : "–‚–@‚Ì“üŒû";
     case BR_NO_END1:
+/*JP
         return "Connection";
+*/
+        return "Ú‘±•”";
     case BR_NO_END2:
+/*JP
         return br->end1_up ? "One way stairs up" : "One way stairs down";
+*/
+        return br->end1_up ? "ã‚è•Ð“¹ŠK’i" : "‰º‚è•Ð“¹ŠK’i";
     case BR_STAIR:
+/*JP
         return br->end1_up ? "Stairs up" : "Stairs down";
+*/
+        return br->end1_up ? "ã‚èŠK’i" : "‰º‚èŠK’i";
     }
 
     return "(unknown)";
@@ -2620,23 +2642,41 @@ int indx;
     *outbuf = '\0';
     switch (indx) {
     case -5:
+/*JP
         Strcpy(outbuf, "Astral Plane");
+*/
+        Strcpy(outbuf, "“VãŠE");
         break;
     case -4:
+/*JP
         planename = "Water";
+*/
+        planename = "…";
         break;
     case -3:
+/*JP
         planename = "Fire";
+*/
+        planename = "‰Î";
         break;
     case -2:
+/*JP
         planename = "Air";
+*/
+        planename = "•—";
         break;
     case -1:
+/*JP
         planename = "Earth";
+*/
+        planename = "“y";
         break;
     }
     if (planename)
+/*JP
         Sprintf(outbuf, "Plane of %s", planename);
+*/
+        Sprintf(outbuf, "%s‚Ì¸—ìŠE", planename);
     else if (!*outbuf)
         Sprintf(outbuf, "unknown plane #%d", indx);
     return outbuf;
@@ -2646,45 +2686,85 @@ STATIC_OVL const char *
 shop_string(rtype)
 int rtype;
 {
+#if 0 /*JP*/
     const char *str = "shop"; /* catchall */
+#else
+    const char *str = "“X"; /* catchall */
+#endif
 
     /* Yuck, redundancy...but shclass.name doesn't cut it as a noun */
     switch (rtype) {
     case SHOPBASE - 1:
+/*JP
         str = "untended shop";
+*/
+        str = "•úŠü‚³‚ê‚½“X";
         break; /* see recalc_mapseen */
     case SHOPBASE:
+/*JP
         str = "general store";
+*/
+        str = "ŽG‰Ý“X";
         break;
     case ARMORSHOP:
+/*JP
         str = "armor shop";
+*/
+        str = "–h‹ï“X";
         break;
     case SCROLLSHOP:
+/*JP
         str = "scroll shop";
+*/
+        str = "Šª•¨“X";
         break;
     case POTIONSHOP:
+/*JP
         str = "potion shop";
+*/
+        str = "–ò“X";
         break;
     case WEAPONSHOP:
+/*JP
         str = "weapon shop";
+*/
+        str = "•Ší“X";
         break;
     case FOODSHOP:
+/*JP
         str = "delicatessen";
+*/
+        str = "H—¿•i“X";
         break;
     case RINGSHOP:
+/*JP
         str = "jewelers";
+*/
+        str = "•óÎ“X";
         break;
     case WANDSHOP:
+/*JP
         str = "wand shop";
+*/
+        str = "ñ“X";
         break;
     case BOOKSHOP:
+/*JP
         str = "bookstore";
+*/
+        str = "‘“X";
         break;
     case FODDERSHOP:
+/*JP
         str = "health food store";
+*/
+        str = "Œ’NH•i“X";
         break;
     case CANDLESHOP:
+/*JP
         str = "lighting shop";
+*/
+        str = "Æ–¾“X";
         break;
     default:
         break;
@@ -2723,12 +2803,21 @@ char *outbuf;
 #endif
 #define COMMA (i++ > 0 ? ", " : PREFIX)
 /* "iterate" once; safe to use as ``if (cond) ADDTOBUF(); else whatever;'' */
+#if 0 /*JP*/
 #define ADDNTOBUF(nam, var)                                                  \
     do {                                                                     \
         if (var)                                                             \
             Sprintf(eos(buf), "%s%s %s%s", COMMA, seen_string((var), (nam)), \
                     (nam), plur(var));                                       \
     } while (0)
+#else
+#define ADDNTOBUF(nam, var)                                                  \
+    do {                                                                     \
+        if (var)                                                             \
+            Sprintf(eos(buf), "%s%s%s", COMMA, seen_string((var), (nam)),    \
+                    (nam));                                                  \
+    } while (0)
+#endif
 #define ADDTOBUF(nam, var)                           \
     do {                                             \
         if (var)                                     \
@@ -2763,12 +2852,18 @@ boolean printdun;
             || In_endgame(&mptr->lev))
             Sprintf(buf, "%s:", dungeons[dnum].dname);
         else if (builds_up(&mptr->lev))
+/*JP
             Sprintf(buf, "%s: levels %d up to %d",
+*/
+            Sprintf(buf, "%s: %dŠK‚©‚ç%dŠK",
                     dungeons[dnum].dname,
                     depthstart + dungeons[dnum].entry_lev - 1,
                     depthstart + dungeons[dnum].dunlev_ureached - 1);
         else
+/*JP
             Sprintf(buf, "%s: levels %d to %d",
+*/
+            Sprintf(buf, "%s: %dŠK‚©‚ç%dŠK",
                     dungeons[dnum].dname, depthstart,
                     depthstart + dungeons[dnum].dunlev_ureached - 1);
         putstr(win, !final ? ATR_INVERSE : 0, buf);
@@ -2783,7 +2878,10 @@ boolean printdun;
          * listing "Level 1:" for it might confuse inexperienced
          * players into thinking there's more than one.
          */
+/*JP
         Sprintf(buf, "%sLevel %d:", TAB, i);
+*/
+        Sprintf(buf, "%s%dŠK:", TAB, i);
 
     /* wizmode prints out proto dungeon names for clarity */
     if (wizard) {
@@ -2796,8 +2894,13 @@ boolean printdun;
     if (mptr->custom)
         Sprintf(eos(buf), " (%s)", mptr->custom);
     if (on_level(&u.uz, &mptr->lev))
+#if 0 /*JP*/
         Sprintf(eos(buf), " <- You %s here.",
                 (!final || (final == 1 && how == ASCENDED)) ? "are" : "were");
+#else
+        Sprintf(eos(buf), " <- ‚±‚±‚É%sD",
+                (!final || (final == 1 && how == ASCENDED)) ? "‚¢‚é" : "‚¢‚½");
+#endif
     putstr(win, !final ? ATR_BOLD : 0, buf);
 
     if (mptr->flags.forgot)
@@ -2812,7 +2915,10 @@ boolean printdun;
          */
         if (mptr->feat.nshop > 0) {
             if (mptr->feat.nshop > 1)
+/*JP
                 ADDNTOBUF("shop", mptr->feat.nshop);
+*/
+                ADDNTOBUF("“X", mptr->feat.nshop);
             else
                 Sprintf(eos(buf), "%s%s", COMMA,
                         an(shop_string(mptr->feat.shoptype)));
@@ -2820,19 +2926,43 @@ boolean printdun;
         if (mptr->feat.naltar > 0) {
             /* Temples + non-temple altars get munged into just "altars" */
             if (mptr->feat.ntemple != mptr->feat.naltar)
+/*JP
                 ADDNTOBUF("altar", mptr->feat.naltar);
+*/
+                ADDNTOBUF("Õ’d", mptr->feat.naltar);
             else
+/*JP
                 ADDNTOBUF("temple", mptr->feat.ntemple);
+*/
+                ADDNTOBUF("Ž›‰@", mptr->feat.ntemple);
 
             /* only print out altar's god if they are all to your god */
             if (Amask2align(Msa2amask(mptr->feat.msalign)) == u.ualign.type)
+/*JP
                 Sprintf(eos(buf), " to %s", align_gname(u.ualign.type));
+*/
+                Sprintf(eos(buf), "(%s)", align_gname(u.ualign.type));
         }
+/*JP
         ADDNTOBUF("throne", mptr->feat.nthrone);
+*/
+        ADDNTOBUF("‹ÊÀ", mptr->feat.nthrone);
+/*JP
         ADDNTOBUF("fountain", mptr->feat.nfount);
+*/
+        ADDNTOBUF("ò", mptr->feat.nfount);
+/*JP
         ADDNTOBUF("sink", mptr->feat.nsink);
+*/
+        ADDNTOBUF("—¬‚µ‘ä", mptr->feat.nsink);
+/*JP
         ADDNTOBUF("grave", mptr->feat.ngrave);
+*/
+        ADDNTOBUF("•æ", mptr->feat.ngrave);
+/*JP
         ADDNTOBUF("tree", mptr->feat.ntree);
+*/
+        ADDNTOBUF("–Ø", mptr->feat.ntree);
 #if 0
         ADDTOBUF("water", mptr->feat.water);
         ADDTOBUF("lava", mptr->feat.lava);
@@ -2849,49 +2979,97 @@ boolean printdun;
     /* we assume that these are mutually exclusive */
     *buf = '\0';
     if (mptr->flags.oracle) {
+/*JP
         Sprintf(buf, "%sOracle of Delphi.", PREFIX);
+*/
+        Sprintf(buf, "%sƒfƒ‹ƒtƒ@ƒC‚Ì_“aD", PREFIX);
     } else if (In_sokoban(&mptr->lev)) {
+#if 0 /*JP*/
         Sprintf(buf, "%s%s.", PREFIX,
                 mptr->flags.sokosolved ? "Solved" : "Unsolved");
+#else
+        Sprintf(buf, "%s%s.", PREFIX,
+                mptr->flags.sokosolved ? "ƒNƒŠƒAÏ" : "–¢ƒNƒŠƒA");
+#endif
     } else if (mptr->flags.bigroom) {
+/*JP
         Sprintf(buf, "%sA very big room.", PREFIX);
+*/
+        Sprintf(buf, "%s‚Æ‚Ä‚à‘å‚«‚¢•”‰®D", PREFIX);
     } else if (mptr->flags.roguelevel) {
+/*JP
         Sprintf(buf, "%sA primitive area.", PREFIX);
+*/
+        Sprintf(buf, "%s’Pƒ‚È•”‰®D", PREFIX);
     } else if (mptr->flags.quest_summons) {
+/*JP
         Sprintf(buf, "%sSummoned by %s.", PREFIX, ldrname());
+*/
+        Sprintf(buf, "%s%s‚©‚çŒÄ‚Ño‚³‚ê‚½D", PREFIX, ldrname());
     } else if (on_level(&mptr->lev, &qstart_level)) {
+#if 0 /*JP*/
         Sprintf(buf, "%sHome%s.", PREFIX,
                 mptr->flags.unreachable ? " (no way back...)" : "");
+#else
+        Sprintf(buf, "%sŒÌ‹½%sD", PREFIX,
+                mptr->flags.unreachable ? "(–ß‚ê‚È‚¢DDD)" : "");
+#endif
         if (u.uevent.qcompleted)
+/*JP
             Sprintf(buf, "%sCompleted quest for %s.", PREFIX, ldrname());
+*/
+            Sprintf(buf, "%s%s‚Ì‚½‚ß‚ÉƒNƒGƒXƒg‚ðŠ®‹‚µ‚½D", PREFIX, ldrname());
         else if (mptr->flags.questing)
+/*JP
             Sprintf(buf, "%sGiven quest by %s.", PREFIX, ldrname());
+*/
+            Sprintf(buf, "%s%s‚©‚çƒNƒGƒXƒg‚ð—^‚¦‚ç‚ê‚½D", PREFIX, ldrname());
     } else if (mptr->flags.ludios) {
         /* presence of the ludios branch in #overview output indicates that
            the player has made it onto the level; presence of this annotation
            indicates that the fort's entrance has been seen (or mapped) */
+/*JP
         Sprintf(buf, "%sFort Ludios.", PREFIX);
+*/
+        Sprintf(buf, "%sƒ[ƒfƒBƒIƒXÔD", PREFIX);
     } else if (mptr->flags.castle) {
+/*JP
         Sprintf(buf, "%sThe castle%s.", PREFIX, tunesuffix(mptr, tmpbuf));
+*/
+        Sprintf(buf, "%sé%sD", PREFIX, tunesuffix(mptr, tmpbuf));
     } else if (mptr->flags.valley) {
+/*JP
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
+*/
+        Sprintf(buf, "%sŽ€‚Ì’JD", PREFIX);
     } else if (mptr->flags.msanctum) {
+/*JP
         Sprintf(buf, "%sMoloch's Sanctum.", PREFIX);
+*/
+        Sprintf(buf, "%sƒ‚[ƒƒbƒN‚Ì¹ˆæD", PREFIX);
     }
     if (*buf)
         putstr(win, 0, buf);
 
     /* print out branches */
     if (mptr->br) {
+#if 0 /*JP*/
         Sprintf(buf, "%s%s to %s", PREFIX, br_string2(mptr->br),
                 dungeons[mptr->br->end2.dnum].dname);
+#else
+        Sprintf(buf, "%s%s‚Ö‚Ì%s", PREFIX, dungeons[mptr->br->end2.dnum].dname,
+		br_string2(mptr->br));
+#endif
 
         /* Since mapseen objects are printed out in increasing order
          * of dlevel, clarify which level this branch is going to
          * if the branch goes upwards.  Unless it's the end game.
          */
         if (mptr->br->end1_up && !In_endgame(&(mptr->br->end2)))
+/*JP
             Sprintf(eos(buf), ", level %d", depth(&(mptr->br->end2)));
+*/
+            Sprintf(eos(buf), ", %dŠK", depth(&(mptr->br->end2)));
         Strcat(buf, ".");
         putstr(win, 0, buf);
     }
@@ -2905,19 +3083,29 @@ boolean printdun;
             if (bp->bonesknown || wizard || final)
                 ++kncnt;
         if (kncnt) {
+/*JP
             Sprintf(buf, "%s%s", PREFIX, "Final resting place for");
+*/
+            Sprintf(buf, "%s%s", PREFIX, "ÅŠú‚Ì’n:");
             putstr(win, 0, buf);
             if (died_here) {
                 /* disclosure occurs before bones creation, so listing dead
                    hero here doesn't give away whether bones are produced */
                 formatkiller(tmpbuf, sizeof tmpbuf, how);
+#if 0 /*JP*/
                 /* rephrase a few death reasons to work with "you" */
                 (void) strsubst(tmpbuf, " himself", " yourself");
                 (void) strsubst(tmpbuf, " herself", " yourself");
                 (void) strsubst(tmpbuf, " his ", " your ");
                 (void) strsubst(tmpbuf, " her ", " your ");
+#endif
+#if 0 /*JP*/
                 Sprintf(buf, "%s%syou, %s%c", PREFIX, TAB, tmpbuf,
                         --kncnt ? ',' : '.');
+#else
+                Sprintf(buf, "%s%s     %s%c", PREFIX, TAB, tmpbuf,
+                        --kncnt ? ',' : '.');
+#endif
                 putstr(win, 0, buf);
             }
             for (bp = mptr->final_resting_place; bp; bp = bp->next) {
