@@ -1,3 +1,12 @@
+Sun Feb 21 2016  Kentaro Shirakata  <argrath@ub32.org>
+
+	* windows/gui対応
+	* 鉱山最下層や倉庫番最終面で「障害発生」が出る問題を修正 (#36038)
+	* win/X11/winX.c のパッチ適用漏れを修正 (#36039)
+	* 翻訳追加修正
+
+Sun Feb 14 2016  Kentaro Shirakata  <argrath@ub32.org>
+
 	* NetHack-3.6.0ベース JNetHackテストリリース(3.6.0-0.1)
 
 Sun Apr  8 2013  Kentaro Shirakata  <argrath@ub32.org>
