@@ -3925,32 +3925,83 @@ struct ext_func_tab extcmdlist[] = {
 
 /* there must be a placeholder in the table above for every entry here */
 static const struct ext_func_tab debug_extcmdlist[] = {
+/*JP
     { "levelchange", "change experience level", wiz_level_change, TRUE },
+*/
+    { "levelchange", "経験レベルを変える", wiz_level_change, TRUE},
+/*JP
     { "lightsources", "show mobile light sources", wiz_light_sources, TRUE },
+*/
+    { "light sources", "移動光源を見る", wiz_light_sources, TRUE},
 #ifdef DEBUG_MIGRATING_MONS
+/*JP
     { "migratemons", "migrate n random monsters", wiz_migrate_mons, TRUE },
+*/
+    { "migratemons", "ランダムな怪物を何体か移住させる", wiz_migrate_mons, TRUE },
 #endif
+/*JP
     { "monpolycontrol", "control monster polymorphs", wiz_mon_polycontrol,
+*/
+    { "monpoly_control", "怪物への変化を制御する", wiz_mon_polycontrol,
       TRUE },
+/*JP
     { "panic", "test panic routine (fatal to game)", wiz_panic, TRUE },
+*/
+    { "panic", "パニックルーチンをテストする(致命的)", wiz_panic, TRUE},
+/*JP
     { "polyself", "polymorph self", wiz_polyself, TRUE },
+*/
+    { "polyself", "変化する", wiz_polyself, TRUE},
 #ifdef PORT_DEBUG
+/*JP
     { "portdebug", "wizard port debug command", wiz_port_debug, TRUE },
+*/
+    { "portdebug", "ウィザードポートデバッグコマンド", wiz_port_debug, TRUE },
 #endif
+/*JP
     { "seenv", "show seen vectors", wiz_show_seenv, TRUE },
+*/
+    { "seenv", "視線ベクトルを見る", wiz_show_seenv, TRUE},
+/*JP
     { "stats", "show memory statistics", wiz_show_stats, TRUE },
+*/
+    { "stats", "メモリ状態を見る", wiz_show_stats, TRUE},
+/*JP
     { "timeout", "look at timeout queue", wiz_timeout_queue, TRUE },
+*/
+    { "timeout", "時間切れキューを見る", wiz_timeout_queue, TRUE},
+/*JP
     { "vanquished", "list vanquished monsters", dovanquished, TRUE },
+*/
+    { "vanquished", "倒した怪物の一覧を見る", dovanquished, TRUE },
+/*JP
     { "vision", "show vision array", wiz_show_vision, TRUE },
+*/
+    { "vision", "視界配列を見る", wiz_show_vision, TRUE},
+/*JP
     { "wizsmell", "smell monster", wiz_smell, TRUE },
+*/
+    { "wizsmell", "怪物の匂いを嗅ぐ", wiz_smell, TRUE },
 #ifdef DEBUG
+/*JP
     { "wizdebug_traveldisplay", "wizard debug: toggle travel display",
+*/
+    { "wizdebug_traveldisplay", "ウィザードデバッグ: 移動表示を切り替える",
       wiz_debug_cmd_traveldisplay, TRUE },
+/*JP
     { "wizdebug_bury", "wizard debug: bury objs under and around you",
+*/
+    { "wizdebug_bury", "ウィザードでバッグ: 物をあなたの周りに埋める",
       wiz_debug_cmd_bury, TRUE },
 #endif
+/*JP
     { "wizrumorcheck", "verify rumor boundaries", wiz_rumor_check, TRUE },
+*/
+    { "wizrumorcheck", "噂の境界を検証する", wiz_rumor_check, TRUE },
+/*JP
     { "wmode", "show wall modes", wiz_show_wmodes, TRUE },
+*/
+    { "wmode", "壁モードを見る", wiz_show_wmodes, TRUE},
     { (char *) 0, (char *) 0, donull, TRUE }
 };
 
