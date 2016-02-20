@@ -1031,6 +1031,12 @@ static XtResource resources[] = {
       nhStr("False") },
     { nhStr("tile_file"), nhStr("Tile_file"), XtRString, sizeof(String),
       XtOffset(AppResources *, tile_file), XtRString, nhStr("x11tiles") },
+#ifdef X11LARGETILE
+    { nhStr("tile_width"), nhStr("Tile_width"), XtRInt, sizeof(int),
+      XtOffset(AppResources *, tile_width), XtRString, nhStr("32") },
+    { nhStr("tile_height"), nhStr("Tile_height"), XtRInt, sizeof(int),
+      XtOffset(AppResources *, tile_height), XtRString, nhStr("32") },
+#endif
     { nhStr("icon"), nhStr("Icon"), XtRString, sizeof(String),
       XtOffset(AppResources *, icon), XtRString, nhStr("nh72") },
     { nhStr("message_lines"), nhStr("Message_lines"), XtRInt, sizeof(int),
