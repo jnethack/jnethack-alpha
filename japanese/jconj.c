@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "hack.h"
 
 #define EUC	0
 #define SJIS	1
