@@ -326,7 +326,10 @@ doextcmd(VOID_ARGS)
 
         func = extcmdlist[idx].ef_funct;
         if (iflags.menu_requested && !accept_menu_prefix(func)) {
+/*JP
             pline("'m' prefix has no effect for this command.");
+*/
+            pline("'m'接頭辞はこのコマンドには無効．");
             iflags.menu_requested = FALSE;
         }
         retval = (*func)();
@@ -1980,7 +1983,7 @@ int final;
                   : surface(u.ux, u.uy)); /* catchall; shouldn't happen */
         you_are(buf, from_what(WWALKING));
 #else
-        Sprintf(buf, "%の上を歩いて",
+        Sprintf(buf, "%sの上を歩いて",
                 is_pool(u.ux, u.uy) ? "水"
                 : is_lava(u.ux, u.uy) ? "溶岩"
                   : surface(u.ux, u.uy)); /* catchall; shouldn't happen */

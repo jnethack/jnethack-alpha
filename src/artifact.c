@@ -1146,9 +1146,11 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
             mdef->mconf = 1;
     }
 
+#if 0 /*JP*//*“ú–{Œê‚Å‚Í•s—v*/
     /* now give message(s) describing side-effects;
        don't let vtense() be fooled by assigned name ending in 's' */
     fakename = youdefend ? "you" : "mon";
+#endif
     if (youattack || youdefend || vis) {
         (void) upstart(hittee); /* capitalize */
         if (resisted) {
@@ -1351,8 +1353,13 @@ int dieroll; /* needed for Magicbane and vorpal blades */
 */
                         You("%s‚É[‚­a‚è‚Â‚¯‚½I",mon_nam(mdef));
                     else if (vis)
+#if 0 /*JP*/
                         pline("%s cuts deeply into %s!", Monnam(magr),
                               hittee);
+#else
+                        pline("%s‚Í%s‚É[‚­a‚è‚Â‚¯‚½I", Monnam(magr),
+                              hittee);
+#endif
                     *dmgptr *= 2;
                     return TRUE;
                 }
@@ -2072,19 +2079,37 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
         if (orc_count == -1 && warn_obj_cnt > 0) {
             /* -1 means that blindness has just been toggled; give a
                'continue' message that eventual 'stop' message will match */
+#if 0 /*JP*/
             pline("%s is %s.", bare_artifactname(uwep),
                   !Blind ? "glowing" : "quivering");
+#else
+            pline("%s‚Í%s‚Ä‚¢‚éD", bare_artifactname(uwep),
+                  !Blind ? "‹P‚¢" : "k‚¦");
+#endif
         } else if (orc_count > 0 && warn_obj_cnt == 0) {
             /* 'start' message */
             if (!Blind)
+#if 0 /*JP*/
                 pline("%s %s %s!", bare_artifactname(uwep),
                       otense(uwep, "glow"), glow_color(uwep->oartifact));
+#else
+                pline("%s‚Í%s‹P‚¢‚½I", bare_artifactname(uwep),
+                      glow_color(uwep->oartifact));
+#endif
             else
+/*JP
                 pline("%s quivers slightly.", bare_artifactname(uwep));
+*/
+                pline("%s‚Í­‚µk‚¦‚½D", bare_artifactname(uwep));
         } else if (orc_count == 0 && warn_obj_cnt > 0) {
             /* 'stop' message */
+#if 0 /*JP*/
             pline("%s stops %s.", bare_artifactname(uwep),
                   !Blind ? "glowing" : "quivering");
+#else
+            pline("%s‚Ì%s‚Í~‚Ü‚Á‚½D", bare_artifactname(uwep),
+                  !Blind ? "‹P‚«" : "k‚¦");
+#endif
         }
     }
 }
@@ -2112,8 +2137,13 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
 
         /* hero can't handle this object, but didn't get touch_artifact()'s
            "<obj> evades your grasp|control" message; give an alternate one */
+#if 0 /*JP*/
         You_cant("handle %s%s!", yname(obj),
                  obj->owornmask ? " anymore" : "");
+#else
+        You_cant("%s%s‚ğˆµ‚¦‚È‚¢I", obj->owornmask ? "‚à‚¤" : "",
+                 xname(obj));
+#endif
         /* also inflict damage unless touch_artifact() already did so */
         if (!touch_blasted) {
             /* damage is somewhat arbitrary; half the usual 1d20 physical
@@ -2122,7 +2152,10 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
                 tmp = rnd(10), dmg += Maybe_Half_Phys(tmp);
             if (bane)
                 dmg += rnd(10);
+/*JP
             Sprintf(buf, "handling %s", killer_xname(obj));
+*/
+            Sprintf(buf, "%s‚ğˆµ‚Á‚Ä", killer_xname(obj));
             losehp(dmg, buf, KILLED_BY);
             exercise(A_CON, FALSE);
         }
@@ -2150,8 +2183,13 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
         } else {
             /* dropx gives a message iff item lands on an altar */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))
+#if 0 /*JP*/
                 pline("%s to the %s.", Tobjnam(obj, "fall"),
                       surface(u.ux, u.uy));
+#else
+                pline("%s‚Í%s‚É—‚¿‚½D", xname(obj),
+                      surface(u.ux, u.uy));
+#endif
             dropx(obj);
         }
         *objp = obj = 0; /* no longer in inventory */
@@ -2260,7 +2298,10 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
     if (had_rings != (!!uleft + !!uright) && uarmg && uarmg->cursed)
         uncurse(uarmg); /* temporary? hack for ring removal plausibility */
     if (had_gloves && !uarmg)
+/*JP
         selftouch("After losing your gloves, you");
+*/
+        selftouch("¬è‚ğ¸‚Á‚½‚ ‚ÆC‚ ‚È‚½‚Í");
 
     if (!--nesting)
         clear_bypasses(); /* reset upon final exit */

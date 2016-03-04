@@ -302,12 +302,36 @@ static const struct poison_effect_message {
     void VDECL((*delivery_func), (const char *, ...));
     const char *effect_msg;
 } poiseff[] = {
+#if 0 /*JP*/
     { You_feel, "weaker" },             /* A_STR */
+#else
+    { You_feel, "弱くなった" },         /* A_STR */
+#endif
+#if 0 /*JP*/
     { Your, "brain is on fire" },       /* A_INT */
+#else
+    { You, "頭に血がのぼった" },        /* A_INT */
+#endif
+#if 0 /*JP*/
     { Your, "judgement is impaired" },  /* A_WIS */
+#else
+    { You, "判断力を失った" },          /* A_WIS */
+#endif
+#if 0 /*JP*/
     { Your, "muscles won't obey you" }, /* A_DEX */
+#else
+    { You, "思うように動けない" },      /* A_DEX */
+#endif
+#if 0 /*JP*/
     { You_feel, "very sick" },          /* A_CON */
+#else
+    { You_feel, "とても気分が悪くなった" }, /* A_CON */
+#endif
+#if 0 /*JP*/
     { You, "break out in hives" }       /* A_CHA */
+#else
+    { You, "じんましんがあらわれた" }   /* A_CHA */
+#endif
 };
 
 /* feedback for attribute loss due to poisoning */
@@ -318,7 +342,10 @@ boolean exclaim; /* emphasis */
 {
     void VDECL((*func), (const char *, ...)) = poiseff[typ].delivery_func;
 
+/*JP
     (*func)("%s%c", poiseff[typ].effect_msg, exclaim ? '!' : '.');
+*/
+    (*func)("%s%s", poiseff[typ].effect_msg, exclaim ? "！" : "．");
 }
 
 /* called when an attack or trap has poisoned the hero (used to be in mon.c)
@@ -1066,13 +1093,20 @@ int oldlevel, newlevel;
                 *(abil->ability) |= mask;
             if (!(*(abil->ability) & INTRINSIC & ~mask)) {
                 if (*(abil->gainstr))
+/*JP
                     You_feel("%s!", abil->gainstr);
+*/
+                    You("%sような気がした！", abil->gainstr);
             }
         } else if (oldlevel >= abil->ulevel && newlevel < abil->ulevel) {
             *(abil->ability) &= ~mask;
             if (!(*(abil->ability) & INTRINSIC)) {
                 if (*(abil->losestr))
+/*JP
                     You_feel("%s!", abil->losestr);
+*/
+                    You("%sような気がした！", abil->losestr);
+/*JP:この条件は満さないはず．*/
                 else if (*(abil->gainstr))
                     You_feel("less %s!", abil->gainstr);
             }
@@ -1256,17 +1290,31 @@ int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
         /* worn helm of opposite alignment might block change */
         if (!uarmh || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)
             u.ualign.type = u.ualignbase[A_CURRENT];
+#if 0 /*JP*/
         You("have a %ssense of a new direction.",
             (u.ualign.type != oldalign) ? "sudden " : "");
+#else
+        You("%s別の方向性にめざめた．",
+            (u.ualign.type != oldalign) ? "突然" : "");
+#endif
     } else {
         /* putting on or taking off a helm of opposite alignment */
         u.ualign.type = (aligntyp) newalign;
         if (reason == 1)
+/*JP
             Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
+*/
+            You("%s寝返った．", Hallucination ? "荒っぽく" : "あっさりと");
         else if (reason == 2)
+#if 0 /*JP*/
             Your("mind is %s.", Hallucination
                                     ? "much of a muchness"
                                     : "back in sync with your body");
+#else
+            Your("心は%s．", Hallucination
+                                    ? "似たり寄ったりになった"
+                                    : "再び体と一致するようになった");
+#endif
     }
 
     if (u.ualign.type != oldalign) {

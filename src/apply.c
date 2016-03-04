@@ -90,7 +90,7 @@ struct obj *obj;
 /*JP
         You("take a picture of the %s.",
 */
-        You("take a picture of the %s.",
+        You("%sの写真を撮った．",
             (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
     } else if (!u.dx && !u.dy) {
         (void) zapyourself(obj, TRUE);
@@ -267,7 +267,11 @@ int rx, ry, *resp;
     } else if (Hallucination) {
         if (!corpse) {
             /* it's a statue */
+/*JP
             Strcpy(buf, "You're both stoned");
+*/
+            Strcpy(buf, "石だ");
+#if 0 /*JP*//*代名詞処理は不要*/
         } else if (corpse->quan == 1L && !more_corpses) {
             int gndr = 2; /* neuter: "it" */
             struct monst *mtmp = get_mtraits(corpse, FALSE);
@@ -290,14 +294,18 @@ int rx, ry, *resp;
             }
             Sprintf(buf, "%s's dead", genders[gndr].he); /* "he"/"she"/"it" */
             buf[0] = highc(buf[0]);
+#endif
         } else { /* plural */
+/*JP
             Strcpy(buf, "They're dead");
+*/
+            Strcpy(buf, "死んでるぜ");
         }
         /* variations on "He's dead, Jim." (Star Trek's Dr McCoy) */
 /*JP
         You_hear("a voice say, \"%s, Jim.\"", buf);
 */
-        You_hear("「そいつは死んでるぜ，ジム」という声が聞こえた．");
+        You_hear("「そいつは%s，ジム」という声が聞こえた．", buf);
         *resp = 1;
         return TRUE;
 
@@ -328,6 +336,7 @@ int rx, ry, *resp;
     } else { /* statue */
         const char *what, *how;
 
+#if 0 /*JP*/
         mptr = &mons[statue->corpsenm];
         if (Blind) { /* ignore statue->dknown; it'll always be set */
             Sprintf(buf, "%s %s",
@@ -339,7 +348,17 @@ int rx, ry, *resp;
             if (!type_is_pname(mptr))
                 what = The(what);
         }
+#else /*JP:日本語ではシンプルに*/
+        if (Blind) { /* ignore statue->dknown; it'll always be set */
+            what = (rx == u.ux && ry == u.uy) ? "これ" : "あれ";
+        } else {
+            what = mons[statue->corpsenm].mname;
+        }
+#endif
+/*JP
         how = "fine";
+*/
+        how = "よい";
         if (Role_if(PM_HEALER)) {
             struct trap *ttmp = t_at(rx, ry);
 
@@ -347,12 +366,12 @@ int rx, ry, *resp;
 /*JP
                 how = "extraordinary";
 */
-                how = "健康的な";
+                how = "並外れた";
             else if (Has_contents(statue))
 /*JP
                 how = "remarkable";
 */
-                how = "躍動的な";
+                how = "注目すべき";
         }
 
 /*JP
@@ -480,7 +499,10 @@ register struct obj *obj;
 
         if (mtmp->mundetected) {
             if (!canspotmon(mtmp))
+/*JP
                 There("is %s hidden there.", mnm);
+*/
+                pline("ここに%sが隠れている．", mnm);
             mtmp->mundetected = 0;
             newsym(mtmp->mx, mtmp->my);
         } else if (mtmp->mappearance) {
@@ -498,9 +520,15 @@ register struct obj *obj;
                 break;
             }
             seemimic(mtmp);
+/*JP
             pline("That %s is really %s", what, mnm);
+*/
+            pline("この%sは実際には%s．", what, mnm);
         } else if (flags.verbose && !canspotmon(mtmp)) {
+/*JP
             There("is %s there.", mnm);
+*/
+            pline("ここには%sがいる．", mnm);
         }
         mstatusline(mtmp);
         if (!canspotmon(mtmp))
@@ -563,7 +591,7 @@ struct obj *obj;
 /*JP
         You("blow bubbles through %s.", yname(obj));
 */
-        You("%sを通して泡を出した．", yname(obj));
+        You("%sを通して泡を出した．", xname(obj));
     } else {
 /*JP
         You(whistle_str, obj->cursed ? "shrill" : "high");
@@ -1522,27 +1550,43 @@ struct obj **optr;
         return;
     }
 
+    /*JP:最終的には「ろうそくを燭台に取りつけますか？」*/
     /* first, minimal candelabrum suffix for formatting candles */
+/*JP
     Sprintf(qsfx, " to\033%s?", thesimpleoname(otmp));
+*/
+    Sprintf(qsfx, "を\033%sに取りつけますか？", thesimpleoname(otmp));
     /* next, format the candles as a prefix for the candelabrum */
 /*JP
     (void) safe_qbuf(qbuf, "Attach ", qsfx, obj, yname, thesimpleoname, s);
 */
-    (void) safe_qbuf(qbuf, "Attach ", qsfx, obj, yname, thesimpleoname, s);
+    (void) safe_qbuf(qbuf, "", qsfx, obj, xname, thesimpleoname, s);
+    /*JP:「(ろうそく)を\033燭台に取りつけますか？」*/
     /* strip temporary candelabrum suffix */
+#if 0 /*JP*/
     if ((q = strstri(qbuf, " to\033")) != 0)
         Strcpy(q, " to ");
+#else
+    if ((q = strchr(qbuf, '\033')) != 0)
+        *q = '\0';
+    /*JP:「(ろうそく)を」*/
+#endif
     /* last, format final "attach candles to candelabrum?" query */
+/*JP
     if (yn(safe_qbuf(qbuf, qbuf, "?", otmp, yname, thesimpleoname, "it"))
+*/
+    if (yn(safe_qbuf(qbuf, qbuf, "に取りつけますか？", otmp, xname, thesimpleoname, "それ"))
         == 'n') {
         use_lamp(obj);
         return;
     } else {
         if ((long) otmp->spe + obj->quan > 7L) {
             obj = splitobj(obj, 7L - (long) otmp->spe);
+#if 0 /*JP:日本語では不要*/
             /* avoid a grammatical error if obj->quan gets
                reduced to 1 candle from more than one */
             s = (obj->quan != 1) ? "candles" : "candle";
+#endif
         } else
             *optr = 0;
 #if 0 /*JP*/
@@ -1687,7 +1731,7 @@ struct obj *obj;
             verbalize("That's in addition to the cost of %s %s, of course.",
                       yname(obj), obj->quan == 1L ? "itself" : "themselves");
 #else
-            verbalize("これはもちろん%sの値段とは別だよ．", Yname2(obj));
+            verbalize("これはもちろん%sの値段とは別だよ．", xname(obj));
 #endif
             bill_dummy_object(obj);
         }
@@ -1706,9 +1750,15 @@ struct obj *obj;
     if (obj->lamplit) {
         if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
             || obj->otyp == BRASS_LANTERN)
+/*JP
             pline("%slamp is now off.", Shk_Your(buf, obj));
+*/
+	    pline("%sランプの灯は消えた．", Shk_Your(buf, obj));
         else
+/*JP
             You("snuff out %s.", yname(obj));
+*/
+            You("%sを吹き消した．", xname(obj));
         end_burn(obj, TRUE);
         return;
     }
@@ -1760,7 +1810,7 @@ struct obj *obj;
                   otense(obj, "burn"), Blind ? "." : " brightly!");
 #else
             pline("%sは%s燃えあがった！",
-                  Yname2(obj), Blind ? "" : "明るく");
+                  xname(obj), Blind ? "" : "明るく");
 #endif
             if (obj->unpaid && costly_spot(u.ux, u.uy)
                 && obj->age == 20L * (long) objects[obj->otyp].oc_cost) {
@@ -2576,6 +2626,7 @@ long timeout;
         struct obj *mshelter = level.objects[mtmp->mx][mtmp->my];
         Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
 
+        /*JP:TODO:and_vanishは未処理*/
         and_vanish[0] = '\0';
         if ((mtmp->minvis && !See_invisible)
             || (mtmp->data->mlet == S_MIMIC
@@ -2616,7 +2667,10 @@ long timeout;
         case OBJ_FLOOR:
             if (cansee_spot && !silent) {
                 if (suppress_see)
+/*JP
                     pline("%s suddenly vanishes!", an(xname(figurine)));
+*/
+                    pline("%sは突然消えた！", xname(figurine));
                 else
 #if 0 /*JP*/
                     You_see("a figurine transform into %s%s!", monnambuf,
@@ -2823,7 +2877,7 @@ struct obj *obj;
 /*JP
             You("cover %s with a thick layer of grease.", yname(otmp));
 */
-            You("%sに脂を丹念に塗った．", yname(otmp));
+            You("%sに脂を丹念に塗った．", xname(otmp));
             otmp->greased = 1;
             if (obj->cursed && !nohands(youmonst.data)) {
                 incr_itimeout(&Glib, rnd(15));
@@ -3302,7 +3356,10 @@ struct obj *obj;
         rx = u.ux + u.dx;
         ry = u.uy + u.dy;
         if (!isok(rx, ry)) {
+/*JP
             You("miss.");
+*/
+            You("はずした．");
             return res;
         }
         mtmp = m_at(rx, ry);
@@ -3490,7 +3547,7 @@ struct obj *obj;
 /*JP
             You("wrap your bullwhip around %s.", yname(otmp));
 */
-            You("鞭を%sにからませた．", yname(otmp));
+            You("鞭を%sにからませた．", xname(otmp));
             if (gotit && mwelded(otmp)) {
 #if 0 /*JP*/
                 pline("%s welded to %s %s%c",
@@ -3516,7 +3573,7 @@ struct obj *obj;
 /*JP
                     You("yank %s to the %s!", yname(otmp),
 */
-                    You("%sを%sに引き落した！", yname(otmp),
+                    You("%sを%sに引き落した！", xname(otmp),
                         surface(u.ux, u.uy));
                     place_object(otmp, u.ux, u.uy);
                     stackobj(otmp);
@@ -3549,7 +3606,7 @@ struct obj *obj;
 /*JP
                     You("snatch %s!", yname(otmp));
 */
-                    You("%sを奪った！", yname(otmp));
+                    You("%sを奪った！", xname(otmp));
                     if (otmp->otyp == CORPSE
                         && touch_petrifies(&mons[otmp->corpsenm]) && !uarmg
                         && !Stone_resistance
@@ -4090,7 +4147,7 @@ struct obj *obj;
 /*JP
     boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
 */
-    boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "バルサ"));
+    boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "バルサの杖"));
 
 #if 0 /*JP*/
     if (!paranoid_query(ParanoidBreakwand,
@@ -4101,7 +4158,7 @@ struct obj *obj;
     if (!paranoid_query(ParanoidBreakwand,
                        safe_qbuf(confirm,
                                  "本当に", "を壊すの？",
-                                 obj, yname, ysimple_name, "杖")))
+                                 obj, xname, ysimple_name, "杖")))
 #endif
         return 0;
 
@@ -4109,19 +4166,19 @@ struct obj *obj;
 /*JP
         You_cant("break %s without hands!", yname(obj));
 */
-        You("手が無いので%sを壊せない！", yname(obj));
+        You("手が無いので%sを壊せない！", xname(obj));
         return 0;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
 /*JP
         You("don't have the strength to break %s!", yname(obj));
 */
-        You("%sを壊すだけの力がない！", yname(obj));
+        You("%sを壊すだけの力がない！", xname(obj));
         return 0;
     }
 /*JP
     pline("Raising %s high above your %s, you break it in two!", yname(obj),
 */
-    pline("%sを%sの上に高く掲げ，二つにへし折った！", yname(obj),
+    You("%sを%sの上に高く掲げ，二つにへし折った！", xname(obj),
           body_part(HEAD));
 
     /* [ALI] Do this first so that wand is removed from bill. Otherwise,

@@ -400,13 +400,24 @@ dig(VOID_ARGS)
                     dmg = 1;
                 else if (uarmf)
                     dmg = (dmg + 1) / 2;
+/*JP
                 You("hit yourself in the %s.", body_part(FOOT));
+*/
+                pline("%sに当たった．", body_part(FOOT));
+#if 0 /*JP*/
                 Sprintf(kbuf, "chopping off %s own %s", uhis(),
                         body_part(FOOT));
+#else
+                Sprintf(kbuf, "自分の%sを切り落として", body_part(FOOT));
+#endif
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
+#if 0 /*JP*/
                 You("destroy the bear trap with %s.",
                     yobjnam(uwep, (const char *) 0));
+#else
+                You("%sで熊の罠を壊した．", xname(uwep));
+#endif
                 u.utrap = 0; /* release from trap */
                 deltrap(ttmp);
             }
@@ -1390,14 +1401,24 @@ struct obj *obj;
                     int adjidx = (idx + 4) % 8;
                     trap_with_u->conjoined |= (1 << idx);
                     trap->conjoined |= (1 << adjidx);
+/*JP
                     pline("You clear some debris from between the pits.");
+*/
+                    pline("あなたは落し穴の間からごみを取りのぞいた．");
                 }
             } else if (u.utrap && u.utraptype == TT_PIT
                        && (trap_with_u = t_at(u.ux, u.uy))) {
+#if 0 /*JP*/
                 You("swing %s, but the rubble has no place to go.",
                     yobjnam(obj, (char *) 0));
+#else
+                You("%sを振り回したが，破片の行き場所がない．", xname(obj));
+#endif
             } else
+/*JP
                 You("swing %s through thin air.", yobjnam(obj, (char *) 0));
+*/
+                You("空中で%sを振り回した．", xname(obj));
         } else {
 #if 0 /*JP*/
             static const char *const d_action[6] = { "swinging", "digging",
@@ -1701,15 +1722,23 @@ boolean unexpected;
             /* U.S. classification system uses 1-A for eligible to serve
                and 4-F for ineligible due to physical or mental defect;
                some intermediate values exist but are rarely seen */
+#if 0 /*JP*/
             You_feel("like you are %s.",
                      (ACURR(A_STR) < 6 || ACURR(A_DEX) < 6
                       || ACURR(A_CON) < 6 || ACURR(A_CHA) < 6
                       || ACURR(A_INT) < 6 || ACURR(A_WIS) < 6) ? "4-F"
                                                                : "1-A");
+#else
+            You("突然杉良太郎を思い出した．");
+#endif
     } else {
         if (!Hallucination) {
+/*JP
             You_feel("a draft.");
+*/
+            You_feel("すきま風を感じた．");
         } else {
+#if 0 /*JP*//*"draft"=「徴兵」*/
             /* "marching" is deliberately ambiguous; it might mean drills
                 after entering military service or mean engaging in protests */
             static const char *draft_reaction[] = {
@@ -1723,6 +1752,9 @@ boolean unexpected;
                 /* L: +(0..2), N: +(-1..1), C: +(-2..0); all: 0..3 */
                 dridx += rn1(3, sgn(u.ualign.type) - 1);
             You_feel("like %s.", draft_reaction[dridx]);
+#else /*JP:日本語では凝ったことはしない*/
+            You("杉良太郎を思い出した．");
+#endif
         }
     }
 }
@@ -1984,7 +2016,10 @@ char *msg;
     int ltyp;
     struct rm *room;
     const char *foundation_msg =
+/*JP
         "The foundation is too hard to dig through from this angle.";
+*/
+        "基礎はこの角度から掘るには固すぎる．";
 
     if (!cc)
         return FALSE;
@@ -2008,16 +2043,25 @@ char *msg;
         return FALSE;
     } else if (IS_TREE(ltyp)) { /* check trees before stone */
         /* if (room->wall_info & W_NONDIGGABLE) */
+/*JP
         Strcpy(msg, "The tree's roots glow then fade.");
+*/
+        Strcpy(msg, "木の根は一瞬輝いた．");
         return FALSE;
     } else if (ltyp == STONE || ltyp == SCORR) {
         if (room->wall_info & W_NONDIGGABLE) {
+/*JP
             Strcpy(msg, "The rock glows then fades.");
+*/
+            Strcpy(msg, "石は一瞬輝いた．");
             return FALSE;
         }
     } else if (ltyp == IRONBARS) {
         /* "set of iron bars" */
+/*JP
         Strcpy(msg, "The bars go much deeper than your pit.");
+*/
+        Strcpy(msg, "棒は落し穴より遥かに深いところまで埋まっている．");
 #if 0
     } else if (is_lava(cc->x, cc->y)) {
     } else if (is_ice(cc->x, cc->y)) {
@@ -2025,39 +2069,69 @@ char *msg;
     } else if (IS_GRAVE(ltyp)) {
 #endif
     } else if (IS_SINK(ltyp)) {
+/*JP
         Strcpy(msg, "A tangled mass of plumbing remains below the sink.");
+*/
+        Strcpy(msg, "入り組んだ配管が流し台の下に残ったままだ．");
         return FALSE;
     } else if ((cc->x == xupladder && cc->y == yupladder) /* ladder up */
                || (cc->x == xdnladder && cc->y == ydnladder)) { /* " down */
+/*JP
         Strcpy(msg, "The ladder is unaffected.");
+*/
+        Strcpy(msg, "はしごは影響を受けない．");
         return FALSE;
     } else {
         const char *supporting = (const char *) 0;
 
         if (IS_FOUNTAIN(ltyp))
+/*JP
             supporting = "fountain";
+*/
+            supporting = "泉";
         else if (IS_THRONE(ltyp))
+/*JP
             supporting = "throne";
+*/
+            supporting = "玉座";
         else if (IS_ALTAR(ltyp))
+/*JP
             supporting = "altar";
+*/
+            supporting = "祭壇";
         else if ((cc->x == xupstair && cc->y == yupstair)
                  || (cc->x == sstairs.sx && cc->y == sstairs.sy
                      && sstairs.up))
             /* "staircase up" */
+/*JP
             supporting = "stairs";
+*/
+            supporting = "階段";
         else if ((cc->x == xdnstair && cc->y == ydnstair)
                  || (cc->x == sstairs.sx && cc->y == sstairs.sy
                      && !sstairs.up))
             /* "staircase down" */
+/*JP
             supporting = "stairs";
+*/
+            supporting = "階段";
         else if (ltyp == DRAWBRIDGE_DOWN   /* "lowered drawbridge" */
                  || ltyp == DBWALL)        /* "raised drawbridge" */
+/*JP
             supporting = "drawbridge";
+*/
+            supporting = "跳ね橋";
 
         if (supporting) {
+#if 0 /*JP*/
             Sprintf(msg, "The %s%ssupporting structures remain intact.",
                     supporting ? s_suffix(supporting) : "",
                     supporting ? " " : "");
+#else
+            Sprintf(msg, "%s%s支えている部分はそのままだ．",
+                    supporting ? supporting : "",
+                    supporting ? "を" : "");
+#endif
             return FALSE;
         }
     }
@@ -2081,7 +2155,10 @@ schar filltyp;
         levl[trap->tx][trap->ty].typ = filltyp;
         liquid_flow(trap->tx, trap->ty, filltyp, trap,
                     (trap->tx == u.ux && trap->ty == u.uy)
+/*JP
                         ? "Suddenly %s flows in from the adjacent pit!"
+*/
+                        ? "突然隣の落し穴から%sが流れ込んできた！"
                         : (char *) 0);
         for (idx = 0; idx < 8; ++idx) {
             if (t.conjoined & (1 << idx)) {
@@ -2205,7 +2282,10 @@ boolean *dealloced;
         unpunish();
         u.utrap = rn1(50, 20);
         u.utraptype = TT_BURIEDBALL;
+/*JP
         pline_The("iron ball gets buried!");
+*/
+        pline_The("鉄の球は埋まった！");
     }
     /* after unpunish(), or might get deallocated chain */
     otmp2 = otmp->nexthere;

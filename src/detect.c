@@ -379,10 +379,16 @@ register struct obj *sobj;
         return !stale;
     } else if (!ct) {
         known = TRUE;
+/*JP
         You("%s %s nearby.", sobj ? "smell" : "sense", what);
+*/
+        You("近くで%s%s．", what, sobj ? "のにおいをかいだ" : "を感知した");
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
+/*JP
                 pline("Your %s starts to tingle.", body_part(NOSE));
+*/
+                pline("あなたの%sがうずうずしだした．", body_part(NOSE));
             u.uedibility = 1;
         }
     } else {
@@ -686,7 +692,7 @@ int mclass;                /* monster class, 0 for all */
 /*JP
                                       : "You feel threatened.");
 */
-                                      : "あなたは恐怖でぞくぞくした．");
+                                      : "あなたは恐怖でぞくっとした．");
         return 1;
     } else {
         boolean woken = FALSE;
@@ -1587,7 +1593,10 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
                     exercise(A_WIS, TRUE);
                     nomul(0);
                     feel_location(x, y); /* make sure it shows up */
+/*JP
                     You("find a hidden door.");
+*/
+                    You("隠された扉を見つけた．");
                 } else if (levl[x][y].typ == SCORR) {
                     if (rnl(7 - fund))
                         continue;
@@ -1596,7 +1605,10 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
                     exercise(A_WIS, TRUE);
                     nomul(0);
                     feel_location(x, y); /* make sure it shows up */
+/*JP
                     You("find a hidden passage.");
+*/
+                    You("隠された通路を見つけた．");
                 } else {
                     /* Be careful not to find anything in an SCORR or SDOOR */
                     if ((mtmp = m_at(x, y)) != 0 && !aflag) {
@@ -1708,7 +1720,10 @@ int full; /* wizard|explore modes allow player to request full map */
 int which_subset; /* when not full, whether to suppress objs and/or traps */
 {
     if ((Hallucination || Stunned || Confusion) && !full) {
+/*JP
         You("are too disoriented for this.");
+*/
+        You("混乱しているのでそれはできない．");
     } else {
         int x, y, glyph, levl_glyph, default_glyph;
         uchar seenv;
@@ -1800,21 +1815,42 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
             u.uswallow = 1;
         flush_screen(1);
         if (full) {
+/*JP
             Strcpy(buf, "underlying terrain");
+*/
+            Strcpy(buf, "下にある地形");
         } else {
+/*JP
             Strcpy(buf, "known terrain");
+*/
+            Strcpy(buf, "知っている地形");
             if (keep_traps)
+#if 0 /*JP*/
                 Sprintf(eos(buf), "%s traps",
                         (keep_objs || keep_mons) ? "," : " and");
+#else
+                Strcat(buf, "と罠");
+#endif
             if (keep_objs)
+#if 0 /*JP*/
                 Sprintf(eos(buf), "%s%s objects",
                         (keep_traps || keep_mons) ? "," : "",
                         keep_mons ? "" : " and");
+#else
+                Strcat(buf, "と物体");
+#endif
             if (keep_mons)
+#if 0 /*JP*/
                 Sprintf(eos(buf), "%s and monsters",
                         (keep_traps || keep_objs) ? "," : "");
+#else
+                Strcat(buf, "と怪物");
+#endif
         }
+/*JP
         pline("Showing %s only...", buf);
+*/
+        pline("%sだけを見る．．．", buf);
         display_nhwindow(WIN_MAP, TRUE); /* give "--More--" prompt */
         docrt(); /* redraw the screen, restoring regular map */
         if (Underwater)

@@ -382,9 +382,15 @@ polymorph_sink()
         make_grave(u.ux, u.uy, (char *) 0);
         break;
     }
+#if 0 /*JP*/
     pline_The("sink transforms into %s!", (levl[u.ux][u.uy].typ == THRONE)
                                               ? "a throne"
                                               : an(surface(u.ux, u.uy)));
+#else
+    pline_The("流し台は%sに変化した！", (levl[u.ux][u.uy].typ == THRONE)
+                                              ? "玉座"
+                                              : an(surface(u.ux, u.uy)));
+#endif
     newsym(u.ux, u.uy);
 }
 
@@ -696,10 +702,12 @@ const char *word;
         /* getobj() kludge sets corpsenm to user's specified count
            when refusing to split a stack of cursed loadstones */
         if (*word) {
+#if 0 /*JP*//*日本語では不要*/
             /* getobj() ignores a count for throwing since that is
                implicitly forced to be 1; replicate its kludge... */
             if (!strcmp(word, "throw") && obj->quan > 1L)
                 obj->corpsenm = 1;
+#endif
 #if 0 /*JP*/
             pline("For some reason, you cannot %s%s the stone%s!", word,
                   obj->corpsenm ? " any of" : "", plur(obj->quan));
@@ -853,7 +861,7 @@ boolean with_impact;
 /*JP
     if (!u.uswallow && flooreffects(obj, u.ux, u.uy, "drop"))
 */
-    if (!u.uswallow && flooreffects(obj,u.ux,u.uy,"落ちる"))
+    if (!u.uswallow && flooreffects(obj,u.ux,u.uy, "落ちる"))
         return;
     /* uswallow check done by GAN 01/29/87 */
     if (u.uswallow) {
@@ -1119,7 +1127,10 @@ dodown()
             if (float_down(I_SPECIAL | TIMEOUT, W_ARTI)) {
                 return 1; /* came down, so moved */
             } else if (!HLevitation && !ELevitation) {
+/*JP
                 Your("latent levitation ceases.");
+*/
+                pline("潜在的な浮遊能力が中断した．");
                 return 1; /* did something, effectively moved */
             }
         }
@@ -1884,7 +1895,10 @@ boolean at_stairs, falling, portal;
 #endif
 
     if ((annotation = get_annotation(&u.uz)))
+/*JP
         You("remember this level as %s.", annotation);
+*/
+        You("この階が%sであることを思い出した．", annotation);
 
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
@@ -2124,11 +2138,22 @@ long timeout UNUSED;
 
         if (rloc(mtmp, TRUE)) {
             if (notice_it && !canseemon(mtmp))
+/*JP
                 pline("%s vanishes.", monname);
+*/
+                pline("%sは消えた．", monname);
             else if (!notice_it && canseemon(mtmp))
+#if 0 /*JP*/
                 pline("%s appears.", Monnam(mtmp)); /* not pre-rloc monname */
+#else
+                pline("%sが現れた．", Monnam(mtmp)); /* not pre-rloc monname */
+#endif
             else if (notice_it && dist2(mtmp->mx, mtmp->my, x, y) > 2)
+#if 0 /*JP*/
                 pline("%s teleports.", monname); /* saw it and still see it */
+#else
+                pline("%sは瞬間移動した．", monname); /* saw it and still see it */
+#endif
         }
     }
 
