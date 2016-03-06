@@ -1,14 +1,14 @@
-Debug-Mode Quick Reference:
+デバッグモード：
 
-^E  ==  detect secret doors and traps.
-^F  ==  do magic mapping.
-^G  ==  create monster.
-^I  ==  identify items in pack.
-^O  ==  tell locations of special levels.
-^T  ==  do intra-level teleport.
-^V  ==  do trans-level teleport.
-^W  ==  make wish.
-^X  ==  show attributes including intrinsic attributes.
+^E  ==  秘密のドアや罠を調べる．
+^F  ==  魔法の地図．
+^G  ==  怪物を造る．
+^I  ==  持ち物を識別する．
+^O  ==  特殊階の位置を知る．
+^T  ==  その階での瞬間移動．
+^V  ==  違う階への瞬間移動．
+^W  ==  望みをかなえる．
+^X  ==  属性を見る．
 
 #levelchange == change experience level
 #lightsources == show mobile light sources

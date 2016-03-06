@@ -1,127 +1,123 @@
-^       Show the type of a trap
-^[      Cancel command
-^A      Redo the previous command
-^C      Quit the game
-^D      Kick something (usually a door, chest, or box)
-^E      Search a room (available in debug mode only)
-^F      Map the level (available in debug mode only)
-^G      Create a monster (available in debug mode only)
-^I      Identify all items (available in debug mode only)
-^O      Show location of special levels (available in debug mode only)
-^P      Toggle through previously displayed game messages
-^R      Redraw screen
-^T      Teleport around level
-^V      Teleport between levels (available in debug mode only)
-^W      Wish (available in debug mode only)
-^X      Show your attributes (shows more in debug or explore mode)
-^Z      Suspend game (only if defined)
-a       Apply (use) a tool
-A       Remove all armor
-b       Go southwest 1 space
-B       Go southwest until you are on top of something
-^B      Go southwest until you are near something
-c       Close a door
-C       Call (name) a monster, an individual object, or a type of object
-d       Drop an item
-D       Drop specific item types
-e       Eat something
-E       Engrave writing on the floor
-f       Fire ammunition from quiver
-F       Followed by direction, fight a monster (even if you don't sense it)
-g       Followed by direction, move until you are near something
-G       Followed by direction, same as control-direction
-h       Go west 1 space (if number_pad is on, display help message)
-H       Go west until you are on top of something
-^H      Go west until you are near something
-i       Show your inventory
-I       Inventory specific item types
-j       Go south 1 space (or if number_pad is on, jump to another location)
-J       Go south until you are on top of something
-^J      Go south until you are near something
-k       Go north 1 space (or if number_pad is on, kick something)
-K       Go north until you are on top of something
-^K      Go north until you are near something
-l       Go east 1 space (or if number_pad is on, loot a box on the floor)
-L       Go east until you are on top of something
-^L      Go east until you are near something
-m       Followed by direction, move without picking anything up or fighting
-M       Followed by direction, move a distance without picking anything up
-n       Go southeast 1 space
-N       Go southeast until you are on something (if number_pad is on, name)
-^N      Go southeast until you are near something
-o       Open a door
-O       Show option settings, possibly change them
-p       Pay your shopping bill
-P       Put on an accessory (ring, amulet, etc)
-q       Quaff (drink) something (potion, water, etc)
-Q       Select ammunition for quiver
-r       Read a scroll or spellbook
-R       Remove an accessory (ring, amulet, etc)
-s       Search for traps and secret doors
-S       Save the game
-t       Throw something
-T       Take off one piece of armor
-u       Go northeast 1 space (or if number_pad is on, untrap something)
-U       Go northeast until you are on top of something
-^U      Go northeast until you are near something
-v       Show version
-V       Show long version and game history
-w       Wield (put in use) a weapon
-W       Wear a piece of armor
-x       Swap wielded and secondary weapons
-X       Toggle two-weapon combat
-y       Go northwest 1 space
-Y       Go northwest until you are on top of something
-^Y      Go northwest until you are near something
-z       Zap a wand
-Z       Zap (cast) a spell
-<       Go up a staircase
->       Go down a staircase
-/       Show what type of thing a symbol corresponds to
-?       Give a help message
-&       Tell what a command does
-!       Do a shell escape (only if defined)
-\       Show what object types have been discovered
-`       Show discovered types for one class of objects
-_       Travel via a shortest-path algorithm to a point on the map 
-.       Rest one move while doing nothing
-        Rest one move while doing nothing (if rest_on_space option is on)
-:       Look at what is on the floor
-;       Show what type of thing a map symbol on the level corresponds to
-,       Pick up things at the current location
-@       Toggle the pickup option on/off
-)       Show the weapon currently wielded
-[       Show the armor currently worn
-=       Show the ring(s) currently worn
-"       Show the amulet currently worn
-(       Show the tools currently in use
-*       Show all equipment in use (combination of the ),[,=,",( commands)
-$       Count your gold
-+       List known spells
-#       Perform an extended command
-M-?     Display extended command help (if the platform allows this)
-M-2     Toggle two-weapon combat (unless number_pad is enabled)
-M-a     Adjust inventory letters
-M-A     Annotate: supply a name for the current dungeon level
-M-c     Talk to someone
-M-C     Conduct: list voluntary challenges you have maintained
-M-d     Dip an object into something
-M-e     Advance or check weapons skills
-M-f     Force a lock
-M-i     Invoke an object's special powers
-M-j     Jump to another location
-M-l     Loot a box on the floor
-M-m     Use a monster's special ability
-M-n     Name a monster, an individual object, or a type of object
-M-o     Offer a sacrifice to the gods
-M-O     Overview: show a summary of the explored dungeon
-M-p     Pray to the gods for help
-M-q     Quit
-M-r     Rub a lamp
-M-R     Ride: mount or dismount a saddled steed
-M-s     Sit down
-M-t     Turn undead
-M-T     Tip: empty a container
-M-u     Untrap something (trap, door, or chest)
-M-v     Print compile time options for this version of NetHack
-M-w     Wipe off your face
+^       罠の種類を調べる
+^[      コマンドをキャンセルする
+^A      前のコマンドを繰り返す
+^C      ゲームをやめる
+^D      何かを蹴る (普通は扉)
+^E      部屋を探す (デバッグモードのみ)
+^F      その階の地図を画く (デバッグモードのみ)
+^G      怪物をつくる (デバッグモードのみ)
+^I      道具を識別する (デバッグモードのみ)
+^O      特殊な階の場所を知る (デバッグモードのみ)
+^P      前のメッセージを見る
+^R      画面を書きなおす
+^T      その階で瞬間移動する
+^V      違う階へ瞬間移動する (デバッグモードのみ)
+^W      望みをかなえる (デバッグモードのみ)
+^X      あなたの属性を見る (細かい情報は発見・デバッグモードのみ)
+^Z      ゲームを中断する (定義しているなら)
+a       道具を使用する
+A       鎧を全て脱ぐ
+b       南西に歩く
+B       何かにぶつかるまで南西に歩く
+^B      何かが見えるまで南西に歩く
+c       扉を閉める
+C       怪物，個々の物，物の種類に名前をつける
+d       物を置く
+D       種類を選んで物を置く
+e       何か食べる
+E       床のほこりに文字を書く
+g       次に方向を指定すると何かにぶつかるまで歩く
+G       次に方向を指定すると何かが見えるまで歩く
+h       西に歩く (number_padが設定されているときは，ヘルプ)
+H       何かにぶつかるまで西に歩く
+^H      何かが見えるまで西に歩く
+i       あなたの持ち物一覧を見る
+I       種類を選択して持ち物一覧を見る
+j       南に歩く (number_padが設定されているときは，他の場所に飛ぶ)
+J       何かにぶつかるまで南に歩く
+^J      何かが見えるまで南に歩く
+k       北に歩く (number_padが設定されているときは，何かを蹴る)
+K       何かにぶつかるまで北に歩く
+^K      何かが見えるまで北に歩く
+l       東に歩く (number_padが設定されているときは，箱の中身を略奪する)
+L       何かにぶつかるまで東に歩く
+^L      何かが見えるまで東に歩く
+m       次に方向を指定すると，ものを拾わずに移動する
+M       次に方向を指定すると，ものを拾わずに遠くに移動する
+n       南東に歩く
+N       何かにぶつかるまで南東に歩く(number_padが設定されているときは，名前をつける)
+^N      何かが見えるまで南東に歩く
+o       扉を開ける
+O       オプションをセットする (O?はオプションを説明する)
+p       店の勘定を払う
+P       アクセアリを身につける(指輪，魔除け，など)
+q       何かを飲む(水薬, 水, など)
+Q       ゲームをやめる
+r       巻物(または，定義しているなら魔法の本)を読む
+R       アクセサリをはずす(指輪，魔除け，など)
+s       罠や秘密の扉を探す
+S       ゲームを保存する
+t       何かを投げる
+T       鎧を脱ぐ
+u       北東に歩く (number_padが設定されているときは，罠をはずす)
+U       何かにぶつかるまで北東に歩く
+^U      何かが見えるまで北東に歩く
+v       バージョンを見る
+V       バージョンおよび歴史を見る (長文)
+w       武器を装備する
+W       鎧を着る
+x       知っている魔法の一覧 (定義されているなら)
+X       二刀流を切り替える
+y       北西に歩く
+Y       何かにぶつかるまで北西に歩く
+^Y      何かが見えるまで北西に歩く
+z       杖をふる
+Z       魔法を唱える (定義されているなら)
+<       階段を昇る
+>       階段を降りる
+/       記号が何に対応しているか調べる
+?       ヘルプ
+&       このコマンドが何か調べる
+!       シェルに抜ける (定義されているなら)
+\       今までに発見された物の一覧
+`       一つの物の種類に対して発見した物の一覧
+_       マップで示された点に最小経路アルゴリズムで移動する
+.       その場で休む
+        何もしないでその場で休む (rest_on_spaceが定義されているなら) 
+:       そこに何があるか見る
+;       画面上の記号が何であるかを調べる
+,       足元の物を拾う
+@       pickupオプションを切り替える
+)       装備している武器を見る
+[       装備している鎧を見る
+=       身につけている指輪を見る
+"       身につけている魔除けを見る
+(       使っている道具を見る
+$       お金を数える
++       知っている魔法の一覧 (定義されているなら)
+#       拡張コマンド
+M-?     拡張コマンドのヘルプ (対応しているプラットフォームなら)
+M-2     二刀流戦闘の切り替え (number_padが設定されていないなら)
+M-a     持ち物一覧の調整 (fixinvオプションが必要)
+M-A     現在の階に名前をつける
+M-c     誰かに話しかける
+M-C     現在維持している自発的挑戦の一覧
+M-d     物を何かに浸す
+M-e     武器の技量を高めるまたは見る
+M-f     鍵をこじあける
+M-i     物の特別な力を使う
+M-j     他の位置の飛びうつる
+M-l     床の上の箱の中身を略奪する
+M-m     怪物の特別能力を使う (定義されているなら)
+M-n     怪物，個々の物，物の種類に名前をつける
+M-o     神に供物を捧げる
+M-O     探索した迷宮の概要を表示
+M-p     神に祈る
+M-r     ランプをこする
+M-R     鞍の付いた生き物に乗るまたは降りる
+M-s     座る
+M-t     アンデットを土にかえす
+M-T     入れ物を空にする
+M-u     罠をはずす (通常はしかけられた物)
+M-v     コンパイル時のオプションを表示する
+M-w     顔を拭う
