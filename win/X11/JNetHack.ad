@@ -22,10 +22,10 @@ JNetHack*map*font:			fixed
 ! the custom format - to enlarge an XPM file, use processing tools
 ! such as XV or preferably PBMplus.
 !
-!JNetHack.tile_file: x11tiles32j
-JNetHack.tile_file: t32-1024.xpm
-JNetHack.tile_width: 32
-JNetHack.tile_height: 32
+JNetHack.tile_file: x11tiles
+!JNetHack.tile_file: t32-1024.xpm
+JNetHack.tile_width: 16
+JNetHack.tile_height: 16
 !JNetHack.double_tile_size: True
 !
 ! The annotation of pets.
@@ -65,8 +65,9 @@ JNetHack*message*translations:	<KeyPress>: input()
 ! It is not guaranteed that the window manager will honor the icon selection.
 !JNetHack*icon: nh56
 !
-! If True, a popup for y/n questions is _not_ used.
-!JNetHack*slow: True
+! If True, the default, a popup for single character prompts such as y/n
+! questions is _not_ used.
+JNetHack*slow: True
 !
 ! The number of lines the message window will show without scrolling.
 !JNetHack*message_lines: 12
@@ -77,7 +78,6 @@ JNetHack*message*translations:	<KeyPress>: input()
 ! If True, force keyboard to attach to popup windows.  Some window managers
 ! enforce a click-to-focus-keyboard policy (e.g. the DECwindows wm).  JNetHack
 ! has a lot of popups and is almost unplayable without some kind of autofocus.
-! If your window manager does click-to-focus, you'll probably want this False.
 !JNetHack*autofocus: True
 !
 ! Specify the number of rows and columns of the map window.  The default
@@ -94,12 +94,7 @@ JNetHack*status_info*borderWidth:	0
 !
 ! Sample color screen entries.
 !
-JNetHack*foreground:		black
-JNetHack*background:		white
-JNetHack*border:		black
-
 JNetHack*jnethack.background: 	wheat
-
 JNetHack*map*yellow:		gold
 JNetHack*map*brown:		tan
 JNetHack*map*gray:		grey85
@@ -130,6 +125,42 @@ JNetHack*player_selection*quit.foreground:	blue
 JNetHack*player_selection*Command.borderColor:	red
 JNetHack*player_selection*Command.foreground:	red
 JNetHack*player_selection*quit.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+
+JNetHack*race_selection*random.borderColor:	blue
+JNetHack*race_selection*random.borderWidth:	2
+JNetHack*race_selection*random.foreground:	blue
+JNetHack*race_selection*random.accelerators: #override\n\
+				<Key>Return:	set() notify() unset()
+JNetHack*race_selection*quit.borderColor:	blue
+JNetHack*race_selection*quit.foreground:		blue
+JNetHack*race_selection*Command.borderColor:	red
+JNetHack*race_selection*Command.foreground:	red
+JNetHack*race_selection*quit.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+
+JNetHack*gender_selection*random.borderColor:	blue
+JNetHack*gender_selection*random.borderWidth:	2
+JNetHack*gender_selection*random.foreground:	blue
+JNetHack*gender_selection*random.accelerators: #override\n\
+				<Key>Return:	set() notify() unset()
+JNetHack*gender_selection*quit.borderColor:	blue
+JNetHack*gender_selection*quit.foreground:	blue
+JNetHack*gender_selection*Command.borderColor:	red
+JNetHack*gender_selection*Command.foreground:	red
+JNetHack*gender_selection*quit.accelerators: #override\n\
+				<Key>Escape:	set() notify() unset()
+
+JNetHack*alignment_selection*random.borderColor:	blue
+JNetHack*alignment_selection*random.borderWidth:	2
+JNetHack*alignment_selection*random.foreground:	blue
+JNetHack*alignment_selection*random.accelerators: #override\n\
+				<Key>Return:	set() notify() unset()
+JNetHack*alignment_selection*quit.borderColor:	blue
+JNetHack*alignment_selection*quit.foreground:	blue
+JNetHack*alignment_selection*Command.borderColor: red
+JNetHack*alignment_selection*Command.foreground:	red
+JNetHack*alignment_selection*quit.accelerators: #override\n\
 				<Key>Escape:	set() notify() unset()
 
 JNetHack*extended_commands*dismiss.borderColor:	blue
