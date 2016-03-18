@@ -194,13 +194,19 @@ eatmupdate()
 
     if (is_obj_mappear(&youmonst,ORANGE) && !Hallucination) {
         /* revert from hallucinatory to "normal" mimicking */
+/*JP
         altmsg = "You now prefer mimicking yourself.";
+*/
+        altmsg = "あなたは自分自身のまねをすることを選んだ．";
         altapp = GOLD_PIECE;
     } else if (is_obj_mappear(&youmonst,GOLD_PIECE) && Hallucination) {
         /* won't happen; anything which might make immobilized
            hero begin hallucinating (black light attack, theft
            of Grayswandir) will terminate the mimicry first */
+/*JP
         altmsg = "Your rind escaped intact.";
+*/
+        altmsg = "あなたの皮がそのままの形で逃げていった．";
         altapp = ORANGE;
     }
 
@@ -519,16 +525,30 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
 
     if (noncorporeal(pd)) {
         if (visflag)
+#if 0 /*JP*/
             pline("%s brain is unharmed.",
                   (mdef == &youmonst) ? "Your" : s_suffix(Monnam(mdef)));
+#else
+            pline("%sの脳は無事だった．",
+                  (mdef == &youmonst) ? "あなた" : Monnam(mdef));
+#endif
         return MM_MISS; /* side-effects can't occur */
     } else if (magr == &youmonst) {
+/*JP
         You("eat %s brain!", s_suffix(mon_nam(mdef)));
+*/
+        You("%sの脳を食べた！", mon_nam(mdef));
     } else if (mdef == &youmonst) {
+/*JP
         Your("brain is eaten!");
+*/
+        Your("脳は食べられた！");
     } else { /* monster against monster */
         if (visflag)
+/*JP
             pline("%s brain is eaten!", s_suffix(Monnam(mdef)));
+*/
+            pline("%sの脳は食べられた！", Monnam(mdef));
     }
 
     if (flesh_petrifies(pd)) {
@@ -542,7 +562,10 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             /* no need to check for poly_when_stoned or Stone_resistance;
                mind flayers don't have those capabilities */
             if (visflag)
+/*JP
                 pline("%s turns to stone!", Monnam(magr));
+*/
+                pline("%sは石になった！", Monnam(magr));
             monstone(magr);
             if (magr->mhp > 0) {
                 /* life-saved; don't continue eating the brains */
@@ -550,7 +573,10 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             } else {
                 if (magr->mtame && !visflag)
                     /* parallels mhitm.c's brief_feeling */
+/*JP
                     You("have a sad thought for a moment, then is passes.");
+*/
+                    You("悲しい考えにおそわれたが、すぐに過ぎさった．");
                 return MM_AGR_DIED;
             }
         }
@@ -562,12 +588,21 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
          */
         eating_conducts(pd);
         if (mindless(pd)) { /* (cannibalism not possible here) */
+/*JP
             pline("%s doesn't notice.", Monnam(mdef));
+*/
+            pline("%sは気づいていない．", Monnam(mdef));
             /* all done; no extra harm inflicted upon target */
             return MM_MISS;
         } else if (is_rider(pd)) {
+/*JP
             pline("Ingesting that is fatal.");
+*/
+            pline("取り込んだらすぐに死んでしまった．");
+/*JP
             Sprintf(killer.name, "unwisely ate the brain of %s", pd->mname);
+*/
+            Sprintf(killer.name, "愚かにも%sの体を食べて", pd->mname);
             killer.format = NO_KILLER_PREFIX;
             done(DIED);
             /* life-saving needed to reach here */
@@ -595,19 +630,28 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
          */
         /* no such thing as mindless players */
         if (ABASE(A_INT) <= ATTRMIN(A_INT)) {
+/*JP
             static NEARDATA const char brainlessness[] = "brainlessness";
+*/
+            static NEARDATA const char brainlessness[] = "脳を失って";
 
             if (Lifesaved) {
                 Strcpy(killer.name, brainlessness);
                 killer.format = KILLED_BY;
                 done(DIED);
                 /* amulet of life saving has now been used up */
+/*JP
                 pline("Unfortunately your brain is still gone.");
+*/
+                pline("残念ながらあなたには脳がない．");
                 /* sanity check against adding other forms of life-saving */
                 u.uprops[LIFESAVED].extrinsic =
                     u.uprops[LIFESAVED].intrinsic = 0L;
             } else {
+/*JP
                 Your("last thought fades away.");
+*/
+                Your("最後の思いが走馬燈のように横ぎった．");
             }
             Strcpy(killer.name, brainlessness);
             killer.format = KILLED_BY;
@@ -615,7 +659,10 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             /* can only get here when in wizard or explore mode and user has
                explicitly chosen not to die; arbitrarily boost intelligence */
             ABASE(A_INT) = ATTRMIN(A_INT) + 2;
+/*JP
             You_feel("like a scarecrow.");
+*/
+            You("かかしのような気持がした．");
         }
         give_nutrit = TRUE; /* in case a conflicted pet is doing this */
         exercise(A_WIS, FALSE);
@@ -627,7 +674,10 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
          */
         if (mindless(pd)) {
             if (visflag)
+/*JP
                 pline("%s doesn't notice.", Monnam(mdef));
+*/
+                pline("%sは気づいていない．", Monnam(mdef));
             return MM_MISS;
         } else if (is_rider(pd)) {
             mondied(magr);
@@ -639,7 +689,10 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             *dmg_p += xtra_dmg;
             give_nutrit = TRUE;
             if (*dmg_p >= mdef->mhp && visflag)
+/*JP
                 pline("%s last thought fades away...",
+*/
+                pline("%sの最後の思いがよぎる．．．",
                       s_suffix(Monnam(mdef)));
         }
     }
@@ -1175,7 +1228,10 @@ register int pm;
     case PM_DOPPELGANGER:
     case PM_SANDESTIN: /* moot--they don't leave corpses */
         if (Unchanging) {
-            You_feel("momentarily different."); /* same as poly trap */
+#if 0 /*JP*/
+            You_feel("一瞬違った感じがした．"); /* same as poly trap */
+#else
+#endif
         } else {
 /*JP
             You_feel("a change coming over you.");
@@ -1346,6 +1402,7 @@ char *buf;
 */
             Strcat(buf, "空っぽの");
         else {
+#if 0 /*JP*//*日本語は後で*/
             if ((obj->cknown || iflags.override_ID) && obj->spe < 0) {
                 if (r == ROTTEN_TIN || r == HOMEMADE_TIN) {
                     /* put these before the word tin */
@@ -1354,19 +1411,32 @@ char *buf;
                 } else {
                     Sprintf(eos(buf), " of %s ", tintxts[r].txt);
                 }
+                Sprintf(eos(buf), "%s", tintxts[r].txt);
             } else {
                 Strcpy(eos(buf), " of ");
             }
+#endif
+#if 1 /*JP*//*「の」で始まるなら後置、それ以外なら前置*/
+            if (strstr(tintxts[r].txt, "の") != tintxts[r].txt) {
+                Strcpy(eos(buf), tintxts[r].txt);
+            }
+#endif
             if (vegetarian(&mons[mnum]))
 /*JP
                 Sprintf(eos(buf), "%s", mons[mnum].mname);
 */
-                Sprintf(eos(buf), "%sの", mons[mnum].mname);
+                Sprintf(eos(buf), "%s", mons[mnum].mname);
             else
 /*JP
                 Sprintf(eos(buf), "%s meat", mons[mnum].mname);
 */
-                Sprintf(eos(buf), "%sの肉の", mons[mnum].mname);
+                Sprintf(eos(buf), "%sの肉", mons[mnum].mname);
+#if 1 /*JP*//*「の」で始まるなら後置、それ以外なら前置*/
+            if (strstr(tintxts[r].txt, "の") == tintxts[r].txt) {
+                Strcpy(eos(buf), tintxts[r].txt);
+            }
+            Strcpy(eos(buf), "の");
+#endif
         }
     }
 }
@@ -1436,7 +1506,10 @@ const char *mesg;
 
     r = tin_variety(tin, FALSE);
     if (tin->otrapped || (tin->cursed && r != HOMEMADE_TIN && !rn2(8))) {
+/*JP
         b_trapped("tin", 0);
+*/
+        b_trapped("缶", 0);
         costly_tin(COST_DSTROY);
         goto use_up_tin;
     }
@@ -1458,7 +1531,10 @@ const char *mesg;
         which = 0; /* 0=>plural, 1=>as-is, 2=>"the" prefix */
         if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE)
             && (Stone_resistance || Hallucination)) {
+/*JP
             what = "chicken";
+*/
+            what = "鶏肉";
             which = 1; /* suppress pluralization */
         } else if (Hallucination) {
             what = rndmonnam(NULL);
@@ -1657,11 +1733,18 @@ struct obj *otmp;
 */
             mesg = "缶は魔法のように開いた！";
         else
+/*JP
             pline_The("tin seems easy to open.");
+*/
+            pline_The("缶は簡単に開けられそうだ．");
     } else if (uwep) {
         switch (uwep->otyp) {
         case TIN_OPENER:
+#if 0 /*JP*/
             mesg = "You easily open the tin."; /* iff tmp==0 */
+#else
+            mesg = "あなたは簡単に缶を開けた．"; /* iff tmp==0 */
+#endif
             tmp = rn2(uwep->cursed ? 3 : !uwep->blessed ? 2 : 1);
             break;
         case DAGGER:
@@ -1939,9 +2022,15 @@ struct obj *otmp;
             consume_oeaten(otmp, 2); /* oeaten >>= 2 */
     } else if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE)
                && (Stone_resistance || Hallucination)) {
+/*JP
         pline("This tastes just like chicken!");
+*/
+        pline("これは鶏肉の味だ！");
     } else if (mnum == PM_FLOATING_EYE && u.umonnum == PM_RAVEN) {
+/*JP
         You("peck the eyeball with delight.");
+*/
+        You("目玉をつんつんつついた．");
     } else {
         /* [is this right?  omnivores end up always disliking the taste] */
         boolean yummy = vegan(&mons[mnum])
@@ -2046,7 +2135,7 @@ struct obj *otmp;
 /*JP
                                 : "That food really hit the spot!");
 */
-                                : "That food really hit the spot!");
+                                : "この食べ物は本当に申し分ない！");
         else if (u.uhunger <= 700)
 /*JP
             pline("That satiated your %s!", body_part(STOMACH));
@@ -2564,11 +2653,20 @@ struct obj *otmp;
                not food, so we substitute cursed; fortunately our hero
                won't have to wait for a prince to be rescued/revived */
             if (Race_if(PM_DWARF) && Hallucination)
+/*JP
                 verbalize("Heigh-ho, ho-hum, I think I'll skip work today.");
+*/
+                verbalize("ハイホー，ハイホー，今日は休み．");
             else if (Deaf || !flags.acoustics)
+/*JP
                 You("fall asleep.");
+*/
+                You("眠りに落ちた．");
             else
+/*JP
                 You_hear("sinister laughter as you fall asleep...");
+*/
+                You_hear("眠りに落ちるときに邪悪な笑い声を聞いた．．．");
             fall_asleep(-rn1(11, 20), TRUE);
         }
         break;
@@ -2615,7 +2713,11 @@ struct obj *otmp;
     int material = objects[otmp->otyp].oc_material, mnum = otmp->corpsenm;
     long rotted = 0L;
 
+#if 0 /*JP*/
     Strcpy(foodsmell, Tobjnam(otmp, "smell"));
+#else
+    Strcpy(foodsmell, xname(otmp));
+#endif
     Strcpy(it_or_they, (otmp->quan == 1L) ? "it" : "they");
 #if 0 /*JP*/
     Sprintf(eat_it_anyway, "Eat %s anyway?",
@@ -3280,7 +3382,10 @@ void
 reset_faint()
 {
     if (afternmv == unfaint)
+/*JP
         unmul("You revive.");
+*/
+        unmul("あなたは気がついた．");
 }
 
 /* compute and comment on your (new?) hunger status */
@@ -3612,7 +3717,10 @@ vomit() /* A good idea from David Neves */
     if (cantvomit(youmonst.data))
         /* doesn't cure food poisoning; message assumes that we aren't
            dealing with some esoteric body_part() */
+/*JP
         Your("jaw gapes convulsively.");
+*/
+        Your("あごは発作的に大きく開いた．");
     else
         make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
     nomul(-2);

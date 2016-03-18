@@ -282,7 +282,11 @@ int *shotlimit_p; /* (see dothrow()) */
         You("何かを投げるのは物理的に無理だ．");
         return FALSE;
     } else if (nohands(youmonst.data)) {
+#if 0 /*JP*/
         You_cant("throw or shoot without hands."); /* not body_part(HAND) */
+#else
+        You("手がない．"); /* not body_part(HAND) */
+#endif
         return FALSE;
         /*[what about !freehand(), aside from cursed missile launcher?]*/
     }
@@ -428,7 +432,10 @@ dofire()
         /* give feedback if quiver has now been filled */
         if (uquiver) {
             uquiver->owornmask &= ~W_QUIVER; /* less verbose */
+/*JP
             prinv("You ready:", uquiver, 0L);
+*/
+            prinv("準備：", uquiver, 0L);
             uquiver->owornmask |= W_QUIVER;
         }
     }
@@ -1013,7 +1020,10 @@ boolean hitsroof;
                 /* egg ends up "all over your face"; perhaps
                    visored helmet should still save you here */
                 if (uarmh)
+/*JP
                     Your("%s fails to protect you.", helm_simple_name(uarmh));
+*/
+                    Your("%sはあなたを守れなかった．", helm_simple_name(uarmh));
                 goto petrify;
             }
         case CREAM_PIE:
@@ -2009,9 +2019,15 @@ xchar x, y;
         && (mtmp = makemon(&mons[rn2(3) ? PM_HOMUNCULUS : PM_IMP], x, y,
                            NO_MM_FLAGS)) != 0) {
         if (canspotmon(mtmp))
+#if 0 /*JP*/
             pline("%s is released!", Hallucination
                                          ? An(rndmonnam(NULL))
                                          : "The picture-painting demon");
+#else
+            pline("%sが解放された！", Hallucination
+                                         ? rndmonnam(NULL)
+                                         : "お絵描きの悪魔");
+#endif
         mtmp->mpeaceful = !obj->cursed;
         set_malign(mtmp);
     }

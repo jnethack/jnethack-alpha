@@ -2225,7 +2225,10 @@ dodip()
     allowall[1] = '\0';
     if (!(obj = getobj(allowall, "dip")))
         return 0;
+/*JP
     if (inaccessible_equipment(obj, "dip", FALSE))
+*/
+    if (inaccessible_equipment(obj, "ÇêZÇ∑", FALSE))
         return 0;
 
 #if 0 /*JP*/

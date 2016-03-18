@@ -332,8 +332,13 @@ boolean devour;
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
             oprice = unpaid_cost(obj, TRUE);
+#if 0 /*JP*/
             pline("That %s will cost you %ld %s.", objnambuf, oprice,
                   currency(oprice));
+#else
+            pline("‚ ‚Ì%s‚Í%ld%s‚¾D", objnambuf, oprice,
+                  currency(oprice));
+#endif
             /* delobj->obfree will handle actual shop billing update */
         }
         delobj(obj);
@@ -1150,6 +1155,7 @@ struct monst *mtmp;
            (on the other hand, perhaps you're sensing a brief glimpse
            of its mind as it changes form) */
         newsym(mtmp->mx, mtmp->my);
+#if 0 /*JP*/
         You("%s %s appear where %s was!",
             cansee(mtmp->mx, mtmp->my) ? "see" : "sense",
             (mtmp->m_ap_type == M_AP_FURNITURE)
@@ -1164,6 +1170,22 @@ struct monst *mtmp;
                                   ? an(mons[mtmp->mappearance].mname)
                                   : something,
             buf);
+#else
+        You("%s‚ª‚ ‚Á‚½‚Æ‚±‚ë‚É%s‚ªŒ»‚ê‚½‚Ì%sI",
+            buf,
+            (mtmp->m_ap_type == M_AP_FURNITURE)
+                ? an(defsyms[mtmp->mappearance].explanation)
+                : (mtmp->m_ap_type == M_AP_OBJECT
+                   && OBJ_DESCR(objects[mtmp->mappearance]))
+                      ? an(OBJ_DESCR(objects[mtmp->mappearance]))
+                      : (mtmp->m_ap_type == M_AP_OBJECT
+                         && OBJ_NAME(objects[mtmp->mappearance]))
+                            ? an(OBJ_NAME(objects[mtmp->mappearance]))
+                            : (mtmp->m_ap_type == M_AP_MONSTER)
+                                  ? an(mons[mtmp->mappearance].mname)
+                                  : something,
+            cansee(mtmp->mx, mtmp->my) ? "‚ðŒ©‚½" : "‚É‹C‚Ã‚¢‚½");
+#endif
         display_nhwindow(WIN_MAP, TRUE);
     }
 }

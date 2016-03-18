@@ -31,7 +31,10 @@ nhsym l_syms[SYM_MAX] = DUMMY;   /* loaded symbols          */
 nhsym r_syms[SYM_MAX] = DUMMY;   /* rogue symbols           */
 
 nhsym warnsyms[WARNCOUNT] = DUMMY; /* the current warning display symbols */
+/*JP
 const char invisexplain[] = "remembered, unseen, creature";
+*/
+const char invisexplain[] = "覚えているが見えていない怪物";
 
 /* Default object class symbols.  See objclass.h.
  * {symbol, name, explain}
@@ -40,88 +43,319 @@ const char invisexplain[] = "remembered, unseen, creature";
  */
 const struct class_sym def_oc_syms[MAXOCLASSES] = {
     { '\0', "", "" }, /* placeholder for the "random class" */
+/*JP
     { ILLOBJ_SYM, "illegal objects", "strange object" },
+*/
+    { ILLOBJ_SYM, "奇妙な物体", "奇妙な物体" },
+/*JP
     { WEAPON_SYM, "weapons", "weapon" },
+*/
+    { WEAPON_SYM, "武器", "武器" },
+/*JP
     { ARMOR_SYM, "armor", "suit or piece of armor" },
+*/
+    { ARMOR_SYM, "鎧", "服または鎧のたぐい" },
+/*JP
     { RING_SYM, "rings", "ring" },
+*/
+    { RING_SYM, "指輪", "指輪" },
+/*JP
     { AMULET_SYM, "amulets", "amulet" },
+*/
+    { AMULET_SYM, "魔除け", "魔除け" },
+/*JP
     { TOOL_SYM, "tools", "useful item (pick-axe, key, lamp...)" },
+*/
+    { TOOL_SYM, "道具", "便利な道具(つるはし，鍵，ランプ．．．)" },
+/*JP
     { FOOD_SYM, "food", "piece of food" },
+*/
+    { FOOD_SYM, "食料", "食料" },
+/*JP
     { POTION_SYM, "potions", "potion" },
+*/
+    { POTION_SYM, "薬", "薬" },
+/*JP
     { SCROLL_SYM, "scrolls", "scroll" },
+*/
+    { SCROLL_SYM, "巻物", "巻物" },
+/*JP
     { SPBOOK_SYM, "spellbooks", "spellbook" },
+*/
+    { SPBOOK_SYM, "魔法書", "魔法書" },
+/*JP
     { WAND_SYM, "wands", "wand" },
+*/
+    { WAND_SYM, "杖", "杖" },
+/*JP
     { GOLD_SYM, "coins", "pile of coins" },
+*/
+    { GOLD_SYM, "金貨", "金貨の山" },
+/*JP
     { GEM_SYM, "rocks", "gem or rock" },
+*/
+    { GEM_SYM, "石", "宝石または石" },
+/*JP
     { ROCK_SYM, "large stones", "boulder or statue" },
+*/
+    { ROCK_SYM, "巨石", "岩または像" },
+/*JP
     { BALL_SYM, "iron balls", "iron ball" },
+*/
+    { BALL_SYM, "鉄球", "鉄球" },
+/*JP
     { CHAIN_SYM, "chains", "iron chain" },
+*/
+    { CHAIN_SYM, "鎖", "鉄の鎖" },
+/*JP
     { VENOM_SYM, "venoms", "splash of venom" }
+*/
+    { VENOM_SYM, "毒", "毒液" }
 };
 
 /* Default monster class symbols.  See monsym.h. */
 const struct class_sym def_monsyms[MAXMCLASSES] = {
     { '\0', "", "" },
+/*JP
     { DEF_ANT, "", "ant or other insect" },
+*/
+    { DEF_ANT, "", "蟻または他の昆虫" },
+/*JP
     { DEF_BLOB, "", "blob" },
+*/
+    { DEF_BLOB, "", "ブロッブ" },
+/*JP
     { DEF_COCKATRICE, "", "cockatrice" },
+*/
+    { DEF_COCKATRICE, "", "コカトリス" },
+/*JP
     { DEF_DOG, "", "dog or other canine" },
+*/
+    { DEF_DOG, "", "犬またはイヌ科の動物" },
+/*JP
     { DEF_EYE, "", "eye or sphere" },
+*/
+    { DEF_EYE, "", "目または球体" },
+/*JP
     { DEF_FELINE, "", "cat or other feline" },
+*/
+    { DEF_FELINE, "", "猫またはネコ科の動物" },
+/*JP
     { DEF_GREMLIN, "", "gremlin" },
+*/
+    { DEF_GREMLIN, "", "グレムリン" },
+/*JP
     { DEF_HUMANOID, "", "humanoid" },
+*/
+    { DEF_HUMANOID, "", "ヒューマノイド" },
+/*JP
     { DEF_IMP, "", "imp or minor demon" },
+*/
+    { DEF_IMP, "", "インプまたは下級悪魔" },
+/*JP
     { DEF_JELLY, "", "jelly" },
+*/
+    { DEF_JELLY, "", "ゼリー" },
+/*JP
     { DEF_KOBOLD, "", "kobold" },
+*/
+    { DEF_KOBOLD, "", "コボルト" },
+/*JP
     { DEF_LEPRECHAUN, "", "leprechaun" },
+*/
+    { DEF_LEPRECHAUN, "", "レプラコーン" },
+/*JP
     { DEF_MIMIC, "", "mimic" },
+*/
+    { DEF_MIMIC, "", "ミミック" },
+/*JP
     { DEF_NYMPH, "", "nymph" },
+*/
+    { DEF_NYMPH, "", "ニンフ" },
+/*JP
     { DEF_ORC, "", "orc" },
+*/
+    { DEF_ORC, "", "オーク" },
+/*JP
     { DEF_PIERCER, "", "piercer" },
+*/
+    { DEF_PIERCER, "", "穴喰い" },
+/*JP
     { DEF_QUADRUPED, "", "quadruped" },
+*/
+    { DEF_QUADRUPED, "", "四足動物" },
+/*JP
     { DEF_RODENT, "", "rodent" },
+*/
+    { DEF_RODENT, "", "齧歯動物" },
+/*JP
     { DEF_SPIDER, "", "arachnid or centipede" },
+*/
+    { DEF_SPIDER, "", "クモ形類動物またはムカデ" },
+/*JP
     { DEF_TRAPPER, "", "trapper or lurker above" },
+*/
+    { DEF_TRAPPER, "", "トラッパーまたはラーカー" },
+/*JP
     { DEF_UNICORN, "", "unicorn or horse" },
+*/
+    { DEF_UNICORN, "", "ユニコーンまたは馬" },
+/*JP
     { DEF_VORTEX, "", "vortex" },
+*/
+    { DEF_VORTEX, "", "渦" },
+/*JP
     { DEF_WORM, "", "worm" },
+*/
+    { DEF_WORM, "", "ワーム" },
+/*JP
     { DEF_XAN, "", "xan or other mythical/fantastic insect" },
+*/
+    { DEF_XAN, "", "ザンまたは神話やファンタジーの昆虫" },
+/*JP
     { DEF_LIGHT, "", "light" },
+*/
+    { DEF_LIGHT, "", "光" },
+/*JP
     { DEF_ZRUTY, "", "zruty" },
+*/
+    { DEF_ZRUTY, "", "ズルティ" },
+/*JP
     { DEF_ANGEL, "", "angelic being" },
+*/
+    { DEF_ANGEL, "", "天使" },
+/*JP
     { DEF_BAT, "", "bat or bird" },
+*/
+    { DEF_BAT, "", "こうもりまたは鳥" },
+/*JP
     { DEF_CENTAUR, "", "centaur" },
+*/
+    { DEF_CENTAUR, "", "ケンタウロス" },
+/*JP
     { DEF_DRAGON, "", "dragon" },
+*/
+    { DEF_DRAGON, "", "ドラゴン" },
+/*JP
     { DEF_ELEMENTAL, "", "elemental" },
+*/
+    { DEF_ELEMENTAL, "", "精霊" },
+/*JP
     { DEF_FUNGUS, "", "fungus or mold" },
+*/
+    { DEF_FUNGUS, "", "キノコまたはモールド" },
+/*JP
     { DEF_GNOME, "", "gnome" },
+*/
+    { DEF_GNOME, "", "ノーム" },
+/*JP
     { DEF_GIANT, "", "giant humanoid" },
+*/
+    { DEF_GIANT, "", "巨人" },
+/*JP
     { '\0', "", "invisible monster" },
+*/
+    { '\0', "", "透明な怪物" },
+/*JP
     { DEF_JABBERWOCK, "", "jabberwock" },
+*/
+    { DEF_JABBERWOCK, "", "ジャバウォック" },
+/*JP
     { DEF_KOP, "", "Keystone Kop" },
+*/
+    { DEF_KOP, "", "警備員" },
+/*JP
     { DEF_LICH, "", "lich" },
+*/
+    { DEF_LICH, "", "リッチ" },
+/*JP
     { DEF_MUMMY, "", "mummy" },
+*/
+    { DEF_MUMMY, "", "ミイラ" },
+/*JP
     { DEF_NAGA, "", "naga" },
+*/
+    { DEF_NAGA, "", "ナーガ" },
+/*JP
     { DEF_OGRE, "", "ogre" },
+*/
+    { DEF_OGRE, "", "オーガ" },
+/*JP
     { DEF_PUDDING, "", "pudding or ooze" },
+*/
+    { DEF_PUDDING, "", "プリンまたはウーズ" },
+/*JP
     { DEF_QUANTMECH, "", "quantum mechanic" },
+*/
+    { DEF_QUANTMECH, "", "量子場" },
+/*JP
     { DEF_RUSTMONST, "", "rust monster or disenchanter" },
+*/
+    { DEF_RUSTMONST, "", "錆の怪物または吸魔の怪物" },
+/*JP
     { DEF_SNAKE, "", "snake" },
+*/
+    { DEF_SNAKE, "", "ヘビ" },
+/*JP
     { DEF_TROLL, "", "troll" },
+*/
+    { DEF_TROLL, "", "トロル" },
+/*JP
     { DEF_UMBER, "", "umber hulk" },
+*/
+    { DEF_UMBER, "", "アンバーハルク" },
+/*JP
     { DEF_VAMPIRE, "", "vampire" },
+*/
+    { DEF_VAMPIRE, "", "吸血鬼" },
+/*JP
     { DEF_WRAITH, "", "wraith" },
+*/
+    { DEF_WRAITH, "", "レイス" },
+/*JP
     { DEF_XORN, "", "xorn" },
+*/
+    { DEF_XORN, "", "ゾーン" },
+/*JP
     { DEF_YETI, "", "apelike creature" },
+*/
+    { DEF_YETI, "", "猿のような生物" },
+/*JP
     { DEF_ZOMBIE, "", "zombie" },
+*/
+    { DEF_ZOMBIE, "", "ゾンビ" },
+/*JP
     { DEF_HUMAN, "", "human or elf" },
+*/
+    { DEF_HUMAN, "", "人間またはエルフ" },
+/*JP
     { DEF_GHOST, "", "ghost" },
+*/
+    { DEF_GHOST, "", "悪魔" },
+/*JP
     { DEF_GOLEM, "", "golem" },
+*/
+    { DEF_GOLEM, "", "ゴーレム" },
+/*JP
     { DEF_DEMON, "", "major demon" },
+*/
+    { DEF_DEMON, "", "悪魔" },
+/*JP
     { DEF_EEL, "", "sea monster" },
+*/
+    { DEF_EEL, "", "海の怪物" },
+/*JP
     { DEF_LIZARD, "", "lizard" },
+*/
+    { DEF_LIZARD, "", "トカゲ" },
+/*JP
     { DEF_WORM_TAIL, "", "long worm tail" },
+*/
+    { DEF_WORM_TAIL, "", "ロングワームの尻尾" },
+/*JP
     { DEF_MIMIC_DEF, "", "mimic" },
+*/
+    { DEF_MIMIC_DEF, "", "ミミック" },
 };
 
 const struct symdef def_warnsyms[WARNCOUNT] = {
@@ -161,6 +395,7 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
  *  Default screen symbols with explanations and colors.
  */
 const struct symdef defsyms[MAXPCHARS] = {
+#if 0 /*JP*/
 /* 0*/ { ' ', "dark part of a room", C(NO_COLOR) },  /* stone */
        { '|', "wall", C(CLR_GRAY) },                 /* vwall */
        { '-', "wall", C(CLR_GRAY) },                 /* hwall */
@@ -171,6 +406,19 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '-', "wall", C(CLR_GRAY) },                 /* crwall */
        { '-', "wall", C(CLR_GRAY) },                 /* tuwall */
        { '-', "wall", C(CLR_GRAY) },                 /* tdwall */
+#else
+/* 0*/ { ' ', "部屋の暗い部分", C(NO_COLOR) },       /* stone */
+       { '|', "壁", C(CLR_GRAY) },                   /* vwall */
+       { '-', "壁", C(CLR_GRAY) },                   /* hwall */
+       { '-', "壁", C(CLR_GRAY) },                   /* tlcorn */
+       { '-', "壁", C(CLR_GRAY) },                   /* trcorn */
+       { '-', "壁", C(CLR_GRAY) },                   /* blcorn */
+       { '-', "壁", C(CLR_GRAY) },                   /* brcorn */
+       { '-', "壁", C(CLR_GRAY) },                   /* crwall */
+       { '-', "壁", C(CLR_GRAY) },                   /* tuwall */
+       { '-', "壁", C(CLR_GRAY) },                   /* tdwall */
+#endif
+#if 0 /*JP*/
 /*10*/ { '|', "wall", C(CLR_GRAY) },                 /* tlwall */
        { '|', "wall", C(CLR_GRAY) },                 /* trwall */
        { '.', "doorway", C(CLR_GRAY) },              /* ndoor */
@@ -181,6 +429,19 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '#', "iron bars", C(HI_METAL) },            /* bars */
        { '#', "tree", C(CLR_GREEN) },                /* tree */
        { '.', "floor of a room", C(CLR_GRAY) },      /* room */
+#else
+/*10*/ { '|', "壁", C(CLR_GRAY) },                   /* tlwall */
+       { '|', "壁", C(CLR_GRAY) },                   /* trwall */
+       { '.', "出入口", C(CLR_GRAY) },               /* ndoor */
+       { '-', "開いた扉", C(CLR_BROWN) },            /* vodoor */
+       { '|', "開いた扉", C(CLR_BROWN) },            /* hodoor */
+       { '+', "閉じた扉", C(CLR_BROWN) },            /* vcdoor */
+       { '+', "閉じた扉", C(CLR_BROWN) },            /* hcdoor */
+       { '#', "鉄棒", C(HI_METAL) },                 /* bars */
+       { '#', "木", C(CLR_GREEN) },                  /* tree */
+       { '.', "部屋の床", C(CLR_GRAY) },             /* room */
+#endif
+#if 0 /*JP*/
 /*20*/ { '.', "dark part of a room", C(CLR_BLACK) }, /* dark room */
        { '#', "corridor", C(CLR_GRAY) },             /* dark corr */
        { '#', "lit corridor", C(CLR_GRAY) },   /* lit corr (see mapglyph.c) */
@@ -191,6 +452,19 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '_', "altar", C(CLR_GRAY) },                /* altar */
        { '|', "grave", C(CLR_GRAY) },                /* grave */
        { '\\', "opulent throne", C(HI_GOLD) },       /* throne */
+#else
+/*20*/ { '.', "部屋の暗い部分", C(CLR_BLACK) },      /* dark room */
+       { '#', "通路", C(CLR_GRAY) },                 /* dark corr */
+       { '#', "明るい通路", C(CLR_GRAY) },     /* lit corr (see mapglyph.c) */
+       { '<', "上り階段", C(CLR_GRAY) },             /* upstair */
+       { '>', "下り階段", C(CLR_GRAY) },             /* dnstair */
+       { '<', "上りはしご", C(CLR_BROWN) },          /* upladder */
+       { '>', "下りはしご", C(CLR_BROWN) },          /* dnladder */
+       { '_', "祭壇", C(CLR_GRAY) },                 /* altar */
+       { '|', "墓", C(CLR_GRAY) },                   /* grave */
+       { '\\', "華やかな玉座", C(HI_GOLD) },         /* throne */
+#endif
+#if 0 /*JP*/
 /*30*/ { '#', "sink", C(CLR_GRAY) },                 /* sink */
        { '{', "fountain", C(CLR_BLUE) },             /* fountain */
        { '}', "water", C(CLR_BLUE) },                /* pool */
@@ -201,6 +475,19 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '#', "raised drawbridge", C(CLR_BROWN) },   /* vcdbridge */
        { '#', "raised drawbridge", C(CLR_BROWN) },   /* hcdbridge */
        { ' ', "air", C(CLR_CYAN) },                  /* open air */
+#else
+/*30*/ { '#', "流し台", C(CLR_GRAY) },               /* sink */
+       { '{', "泉", C(CLR_BLUE) },                   /* fountain */
+       { '}', "水のたまった場所", C(CLR_BLUE) },     /* pool */
+       { '.', "氷", C(CLR_CYAN) },                   /* ice */
+       { '}', "溶岩", C(CLR_RED) },                  /* lava */
+       { '.', "降りている跳ね橋", C(CLR_BROWN) },    /* vodbridge */
+       { '.', "降りている跳ね橋", C(CLR_BROWN) },    /* hodbridge */
+       { '#', "上っている跳ね橋", C(CLR_BROWN) },    /* vcdbridge */
+       { '#', "上っている跳ね橋", C(CLR_BROWN) },    /* hcdbridge */
+       { ' ', "空気のたまった場所", C(CLR_CYAN) },   /* open air */
+#endif
+#if 0 /*JP*/
 /*40*/ { '#', "cloud", C(CLR_GRAY) },                /* [part of] a cloud */
        { '}', "water", C(CLR_BLUE) },                /* under water */
        { '^', "arrow trap", C(HI_METAL) },           /* trap */
@@ -211,6 +498,19 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "land mine", C(CLR_RED) },             /* trap */
        { '^', "rolling boulder trap", C(CLR_GRAY) }, /* trap */
        { '^', "sleeping gas trap", C(HI_ZAP) },      /* trap */
+#else
+/*40*/ { '#', "雲", C(CLR_GRAY) },                   /* [part of] a cloud */
+       { '}', "水", C(CLR_BLUE) },                   /* under water */
+       { '^', "矢の罠", C(HI_METAL) },               /* trap */
+       { '^', "投げ矢の罠", C(HI_METAL) },           /* trap */
+       { '^', "落石の罠", C(CLR_GRAY) },             /* trap */
+       { '^', "きしむ板", C(CLR_BROWN) },            /* trap */
+       { '^', "熊の罠", C(HI_METAL) },               /* trap */
+       { '^', "地雷", C(CLR_RED) },                  /* trap */
+       { '^', "巨岩の罠", C(CLR_GRAY) },             /* trap */
+       { '^', "睡眠ガスの罠", C(HI_ZAP) },           /* trap */
+#endif
+#if 0 /*JP*/
 /*50*/ { '^', "rust trap", C(CLR_BLUE) },            /* trap */
        { '^', "fire trap", C(CLR_ORANGE) },          /* trap */
        { '^', "pit", C(CLR_BLACK) },                 /* trap */
@@ -221,6 +521,19 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "level teleporter", C(CLR_MAGENTA) },    /* trap */
        { '^', "magic portal", C(CLR_BRIGHT_MAGENTA) }, /* trap */
        { '"', "web", C(CLR_GRAY) },                    /* web */
+#else
+/*50*/ { '^', "腐食の罠", C(CLR_BLUE) },             /* trap */
+       { '^', "火の罠", C(CLR_ORANGE) },             /* trap */
+       { '^', "落し穴", C(CLR_BLACK) },              /* trap */
+       { '^', "トゲだらけの落し穴", C(CLR_BLACK) },  /* trap */
+       { '^', "穴", C(CLR_BROWN) },                  /* trap */
+       { '^', "落し扉", C(CLR_BROWN) },              /* trap */
+       { '^', "瞬間移動の罠", C(CLR_MAGENTA) },      /* trap */
+       { '^', "別の階への瞬間移動の罠", C(CLR_MAGENTA) }, /* trap */
+       { '^', "魔法の罠", C(CLR_BRIGHT_MAGENTA) },   /* trap */
+       { '"', "くもの巣", C(CLR_GRAY) },             /* web */
+#endif
+#if 0 /*JP*/
 /*60*/ { '^', "statue trap", C(CLR_GRAY) },            /* trap */
        { '^', "magic trap", C(HI_ZAP) },               /* trap */
        { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
@@ -233,13 +546,32 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '*', "", C(CLR_WHITE) },               /* dig beam */
        { '!', "", C(CLR_WHITE) },               /* camera flash beam */
        { ')', "", C(HI_WOOD) },                 /* boomerang open left */
+#else
+/*60*/ { '^', "彫像の罠", C(CLR_GRAY) },               /* trap */
+       { '^', "魔法の罠", C(HI_ZAP) },                 /* trap */
+       { '^', "反魔法空間の罠", C(HI_ZAP) },           /* trap */
+       { '^', "変化の罠", C(CLR_BRIGHT_GREEN) },       /* trap */
+       { '^', "振動している場所", C(CLR_YELLOW) },     /* trap */
+       { '|', "壁", C(CLR_GRAY) },              /* vbeam */
+       { '-', "壁", C(CLR_GRAY) },              /* hbeam */
+       { '\\', "壁", C(CLR_GRAY) },             /* lslant */
+       { '/', "壁", C(CLR_GRAY) },              /* rslant */
+       { '*', "", C(CLR_WHITE) },               /* dig beam */
+       { '!', "", C(CLR_WHITE) },               /* camera flash beam */
+       { ')', "", C(HI_WOOD) },                 /* boomerang open left */
+#endif
 /*70*/ { '(', "", C(HI_WOOD) },                 /* boomerang open right */
        { '0', "", C(HI_ZAP) },                  /* 4 magic shield symbols */
        { '#', "", C(HI_ZAP) },
        { '@', "", C(HI_ZAP) },
        { '*', "", C(HI_ZAP) },
+#if 0 /*JP*/
        { '#', "poison cloud", C(CLR_BRIGHT_GREEN) },   /* part of a cloud */
        { '?', "valid position", C(CLR_BRIGHT_GREEN) }, /*  target position */
+#else
+       { '#', "毒雲", C(CLR_BRIGHT_GREEN) },           /* part of a cloud */
+       { '?', "有効な位置", C(CLR_BRIGHT_GREEN) },     /*  target position */
+#endif
        { '/', "", C(CLR_GREEN) },         /* swallow top left      */
        { '-', "", C(CLR_GREEN) },         /* swallow top center    */
        { '\\', "", C(CLR_GREEN) },        /* swallow top right     */

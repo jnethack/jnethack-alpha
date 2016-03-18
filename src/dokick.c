@@ -194,8 +194,13 @@ xchar x, y;
             map_invisible(x, y);
         else
             newsym(x, y);
+#if 0 /*JP*/
         There("is %s here.",
               canspotmon(mon) ? a_monnam(mon) : "something hidden");
+#else
+        There("%sがいる．",
+              canspotmon(mon) ? a_monnam(mon) : "何か隠れているもの");
+#endif
     }
 
     /* Kick attacks by kicking monsters are normal attacks, not special.
@@ -424,6 +429,7 @@ register struct obj *gold;
                out of the vault.  If he did do that, player
                could try fighting, then weasle out of being
                killed by throwing his/her gold when losing. */
+#if 0 /*JP*/
             verbalize(
                 umoney
                     ? "Drop the rest and follow me."
@@ -432,6 +438,16 @@ register struct obj *gold;
                           : mtmp->mpeaceful
                                 ? "I'll take care of that; please move along."
                                 : "I'll take that; now get moving.");
+#else
+            verbalize(
+                umoney
+                    ? "残りを置いてついてきなさい．"
+                    : hidden_gold()
+                          ? "まだ金を隠しているな．置きなさい．"
+                          : mtmp->mpeaceful
+                                ? "それは私が拾っておきますからついてきてください．"
+                                : "それは拾っておく．来なさい．");
+#endif
         } else if (is_mercenary(mtmp->data)) {
             long goldreqd = 0L;
 
@@ -783,20 +799,36 @@ xchar x, y;
             kickedobj = splitobj(kickedobj, 1L);
         } else {
             if (rn2(20)) {
+#if 0 /*JP*/
                 static NEARDATA const char *const flyingcoinmsg[] = {
                     "scatter the coins", "knock coins all over the place",
                     "send coins flying in all directions",
                 };
+#else
+                static NEARDATA const char *const flyingcoinmsg[] = {
+                    "金貨をまき散らした", "金貨をばらまいた",
+                    "金貨をあちこちに飛ばした",
+                };
+#endif
 
+/*JP
                 pline("Thwwpingg!");
+*/
+                pline("ガシャーン！");
+/*JP
                 You("%s!", flyingcoinmsg[rn2(SIZE(flyingcoinmsg))]);
+*/
+                You("%s！", flyingcoinmsg[rn2(SIZE(flyingcoinmsg))]);
                 (void) scatter(x, y, rn2(3) + 1, VIS_EFFECTS | MAY_HIT,
                                kickedobj);
                 newsym(x, y);
                 return 1;
             }
             if (kickedobj->quan > 300L) {
+/*JP
                 pline("Thump!");
+*/
+                pline("ゴツン！");
                 return (!rn2(3) || martial());
             }
         }
@@ -995,9 +1027,15 @@ dokick()
 
         if (wl == BOTH_SIDES)
             bp = makeplural(bp);
+#if 0 /*JP*/
         Your("%s%s %s in no shape for kicking.",
              (wl == LEFT_SIDE) ? "left " : (wl == RIGHT_SIDE) ? "right " : "",
              bp, (wl == BOTH_SIDES) ? "are" : "is");
+#else
+        Your("%s%sは蹴りができる状態じゃない．",
+             (wl == LEFT_SIDE) ? "左" : (wl == RIGHT_SIDE) ? "右" : "",
+             bp);
+#endif
         no_kick = TRUE;
     } else if (near_capacity() > SLT_ENCUMBER) {
 /*JP
@@ -1362,9 +1400,16 @@ dokick()
             (void) mksobj_at(ROCK, x, y, TRUE, FALSE);
             del_engr_at(x, y);
             if (Blind)
+#if 0 /*JP*/
                 pline("Crack!  %s broke!", Something);
+#else
+                pline("ゴツン！何かが壊れた！");
+#endif
             else {
+/*JP
                 pline_The("headstone topples over and breaks!");
+*/
+                pline("墓石は倒れて壊れた！");
                 newsym(x, y);
             }
             return 1;

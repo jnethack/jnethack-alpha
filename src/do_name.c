@@ -119,7 +119,10 @@ const char *goal;
     boolean hilite_state = FALSE;
 
     if (!goal)
+/*JP
         goal = "desired location";
+*/
+        goal = "目的地";
     if (flags.verbose) {
 /*JP
         pline("(For instructions type a ?)");
@@ -139,7 +142,10 @@ const char *goal;
 #endif
     for (;;) {
         if (show_goal_msg) {
+/*JP
             pline("Move cursor to %s:", goal);
+*/
+            pline("カーソルを%sに動かしてください:", goal);
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
             show_goal_msg = FALSE;
@@ -241,9 +247,15 @@ const char *goal;
             goto nxtc;
         } else if (c == '#') {
             auto_msg = !auto_msg;
+#if 0 /*JP*/
             pline("Automatic description %sis %s.",
                   flags.verbose ? "of features under cursor " : "",
                   auto_msg ? "on" : "off");
+#else
+            pline("%s説明自動表示：%s",
+                  flags.verbose ? "カーソルの下にあるものの" : "",
+                  auto_msg ? "オン" : "オフ");
+#endif
             if (!auto_msg)
                 show_goal_msg = TRUE;
             msg_given = TRUE;
@@ -897,8 +909,13 @@ namefloorobj()
     }
     if (!obj) {
         /* "under you" is safe here since there's no object to hide under */
+#if 0 /*JP*/
         pline("There doesn't seem to be any object %s.",
               (cc.x == u.ux && cc.y == u.uy) ? "under you" : "there");
+#else
+        pline("%sには何もないようだ．",
+              (cc.x == u.ux && cc.y == u.uy) ? "あなたの下" : "そこ");
+#endif
         return;
     }
     /* note well: 'obj' might be as instance of STRANGE_OBJECT if target
@@ -927,16 +944,35 @@ namefloorobj()
         /* traditional */
         unames[4] = roguename();
         /* silly */
+/*JP
         unames[5] = "Wibbly Wobbly";
+*/
+        unames[5] = "うろうろ";
+#if 0 /*JP*/
         pline("%s %s to call you \"%s.\"",
               The(buf), use_plural ? "decide" : "decides",
               unames[rn2(SIZE(unames))]);
+#else
+        pline("%sはあなたを「%s」と呼ぶことに決めた．",
+              buf,
+              unames[rn2(SIZE(unames))]);
+#endif
     } else if (!objtyp_is_callable(obj->otyp)) {
+#if 0 /*JP*/
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
+#else
+        pline("%sに種類の名前を割り当てることはできない．",
+              buf);
+#endif
     } else if (!obj->dknown) {
+#if 0 /*JP*/
         You("don't know %s %s well enough to name %s.",
             use_plural ? "those" : "that", buf, use_plural ? "them" : "it");
+#else
+        You("名前を付けられるほど%sのことをよく知らない．",
+            buf);
+#endif
     } else {
         docall(obj);
     }
@@ -1055,9 +1091,15 @@ boolean called;
     /* an "aligned priest" not flagged as a priest or minion should be
        "priest" or "priestess" (normally handled by priestname()) */
     if (mdat == &mons[PM_ALIGNED_PRIEST])
+/*JP
         pm_name = mtmp->female ? "priestess" : "priest";
+*/
+        pm_name = mtmp->female ? "尼僧" : "僧侶";
     else if (mdat == &mons[PM_HIGH_PRIEST] && mtmp->female)
+/*JP
         pm_name = "high priestess";
+*/
+        pm_name = "法王";
 
     /* Shopkeepers: use shopkeeper name.  For normal shopkeepers, just
      * "Asidonhopo"; for unusual ones, "Asidonhopo the invisible

@@ -2009,11 +2009,20 @@ donamelevel()
 
     if (mptr->custom) {
         char tmpbuf[BUFSZ];
+#if 0 /*JP*/
         Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
                 strlen(mptr->custom) > 30 ? "..." : "");
         getlin(tmpbuf, nbuf);
+#else
+        Sprintf(tmpbuf, "現在の名前「%.30s%s」を何に書き換える？", mptr->custom,
+                strlen(mptr->custom) > 30 ? "..." : "");
+        getlin(tmpbuf, nbuf);
+#endif
     } else
+/*JP
         getlin("What do you want to call this dungeon level?", nbuf);
+*/
+        getlin("この階を何と呼ぶ？", nbuf);
     if (index(nbuf, '\033'))
         return 0;
     (void) mungspaces(nbuf);

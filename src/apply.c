@@ -2869,7 +2869,10 @@ struct obj *obj;
         otmp = getobj(lubricables, "grease");
         if (!otmp)
             return;
+/*JP
         if (inaccessible_equipment(otmp, "grease", FALSE))
+*/
+        if (inaccessible_equipment(otmp, "‚ÉŽ‰‚ð“h‚é", FALSE))
             return;
         consume_obj_charge(obj, TRUE);
 

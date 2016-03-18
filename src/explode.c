@@ -605,9 +605,15 @@ int expltype;
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg
                            == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
+/*JP
                     pline("It is fatal.");
+*/
+                    pline("それは致命的だ．");
                 else
+/*JP
                     pline_The("%s is fatal.", str);
+*/
+                    pline_The("%sは致命的だ．", str);
                 /* Known BUG: BURNING suppresses corpse in bones data,
                    but done does not handle killer reason correctly */
                 done((adtyp == AD_FIRE) ? BURNING : DIED);

@@ -2,12 +2,12 @@
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* Code for drinking from fountains. */
-
 /* JNetHack Copyright */
 /* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
 /* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
 /* JNetHack may be freely redistributed.  See license for details. */
+
+/* Code for drinking from fountains. */
 
 #include "hack.h"
 
@@ -797,7 +797,7 @@ drinksink()
 /*JP
         pline("Yuk, this water tastes awful.");
 */
-	pline("オェ，とてもひどい味がする．");
+        pline("オェ，とてもひどい味がする．");
         more_experienced(1, 0);
         newexplevel();
         break;

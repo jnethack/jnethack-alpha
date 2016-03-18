@@ -1003,7 +1003,10 @@ int mode;
     } else if (dx && dy && worm_cross(ux, uy, x, y)) {
         /* consecutive long worm segments are at <ux,y> and <x,uy> */
         if (mode == DO_MOVE)
+/*JP
             pline("%s is in your way.", Monnam(m_at(ux, y)));
+*/
+            pline("道の途中に%sがいる．", Monnam(m_at(ux, y)));
         return FALSE;
     }
     /* Pick travel path that does not require crossing a trap.
@@ -1403,36 +1406,72 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
                    after this successful move would have its
                    can't-do-that message suppressed by Norep */
                 if (flags.verbose)
+/*JP
                     Norep("You move within the chain's reach.");
+*/
+                    Norep("鎖が届く範囲に移動できる．");
                 return TRUE;
             }
         }
         if (--u.utrap) {
             if (flags.verbose) {
                 if (anchored) {
+#if 0 /*JP*/
                     predicament = "chained to the";
                     culprit = "buried ball";
+#else
+                    predicament = "とつながっている";
+                    culprit = "埋まっている球";
+#endif
                 } else {
+#if 0 /*JP*/
                     predicament = "stuck in the";
                     culprit = surface(u.ux, u.uy);
+#else
+                    predicament = "に埋まっている";
+                    culprit = surface(u.ux, u.uy);
+#endif
                 }
                 if (u.usteed) {
                     if (anchored)
+#if 0 /*JP*/
                         Norep("You and %s are %s %s.", steedname, predicament,
                               culprit);
+#else
+                        Norep("あなたと%sは%s%s．", steedname, culprit,
+                              predicament);
+#endif
                     else
+#if 0 /*JP*/
                         Norep("%s is %s %s.", upstart(steedname), predicament,
                               culprit);
+#else
+                        Norep("%sは%s%s．", steedname, culprit,
+                              predicament);
+#endif
                 } else
+/*JP
                     Norep("You are %s %s.", predicament, culprit);
+*/
+                    Norep("あなたは%sに%s．", culprit, predicament);
             }
         } else {
             if (u.usteed)
+#if 0 /*JP*/
                 pline("%s finally %s free.", upstart(steedname),
                       !anchored ? "lurches" : "wrenches the ball");
+#else
+                pline("%sは%sやっと自由になった．", upstart(steedname),
+                      !anchored ? "もがいて" : "鉄球をもぎ取って");
+#endif
             else
+#if 0 /*JP*/
                 You("finally %s free.",
                     !anchored ? "wriggle" : "wrench the ball");
+#else
+                You("%sやっと自由になった．",
+                    !anchored ? "もがいて" : "鉄球をもぎ取って");
+#endif
             if (anchored)
                 buried_ball_to_punishment();
         }
@@ -1761,27 +1800,51 @@ domove()
                because you don't see remembered terrain while underwater;
                although the hero can attack an adjacent monster this way,
                assume he can't reach out far enough to distinguish terrain */
+#if 0 /*JP*/
             Sprintf(buf, (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
                              ? "an air bubble"
                              : "nothing");
+#else
+            Sprintf(buf, (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
+                             ? "空気の泡"
+                             : "何もないところ");
+#endif
         else if (solid)
             /* glyph might indicate unseen terrain if hero is blind;
                unlike searching, this won't reveal what that terrain is
                (except for solid rock, where the glyph would otherwise
                yield ludicrous "dark part of a room") */
+#if 0 /*JP*/
             Strcpy(buf,
                    (levl[x][y].typ == STONE)
                        ? "solid rock"
                        : glyph_is_cmap(glyph)
                             ? the(defsyms[glyph_to_cmap(glyph)].explanation)
                             : (const char *) "an unknown obstacle");
+#else
+            Strcpy(buf,
+                   (levl[x][y].typ == STONE)
+                       ? "石"
+                       : glyph_is_cmap(glyph)
+                            ? the(defsyms[glyph_to_cmap(glyph)].explanation)
+                            : (const char *) "不明な障害物");
+#endif
         /* note: 'solid' is misleadingly named and catches pools
            of water and lava as well as rock and walls */
         else
+/*JP
             Strcpy(buf, "thin air");
+*/
+            Strcpy(buf, "何もない空中");
+#if 0 /*JP*/
         You("%s%s %s.",
             !(boulder || solid) ? "" : !explo ? "harmlessly " : "futilely ",
             explo ? "explode at" : "attack", buf);
+#else
+        You("%s%s%s.",
+            !(boulder || solid) ? "" : !explo ? "効果なく" : "むだに",
+            buf, explo ? "で爆発した" : "を攻撃した");
+#endif
 
         nomul(0);
         if (explo) {
@@ -1877,7 +1940,10 @@ domove()
         } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
             /* can't swap places when pet can't move to your spot */
             u.ux = u.ux0, u.uy = u.uy0;
+/*JP
             You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+*/
+            You("止まった．%sは斜めに動けない．", upstart(y_monnam(mtmp)));
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
@@ -2097,7 +2163,10 @@ switch_terrain()
     if (blocklev) {
         /* called from spoteffects(), skip float_down() */
         if (Levitation)
+/*JP
             You_cant("levitate in here.");
+*/
+            You_cant("ここでは浮遊できない．");
         BLevitation |= FROMOUTSIDE;
     } else if (BLevitation) {
         BLevitation &= ~FROMOUTSIDE;
@@ -2107,7 +2176,10 @@ switch_terrain()
     /* the same terrain that blocks levitation also blocks flight */
     if (blocklev) {
         if (Flying)
+/*JP
             You_cant("fly in here.");
+*/
+            You_cant("ここでは飛べない．");
         BFlying |= FROMOUTSIDE;
     } else if (BFlying) {
         BFlying &= ~FROMOUTSIDE;
@@ -2116,7 +2188,10 @@ switch_terrain()
            resuming it; that could be tracked so that this message could
            be adjusted to "resume flying", but isn't worth the effort...] */
         if (Flying)
+/*JP
             You("start flying.");
+*/
+            You("飛びはじめた．");
     }
 }
 
@@ -2307,9 +2382,15 @@ boolean pick;
     /* Warning alerts you to ice danger */
     if (Warning && is_ice(u.ux, u.uy)) {
         static const char *const icewarnings[] = {
+#if 0 /*JP*/
             "The ice seems very soft and slushy.",
             "You feel the ice shift beneath you!",
             "The ice, is gonna BREAK!", /* The Dead Zone */
+#else
+            "氷はとても軟らかくて溶けそうだ．",
+            "あなたの下の氷が動いたような気がした！",
+            "氷が壊れるぞ！", /* The Dead Zone */
+#endif
         };
         long time_left = spot_time_left(u.ux, u.uy, MELT_ICE_AWAY);
         if (time_left && time_left < 15L)
@@ -2788,15 +2869,30 @@ dopickup()
     if (!OBJ_AT(u.ux, u.uy)) {
         register struct rm *lev = &levl[u.ux][u.uy];
         if (IS_THRONE(lev->typ))
+/*JP
             pline("It must weigh%s a ton!", lev->looted ? " almost" : "");
+*/
+            pline("これは%s重い！", lev->looted ? "かなり" : "すごく");
         else if (IS_SINK(lev->typ))
+/*JP
             pline_The("plumbing connects it to the floor.");
+*/
+            pline_The("配管は床につながっている．");
         else if (IS_GRAVE(lev->typ))
+/*JP
             You("don't need a gravestone.  Yet.");
+*/
+            pline("あなたには墓石は不要だ．．．今のところ．");
         else if (IS_FOUNTAIN(lev->typ))
+/*JP
             You("could drink the water...");
+*/
+            You("水を飲めない．．．");
         else if (IS_DOOR(lev->typ) && (lev->doormask & D_ISOPEN))
+/*JP
             pline("It won't come off the hinges.");
+*/
+            pline("ヒンジを外せない．");
         else
 /*JP
             There("is nothing here to pick up.");
@@ -2813,7 +2909,10 @@ dopickup()
         else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach();
         else if (Blind && !can_reach_floor(TRUE))
+/*JP
             You("cannot reach anything here.");
+*/
+            You("何にも届かない．");
         else
 /*JP
             You("cannot reach the %s.", surface(u.ux, u.uy));

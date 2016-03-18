@@ -191,11 +191,19 @@ cant_reach_floor(x, y, up, check_pit)
 int x, y;
 boolean up, check_pit;
 {
+#if 0 /*JP*/
     You("can't reach the %s.",
         up ? ceiling(x, y)
            : (check_pit && can_reach_floor(FALSE))
                ? "bottom of the pit"
                : surface(x, y));
+#else
+    You("%sÇ…ìÕÇ©Ç»Ç¢ÅD",
+        up ? ceiling(x, y)
+           : (check_pit && can_reach_floor(FALSE))
+               ? "óéÇµåäÇÃíÍ"
+               : surface(x, y));
+#endif
 }
 
 const char *
@@ -660,7 +668,10 @@ doengrave()
         return 0;
 
     if (otmp == &zeroobj) {
+/*JP
         Strcat(strcpy(fbuf, "your "), makeplural(body_part(FINGER)));
+*/
+        Strcat(strcpy(fbuf, "Ç†Ç»ÇΩÇÃ"), makeplural(body_part(FINGER)));
         writer = fbuf;
     } else
         writer = yname(otmp);

@@ -134,7 +134,10 @@ boolean on;
 */
                 Your("静かに動けるようになった．");
             else if (Levitation || Flying)
+/*JP
                 You("float imperceptibly.");
+*/
+                You("いつのまにか浮いていた．");
             else
 /*JP
                 You("walk very quietly.");
@@ -179,8 +182,13 @@ boolean on;
                 || Detect_monsters))) {
         makeknown(obj->otyp);
 
+#if 0 /*JP*/
         You_feel("that monsters%s have difficulty pinpointing your location.",
                  on ? "" : " no longer");
+#else
+        You_feel("怪物はあなたの位置がはっきりと分か%sなったようだ．",
+                 on ? "らなく" : "るように");
+#endif
     }
 }
 
@@ -508,7 +516,7 @@ Helmet_on(VOID_ARGS)
             You("%sような気がした．",
                      ACURR(A_INT)
                              <= (ABASE(A_INT) + ABON(A_INT) + ATEMP(A_INT))
-                         ? "街角に座っている"
+                         ? "隅っこに座っている"
                          : "目がまわった");
 #endif
         } else {
@@ -1461,9 +1469,15 @@ struct obj *stolenobj; /* no message if stolenobj is already being doffing */
        by unmul() since the on or off action isn't completing */
     afternmv = 0;
     if (putting_on || otmp != stolenobj) {
+#if 0 /*JP*/
         Sprintf(buf, "You stop %s %s.",
                 putting_on ? "putting on" : "taking off",
                 thesimpleoname(otmp));
+#else
+        Sprintf(buf, "あなたは%sを%sのを止めた．",
+                thesimpleoname(otmp),
+                putting_on ? "身につける" : "外す");
+#endif
     } else {
         buf[0] = '\0';   /* silently stop doffing stolenobj */
         result = -multi; /* remember this before calling unmul() */
@@ -1533,7 +1547,10 @@ armor_or_accessory_off(obj)
 struct obj *obj;
 {
     if (!(obj->owornmask & (W_ARMOR | W_ACCESSORY))) {
+/*JP
         You("are not wearing that.");
+*/
+        You("それを身につけていない．");
         return 0;
     }
 
@@ -2099,7 +2116,7 @@ struct obj *obj;
 /*JP
                 You("cannot make the ring stick to your body.");
 */
-                You("指輪をはめれない体だ．");
+                You("指輪をはめられない体だ．");
                 return 0;
             }
             if (uleft && uright) {
@@ -2225,7 +2242,7 @@ struct obj *obj;
 /*JP
             You_cant("wear that!");
 */
-            You_cant("wear that!");
+            You_cant("それを身につけられない！");
             return 0;
         }
     }
@@ -2310,7 +2327,10 @@ dowear()
     if (uarm && uarmu && uarmc && uarmh && uarms && uarmg && uarmf
         && uleft && uright && uamul && ublindf) {
         /* 'W' message doesn't mention accessories */
+/*JP
         You("are already wearing a full complement of armor.");
+*/
+        You("すでに完全装備している．");
         return 0;
     }
     otmp = getobj(clothes, "wear");
@@ -3125,10 +3145,16 @@ boolean
 inaccessible_equipment(obj, verb, only_if_known_cursed)
 struct obj *obj;
 const char *verb; /* "dip" or "grease", or null to avoid messages */
+/*JP:日本語では "を浸す", "に脂を塗る", null のいずれか*/
 boolean only_if_known_cursed; /* ignore covering unless known to be cursed */
 {
+#if 0 /*JP*/
     static NEARDATA const char need_to_take_off_outer_armor[] =
         "need to take off %s to %s %s.";
+#else /*JP:引数が原文と変わっていることに注意*/
+    static NEARDATA const char need_to_take_off_outer_armor[] =
+        "%s%sには%sを%s必要がある．";
+#endif
     char buf[BUFSZ];
     boolean anycovering = !only_if_known_cursed; /* more comprehensible... */
 #define BLOCKSACCESS(x) (anycovering || ((x)->cursed && (x)->bknown))
@@ -3140,7 +3166,11 @@ boolean only_if_known_cursed; /* ignore covering unless known to be cursed */
     if (obj == uarm && uarmc && BLOCKSACCESS(uarmc)) {
         if (verb) {
             Strcpy(buf, yname(uarmc));
+#if 0 /*JP*/
             You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+#else /*JP:対象はクロークなのでjoffmsgを使わず決め撃ち*/
+            You(need_to_take_off_outer_armor, xname(obj), verb, buf, "脱ぐ");
+#endif
         }
         return TRUE;
     }
@@ -3160,10 +3190,17 @@ boolean only_if_known_cursed; /* ignore covering unless known to be cursed */
             if (uarmc)
                 Strcat(buf, yname(uarmc));
             if (uarm && uarmc)
+/*JP
                 Strcat(buf, " and ");
+*/
+                Strcat(buf, "と");
             if (uarm)
                 Strcat(buf, sameprefix ? xname(uarm) : yname(uarm));
+#if 0 /*JP*/
             You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+#else /*JP:対象はクロークか鎧なのでjoffmsgを使わず決め撃ち*/
+            You(need_to_take_off_outer_armor, xname(obj), verb, buf, "脱ぐ");
+#endif
         }
         return TRUE;
     }
@@ -3171,7 +3208,11 @@ boolean only_if_known_cursed; /* ignore covering unless known to be cursed */
     if ((obj == uleft || obj == uright) && uarmg && BLOCKSACCESS(uarmg)) {
         if (verb) {
             Strcpy(buf, yname(uarmg));
+#if 0 /*JP*/
             You(need_to_take_off_outer_armor, buf, verb, yname(obj));
+#else /*JP:対象は小手なのでjoffmsgを使わず決め撃ち*/
+            You(need_to_take_off_outer_armor, xname(obj), verb, buf, "はずす");
+#endif
         }
         return TRUE;
     }

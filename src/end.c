@@ -467,12 +467,21 @@ int how;
                set up fake mptr for type_is_pname/the_unique_pm */
             mptr = &mons[mtmp->mappearance];
             fakenm = mptr->mname;
+#if 0 /*JP*/
         } else if (alt && strstri(realnm, "vampire")
                    && !strcmp(fakenm, "vampire bat")) {
             /* special case: use "vampire in bat form" in preference
                to redundant looking "vampire in vampire bat form" */
             fakenm = "bat";
+#else
+        } else if (alt && strstri(realnm, "ãzååãS")
+                   && !strcmp(fakenm, "ãzååÇ±Ç§Ç‡ÇË")) {
+            /* ÅuãzååÇ±Ç§Ç‡ÇËÇÃépÇÃãzååãSÅvÇÕèÁí∑Ç»ÇÃÇ≈
+               ÅuÇ±Ç§Ç‡ÇËÇÃépÇÃãzååãSÅvÇÃå`Ç…Ç∑ÇÈ */
+            fakenm = "Ç±Ç§Ç‡ÇË";
+#endif
         }
+#if 0 /*JP*/
         /* for the alternate format, always suppress any article;
            pname and the_unique should also have s_suffix() applied,
            but vampires don't take on any shapes which warrant that */
@@ -482,12 +491,23 @@ int how;
             Sprintf(shape, "the %s", fakenm);
         else /* "a"/"an" */
             Strcpy(shape, an(fakenm));
+#else /*JP:ì˙ñ{åÍÇ≈ÇÕÉVÉìÉvÉã*/
+        Strcpy(shape, fakenm);
+#endif
         /* omit "called" to avoid excessive verbosity */
+#if 0 /*JP*/
         Sprintf(eos(buf),
                 alt ? "%s in %s form"
                     : mimicker ? "%s disguised as %s"
                                : "%s imitating %s",
                 realnm, shape);
+#else
+        Sprintf(eos(buf),
+                alt ? "%sÇÃépÇÃ%s"
+                    : mimicker ? "%sÇÃÇ”ÇËÇÇµÇƒÇ¢ÇÈ%s"
+                               : "%sÇÃÇ‹ÇÀÇÇµÇƒÇ¢ÇÈ%s",
+                shape, realnm);
+#endif
         mptr = mtmp->data; /* reset for mimicker case */
     } else if (mptr == &mons[PM_GHOST]) {
 #if 0 /*JP*/
@@ -787,9 +807,15 @@ boolean taken;
 
     if (!done_stopprint) {
         ask = should_query_disclose_option('o', &defquery);
+#if 0 /*JP*/
         c = ask ? yn_function("Do you want to see the dungeon overview?",
                               ynqchars, defquery)
                 : defquery;
+#else
+        c = ask ? yn_function("ñ¿ã{ÇÃäTóvÇå©Ç‹Ç∑Ç©ÅH",
+                              ynqchars, defquery)
+                : defquery;
+#endif
         if (c == 'y')
             show_overview((how >= PANICKED) ? 1 : 2, how);
         if (c == 'q')
@@ -1778,7 +1804,10 @@ boolean ask;
         }
     } else if (defquery == 'a') {
         /* #dovanquished rather than final disclosure, so pline() is ok */
+/*JP
         pline("No monsters have been vanquished.");
+*/
+        pline("ì|ÇµÇΩìGÇÕÇ¢Ç»Ç©Ç¡ÇΩÅD");
     }
 }
 
