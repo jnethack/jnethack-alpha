@@ -1,3 +1,12 @@
+Fri Mar 18 2016  Kentaro Shirakata  <argrath@ub32.org>
+
+	* JNetHack-3.6.0-0.3リリース
+	* unix/X11対応
+	* JNetHack.adを現状に合うように更新
+	* VS2013のIDEでビルド出来るように調整
+	* 噂、神託、ヘルプの翻訳を追加
+	* 翻訳追加修正
+
 Sun Feb 21 2016  Kentaro Shirakata  <argrath@ub32.org>
 
 	* JNetHack-3.6.0-0.2リリース
