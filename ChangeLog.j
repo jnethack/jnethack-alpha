@@ -1,3 +1,9 @@
+Thu Mar 24 2016  Kentaro Shirakata  <argrath@ub32.org>
+
+	* JNetHack-3.6.0-0.4リリース
+	* 一部のファイルの文字コードがEUC-JPになっていた問題を修正 (#36189)
+	* 翻訳追加修正
+
 Fri Mar 18 2016  Kentaro Shirakata  <argrath@ub32.org>
 
 	* JNetHack-3.6.0-0.3リリース
