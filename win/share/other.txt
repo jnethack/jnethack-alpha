@@ -27,7 +27,7 @@ Y = (149, 149, 149)
 Z = (195, 195, 195)
 0 = (100, 100, 100)
 1 = (72, 108, 108)
-# tile 0 (dark part of a room)
+# tile 0 (ïîâÆÇÃà√Ç¢ïîï™)
 {
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
@@ -46,7 +46,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
 }
-# tile 1 (wall)
+# tile 1 (ï«)
 {
   ANNOA1PPPPP1NNOA
   AOOOA1P1PP11OOOA
@@ -65,7 +65,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 2 (wall)
+# tile 2 (ï«)
 {
   AAANOOAAAAANOOAA
   OOONOOA1OOONOOA1
@@ -84,7 +84,7 @@ Z = (195, 195, 195)
   1111111111111111
   AAAAAAAAAAAAAAAA
 }
-# tile 3 (wall)
+# tile 3 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -103,7 +103,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 4 (wall)
+# tile 4 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -122,7 +122,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 5 (wall)
+# tile 5 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -141,7 +141,7 @@ Z = (195, 195, 195)
   1111111111111111
   AAAAAAAAAAAAAAAA
 }
-# tile 6 (wall)
+# tile 6 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -160,7 +160,7 @@ Z = (195, 195, 195)
   1111111111111111
   AAAAAAAAAAAAAAAA
 }
-# tile 7 (wall)
+# tile 7 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -179,7 +179,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 8 (wall)
+# tile 8 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -198,7 +198,7 @@ Z = (195, 195, 195)
   1111111111111111
   AAAAAAAAAAAAAAAA
 }
-# tile 9 (wall)
+# tile 9 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -217,7 +217,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 10 (wall)
+# tile 10 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -236,7 +236,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 11 (wall)
+# tile 11 (ï«)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -255,7 +255,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 12 (doorway)
+# tile 12 (èoì¸å˚)
 {
   AAAAAAAAAAAAAAAA
   AA............AA
@@ -274,7 +274,7 @@ Z = (195, 195, 195)
   AA............AA
   AAAAAAAAAAAAAAAA
 }
-# tile 13 (open door)
+# tile 13 (äJÇ¢ÇΩî‡)
 {
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
@@ -293,7 +293,7 @@ Z = (195, 195, 195)
   A..............A
   AAAAAAAAAAAAAAAA
 }
-# tile 14 (open door)
+# tile 14 (äJÇ¢ÇΩî‡)
 {
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
@@ -312,7 +312,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
 }
-# tile 15 (closed door)
+# tile 15 (ï¬Ç∂ÇΩî‡)
 {
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
@@ -331,7 +331,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
 }
-# tile 16 (closed door)
+# tile 16 (ï¬Ç∂ÇΩî‡)
 {
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
@@ -350,7 +350,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
 }
-# tile 17 (iron bars)
+# tile 17 (ìSñ_)
 {
   ................
   ................
@@ -369,7 +369,7 @@ Z = (195, 195, 195)
   .BP.BP.BP.PP.PP.
   ................
 }
-# tile 18 (tree)
+# tile 18 (ñÿ)
 {
   ................
   .....FFFFFF.....
@@ -388,7 +388,7 @@ Z = (195, 195, 195)
   ...JJJJ.J.JJJA..
   ................
 }
-# tile 19 (floor of a room)
+# tile 19 (ïîâÆÇÃè∞)
 {
   ................
   ................
@@ -407,7 +407,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 20 (dark part of a room)
+# tile 20 (ïîâÆÇÃà√Ç¢ïîï™)
 {
   .A.A.A.A.A.A.A.A
   A.A.A.A.A.A.A.A.
@@ -426,7 +426,7 @@ Z = (195, 195, 195)
   .A.A.A.A.A.A.A.A
   A.A.A.A.A.A.A.A.
 }
-# tile 21 (corridor)
+# tile 21 (í òH)
 {
   ................
   ................
@@ -445,7 +445,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 22 (lit corridor)
+# tile 22 (ñæÇÈÇ¢í òH)
 {
   ................
   ................
@@ -464,7 +464,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 23 (staircase up)
+# tile 23 (è„ÇËäKíi)
 {
   AAAAAAAAAAAAAA.A
   AADJJJJJJJJJDA.A
@@ -483,7 +483,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAA.A
   AAAAAAAAAAAAAAAA
 }
-# tile 24 (staircase down)
+# tile 24 (â∫ÇËäKíi)
 {
   AAAAAAAAAAAAAA.A
   AADJJJJJJJJJDA.A
@@ -502,7 +502,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAA.A
   AAAAAAAAAAAAAAAA
 }
-# tile 25 (ladder up)
+# tile 25 (è„ÇËÇÕÇµÇ≤)
 {
   ADAAAAAAAAAAAD.A
   AADAAAANAAAADA.A
@@ -521,7 +521,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAA.A
   AAAAAAAAAAAAAAAA
 }
-# tile 26 (ladder down)
+# tile 26 (â∫ÇËÇÕÇµÇ≤)
 {
   ADAAAAAAAAAAAD.A
   AADAAAANAAAADA.A
@@ -540,7 +540,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAA.A
   AAAAAAAAAAAAAAAA
 }
-# tile 27 (altar)
+# tile 27 (ç’íd)
 {
   ................
   ................
@@ -559,7 +559,7 @@ Z = (195, 195, 195)
   ...AAAAAAAAAAA..
   ................
 }
-# tile 28 (grave)
+# tile 28 (ïÊ)
 {
   ................
   ................
@@ -578,7 +578,7 @@ Z = (195, 195, 195)
   FFFFFFFFFFFFFFF.
   ................
 }
-# tile 29 (opulent throne)
+# tile 29 (âÿÇ‚Ç©Ç»ã ç¿)
 {
   ................
   .....HHHHH......
@@ -597,7 +597,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 30 (sink)
+# tile 30 (ó¨Çµë‰)
 {
   ................
   ................
@@ -616,7 +616,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 31 (fountain)
+# tile 31 (êÚ)
 {
   ....E....E......
   ..EEEE..EEE.....
@@ -635,7 +635,7 @@ Z = (195, 195, 195)
   ....AAAAAAAAA...
   ................
 }
-# tile 32 (water)
+# tile 32 (êÖÇÃÇΩÇ‹Ç¡ÇΩèÍèä)
 {
   ..........NNN...
   .EEEE....NE.EN..
@@ -654,7 +654,7 @@ Z = (195, 195, 195)
   .E..EE...E..EEE.
   EE....EEE.....EE
 }
-# tile 33 (ice)
+# tile 33 (ïX)
 {
   NNNNNNNNNNNNNNNN
   NNNNNNNNNNNNNNNN
@@ -673,7 +673,7 @@ Z = (195, 195, 195)
   NNNNNNNNNNNNNNNN
   NNNNNNNNNNNNNNNN
 }
-# tile 34 (molten lava)
+# tile 34 (ónä‚)
 {
   DDDDDDCDDDDDDDDD
   DDDDDCDKDDDDDDDD
@@ -692,7 +692,7 @@ Z = (195, 195, 195)
   DDDDKKDDDDCDDDDD
   DDDDDDDDDDDKDDDD
 }
-# tile 35 (lowered drawbridge)
+# tile 35 (ç~ÇËÇƒÇ¢ÇÈíµÇÀã¥)
 {
   EKKAKKKKKKKAKKAE
   EJKKKKKKKKKKKJAA
@@ -711,7 +711,7 @@ Z = (195, 195, 195)
   EEJJJJJJJJJJJAAA
   EJKKKKKKKKKKKJAA
 }
-# tile 36 (lowered drawbridge)
+# tile 36 (ç~ÇËÇƒÇ¢ÇÈíµÇÀã¥)
 {
   EEEEEEEEEEEEEEEE
   JEJKJEJKJEJKJEJK
@@ -730,7 +730,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAAAA
   AAAEAAAEAAAEAAAE
 }
-# tile 37 (raised drawbridge)
+# tile 37 (è„Ç¡ÇƒÇ¢ÇÈíµÇÀã¥)
 {
   ................
   ..JKJ.JKJ.JKJ...
@@ -749,7 +749,7 @@ Z = (195, 195, 195)
   ...AAA.AAA.AAA..
   ................
 }
-# tile 38 (raised drawbridge)
+# tile 38 (è„Ç¡ÇƒÇ¢ÇÈíµÇÀã¥)
 {
   ................
   ..JJJJJJJJJJJ...
@@ -768,7 +768,7 @@ Z = (195, 195, 195)
   ...AAAAAAAAAAA..
   ................
 }
-# tile 39 (air)
+# tile 39 (ãÛãCÇÃÇΩÇ‹Ç¡ÇΩèÍèä)
 {
   BBBBBBBBBBBBBBBB
   BBBBBBBBBBBBBBBB
@@ -787,7 +787,7 @@ Z = (195, 195, 195)
   BBBBBBBBBBBBBBBB
   BBBBBBBBBBBBBBBB
 }
-# tile 40 (cloud)
+# tile 40 (â_)
 {
   BBBBBBBBBBBBBBBB
   BBBBBNNNNNNNBBBB
@@ -806,7 +806,7 @@ Z = (195, 195, 195)
   BBBBBBOOOOBBBBBB
   BBBBBBBBBBBBBBBB
 }
-# tile 41 (water)
+# tile 41 (êÖ)
 {
   EEEEEEEEEEEEEEEE
   EEEEEEEEEEEEEEEE
@@ -825,7 +825,7 @@ Z = (195, 195, 195)
   EEEEEEEEEEEEEEEE
   EEEEEEEEEEEEEEEE
 }
-# tile 42 (arrow trap)
+# tile 42 (ñÓÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -844,7 +844,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 43 (dart trap)
+# tile 43 (ìäÇ∞ñÓÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -863,7 +863,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 44 (falling rock trap)
+# tile 44 (óéêŒÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -882,7 +882,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 45 (squeaky board)
+# tile 45 (Ç´ÇµÇﬁî¬)
 {
   ................
   .....DDDDD......
@@ -901,7 +901,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 46 (bear trap)
+# tile 46 (åFÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -920,7 +920,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 47 (land mine)
+# tile 47 (ínóã)
 {
   ................
   .....DDDDD......
@@ -939,7 +939,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 48 (rolling boulder trap)
+# tile 48 (ãêä‚ÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -958,7 +958,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 49 (sleeping gas trap)
+# tile 49 (êáñ∞ÉKÉXÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -977,7 +977,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 50 (rust trap)
+# tile 50 (ïÖêHÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -996,7 +996,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 51 (fire trap)
+# tile 51 (âŒÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -1015,7 +1015,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 52 (pit)
+# tile 52 (óéÇµåä)
 {
   AAAAAAAAAAAAAAAA
   A.AAAAAAAAAAAABA
@@ -1034,7 +1034,7 @@ Z = (195, 195, 195)
   A.PPPPPPPPPPPPPA
   AAAAAAAAAAAAAAAA
 }
-# tile 53 (spiked pit)
+# tile 53 (ÉgÉQÇæÇÁÇØÇÃóéÇµåä)
 {
   AAAAAAAAAAAAAAAA
   A.AAAAAAAAAAAABA
@@ -1053,7 +1053,7 @@ Z = (195, 195, 195)
   A.PPPPPPPPPPPPPA
   AAAAAAAAAAAAAAAA
 }
-# tile 54 (hole)
+# tile 54 (åä)
 {
   ................
   ......AAAA......
@@ -1072,7 +1072,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 55 (trap door)
+# tile 55 (óéÇµî‡)
 {
   AAAAAAAAAAAAAAAA
   A.AAAAAAAAAAAABA
@@ -1091,7 +1091,7 @@ Z = (195, 195, 195)
   A.PPPPPPPPPPPPPA
   AAAAAAAAAAAAAAAA
 }
-# tile 56 (teleportation trap)
+# tile 56 (èuä‘à⁄ìÆÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -1110,7 +1110,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 57 (level teleporter)
+# tile 57 (ï ÇÃäKÇ÷ÇÃèuä‘à⁄ìÆÇÃ„©)
 {
   ................
   .....DDADD......
@@ -1129,7 +1129,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 58 (magic portal)
+# tile 58 (ñÇñ@ÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -1148,7 +1148,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 59 (web)
+# tile 59 (Ç≠Ç‡ÇÃëÉ)
 {
   OAOA.OA...O....O
   .O.NNNN.NOA..OOA
@@ -1167,7 +1167,7 @@ Z = (195, 195, 195)
   .OA.............
   OA..............
 }
-# tile 60 (statue trap)
+# tile 60 (í§ëúÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -1186,7 +1186,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 61 (magic trap)
+# tile 61 (ñÇñ@ÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -1205,7 +1205,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 62 (anti-magic field)
+# tile 62 (îΩñÇñ@ãÛä‘ÇÃ„©)
 {
   ................
   ......DDDDD.....
@@ -1224,7 +1224,7 @@ Z = (195, 195, 195)
   .....AAAAA......
   ................
 }
-# tile 63 (polymorph trap)
+# tile 63 (ïœâªÇÃ„©)
 {
   ................
   .....DDDDD......
@@ -1243,7 +1243,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 64 (vibrating square)
+# tile 64 (êUìÆÇµÇƒÇ¢ÇÈèÍèä)
 {
   ................
   ................
@@ -1262,7 +1262,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 65 (wall)
+# tile 65 (ï«)
 {
   .......NN.......
   ......NN........
@@ -1281,7 +1281,7 @@ Z = (195, 195, 195)
   .........NN.....
   ........NN......
 }
-# tile 66 (wall)
+# tile 66 (ï«)
 {
   ................
   ................
@@ -1300,7 +1300,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 67 (wall)
+# tile 67 (ï«)
 {
   NNNNN...........
   ....N...........
@@ -1319,7 +1319,7 @@ Z = (195, 195, 195)
   ............N...
   ............NNNN
 }
-# tile 68 (wall)
+# tile 68 (ï«)
 {
   ............NNNN
   ............N...
@@ -1490,7 +1490,7 @@ Z = (195, 195, 195)
   .....NNNNN......
   ................
 }
-# tile 77 (poison cloud)
+# tile 77 (ì≈â_)
 {
   BBBBBBBBBBBBBBBB
   BBBBBFFFFFFFBBBB
@@ -1509,7 +1509,7 @@ Z = (195, 195, 195)
   BBBBBBGGGGBBBBBB
   BBBBBBBBBBBBBBBB
 }
-# tile 78 (valid position)
+# tile 78 (óLå¯Ç»à íu)
 {
   ................
   ................
