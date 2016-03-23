@@ -8,6 +8,6 @@
 /* JNetHack may be freely redistributed.  See license for details. */
 
 #define JVERSION_MAJOR	0
-#define JVERSION_MINOR	3
+#define JVERSION_MINOR	4
 #define JPATCHLEVEL	0
 #define JEDITLEVEL	0
