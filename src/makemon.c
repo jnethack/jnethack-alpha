@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 
 #include <ctype.h>
@@ -2118,7 +2123,10 @@ int *seencount;  /* secondary output */
         impossible("bad bag o' tricks");
     } else if (bag->spe < 1) {
         /* if tipping known empty bag, give normal empty container message */
+/*JP
         pline1((tipping && bag->cknown) ? "It's empty." : nothing_happens);
+*/
+        pline1((tipping && bag->cknown) ? "ÇªÇÍÇÕãÛÇæÅD" : nothing_happens);
         /* now known to be empty if sufficiently discovered */
         if (bag->dknown && objects[bag->otyp].oc_name_known)
             bag->cknown = 1;
@@ -2144,7 +2152,10 @@ int *seencount;  /* secondary output */
             if (bag->dknown)
                 makeknown(BAG_OF_TRICKS);
         } else if (!tipping) {
+/*JP
             pline1(!moncount ? nothing_happens : "Nothing seems to happen.");
+*/
+            pline1(!moncount ? nothing_happens : "âΩÇ‡ãNÇ´Ç»Ç©Ç¡ÇΩÇÊÇ§ÇæÅD");
         }
     }
     return moncount;

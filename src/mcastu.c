@@ -759,20 +759,34 @@ int spellnum;
         fmt = 0;
         if (!seecaster) {
             char *arg; /* [not const: upstart(N==1 ? an() : makeplural())] */
+/*JP
             const char *what = (let == S_SNAKE) ? "snake" : "insect";
+*/
+            const char *what = (let == S_SNAKE) ? "ヘビ" : "虫";
 
             if (newseen <= oldseen || Unaware) {
                 /* unseen caster fails or summons unseen critters,
                    or unconscious hero ("You dream that you hear...") */
+/*JP
                 You_hear("someone summoning %s.", makeplural(what));
+*/
+                You_hear("誰かが%sを召喚しているのを聞いた．", what);
             } else {
                 /* unseen caster summoned seen critter(s) */
                 arg = (newseen == oldseen + 1) ? an(what) : makeplural(what);
                 if (!Deaf)
+#if 0 /*JP*/
                     You_hear("someone summoning something, and %s %s.", arg,
                              vtense(arg, "appear"));
+#else
+                    You_hear("誰かが何かを召喚するのを聞いた，そして%sが現れた．",
+                             arg);
+#endif
                 else
+/*JP
                     pline("%s %s.", upstart(arg), vtense(arg, "appear"));
+*/
+                    pline("%sが現れた．", arg);
             }
 
             /* seen caster, possibly producing unseen--or just one--critters;

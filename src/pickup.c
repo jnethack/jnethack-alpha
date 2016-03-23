@@ -75,15 +75,15 @@ static NEARDATA struct obj *current_container;
 /*JP
 static const char moderateloadmsg[] = "You have a little trouble lifting";
 */
-static const char moderateloadmsg[] = "を持ったら少しふらついた．";
+static const char moderateloadmsg[] = "を持ったら少しふらついた";
 /*JP
 static const char nearloadmsg[] = "You have much trouble lifting";
 */
-static const char nearloadmsg[] = "はずっしりと肩にのしかかった．";
+static const char nearloadmsg[] = "はずっしりと肩にのしかかった";
 /*JP
 static const char overloadmsg[] = "You have extreme difficulty lifting";
 */
-static const char overloadmsg[] = "を持ちあげるのはとてもつらい．";
+static const char overloadmsg[] = "を持ちあげるのはとてもつらい";
 
 /* BUG: this lets you look at cockatrice corpses while blind without
    touching them */
@@ -945,8 +945,13 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
 
         any = zeroany;
         if (sorted && n > 1) {
+#if 0 /*JP*/
             Sprintf(buf, "%s Creatures",
                     is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
+#else
+            Sprintf(buf, "%s込まれている怪物",
+                    is_animal(u.ustuck->data) ? "飲み" : "巻き");
+#endif
             add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
                      MENU_UNSELECTED);
         }
@@ -1183,7 +1188,7 @@ int how;               /* type of query */
 /*JP
                  "Items of unknown B/C/U status", MENU_UNSELECTED);
 */
-                        "祝福／呪いがわからないもの", MENU_UNSELECTED);
+                 "祝福／呪いがわからないもの", MENU_UNSELECTED);
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
@@ -1360,7 +1365,7 @@ int *wt_before, *wt_after;
                 (qq == 1L) ? "one" : "some", obj_nambuf, where);
 #else
             You("%s%sのうちの%sしか%s．",
-                where, obj_nambuf, (qq == 1L) ? "１つ" : "いくつか", verb);
+                where, obj_nambuf, (qq == 1L) ? "一つ" : "いくつか", verb);
 #endif
         *wt_after = wt;
         return qq;
@@ -1465,19 +1470,41 @@ boolean telekinesis;
                 result = 0; /* don't lift */
             } else {
                 char qbuf[BUFSZ];
+#if 1 /*JP*/
+                char qsfx[BUFSZ];
+#endif
                 long savequan = obj->quan;
 
                 obj->quan = *cnt_p;
+#if 0 /*JP*/
                 Strcpy(qbuf, (next_encumbr > HVY_ENCUMBER)
                                  ? overloadmsg
                                  : (next_encumbr > MOD_ENCUMBER)
                                        ? nearloadmsg
                                        : moderateloadmsg);
+#else
+                /*JP:アイテム名の後ろに付けたいがsafe_qbufのqsuffixは
+                     qbufと共用できないので別にqsfxを用意してそちらを使う*/
+                Strcpy(qsfx, (next_encumbr > HVY_ENCUMBER)
+                                 ? overloadmsg
+                                 : (next_encumbr > MOD_ENCUMBER)
+                                       ? nearloadmsg
+                                       : moderateloadmsg);
+                Strcat(qsfx, "．続けますか？");
+#endif
+
+#if 0 /*JP*//*日本語ではどちらも「持つ」で済ませる*/
                 if (container)
                     (void) strsubst(qbuf, "lifting", "removing");
+#endif
+#if 0 /*JP*/
                 Strcat(qbuf, " ");
                 (void) safe_qbuf(qbuf, qbuf, ".  Continue?", obj, doname,
                                  ansimpleoname, something);
+#else /*JP:前には何も付けず後ろにqsfxを付ける*/
+                (void) safe_qbuf(qbuf, "", qsfx, obj, doname,
+                                 ansimpleoname, "これ");
+#endif
                 obj->quan = savequan;
                 switch (ynq(qbuf)) {
                 case 'q':
@@ -1817,7 +1844,7 @@ doloot()
     int timepassed = 0;
     coord cc;
     boolean underfoot = TRUE;
-#if 0 /*JP*/
+#if 0 /*JP*//*not used*/
     const char *dont_find_anything = "don't find anything";
 #endif
     struct monst *mtmp;
@@ -1842,7 +1869,10 @@ doloot()
         if (rn2(6) && reverse_loot())
             return 1;
         if (rn2(2)) {
+/*JP
             pline("Being confused, you find nothing to loot.");
+*/
+            pline("混乱しているので，開けるものを見つけられない．");
             return 1; /* costs a turn */
         }             /* else fallthrough to normal looting */
     }
@@ -2029,7 +2059,10 @@ reverse_loot()
          */
         for (n = inv_cnt(TRUE), otmp = invent; otmp; --n, otmp = otmp->nobj)
             if (!rn2(n + 1)) {
+/*JP
                 prinv("You find old loot:", otmp, 0L);
+*/
+                prinv("以前開けたもの:", otmp, 0L);
                 return TRUE;
             }
         return FALSE;
@@ -2094,7 +2127,10 @@ reverse_loot()
             if (!rn2(10))
                 levl[x][y].looted = T_LOOTED;
         } else {
+/*JP
             You("drop %s.", doname(goldob));
+*/
+            You("%sを落した．", doname(goldob));
             dropx(goldob);
         }
     }
@@ -2718,12 +2754,23 @@ int held;
     for (;;) { /* repeats if '?' or ":' gets chosen */
         outmaybe = (outokay || !current_container->cknown);
         if (!outmaybe)
+#if 0 /*JP*/
             (void) safe_qbuf(qbuf, (char *) 0, " is empty.  Do what with it?",
                              current_container, Yname2, Ysimple_name2,
                              "This");
+#else
+            (void) safe_qbuf(qbuf, (char *) 0, "は空だ．どうする？",
+                             current_container, Yname2, Ysimple_name2,
+                             "これ");
+#endif
         else
+#if 0 /*JP*/
             (void) safe_qbuf(qbuf, "Do what with ", "?", current_container,
                              yname, ysimple_name, "it");
+#else
+            (void) safe_qbuf(qbuf, (char *) 0, "をどうする？", current_container,
+                             yname, ysimple_name, "これ");
+#endif
         /* ask player about what to do with this container */
         if (flags.menu_style == MENU_FULL) {
             if (!inokay && !outmaybe) {
@@ -2786,8 +2833,12 @@ int held;
 
     if ((loot_in || stash_one)
         && (!invent || (invent == current_container && !invent->nobj))) {
+#if 0 /*JP*/
         You("don't have anything%s to %s.", invent ? " else" : "",
             stash_one ? "stash" : "put in");
+#else
+        You("%s入れるものがない．", invent ? "他に" : "");
+#endif
         loot_in = stash_one = FALSE;
     }
 
@@ -2866,12 +2917,18 @@ boolean put_in;
     int used = 0, menu_on_request = 0;
 
     if (put_in) {
+/*JP
         action = "put in";
+*/
+        action = "入れる";
         objlist = &invent;
         actionfunc = in_container;
         checkfunc = ck_bag;
     } else {
+/*JP
         action = "take out";
+*/
+        action = "取り出す";
         objlist = &(current_container->cobj);
         actionfunc = out_container;
         checkfunc = (int FDECL((*), (OBJ_P))) 0;
@@ -2897,7 +2954,10 @@ boolean put_in;
     int n, i, n_looted = 0;
     boolean all_categories = TRUE, loot_everything = FALSE;
     char buf[BUFSZ];
+/*JP
     const char *action = put_in ? "Put in" : "Take out";
+*/
+    const char *action = put_in ? "入れる" : "取り出す";
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     int mflags, res;
@@ -2907,7 +2967,10 @@ boolean put_in;
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
+/*JP
         Sprintf(buf, "%s what type of objects?", action);
+*/
+        Sprintf(buf, "どの種類のものを%s？", action);
         mflags = put_in
                      ? ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN
                      : ALL_TYPES | CHOOSE_ALL | BUC_ALLBKNOWN | BUC_UNKNOWN;
@@ -2940,7 +3003,10 @@ boolean put_in;
             mflags |= USE_INVLET;
         if (!put_in)
             current_container->cknown = 1;
+/*JP
         Sprintf(buf, "%s what?", action);
+*/
+        Sprintf(buf, "何を%s？", action);
         n = query_objlist(buf, put_in ? invent : current_container->cobj,
                           mflags, &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
@@ -2992,40 +3058,63 @@ boolean outokay, inokay, alreadyused;
     start_menu(win);
 
     any.a_int = 1; /* ':' */
+/*JP
     Sprintf(buf, "Look inside %s", thesimpleoname(obj));
+*/
+    Sprintf(buf, "%sの中身を見る", thesimpleoname(obj));
     add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE, buf,
              MENU_UNSELECTED);
     if (outokay) {
         any.a_int = 2; /* 'o' */
+/*JP
         Sprintf(buf, "take %s out", something);
+*/
+        Strcpy(buf, "何かを取り出す");
         add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
     if (inokay) {
         any.a_int = 3; /* 'i' */
+/*JP
         Sprintf(buf, "put %s in", something);
+*/
+        Strcpy(buf, "何かを入れる");
         add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
     if (outokay) {
         any.a_int = 4; /* 'b' */
+/*JP
         Sprintf(buf, "%stake out, then put in", inokay ? "both; " : "");
+*/
+        Sprintf(buf, "%sまず取り出す，それから入れる", inokay ? "両方; " : "");
         add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
     if (inokay) {
         any.a_int = 5; /* 'r' */
+#if 0 /*JP*/
         Sprintf(buf, "%sput in, then take out",
                 outokay ? "both reversed; " : "");
+#else
+        Sprintf(buf, "%sまず入れる，それから取り出す",
+                outokay ? "両方を逆順で; " : "");
+#endif
         add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
         any.a_int = 6; /* 's' */
+/*JP
         Sprintf(buf, "stash one item into %s", thesimpleoname(obj));
+*/
+        Sprintf(buf, "ものを一つだけ%sに入れる", thesimpleoname(obj));
         add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
     any.a_int = 7; /* 'q' */
+/*JP
     Strcpy(buf, alreadyused ? "done" : "do nothing");
+*/
+    Strcpy(buf, alreadyused ? "終わる" : "何もしない");
     add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE, buf,
              MENU_SELECTED);
 
@@ -3062,8 +3151,12 @@ dotip()
 
     /* check floor container(s) first; at most one will be accessed */
     if ((boxes = container_at(cc.x, cc.y, TRUE)) > 0) {
+#if 0 /*JP*/
         Sprintf(buf, "You can't tip %s while carrying so much.",
                 !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
+#else
+        Strcpy(buf, "たくさんものを持ちすぎているのでひっくりかえせない．");
+#endif
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
             if (boxes > 1 && (flags.menu_style != MENU_TRADITIONAL
                               || iflags.menu_requested)) {
@@ -3124,9 +3217,15 @@ dotip()
                     nobj = cobj->nexthere;
                     if (!Is_container(cobj))
                         continue;
+#if 0 /*JP*/
                     c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?",
                                       cobj,
                                       doname, ansimpleoname, "container"));
+#else
+                    c = ynq(safe_qbuf(qbuf, "ここには", " がある，ひっくり返す?",
+                                      cobj,
+                                      doname, ansimpleoname, "入れ物"));
+#endif
                     if (c == 'q')
                         return 0;
                     if (c == 'n')
@@ -3152,30 +3251,57 @@ dotip()
     /* assorted other cases */
     if (Is_candle(cobj) && cobj->lamplit) {
         /* note "wax" even for tallow candles to avoid giving away info */
+/*JP
         spillage = "wax";
+*/
+        spillage = "ろう";
     } else if ((cobj->otyp == POT_OIL && cobj->lamplit)
                || (cobj->otyp == OIL_LAMP && cobj->age != 0L)
                || (cobj->otyp == MAGIC_LAMP && cobj->spe != 0)) {
+/*JP
         spillage = "oil";
+*/
+        spillage = "油";
         /* todo: reduce potion's remaining burn timer or oil lamp's fuel */
     } else if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
         /* charged consumed below */
+/*JP
         spillage = "grease";
+*/
+        spillage = "脂";
     } else if (cobj->otyp == FOOD_RATION || cobj->otyp == CRAM_RATION
                || cobj->otyp == LEMBAS_WAFER) {
+/*JP
         spillage = "crumbs";
+*/
+        spillage = "パンくず";
     } else if (cobj->oclass == VENOM_CLASS) {
+/*JP
         spillage = "venom";
+*/
+        spillage = "毒液";
     }
     if (spillage) {
         buf[0] = '\0';
         if (is_pool(u.ux, u.uy))
+/*JP
             Sprintf(buf, " and gradually %s", vtense(spillage, "dissipate"));
+*/
+            Strcpy(buf, "そして徐々に散っていった．");
         else if (is_lava(u.ux, u.uy))
+#if 0 /*JP*/
             Sprintf(buf, " and immediately %s away",
                     vtense(spillage, "burn"));
+#else
+            Strcpy(buf, "そしてすぐに燃えつきた．");
+#endif
+#if 0 /*JP*/
         pline("Some %s %s onto the %s%s.", spillage,
               vtense(spillage, "spill"), surface(u.ux, u.uy), buf);
+#else
+        pline("%sが%sの上に飛び散った．%s", spillage,
+              surface(u.ux, u.uy), buf);
+#endif
         /* shop usage message comes after the spill message */
         if (cobj->otyp == CAN_OF_GREASE && cobj->spe > 0) {
             consume_obj_charge(cobj, TRUE);
@@ -3185,7 +3311,10 @@ dotip()
     }
     /* anything not covered yet */
     if (cobj->oclass == POTION_CLASS) /* can't pour potions... */
+/*JP
         pline_The("%s %s securely sealed.", xname(cobj), otense(cobj, "are"));
+*/
+        pline_The("%sはしっかりと栓がされている．", xname(cobj));
     else if (cobj->otyp == STATUE)
 /*JP
         pline("Nothing interesting happens.");
@@ -3221,7 +3350,10 @@ struct obj *box; /* or bag */
        non-standard "container" horn of plenty */
     box->lknown = 1;
     if (box->olocked) {
+/*JP
         pline("It's locked.");
+*/
+        pline("鍵が掛かっている．");
     } else if (box->otrapped) {
         /* we're not reaching inside but we're still handling it... */
         (void) chest_trap(box, HAND, FALSE);
@@ -3247,9 +3379,15 @@ struct obj *box; /* or bag */
 
         if (box->spe < old_spe) {
             if (bag)
+#if 0 /*JP*/
                 pline((seen == 0) ? "Nothing seems to happen."
                                   : (seen == 1) ? "A monster appears."
                                                 : "Monsters appear!");
+#else
+                pline((seen == 0) ? "何も起きなかったようだ．"
+                                  : (seen == 1) ? "怪物が現れた．"
+                                                : "怪物が現れた！");
+#endif
             /* check_unpaid wants to see a non-zero charge count */
             box->spe = old_spe;
             check_unpaid_usage(box, TRUE);
@@ -3264,13 +3402,19 @@ struct obj *box; /* or bag */
         observe_quantum_cat(box);
         if (!Has_contents(box)) /* evidently a live cat came out */
             /* container type of "large box" is inferred */
+/*JP
             pline("%sbox is now empty.", Shk_Your(yourbuf, box));
+*/
+            pline("%s箱は空になった．", Shk_Your(yourbuf, box));
         else /* holds cat corpse or other random stuff */
             empty_it = TRUE;
         box->cknown = 1;
     } else if (!Has_contents(box)) {
         box->cknown = 1;
+/*JP
         pline("It's empty.");
+*/
+        pline("これは空だ．");
     } else {
         empty_it = TRUE;
     }
@@ -3286,9 +3430,14 @@ struct obj *box; /* or bag */
         if (u.uswallow)
             highdrop = altarizing = FALSE;
         box->cknown = 1;
+#if 0 /*JP*/
         pline("%s out%c",
               box->cobj->nobj ? "Objects spill" : "An object spills",
               !(highdrop || altarizing) ? ':' : '.');
+#else
+        pline("中身が出てきた%s",
+              !(highdrop || altarizing) ? "：" : "．");
+#endif
         for (otmp = box->cobj; otmp; otmp = nobj) {
             nobj = otmp->nobj;
             obj_extract_self(otmp);
@@ -3311,17 +3460,28 @@ struct obj *box; /* or bag */
                 if (altarizing)
                     doaltarobj(otmp);
                 else if (verbose)
+#if 0 /*JP*/
                     pline("%s %s to the %s.", Doname2(otmp),
                           otense(otmp, "drop"), surface(ox, oy));
+#else
+                    pline("%sは%sの上に落ちた．", Doname2(otmp),
+                          surface(ox, oy));
+#endif
                 else
+/*JP
                     pline("%s%c", doname(otmp), nobj ? ',' : '.');
+*/
+                    pline("%s%s", doname(otmp), nobj ? "，" : "．");
                 dropy(otmp);
             }
             if (maybeshopgoods)
                 iflags.suppress_price--; /* reset */
         }
         if (loss) /* magic bag lost some shop goods */
+/*JP
             You("owe %ld %s for lost merchandise.", loss, currency(loss));
+*/
+            You("失ったものに対して%ld%sの負債を負った．", loss, currency(loss));
         box->owt = weight(box); /* mbag_item_gone() doesn't update this */
         if (held)
             (void) encumber_msg();

@@ -355,8 +355,13 @@ struct obj *pick;
         You("%sをつかむことができない！手がないんだもの！", xname(pick));
         return PICKLOCK_DID_NOTHING;
     } else if (u.uswallow) {
+#if 0 /*JP*/
         You_cant("%sunlock %s.", (picktyp == CREDIT_CARD) ? "" : "lock or ",
                  mon_nam(u.ustuck));
+#else
+        You_cant("%sを%sない．", mon_nam(u.ustuck),
+                 (picktyp == CREDIT_CARD) ? "開けられ" : "開け閉めでき");
+#endif
         return PICKLOCK_DID_NOTHING;
     }
 
@@ -626,7 +631,10 @@ doforce()
     char qbuf[QBUFSZ];
 
     if (u.uswallow) {
+/*JP
         You_cant("force anything from inside here.");
+*/
+        You_cant("内側からこじ開けることはできない．");
         return 0;
     }
     if (!uwep /* proper type test */

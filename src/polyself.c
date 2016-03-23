@@ -133,9 +133,16 @@ boolean on;
            vulnerable form into another causes the counter to be reset */
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION
             && can_be_strangled(&youmonst)) {
+#if 0 /*JP*/
             Your("%s %s your %s!", simpleonames(uamul),
                  Strangled ? "still constricts" : "begins constricting",
                  body_part(NECK)); /* "throat" */
+#else
+            Your("%s%s%s‚ði‚ß%sI", simpleonames(uamul),
+                 Strangled ? "‚Í‚Ü‚¾" : "‚ª",
+                 body_part(NECK),
+                 Strangled ? "‚Ä‚¢‚é" : "‚Í‚¶‚ß‚½");
+#endif
             Strangled = 6L;
             makeknown(AMULET_OF_STRANGULATION);
         }
@@ -144,7 +151,10 @@ boolean on;
     } else {
         if (Strangled && !can_be_strangled(&youmonst)) {
             Strangled = 0L;
+/*JP
             You("are no longer being strangled.");
+*/
+            You("‚à‚Í‚â’‚‘§‚µ‚Ä‚¢‚È‚¢D");
         }
     }
 }
@@ -407,7 +417,10 @@ int psflags;
             controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
     if (Unchanging) {
+/*JP
         pline("You fail to transform!");
+*/
+        pline("‚ ‚È‚½‚Í•Ï‰»‚ÉŽ¸”s‚µ‚½I");
         return;
     }
     /* being Stunned|Unaware doesn't negate this aspect of Poly_control */
@@ -498,7 +511,10 @@ int psflags;
                     pm_name = the(pm_name);
                 else if (!type_is_pname(&mons[mntmp]))
                     pm_name = an(pm_name);
+/*JP
                 You_cant("polymorph into %s.", pm_name);
+*/
+                You_cant("%s‚É•Ï‰»‚Å‚«‚È‚¢D", pm_name);
             } else
                 break;
         } while (--tryct > 0);
@@ -530,13 +546,20 @@ int psflags;
                     /* similar to noarmor(invent.c),
                        shorten to "<color> scale mail" */
                     dsmail = strcpy(buf, simpleonames(uarm));
+#if 0 /*JP*/
                     if ((p = strstri(dsmail, " dragon ")) != 0)
                         while ((p[1] = p[8]) != '\0')
                             ++p;
+#endif
                     /* tricky phrasing; dragon scale mail
                        is singular, dragon scales are plural */
+#if 0 /*JP*/
                     Your("%s reverts to scales as you merge with them.",
                          dsmail);
+#else
+                    Your("%s‚Í—Ø‚É–ß‚Á‚½D",
+                         dsmail);
+#endif
                     /* uarm->spe enchantment remains unchanged;
                        re-converting scales to mail poses risk
                        of evaporation due to over enchanting */
@@ -563,7 +586,10 @@ int psflags;
                             ? PM_WOLF
                             : !rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
             if (controllable_poly) {
+/*JP
                 Sprintf(buf, "Become %s?", an(mons[mntmp].mname));
+*/
+                Sprintf(buf, "%s‚É‚È‚éH", mons[mntmp].mname);
                 if (yn(buf) != 'y')
                     return;
             }
@@ -805,9 +831,17 @@ int mntmp;
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
             char buf[BUFSZ];
 
+#if 0 /*JP*/
             pline("%s touch %s.", no_longer_petrify_resistant,
                   mon_nam(u.usteed));
+#else
+            pline("%s‚Í%s‚ÉG‚ê‚½D", no_longer_petrify_resistant,
+                  mon_nam(u.usteed));
+#endif
+/*JP
             Sprintf(buf, "riding %s", an(u.usteed->data->mname));
+*/
+            Sprintf(buf, "%s‚Éæ‚Á‚Ä", u.usteed->data->mname);
             instapetrify(buf);
         }
         if (!can_ride(u.usteed))
@@ -1161,22 +1195,35 @@ int alone;
             candropwep = canletgo(uwep, "");
             candropswapwep = !u.twoweap || canletgo(uswapwep, "");
             if (alone) {
+#if 0 /*JP*/
                 what = (candropwep && candropswapwep) ? "drop" : "release";
+#endif
+/*JP
                 which = is_sword(uwep) ? "sword" : weapon_descr(uwep);
+*/
+                which = is_sword(uwep) ? "Œ•" : weapon_descr(uwep);
                 if (u.twoweap) {
                     whichtoo =
+/*JP
                         is_sword(uswapwep) ? "sword" : weapon_descr(uswapwep);
+*/
+                        is_sword(uswapwep) ? "Œ•" : weapon_descr(uswapwep);
                     if (strcmp(which, whichtoo))
+/*JP
                         which = "weapon";
+*/
+                        which = "•Ší";
                 }
+#if 0 /*JP*//*•¡”Œ`‚É‚µ‚È‚¢*/
                 if (uwep->quan != 1L || u.twoweap)
                     which = makeplural(which);
+#endif
 
 #if 0 /*JP*/
                 You("find you must %s %s %s!", what,
                     the_your[!!strncmp(which, "corpse", 6)], which);
 #else
-                You("%s‚ð—Ž‚Æ‚µ‚½‚±‚Æ‚É‹C‚Ã‚¢‚½I", what);
+                You("%s‚ð—Ž‚Æ‚µ‚½‚±‚Æ‚É‹C‚Ã‚¢‚½I", which);
 #endif
             }
             if (u.twoweap) {
@@ -1726,12 +1773,21 @@ dohide()
     /* can't hide while being held (or holding) or while trapped
        (except for floor hiders [trapper or mimic] in pits) */
     if (u.ustuck || (u.utrap && (u.utraptype != TT_PIT || on_ceiling))) {
+#if 0 /*JP*/
         You_cant("hide while you're %s.",
                  !u.ustuck ? "trapped" : !sticks(youmonst.data)
                                              ? "being held"
                                              : humanoid(u.ustuck->data)
                                                    ? "holding someone"
                                                    : "holding that creature");
+#else
+        You_cant("%sŠÔ‚Í‰B‚ê‚ç‚ê‚È‚¢D",
+                 !u.ustuck ? "•ß‚Ü‚Á‚Ä‚¢‚é" : !sticks(youmonst.data)
+                                             ? "•ß‚Ü‚¦‚ç‚ê‚Ä‚¢‚é"
+                                             : humanoid(u.ustuck->data)
+                                                   ? "’N‚©‚ð‚Â‚©‚ñ‚Å‚¢‚é"
+                                                   : "‰ö•¨‚ð‚Â‚©‚ñ‚Å‚¢‚é");
+#endif
         if (u.uundetected
             || (ismimic && youmonst.m_ap_type != M_AP_NOTHING)) {
             u.uundetected = 0;
@@ -1744,26 +1800,41 @@ dohide()
        such critters aren't offered the option of hiding via #monster */
     if (youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy)) {
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ))
+/*JP
             The("fountain is not deep enough to hide in.");
+*/
+            The("ò‚Í‰B‚ê‚ç‚ê‚é‚Ù‚Ç[‚­‚È‚¢D");
         else
+/*JP
             There("is no water to hide in here.");
+*/
+            There("‚±‚±‚É‚Í‰B‚ê‚é‚½‚ß‚Ì…‚ª‚È‚¢D");
         u.uundetected = 0;
         return 0;
     }
     if (hides_under(youmonst.data) && !level.objects[u.ux][u.uy]) {
+/*JP
         There("is nothing to hide under here.");
+*/
+        There("‚±‚±‚É‚Í‰B‚ê‚ç‚ê‚é‚à‚Ì‚ª‚È‚¢D");
         u.uundetected = 0;
         return 0;
     }
     /* Planes of Air and Water */
     if (on_ceiling && !has_ceiling(&u.uz)) {
+/*JP
         There("is nowhere to hide above you.");
+*/
+        There("‚ ‚È‚½‚Ìã‚É‚Í‰B‚ê‚ç‚ê‚éêŠ‚ª‚È‚¢D");
         u.uundetected = 0;
         return 0;
     }
     if ((is_hider(youmonst.data) && !Flying) /* floor hider */
         && (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))) {
+/*JP
         There("is nowhere to hide beneath you.");
+*/
+        There("‚ ‚È‚½‚Ì‰º‚É‚Í‰B‚ê‚ç‚ê‚éêŠ‚ª‚È‚¢D");
         u.uundetected = 0;
         return 0;
     }
@@ -1795,7 +1866,10 @@ dopoly()
     if (is_vampire(youmonst.data)) {
         polyself(2);
         if (savedat != youmonst.data) {
+/*JP
             You("transform into %s.", an(youmonst.data->mname));
+*/
+            You("%s‚ÌŽp‚É‚È‚Á‚½D", youmonst.data->mname);
             newsym(u.ux, u.uy);
         }
     }
@@ -2145,7 +2219,10 @@ int part;
 #endif
     }
     if (mptr == &mons[PM_STALKER] && part == HEAD)
+/*JP
         return "head";
+*/
+        return "“ª";
     if (mptr->mlet == S_EEL && mptr != &mons[PM_JELLYFISH])
         return fish_parts[part];
     if (mptr->mlet == S_WORM)

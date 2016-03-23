@@ -119,7 +119,7 @@ struct attack *mattk;
         fmt = (could_seduce(magr, mdef, mattk) && !magr->mcan)
                   ? "%s pretends to be friendly to"
                   : "%s misses";
-#else
+#else /*JP:英語と変数展開のタイミングが異なるので注意*/
         fmt = (could_seduce(magr,mdef,mattk) && !magr->mcan)
                   ? "%sは%%sに友好的なふりをした．"
                   : "%sの%%sへの攻撃は外れた．";
@@ -276,12 +276,18 @@ boolean quietly;
                 return MM_HIT; /* no damage during the polymorph */
             }
             if (!quietly && canspotmon(magr))
+/*JP
                 pline("%s turns to stone!", Monnam(magr));
+*/
+                pline("%sは石になった！", Monnam(magr));
             monstone(magr);
             if (magr->mhp > 0)
                 return MM_HIT; /* lifesaved */
             else if (magr->mtame && !vis)
+/*JP
                 You(brief_feeling, "peculiarly sad");
+*/
+                You(brief_feeling, "もの悲しい");
             return MM_AGR_DIED;
         }
     }
@@ -291,8 +297,12 @@ boolean quietly;
     place_monster(magr, tx, ty); /* put down at target spot */
     place_monster(mdef, fx, fy);
     if (vis && !quietly)
+#if 0 /*JP*/
         pline("%s moves %s out of %s way!", Monnam(magr), mon_nam(mdef),
               is_rider(pa) ? "the" : mhis(magr));
+#else
+        pline("%sは%sを押しのけた！", Monnam(magr), mon_nam(mdef));
+#endif
     newsym(fx, fy);  /* see it */
     newsym(tx, ty);  /*   all happen */
     flush_screen(0); /* make sure it shows up */
@@ -626,7 +636,7 @@ struct attack *mattk;
         Sprintf(buf, "%s gazes at", Monnam(magr));
         pline("%s %s...", buf, mon_nam(mdef));
 #else
-        Sprintf(buf,"%sは%%sをにらみつけた．．．", Monnam(magr));
+        Sprintf(buf, "%sは%%sをにらみつけた．．．", Monnam(magr));
         pline(buf, mon_nam(mdef));
 #endif
     }
@@ -737,7 +747,7 @@ register struct attack *mattk;
         Sprintf(buf, "%s swallows", Monnam(magr));
         pline("%s %s.", buf, mon_nam(mdef));
 #else
-        Sprintf(buf,"%sは%%sをぐっと飲みこんだ．", Monnam(magr));
+        Sprintf(buf, "%sは%%sをぐっと飲みこんだ．", Monnam(magr));
         pline(buf, mon_nam(mdef));
 #endif
     }
@@ -1100,13 +1110,14 @@ register struct attack *mattk;
                       Monnam(mdef));
             tmp = 0;
         } else if (vis) {
-#if 0 /*JP*/
+/*JP
             pline("%s is covered in acid!", Monnam(mdef));
-            pline("It burns %s!", mon_nam(mdef));
-#else
+*/
             pline("%sは酸につつまれた！", Monnam(mdef));
+/*JP
+            pline("It burns %s!", mon_nam(mdef));
+*/
             pline("%sは焼かれた！", mon_nam(mdef));
-#endif
         }
         if (!rn2(30))
             erode_armor(mdef, ERODE_CORRODE);
@@ -1888,7 +1899,10 @@ boolean givemsg;
             || attacktype(mon->data, AT_BREA))) {
         mon->mspec_used += d(2, 2);
         if (givemsg)
+/*JP
             pline("%s seems lethargic.", Monnam(mon));
+*/
+            pline("%sは無気力になったようだ．", Monnam(mon));
     }
 }
 

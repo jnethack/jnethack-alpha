@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers \
                                        */
 #include "hack.h"
@@ -493,6 +498,7 @@ register struct monst *mtmp;
     /* a stethoscope exposes mimic before getting here so this
        won't be relevant for it, but wand of probing doesn't */
     if (mtmp->m_ap_type)
+#if 0 /*JP*/
         Sprintf(eos(info), ", mimicking %s",
                 (mtmp->m_ap_type == M_AP_FURNITURE)
                     ? an(defsyms[mtmp->mappearance].explanation)
@@ -503,6 +509,18 @@ register struct monst *mtmp;
                           : (mtmp->m_ap_type == M_AP_MONSTER)
                                 ? an(mons[mtmp->mappearance].mname)
                                 : something); /* impossible... */
+#else
+        Sprintf(eos(info), ", %sのまねをしている",
+                (mtmp->m_ap_type == M_AP_FURNITURE)
+                    ? an(defsyms[mtmp->mappearance].explanation)
+                    : (mtmp->m_ap_type == M_AP_OBJECT)
+                          ? ((mtmp->mappearance == GOLD_PIECE)
+                                 ? "金貨"
+                                 : an(simple_typename(mtmp->mappearance)))
+                          : (mtmp->m_ap_type == M_AP_MONSTER)
+                                ? an(mons[mtmp->mappearance].mname)
+                                : something); /* impossible... */
+#endif
     if (mtmp->mcan)
 /*JP
         Strcat(info, ", cancelled");
@@ -820,19 +838,33 @@ struct obj *otmp2;
     if ((!Blind && visible) || inpack) {
         if (Hallucination) {
             if (onfloor) {
+/*JP
                 You_see("parts of the floor melting!");
+*/
+                You_see("床の一部が溶けているのを見た！");
             } else if (inpack) {
+/*JP
                 Your("pack reaches out and grabs something!");
+*/
+                Your("かばんが手を伸ばして何かをつかんだ！");
             }
             /* even though we can see where they should be,
              * they'll be out of our view (minvent or container)
              * so don't actually show anything */
         } else if (onfloor || inpack) {
+#if 0 /*JP*/
             pline("The %s coalesce%s.", makeplural(obj_typename(otmp->otyp)),
                   inpack ? " inside your pack" : "");
+#else
+            pline("%sが%s合体した．", obj_typename(otmp->otyp),
+                  inpack ? "あなたのかばんの中で" : "");
+#endif
         }
     } else {
+/*JP
         You_hear("a faint sloshing sound.");
+*/
+        You_hear("かすかなバシャバシャという音を聞いた．");
     }
 }
 

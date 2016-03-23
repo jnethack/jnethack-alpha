@@ -119,29 +119,47 @@ struct obj *obj;
     case P_SLING:
         if (is_ammo(obj))
             descr = (obj->otyp == ROCK || is_graystone(obj))
+/*JP
                         ? "stone"
+*/
+                        ? "石"
                         /* avoid "rock"; what about known glass? */
                         : (obj->oclass == GEM_CLASS)
+/*JP
                             ? "gem"
+*/
+                            ? "宝石"
                             /* in case somebody adds odd sling ammo */
                             : def_oc_syms[(int) obj->oclass].name;
         break;
     case P_BOW:
         if (is_ammo(obj))
+/*JP
             descr = "arrow";
+*/
+            descr = "矢";
         break;
     case P_CROSSBOW:
         if (is_ammo(obj))
+/*JP
             descr = "bolt";
+*/
+            descr = "ボルト";
         break;
     case P_FLAIL:
         if (obj->otyp == GRAPPLING_HOOK)
+/*JP
             descr = "hook";
+*/
+            descr = "フック";
         break;
     case P_PICK_AXE:
         /* even if "dwarvish mattock" hasn't been discovered yet */
         if (obj->otyp == DWARVISH_MATTOCK)
+/*JP
             descr = "mattock";
+*/
+            descr = "つるはし";
         break;
     default:
         break;

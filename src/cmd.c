@@ -2636,7 +2636,7 @@ int final;
 /*JP
         you_have("infravision", from_what(INFRAVISION));
 */
-        you_have("ˆÃˆÅ‚Å•¨‚ğŒ©‚é”\—Í", from_what(INFRAVISION));
+        you_have("ÔŠOü‚ªŒ©‚¦‚é‹Šo", from_what(INFRAVISION));
     if (Detect_monsters)
 /*JP
         you_are("sensing the presence of monsters", "");

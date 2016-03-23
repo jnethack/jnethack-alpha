@@ -493,11 +493,15 @@ oclass_to_name(oclass, buf)
 char oclass;
 char *buf;
 {
+#if 0 /*JP*//*使わない*/
     char *s;
+#endif
 
     Strcpy(buf, let_to_name(oclass, FALSE, FALSE));
+#if 0 /*JP*//*小文字化しない*/
     for (s = buf; *s; ++s)
         *s = lowc(*s);
+#endif
     return buf;
 }
 
@@ -506,10 +510,22 @@ int
 doclassdisco()
 {
     static NEARDATA const char
+/*JP
         prompt[] = "View discoveries for which sort of objects?",
+*/
+        prompt[] = "どの種類の発見物を見ますか？",
+/*JP
         havent_discovered_any[] = "haven't discovered any %s yet.",
+*/
+        havent_discovered_any[] = "まだ何も%sを発見していない．",
+/*JP
         unique_items[] = "unique items",
+*/
+        unique_items[] = "特殊アイテム",
+/*JP
         artifact_items[] = "artifacts";
+*/
+        artifact_items[] = "聖器";
     char *s, c, oclass, menulet, allclasses[MAXOCLASSES],
         discosyms[2 + MAXOCLASSES + 1], buf[BUFSZ];
     int i, ct, dis, xtras;
@@ -573,7 +589,10 @@ doclassdisco()
 
     /* there might not be anything for us to do... */
     if (!discosyms[0]) {
+/*JP
         You(havent_discovered_any, "items");
+*/
+        You(havent_discovered_any, "アイテム");
         if (tmpwin != WIN_ERR)
             destroy_nhwindow(tmpwin);
         return 0;
@@ -645,7 +664,10 @@ doclassdisco()
         break;
     default:
         oclass = def_char_to_objclass(c);
+/*JP
         Sprintf(buf, "Discovered %s", let_to_name(oclass, FALSE, FALSE));
+*/
+        Sprintf(buf, "発見した%s", let_to_name(oclass, FALSE, FALSE));
         putstr(tmpwin, iflags.menu_headings, buf);
         for (i = bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i) {
@@ -716,11 +738,20 @@ rename_disco()
         }
     }
     if (ct == 0) {
+/*JP
         You("haven't discovered anything yet...");
+*/
+        You("まだ何も発見していない．．．");
     } else if (mn == 0) {
+/*JP
         pline("None of your discoveries can be assigned names...");
+*/
+        pline("名前の付けられる発見物はない．．．");
     } else {
+/*JP
         end_menu(tmpwin, "Pick an object type to name");
+*/
+        end_menu(tmpwin, "名前を付けるオブジェクトの種類を選んでください");
         dis = STRANGE_OBJECT;
         sl = select_menu(tmpwin, PICK_ONE, &selected);
         if (sl > 0) {

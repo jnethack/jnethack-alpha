@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #ifdef OPTION_LISTS_ONLY /* (AMIGA) external program for opt lists */
 #include "config.h"
 #include "objclass.h"
@@ -478,8 +483,13 @@ static struct Comp_Opt {
     { "hicolor",  "パレットが同じとき、指示したものだけ反転させる", 15, SET_IN_FILE },
 #endif
 #endif
+#if 0 /*JP*/
     { "paranoid_confirmation", "extra prompting in certain situations", 28,
       SET_IN_GAME },
+#else
+    { "paranoid_confirmation", "一部の状況で追加の確認をする", 28,
+      SET_IN_GAME },
+#endif
 /*JP
     { "pettype", "your preferred initial pet type", 4, DISP_IN_GAME },
 */
@@ -494,10 +504,20 @@ static struct Comp_Opt {
 */
     { "pickup_types", "自動で拾いあげる物のシンボル",
       MAXOCLASSES, SET_IN_GAME },
+#if 0 /*JP*/
     { "pile_limit", "threshold for \"there are many objects here\"", 24,
       SET_IN_GAME },
+#else
+    { "pile_limit", "「ここにはたくさんのものがある」のしきい値", 24,
+      SET_IN_GAME },
+#endif
+#if 0 /*JP*/
     { "playmode", "normal play, non-scoring explore mode, or debug mode", 8,
       DISP_IN_GAME },
+#else
+    { "playmode", "通常モード，探検モード，デバッグモードのいずれか", 8,
+      DISP_IN_GAME },
+#endif
 /*JP
     { "player_selection", "choose character via dialog or prompts", 12,
 */
@@ -533,7 +553,10 @@ static struct Comp_Opt {
 */
     { "scroll_margin", "マップ端からのマップスクロール開始距離", 20,
       DISP_IN_GAME }, /*WC*/
+/*JP
     { "sortloot", "sort object selection lists by description", 4,
+*/
+    { "sortloot", "物体選択リストを説明でソートする", 4,
       SET_IN_GAME },
 #ifdef MSDOS
 /*JP
@@ -541,11 +564,22 @@ static struct Comp_Opt {
 */
     { "soundcard", "使用しているサウンドカードの種類", 20, SET_IN_FILE },
 #endif
+#if 0 /*JP*/
     { "symset", "load a set of display symbols from the symbols file", 70,
       SET_IN_GAME },
+#else
+    { "symset", "symbolsファイルから表示シンボルの設定を読み込む", 70,
+      SET_IN_GAME },
+#endif
+#if 0 /*JP*/
     { "roguesymset",
       "load a set of rogue display symbols from the symbols file", 70,
       SET_IN_GAME },
+#else
+    { "roguesymset",
+      "symbolsファイルからローグレベルの表示シンボルの設定を読み込む", 70,
+      SET_IN_GAME },
+#endif
 /*JP
     { "suppress_alert", "suppress alerts about version-specific features", 8,
 */
@@ -611,13 +645,25 @@ static struct Comp_Opt {
 */
     { "windowtype", "使用するウインドウシステム", WINTYPELEN, DISP_IN_GAME },
 #ifdef WINCHAIN
+/*JP
     { "windowchain", "window processor to use", WINTYPELEN, SET_IN_SYS },
+*/
+    { "windowchain", "使用するウィンドウプロセッサ", WINTYPELEN, SET_IN_SYS },
 #endif
 #ifdef BACKWARD_COMPAT
+/*JP
     { "DECgraphics", "load DECGraphics display symbols", 70, SET_IN_FILE },
+*/
+    { "DECgraphics", "DECGraphics表示シンボルを読み込む", 70, SET_IN_FILE },
+/*JP
     { "IBMgraphics", "load IBMGraphics display symbols", 70, SET_IN_FILE },
+*/
+    { "IBMgraphics", "IBMGraphics表示シンボルを読み込む", 70, SET_IN_FILE },
 #ifdef MAC_GRAPHICS_ENV
+/*JP
     { "Macgraphics", "load MACGraphics display symbols", 70, SET_IN_FILE },
+*/
+    { "Macgraphics", "MACGraphics表示シンボルを読み込む", 70, SET_IN_FILE },
 #endif
 #endif
 #if 1 /*JP*/

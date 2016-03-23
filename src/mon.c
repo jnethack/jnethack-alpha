@@ -1779,11 +1779,11 @@ struct monst *mtmp;
 /*JP
             pline("But wait...");
 */
-                        pline("しかし．．．");
+            pline("ちょっとまった．．．");
 /*JP
             pline("%s medallion begins to glow!", s_suffix(Monnam(mtmp)));
 */
-            pline("%sのメダリオンが輝きはじめた！", Monnam(mtmp));
+            pline("%sの魔除けが輝きはじめた！", Monnam(mtmp));
             makeknown(AMULET_OF_LIFE_SAVING);
             /* amulet is visible, but monster might not be */
             if (canseemon(mtmp)) {
@@ -1802,7 +1802,7 @@ struct monst *mtmp;
 /*JP
             pline_The("medallion crumbles to dust!");
 */
-            pline_The("メダリオンはこなごなにくだけてしまった！");
+            pline("魔除けはこなごなにくだけた！");
         }
         m_useup(mtmp, lifesave);
 
@@ -1854,6 +1854,7 @@ register struct monst *mtmp;
                             || amorphous(mtmp->data));
 
             /* construct a format string before transformation */
+#if 0 /*JP*/
             Sprintf(buf, "The %s%s suddenly %s and rises as %%s!",
                     spec_mon ? "" : "seemingly dead ",
                     x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
@@ -1861,6 +1862,15 @@ register struct monst *mtmp;
                                  | SUPPRESS_INVISIBLE | SUPPRESS_IT,
                              FALSE),
                     spec_mon ? "reconstitutes" : "transforms");
+#else
+            Sprintf(buf, "%s%sは突然%s，%%sとして蘇った！",
+                    spec_mon ? "" : "死んだように思われた",
+                    x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
+                             SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
+                                 | SUPPRESS_INVISIBLE | SUPPRESS_IT,
+                             FALSE),
+                    spec_mon ? "再構成され" : "変化し");
+#endif
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
             if (mtmp->mhpmax <= 0)
@@ -2373,7 +2383,11 @@ int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
                 /* oc_big is also oc_bimanual and oc_bulky */
                 && (otmp->owt > 30 || objects[otyp].oc_big)) {
                 delobj(otmp);
+#if 0 /*JP*/
             } else if (!flooreffects(otmp, x, y, (dest & 1) ? "fall" : "")) {
+#else
+            } else if (!flooreffects(otmp, x, y, (dest & 1) ? "落ちる" : "")) {
+#endif
                 place_object(otmp, x, y);
                 stackobj(otmp);
             }
@@ -2384,7 +2398,10 @@ int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
                                                    : CORPSTAT_NONE);
             if (burycorpse && cadaver && cansee(x, y) && !mtmp->minvis
                 && cadaver->where == OBJ_BURIED && (dest & 1)) {
+/*JP
                 pline("%s corpse ends up buried.", s_suffix(Monnam(mtmp)));
+*/
+                pline("%sの死体は埋まってしまった．", s_suffix(Monnam(mtmp)));
             }
         }
     }
@@ -2525,8 +2542,12 @@ struct monst *mtmp;
     if (!in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
         if (!couldspot && canspotmon(mtmp))
+#if 0 /*JP*/
             pline("%s suddenly %s!", Amonnam(mtmp),
                   !Blind ? "appears" : "arrives");
+#else
+            pline("突然%sが現れた！", Amonnam(mtmp));
+#endif
     }
     return;
 }
@@ -3790,14 +3811,20 @@ struct permonst *mdat;
         switch (mndx) {
         case PM_ROTHE:
         case PM_MINOTAUR:
+/*JP
             You("notice a bovine smell.");
+*/
+            You("牛のようなにおいに気付いた．");
             msg_given = TRUE;
             break;
         case PM_CAVEMAN:
         case PM_CAVEWOMAN:
         case PM_BARBARIAN:
         case PM_NEANDERTHAL:
+/*JP
             You("smell body odor.");
+*/
+            pline("体臭のようなにおいがした．");
             msg_given = TRUE;
             break;
         /*
@@ -3820,7 +3847,10 @@ struct permonst *mdat;
         case PM_WERERAT:
         case PM_WEREWOLF:
         case PM_OWLBEAR:
+/*JP
             You("detect an odor reminiscent of an animal's den.");
+*/
+            pline("動物のねぐらを思い出すようなにおいがした．");
             msg_given = TRUE;
             break;
         /*
@@ -3828,16 +3858,25 @@ struct permonst *mdat;
             break;
         */
         case PM_STEAM_VORTEX:
+/*JP
             You("smell steam.");
+*/
+            pline("蒸気のにおいがした．");
             msg_given = TRUE;
             break;
         case PM_GREEN_SLIME:
+/*JP
             pline("%s stinks.", Something);
+*/
+            pline("悪臭がした．");
             msg_given = TRUE;
             break;
         case PM_VIOLET_FUNGUS:
         case PM_SHRIEKER:
+/*JP
             You("smell mushrooms.");
+*/
+            pline("きのこのにおいがした．");
             msg_given = TRUE;
             break;
         /* These are here to avoid triggering the
@@ -3855,35 +3894,61 @@ struct permonst *mdat;
         if (nonspecific)
             switch (mdat->mlet) {
             case S_DOG:
+/*JP
                 You("notice a dog smell.");
+*/
+                You("犬のにおいに気付いた．");
                 msg_given = TRUE;
                 break;
             case S_DRAGON:
+/*JP
                 You("smell a dragon!");
+*/
+                pline("ドラゴンのにおいがする！");
                 msg_given = TRUE;
                 break;
             case S_FUNGUS:
+/*JP
                 pline("%s smells moldy.", Something);
+*/
+                pline("何か苔のようなにおいがする．");
                 msg_given = TRUE;
                 break;
             case S_UNICORN:
+#if 0 /*JP*/
                 You("detect a%s odor reminiscent of a stable.",
                     (mndx == PM_PONY) ? "n" : " strong");
+#else
+                pline("馬小屋を思い出すような%sにおいがした．",
+                    (mndx == PM_PONY) ? "" : "強い");
+#endif
                 msg_given = TRUE;
                 break;
             case S_ZOMBIE:
+/*JP
                 You("smell rotting flesh.");
+*/
+                pline("腐った肉のにおいがした．");
                 msg_given = TRUE;
                 break;
             case S_EEL:
+/*JP
                 You("smell fish.");
+*/
+                pline("魚のにおいがした．");
                 msg_given = TRUE;
                 break;
             case S_ORC:
                 if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC)))
+/*JP
                     You("notice an attractive smell.");
+*/
+                    You("魅力的なにおいに気付いた．");
                 else
+/*JP
                     pline("A foul stench makes you feel a little nauseated.");
+*/
+                    pline("むかつくような悪臭で少し気分が悪くなった．");
                 msg_given = TRUE;
                 break;
             default:

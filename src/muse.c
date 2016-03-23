@@ -85,7 +85,10 @@ struct obj *obj;
         struct monst *mtmp;
 
         potion_descr = OBJ_DESCR(objects[obj->otyp]);
+/*JP
         if (potion_descr && !strcmp(potion_descr, "milky")) {
+*/
+        if (potion_descr && !strcmp(potion_descr, "ミルク色の")) {
             if (!(mvitals[PM_GHOST].mvflags & G_GONE)
                 && !rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_GHOST].born))) {
                 if (!enexto(&cc, mon->mx, mon->my, &mons[PM_GHOST]))
@@ -125,7 +128,7 @@ struct obj *obj;
 /*JP
         if (potion_descr && !strcmp(potion_descr, "smoky")
 */
-        if (potion_descr && !strcmp(potion_descr, "煙の出ている薬")
+        if (potion_descr && !strcmp(potion_descr, "煙の出ている")
             && !(mvitals[PM_DJINNI].mvflags & G_GONE)
             && !rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_DJINNI].born))) {
             if (!enexto(&cc, mon->mx, mon->my, &mons[PM_DJINNI]))

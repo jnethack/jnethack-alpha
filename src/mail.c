@@ -474,12 +474,30 @@ struct obj *otmp;
 #ifdef AMIGA
         "Only Amiga makes it possible.", "CATS have all the answers.",
 #endif
+/*JP
         "This mail complies with the Yendorian Anti-Spam Act (YASA)",
+*/
+        "このメールはイェンダースパム対策法(YASA)に準拠しています．",
+/*JP
         "Please find enclosed a small token to represent your Owlbear",
+*/
+        "あなたのアウルベアを表現するために同封した小さいトークンを探してください",
+/*JP
         "**FR33 P0T10N 0F FULL H34L1NG**",
+*/
+        "**完全回復の薬プレゼント**",
+/*JP
         "Please return to sender (Asmodeus)",
+*/
+        "送信者(アスモデウス)に送り返してください",
+/*JP
       "Buy a potion of gain level for only $19.99! Guaranteed to be blessed!",
+*/
+      "レベルアップの薬がたったの1980円!祝福保証!",
+/*JP
         "Invitation: Visit the NetHack web site at http://www.nethack.org!"
+*/
+        "招待状: NetHack ウェブサイト http://www.nethack.org に来てね!"
     };
 
     /* XXX replace with more general substitution code and add local

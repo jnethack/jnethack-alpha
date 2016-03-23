@@ -2,6 +2,10 @@
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
 
+/* JNetHack Copyright */
+/* For 3.6-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
 

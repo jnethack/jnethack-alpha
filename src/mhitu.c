@@ -503,7 +503,10 @@ register struct monst *mtmp;
                    so mtmp's next move will be a regular attack */
                 place_monster(mtmp, mtmp->mx, mtmp->my); /* put back */
                 newsym(u.ux, u.uy); /* u.uundetected was toggled */
+/*JP
                 pline("%s draws back as you drop!", Monnam(mtmp));
+*/
+                pline("‚ ‚È‚½‚ª—‚¿‚é‚±‚Æ‚Å%s‚Íˆø‚«–ß‚³‚ê‚½I", Monnam(mtmp));
                 return 0;
             }
 
@@ -717,7 +720,10 @@ register struct monst *mtmp;
             int numseen, numhelp;
             char buf[BUFSZ], genericwere[BUFSZ];
 
+/*JP
             Strcpy(genericwere, "creature");
+*/
+            Strcpy(genericwere, "‰½‚©");
             numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
             if (youseeit) {
 /*JP
@@ -765,10 +771,7 @@ register struct monst *mtmp;
                         pline("%s%s!", upstart(buf), from_nowhere);
 #else
                         pline("%s‚ª%sŒ»‚ê‚½I",
-                              strcmp(genericwere, "creature")
-                              ? genericwere
-                              : "‰½‚©",
-                              from_nowhere);
+                              genericwere, from_nowhere);
 #endif
                     }
                 } /* else no help came; but you didn't know it tried */

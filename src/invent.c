@@ -779,6 +779,7 @@ register int type;
  * http://concord.wikia.com/wiki/List_of_Fictional_Currencies
  */
 static const char *const currencies[] = {
+#if 0 /*JP*/
     "Altarian Dollar",       /* The Hitchhiker's Guide to the Galaxy */
     "Ankh-Morpork Dollar",   /* Discworld */
     "auric",                 /* The Domination of Draka */
@@ -800,6 +801,29 @@ static const char *const currencies[] = {
     "Triganic Pu",           /* The Hitchhiker's Guide to the Galaxy */
     "woolong",               /* Cowboy Bebop */
     "zorkmid",               /* Zork, NetHack */
+#else
+    "アルタイル・ドル",      /* The Hitchhiker's Guide to the Galaxy */
+    "アンクモルポーク・ドル", /* Discworld */
+    "ユーリック",            /* The Domination of Draka */
+    "バッカゾイド",          /* Space Quest */
+    "サーボゾイド",          /* Starslip */
+    "クレジット・チット",    /* Deus Ex */
+    "キュービット",          /* Battlestar Galactica */
+    "フレニアン・ピッブル・ビード", /* The Hitchhiker's Guide to the Galaxy */
+    "フレッツァ",            /* Jules Verne */
+    "帝国クレジット",        /* Star Wars */
+    "香港月ドル",            /* The Moon is a Harsh Mistress */
+    "コンバック",            /* Snow Crash */
+    "ナーナイト",            /* System Shock 2 */
+    "クァトロ",              /* Star Trek, Sim City */
+    "シモレオン",            /* Sim City */
+    "ソラリ",                /* Spaceballs */
+    "スペースバック",        /* Spaceballs */
+    "スポアバック",          /* Spore */
+    "トライガニック・プー",  /* The Hitchhiker's Guide to the Galaxy */
+    "ウーロン",              /* Cowboy Bebop */
+    "ゴールド",              /* Zork, NetHack */
+#endif
 };
 
 const char *
@@ -1250,8 +1274,12 @@ register const char *let, *word;
                     bp = (rn2(2) ? buf : (bp + 4));
                 } else
                     bp = buf;
+#if 0 /*JP*/
                 You("mime %s something%s%s.", ing_suffix(bp), suf ? " " : "",
                     suf ? suf : "");
+#else
+                You("何かを%sふりをした．", bp);
+#endif
             }
             return (allownone ? &zeroobj : (struct obj *) 0);
         }
@@ -1497,12 +1525,12 @@ static NEARDATA const char removeables[] = { ARMOR_CLASS, WEAPON_CLASS,
 /* interactive version of getobj - used for Drop, Identify and */
 /* Takeoff (A). Return the number of times fn was called successfully */
 /* If combo is TRUE, we just use this to get a category list */
-/*JP CHECK: 3.4.3 の呼び出し元
-do.c:864:               (result = ggetobj("drop", drop, 0, FALSE, (unsigned *)0)) < -1)
-do.c:925:       i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
-do_wear.c:2538:     (result = ggetobj("take off", select_off, 0, FALSE, (unsigned *)0)) < -1)
-do_wear.c:2586: if (ggetobj("take off", select_off, 0, TRUE, (unsigned *)0) == -2)
-invent.c:1782:          n = ggetobj("identify", identify, id_limit, FALSE, (unsigned *)0);
+/*JP CHECK: 3.6.0 の呼び出し元
+do.c:962:        || (result = ggetobj("drop", drop, 0, FALSE, (unsigned *) 0)) < -1)
+do.c:1009:        i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
+do_wear.c:2955:        || (result = ggetobj("take off", select_off, 0, FALSE,
+do_wear.c:3007:        if (ggetobj("take off", select_off, 0, TRUE, (unsigned *) 0) == -2)
+invent.c:2014:                n = ggetobj("identify", identify, id_limit, FALSE,
 */
 int
 ggetobj(word, fn, mx, combo, resultflags)
@@ -1717,10 +1745,9 @@ unsigned *resultflags;
  * If allflag then no questions are asked. Max gives the max nr of
  * objects to be treated. Return the number of objects treated.
  */
-/*JP CHECK: 3.4.3 での呼び出し元
-invent.c:1512:ggetobj() int cnt = askchain(&invent, olets, allflag, fn, ckfn, mx, word); 
-pickup.c:2615:("nodot") if (askchain((struct obj **)&current_container->cobj,
-pickup.c:2711:("nodot") (void) askchain((struct obj **)&invent,
+/*JP CHECK: 3.6.0 での呼び出し元
+invent.c:1728:        int cnt = askchain(&invent, olets, allflag, fn, ckfn, mx, word);
+pickup.c:2882:        if (askchain(objlist, (one_by_one ? (char *) 0 : selection), allflag,
   wordには動詞が英語で入る。
 */
 int
@@ -1939,7 +1966,10 @@ int id_limit;
             pline1(thats_enough_tries);
             break;
         } else { /* try again */
+/*JP
             pline("Choose an item; use ESC to decline.");
+*/
+            pline("アイテムを選んでください;やめるならESC．");
         }
     }
 }
@@ -2747,17 +2777,30 @@ dotypeinv()
 
             switch (c) {
             case 'B':
+/*JP
                 which = "known to be blessed";
+*/
+                which = "祝福されているとわかっている";
                 break;
             case 'U':
+/*JP
                 which = "known to be uncursed";
+*/
+                which = "呪われていないとわかっている";
                 break;
             case 'C':
+/*JP
                 which = "known to be cursed";
+*/
+                which = "呪われているとわかっている";
                 break;
             case 'X':
+#if 0 /*JP*/
                 You(
           "have no objects whose blessed/uncursed/cursed status is unknown.");
+#else
+                You("祝福／呪いがわからないものは何ももっていない．");
+#endif
                 break; /* better phrasing is desirable */
             default:
 /*JP
@@ -3037,7 +3080,10 @@ boolean picked_some;
             pline1(fbuf);
         read_engr_at(u.ux, u.uy); /* Eric Backus */
         if (obj_cnt == 1 && otmp->quan == 1L)
+/*JP
             There("is %s object here.", picked_some ? "another" : "an");
+*/
+            There("ここには%s一つものがある．", picked_some ? "もう" : "");
         else
 #if 0 /*JP*/
             There("are %s%s objects here.",
@@ -3056,6 +3102,7 @@ boolean picked_some;
 #endif
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
+#if 0 /*JP*//*"It's (corpse_name), unfortunately"*/
                 pline("%s %s%s.",
                       (obj_cnt > 1)
                           ? "Including"
@@ -3066,6 +3113,16 @@ boolean picked_some;
                       poly_when_stoned(youmonst.data)
                           ? ""
                           : ", unfortunately");
+#else
+                pline("%s%s%s．",
+                      poly_when_stoned(youmonst.data)
+                          ? ""
+                          : "残念ながら",
+                      corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
+                      (obj_cnt > 1)
+                          ? "を含んでいる"
+                          : "だ");
+#endif
                 feel_cockatrice(otmp, FALSE);
                 break;
             }
@@ -3103,7 +3160,10 @@ boolean picked_some;
         for (; otmp; otmp = otmp->nexthere) {
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 felt_cockatrice = TRUE;
+/*JP
                 Sprintf(buf, "%s...", doname(otmp));
+*/
+                Sprintf(buf, "%s．．．", doname(otmp));
                 putstr(tmpwin, 0, buf);
                 break;
             }
@@ -3649,7 +3709,10 @@ doorganize() /* inventory organizer by Del Lamb */
     const char *adj_type;
 
     if (!invent) {
+/*JP
         You("aren't carrying anything to adjust.");
+*/
+        You("順序を変えるものを何も持っていない．");
         return 0;
     }
 
@@ -3801,7 +3864,10 @@ doorganize() /* inventory organizer by Del Lamb */
                 } else if (inv_cnt(FALSE) >= 52) {
                     (void) merged(&splitting, &obj); /* undo split */
                     /* "knapsack cannot accommodate any more items" */
+/*JP
                     Your("pack is too full.");
+*/
+                    Your("持ち物は一杯だ．");
                     return 0;
                 } else {
                     bumped = otmp;
@@ -3833,7 +3899,10 @@ doorganize() /* inventory organizer by Del Lamb */
     /* messages deferred until inventory has been fully reestablished */
     prinv(adj_type, obj, 0L);
     if (bumped)
+/*JP
         prinv("Moving:", bumped, 0L);
+*/
+        prinv("移動:", bumped, 0L);
     if (splitting)
         clear_splitobjs(); /* reset splitobj context */
     update_inventory();

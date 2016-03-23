@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 /* This file contains the command routines dowhatis() and dohelp() and */
 /* a few other help related facilities */
 
@@ -367,6 +372,7 @@ char *buf, *monbuf;
                 how |= 4;
 
             if (how)
+#if 0 /*JP*/
                 Sprintf(
                     eos(buf), " [seen: %s%s%s%s%s]",
                     (how & 1) ? "infravision" : "",
@@ -375,6 +381,16 @@ char *buf, *monbuf;
                     /* add comma if detect and (infrav or telep or both) */
                     ((how & 7) > 4) ? ", " : "",
                     (how & 4) ? "monster detection" : "");
+#else
+                Sprintf(
+                    eos(buf), " [感知: %s%s%s%s%s]",
+                    (how & 1) ? "赤外線" : "",
+                    /* add comma if telep and infrav */
+                    ((how & 3) > 2) ? ", " : "", (how & 2) ? "テレパシー" : "",
+                    /* add comma if detect and (infrav or telep or both) */
+                    ((how & 7) > 4) ? ", " : "",
+                    (how & 4) ? "怪物感知" : "");
+#endif
         }
     } else if (u.uswallow) {
         /* all locations when swallowed other than the hero are the monster */
@@ -971,15 +987,24 @@ coord *click_cc;
                versions: "Specify unknown object by cursor?" */
             add_menu(win, NO_GLYPH, &any,
                      flags.lootabc ? 0 : any.a_char, 'y', ATR_NONE,
+/*JP
                      "something on the map", MENU_UNSELECTED);
+*/
+                     "地図上にあるもの", MENU_UNSELECTED);
             any.a_char = 'i';
             add_menu(win, NO_GLYPH, &any,
                      flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+/*JP
                      "something you're carrying", MENU_UNSELECTED);
+*/
+                     "あなたが持っているもの", MENU_UNSELECTED);
             any.a_char = '?';
             add_menu(win, NO_GLYPH, &any,
                      flags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
+/*JP
                      "something else (by symbol or name)", MENU_UNSELECTED);
+*/
+                     "それ以外(シンボルか名前で指定)", MENU_UNSELECTED);
             if (!u.uswallow && !Hallucination) {
                 any = zeroany;
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -992,21 +1017,36 @@ coord *click_cc;
                 any.a_char = 'm';
                 add_menu(win, NO_GLYPH, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+/*JP
                          "nearby monsters", MENU_UNSELECTED);
+*/
+                         "近くにいる怪物", MENU_UNSELECTED);
                 any.a_char = 'M';
                 add_menu(win, NO_GLYPH, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+/*JP
                          "all monsters shown on map", MENU_UNSELECTED);
+*/
+                         "地図上にいる全ての怪物", MENU_UNSELECTED);
                 any.a_char = 'o';
                 add_menu(win, NO_GLYPH, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+/*JP
                          "nearby objects", MENU_UNSELECTED);
+*/
+                         "近くにあるもの", MENU_UNSELECTED);
                 any.a_char = 'O';
                 add_menu(win, NO_GLYPH, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+/*JP
                          "all objects shown on map", MENU_UNSELECTED);
+*/
+                         "地図上にある全てのもの", MENU_UNSELECTED);
             }
+/*JP
             end_menu(win, "What do you want to look at:");
+*/
+            end_menu(win, "何を見る？");
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
                 i = pick_list->item.a_char;
                 free((genericptr_t) pick_list);
@@ -1226,9 +1266,15 @@ boolean do_mons; /* True => monsters, False => objects */
     if (count)
         display_nhwindow(win, TRUE);
     else
+#if 0 /*JP*/
         pline("No %s are currently shown %s.",
               do_mons ? "monsters" : "objects",
               nearby ? "nearby" : "on the map");
+#else
+        pline("今のところ%sに%s．",
+              nearby ? "近く" : "地図上",
+              do_mons ? "怪物はいない" : "ものはない");
+#endif
     destroy_nhwindow(win);
 }
 

@@ -484,11 +484,17 @@ boolean talk;
 
     if (!xtime && old) {
         if (talk)
+/*JP
             You("can hear again.");
+*/
+            You("また聞こえるようになった．");
         toggled = TRUE;
     } else if (xtime && !old) {
         if (talk)
+/*JP
             You("are unable to hear anything.");
+*/
+            You("何も聞こえなくなった．");
         toggled = TRUE;
     }
     /* deafness isn't presently shown on status line, but
@@ -1527,7 +1533,10 @@ const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
     } else if (potion->cursed) {
         if (targobj->blessed) {
             func = unbless;
+/*JP
             glowcolor = "brown";
+*/
+            glowcolor = "茶色の";
             costchange = COST_UNBLSS;
         } else if (!targobj->cursed) {
             func = curse;
@@ -1549,10 +1558,19 @@ const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
            is cleared instead of set if perception is distorted */
         if (useeit) {
             glowcolor = hcolor(glowcolor);
+            /*JP:3.6.0時点では動詞は"glow"だけなので決め撃ち*/
             if (altfmt)
+#if 0 /*JP*/
                 pline("%s with %s aura.", objphrase, an(glowcolor));
+#else
+                pline("%sは%sオーラにつつまれた．", objphrase, glowcolor);
+#endif
             else
+#if 0 /*JP*/
                 pline("%s %s.", objphrase, glowcolor);
+#else
+                pline("%sは%s輝いた．", objphrase, jconj_adj(glowcolor));
+#endif
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
             targobj->bknown = !Hallucination;
         }
@@ -1702,7 +1720,10 @@ boolean your_fault;
 
         switch (obj->otyp) {
         case POT_WATER:
+/*JP
             Sprintf(saddle_glows, "%s %s", buf, aobjnam(saddle, "glow"));
+*/
+            Sprintf(saddle_glows, "%s", buf);
             affected = H2Opotion_dip(obj, saddle, useeit, saddle_glows);
             break;
         case POT_POLYMORPH:
@@ -1710,7 +1731,10 @@ boolean your_fault;
             break;
         }
         if (useeit && !affected)
+/*JP
             pline("%s %s wet.", buf, aobjnam(saddle, "get"));
+*/
+            pline("%sは濡れた．", buf);
     } else {
         boolean angermon = TRUE;
 
@@ -2233,8 +2257,8 @@ dodip()
 
 #if 0 /*JP*/
     Sprintf(qbuf, "dip %s into", thesimpleoname(obj));
-#else
-    Sprintf(qbuf, "%sを浸しますか", thesimpleoname(obj));
+#else /*JP:英語では何を浸すかを含めているが日本語では処理の都合でとりあえず省略*/
+    Sprintf(qbuf, "dip into");
 #endif
     here = levl[u.ux][u.uy].typ;
     /* Is there a fountain to dip into here? */
@@ -2288,7 +2312,11 @@ dodip()
     potion->in_use = TRUE; /* assume it will be used up */
     if (potion->otyp == POT_WATER) {
         boolean useeit = !Blind || (obj == ublindf && Blindfolded_only);
+#if 0 /*JP*/
         const char *obj_glows = Yobjnam2(obj, "glow");
+#else
+        const char *obj_glows = cxname(obj);
+#endif
 
         if (H2Opotion_dip(potion, obj, useeit, obj_glows))
             goto poof;
@@ -2452,22 +2480,35 @@ dodip()
            been made in order to get the merge result for both cases;
            as a consequence, mixing while Fumbling drops the mixture */
         freeinv(obj);
+#if 0 /*JP*/
         (void) hold_another_object(obj, "You drop %s!", doname(obj),
                                    (const char *) 0);
+#else
+        (void) hold_another_object(obj, "%sを落した！", doname(obj),
+                                   (const char *) 0);
+#endif
         return 1;
     }
 
     if (potion->otyp == POT_ACID && obj->otyp == CORPSE
         && obj->corpsenm == PM_LICHEN && !Blind) {
+#if 0 /*JP*/
         pline("%s %s %s around the edges.", The(cxname(obj)),
               otense(obj, "turn"),
               potion->odiluted ? hcolor(NH_ORANGE) : hcolor(NH_RED));
+#else
+        pline("%sはふちが%sなった．", The(cxname(obj)),
+              jconj_adj(potion->odiluted ? hcolor(NH_ORANGE) : hcolor(NH_RED)));
+#endif
         potion->in_use = FALSE; /* didn't go poof */
         return 1;
     }
 
     if (potion->otyp == POT_WATER && obj->otyp == TOWEL) {
-        pline_The("towel soaks it up!");
+/*JP
+        pline_The("towel soak up!");
+*/
+        pline_The("タオルは水を吸い込んだ！");
         /* wetting towel already done via water_damage() in H2Opotion_dip */
         goto poof;
     }

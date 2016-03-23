@@ -56,6 +56,7 @@ struct Jitem {
              && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
              && typ != OPAL)))
 
+#if 0 /*JP*/
 STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { BROADSWORD, "ninja-to" },
                                              { FLAIL, "nunchaku" },
@@ -69,6 +70,21 @@ STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { FOOD_RATION, "gunyoki" },
                                              { POT_BOOZE, "sake" },
                                              { 0, "" } };
+#else
+STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "˜e·‚µ" },
+                                             { BROADSWORD, "”EŽÒ“" },
+                                             { FLAIL, "ƒkƒ“ƒ`ƒƒƒN" },
+                                             { GLAIVE, "‚È‚¬‚È‚½" },
+                                             { LOCK_PICK, "‚¨‚³‚­" },
+                                             { WOODEN_HARP, "‹Õ" },
+                                             { KNIFE, "Žh“" },
+                                             { PLATE_MAIL, "’Zb" },
+                                             { HELMET, "Š•" },
+                                             { LEATHER_GLOVES, "‹|Œœ" },
+                                             { FOOD_RATION, "ŠÛ–ò" },
+                                             { POT_BOOZE, "Žð" },
+                                             { 0, "" } };
+#endif
 
 STATIC_DCL const char *FDECL(Japanese_item_name, (int i));
 
@@ -834,7 +850,10 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     if (obj->otyp == T_SHIRT && program_state.gameover) {
         char tmpbuf[BUFSZ];
 
+/*JP
         Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+*/
+        Sprintf(eos(buf), "(u%sv‚Æ‘‚¢‚Ä‚ ‚é)", tshirt_text(obj, tmpbuf));
     }
 
 #if 0 /*JP*/
@@ -894,8 +913,13 @@ struct obj *obj;
         bareobj.spe = obj->spe;
 
     bufp = distant_name(&bareobj, xname); /* xname(&bareobj) */
+#if 0 /*JP*/
     if (!strncmp(bufp, "uncursed ", 9))
         bufp += 9; /* Role_if(PM_PRIEST) */
+#else
+    if (!strncmp(bufp, "Žô‚í‚ê‚Ä‚¢‚È‚¢", 14))
+        bufp += 14; /* Role_if(PM_PRIEST) */
+#endif
 
     objects[otyp].oc_uname = saveobcls.oc_uname;
     objects[otyp].oc_name_known = saveobcls.oc_name_known;
@@ -2914,6 +2938,8 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
     { "grey stone", GEM_CLASS, LUCKSTONE, FLINT },
 };
 
+
+#if 0 /*JP*//*not used*/
 /* alternate spellings; if the difference is only the presence or
    absence of spaces and/or hyphens (such as "pickaxe" vs "pick axe"
    vs "pick-axe") then there is no need for inclusion in this list;
@@ -2957,6 +2983,7 @@ struct alt_spellings {
     { "flintstone", FLINT },
     { (const char *) 0, 0 },
 };
+#endif
 
 short
 rnd_otyp_by_wpnskill(skill)
@@ -3274,6 +3301,7 @@ struct obj *no_wish;
         contents = SPINACH;
     }
 
+#if 0 /*JP*//*“ú–{Œê‚Å‚Íˆ—‚µ‚È‚¢*/
     /*
     Skip over "pair of ", "pairs of", "set of" and "sets of".
 
@@ -3298,7 +3326,9 @@ struct obj *no_wish;
     } else if (!strncmpi(bp, "sets of ", 8)) {
         bp += 8;
     }
+#endif
 
+#if 0 /*JP*//*“ú–{Œê‚Å‚Íˆ—‚µ‚È‚¢*/
     /* intercept pudding globs here; they're a valid wish target,
      * but we need them to not get treated like a corpse.
      *
@@ -3330,6 +3360,7 @@ struct obj *no_wish;
                 *p = 0;
         }
     }
+#endif
     /* Find corpse type w/o "of" (red dragon scale mail, yeti corpse) */
     if (strncmpi(bp, "samurai sword", 13))   /* not the "samurai" monster! */
         if (strncmpi(bp, "wizard lock", 11)) /* not the "wizard" monster! */
@@ -3361,6 +3392,7 @@ struct obj *no_wish;
                             }
                         }
 
+#if 0 /*JP*//*’P”‰»‚Í‚µ‚È‚¢*/
     /* first change to singular if necessary */
     if (*bp) {
         char *sng = makesingular(bp);
@@ -3370,7 +3402,9 @@ struct obj *no_wish;
             Strcpy(bp, sng);
         }
     }
+#endif
 
+#if 0 /*JP*//*ƒXƒyƒ‹—h‚êˆ—‚Í‚µ‚È‚¢*/
     /* Alternate spellings (pick-ax, silver sabre, &c) */
     {
         struct alt_spellings *as = spellings;
@@ -3393,6 +3427,7 @@ struct obj *no_wish;
                 ++p; /* self terminating */
         }
     }
+#endif
 
     /* dragon scales - assumes order of dragons */
     if (!strcmpi(bp, "scales") && mntmp >= PM_GRAY_DRAGON
@@ -3403,6 +3438,7 @@ struct obj *no_wish;
     }
 
     p = eos(bp);
+#if 0 /*JP*/
     if (!BSTRCMPI(bp, p - 10, "holy water")) {
         typ = POT_WATER;
         if ((p - bp) >= 12 && *(p - 12) == 'u')
@@ -3411,11 +3447,31 @@ struct obj *no_wish;
             blessed = 1;
         goto typfnd;
     }
+#else /*JP:¹…‚Æ•sò‚È…‚ð•Ê‚É”»’è*/
+    if (!BSTRCMPI(bp, p - 4, "¹…")) {
+        typ = POT_WATER;
+	blessed = 1;
+        goto typfnd;
+    }
+    if (!BSTRCMPI(bp, p - 4, "•sò‚È…")) {
+        typ = POT_WATER;
+	iscursed = 1;
+        goto typfnd;
+    }
+#endif
+#if 0 /*JP*/
     if (unlabeled && !BSTRCMPI(bp, p - 6, "scroll")) {
+#else
+    if (unlabeled && !BSTRCMPI(bp, p - 4, "Šª•¨")) {
+#endif
         typ = SCR_BLANK_PAPER;
         goto typfnd;
     }
+#if 0 /*JP*/
     if (unlabeled && !BSTRCMPI(bp, p - 9, "spellbook")) {
+#else
+    if (unlabeled && !BSTRCMPI(bp, p - 6, "–‚–@‘")) {
+#endif
         typ = SPE_BLANK_PAPER;
         goto typfnd;
     }
@@ -3425,9 +3481,14 @@ struct obj *no_wish;
      * gold/money concept.  Maybe we want to add other monetary units as
      * well in the future. (TH)
      */
+#if 0 /*JP*/
     if (!BSTRCMPI(bp, p - 10, "gold piece") || !BSTRCMPI(bp, p - 7, "zorkmid")
         || !strcmpi(bp, "gold") || !strcmpi(bp, "money")
         || !strcmpi(bp, "coin") || *bp == GOLD_SYM) {
+#else
+    if (!BSTRCMPI(bp, p - 4, "‹à‰Ý") || !BSTRCMPI(bp, p - 8, "ƒS[ƒ‹ƒh")
+        || *bp == GOLD_SYM) {
+#endif
         if (cnt > 5000 && !wizard)
             cnt = 5000;
         else if (cnt < 1)
@@ -3622,7 +3683,11 @@ srch:
         Strcat(bp, " mail");
         goto retry;
     }
+#if 0 /*JP*/
     if (!strcmpi(bp, "spinach")) {
+#else
+    if (!strcmp(bp, "ƒzƒEƒŒƒ“‘")) {
+#endif
         contents = SPINACH;
         typ = TIN;
         goto typfnd;
