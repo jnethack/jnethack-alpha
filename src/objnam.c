@@ -240,8 +240,7 @@ register int otyp;
 #if 0 /*JP*/
         Sprintf(eos(buf), " (%s)", dn);
 #else
-        Sprintf(eos(buf), "(%s%s)", dn,
-            ocl->oc_class == POTION_CLASS ? "薬" : "");
+        Sprintf(eos(buf), "(%s)", dn);
 #endif
     return buf;
 }
@@ -671,10 +670,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             }
         } else {
             Strcat(buf, dn);
-/*JP
+#if 0 /*JP*//*不確定名に「薬」は付いている*/
             Strcat(buf, " potion");
-*/
-            Strcat(buf, "薬");
+#endif
         }
         break;
     case SCROLL_CLASS:
