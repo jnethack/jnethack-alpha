@@ -11,9 +11,9 @@
 
 MAZE:"earth",' '
 FLAGS: noteleport,hardfloor,shortsighted
-MESSAGE: "Well done, mortal!"
-MESSAGE: "But now thou must face the final Test..."
-MESSAGE: "Prove thyself worthy or perish!"
+MESSAGE: "よくやった，定命の者よ！"
+MESSAGE: "しかし，汝は最後の試練に直面している．．．"
+MESSAGE: "汝自身価値あるものか否かを示せ！"
 
 GEOMETRY:center,center
 # The player lands, upon arrival, in the
@@ -131,8 +131,8 @@ MAZE:"air",' '
 FLAGS: noteleport,hardfloor,shortsighted
 # The following messages are somewhat obtuse, to make then
 # equally meaningful if the player can see or not.
-MESSAGE: "What a strange feeling!"
-MESSAGE: "You notice that there is no gravity here."
+MESSAGE: "なんと奇妙な感覚だ！"
+MESSAGE: "あなたはここには重力がないことに気がついた．"
 GEOMETRY:center,center
 # The player lands, upon arrival, in the
 # lower-left area.  The location of the
@@ -381,7 +381,7 @@ OBJECT:('`',"boulder"),random
 
 MAZE:"water",' '
 FLAGS: noteleport,hardfloor,shortsighted
-MESSAGE: "You find yourself suspended in an air bubble surrounded by water."
+MESSAGE: "あなたは自分が水中の空気の泡のなかに浮遊していることに気づいた．"
 GEOMETRY:center,center
 # The player lands upon arrival to an air bubble
 # within the leftmost third of the level.  The
@@ -478,9 +478,9 @@ MONSTER:('E',"water elemental"),random,hostile
 
 MAZE:"astral",' '
 FLAGS: noteleport,hardfloor,nommap,shortsighted,solidify
-MESSAGE: "You arrive on the Astral Plane!"
-MESSAGE: "Here the High Temple of %d is located."
-MESSAGE: "You sense alarm, hostility, and excitement in the air!"
+MESSAGE: "あなたは精霊界に到着した！"
+MESSAGE: "ここにはあなたの神の大神殿がある．"
+MESSAGE: "あなたは危険を感じ，興奮した！"
 GEOMETRY:center,center
 MAP
                               ---------------                              

@@ -200,10 +200,10 @@ OBJECT:random,random
 OBJECT:random,random
 OBJECT:random,random
 # Treasure?
-ENGRAVING:random,engrave,"X marks the spot."
-ENGRAVING:random,engrave,"X marks the spot."
-ENGRAVING:random,engrave,"X marks the spot."
-ENGRAVING:random,engrave,"X marks the spot."
+ENGRAVING:random,engrave,"×印地点"
+ENGRAVING:random,engrave,"×印地点"
+ENGRAVING:random,engrave,"×印地点"
+ENGRAVING:random,engrave,"×印地点"
 # Random traps
 TRAP:"spiked pit",(24,02)
 TRAP:"spiked pit",(37,00)
