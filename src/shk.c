@@ -3475,7 +3475,7 @@ xchar x, y;
 #else
             Sprintf(qbuf,
                     "%sはあなたの", Monnam(shkp));
-            Sprintf(qbuf,
+            Sprintf(qsfx,
                     "%sに%ldの値%s．売りますか？",
                     (!ltmp && cltmp) ? "の中身" : "",
                     offer, 
