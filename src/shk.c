@@ -3361,6 +3361,9 @@ xchar x, y;
     shkmoney = money_cnt(shkp->minvent);
     if (!shkmoney) {
         char c, qbuf[BUFSZ];
+#if 1 /*JP*/
+        char qsfx[BUFSZ];
+#endif
         long tmpcr = ((offer * 9L) / 10L) + (offer <= 1L);
 
         if (sell_how == SELL_NORMAL || auto_credit) {
@@ -3376,9 +3379,9 @@ xchar x, y;
             c = ynaq(safe_qbuf(qbuf, qbuf, "?", obj, doname, thesimpleoname,
                                (obj->quan == 1L) ? "that" : "those"));
 #else
-            Sprintf(qbuf, "‚É‚Â‚¢‚Ä%ld%s‚Ì—a‚¯‹à‚ğó‚¯‚¢‚ê‚Ü‚·‚©H", tmpcr,
+            Sprintf(qsfx, "‚É‚Â‚¢‚Ä%ld%s‚Ì—a‚¯‹à‚ğó‚¯‚¢‚ê‚Ü‚·‚©H", tmpcr,
                     currency(tmpcr));
-            c = ynaq(safe_qbuf(qbuf, "", qbuf, obj, doname, thesimpleoname,
+            c = ynaq(safe_qbuf(qbuf, "", qsfx, obj, doname, thesimpleoname,
                                "‚»‚ê"));
 #endif
             if (c == 'a') {
