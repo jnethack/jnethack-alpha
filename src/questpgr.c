@@ -2,6 +2,11 @@
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 #include "dlb.h"
 
@@ -262,9 +267,11 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
                 : (lwhich == 'j') ? genders[g].his : "?";
     }
     Strcpy(cvt_buf, pnoun);
+#if 0 /*JP*/
     /* capitalize for H,I,J */
     if (lwhich != which)
         cvt_buf[0] = highc(cvt_buf[0]);
+#endif
     return;
 }
 
@@ -322,6 +329,7 @@ char c;
     case 'O':
     case 'o':
         str = the(artiname(urole.questarti));
+#if 0 /*JP*/
         if (c == 'O') {
             /* shorten "the Foo of Bar" to "the Foo"
                (buffer returned by the() is modifiable) */
@@ -330,6 +338,7 @@ char c;
             if (p)
                 *p = '\0';
         }
+#endif
         break;
     case 'n':
         str = neminame();
@@ -424,7 +433,9 @@ char *in_line, *out_line;
 
                 /* capitalize */
                 case 'C':
+#if 0 /*JP*/
                     cvt_buf[0] = highc(cvt_buf[0]);
+#endif
                     break;
 
                 /* replace name with pronoun;
@@ -443,25 +454,31 @@ char *in_line, *out_line;
 
                 /* pluralize */
                 case 'P':
+#if 0 /*JP*/
                     cvt_buf[0] = highc(cvt_buf[0]);
+#endif
                 case 'p':
                     Strcpy(cvt_buf, makeplural(cvt_buf));
                     break;
 
                 /* append possessive suffix */
                 case 'S':
+#if 0 /*JP*/
                     cvt_buf[0] = highc(cvt_buf[0]);
+#endif
                 case 's':
                     Strcpy(cvt_buf, s_suffix(cvt_buf));
                     break;
 
                 /* strip any "the" prefix */
                 case 't':
+#if 0 /*JP*/
                     if (!strncmpi(cvt_buf, "the ", 4)) {
                         Strcat(cc, &cvt_buf[4]);
                         cc += strlen(cc);
                         continue; /* for */
                     }
+#endif
                     break;
 
                 default:

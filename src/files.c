@@ -3524,7 +3524,10 @@ unsigned oid; /* book identifier */
 
     int scope = 0;
     int linect = 0, passagecnt = 0, targetpassage = 0;
+/*JP
     const char *badtranslation = "an incomprehensible foreign translation";
+*/
+    const char *badtranslation = "不完全な外国語翻訳";
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;
     boolean grasped = FALSE;
@@ -3533,7 +3536,10 @@ unsigned oid; /* book identifier */
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
         if (!nowin_buf)
+/*JP
             pline("It's %s of \"%s\"!", badtranslation, tribtitle);
+*/
+            pline("これは「%s」の%sだ！", tribtitle, badtranslation);
         return grasped;
     }
 
@@ -3544,7 +3550,10 @@ unsigned oid; /* book identifier */
     if (!fp) {
         /* this is actually an error - cannot open tribute file! */
         if (!nowin_buf)
+/*JP
             pline("You feel too overwhelmed to continue!");
+*/
+            pline("あなたは続けられないほど圧倒された！");
         return grasped;
     }
 
@@ -3674,7 +3683,10 @@ cleanup:
         grasped = TRUE;
     } else {
         if (!nowin_buf)
+/*JP
             pline("It seems to be %s of \"%s\"!", badtranslation, tribtitle);
+*/
+            pline("これは「%s」の%sのようだ！", tribtitle, badtranslation);
         else
             if (foundpassage)
                 grasped = TRUE;

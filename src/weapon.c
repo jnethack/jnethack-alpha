@@ -2,16 +2,16 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 /*
  *      This module contains code for calculation of "to hit" and damage
  *      bonuses for any given weapon used, as well as weapons selection
  *      code for monsters.
  */
-
-/* JNetHack Copyright */
-/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
-/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
-/* JNetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
@@ -889,16 +889,32 @@ boolean verbose;
     /* new state is only reported if it's an increase */
     if (newspe > obj->spe) {
         if (verbose) {
+#if 0 /*JP*/
             const char *wetness = (newspe < 3)
                                      ? (!obj->spe ? "damp" : "damper")
                                      : (!obj->spe ? "wet" : "wetter");
+#else
+            const char *wetness = (newspe < 3)
+                                     ? (!obj->spe ? "Ž¼‚Á‚½" : "‚³‚ç‚ÉŽ¼‚Á‚½")
+                                     : (!obj->spe ? "”G‚ê‚½" : "‚³‚ç‚É”G‚ê‚½");
+#endif
 
             if (carried(obj))
+#if 0 /*JP*/
                 pline("%s gets %s.", Yobjnam2(obj, (const char *) 0),
                       wetness);
+#else
+                pline("%s‚Í%sD", Yobjnam2(obj, (const char *) 0),
+                      wetness);
+#endif
             else if (mcarried(obj) && canseemon(obj->ocarry))
+#if 0 /*JP*/
                 pline("%s %s gets %s.", s_suffix(Monnam(obj->ocarry)),
                       xname(obj), wetness);
+#else
+                pline("%s%s‚Í%sD", s_suffix(Monnam(obj->ocarry)),
+                      xname(obj), wetness);
+#endif
         }
     }
     obj->spe = min(newspe, 7);
@@ -922,11 +938,21 @@ boolean verbose;
     if (newspe < obj->spe) {
         if (verbose) {
             if (carried(obj))
+#if 0 /*JP*/
                 pline("%s dries%s.", Yobjnam2(obj, (const char *) 0),
                       !newspe ? " out" : "");
+#else
+                pline("%s‚Í%sD", Yobjnam2(obj, (const char *) 0),
+                      !newspe ? "Š£‚«‚«‚Á‚½" : "Š£‚¢‚½");
+#endif
             else if (mcarried(obj) && canseemon(obj->ocarry))
+#if 0 /*JP*/
                 pline("%s %s drie%s.", s_suffix(Monnam(obj->ocarry)),
                       xname(obj), !newspe ? " out" : "");
+#else
+                pline("%s%s‚Í%sD", s_suffix(Monnam(obj->ocarry)),
+                      xname(obj), !newspe ? "Š£‚«‚«‚Á‚½" : "Š£‚¢‚½");
+#endif
         }
     }
     newspe = min(newspe, 7);

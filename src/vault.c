@@ -360,9 +360,15 @@ invault()
         newsym(guard->mx, guard->my);
         if (u.uswallow) {
             /* can't interrogate hero, don't interrogate engulfer */
+/*JP
             verbalize("What's going on here?");
+*/
+            verbalize("ここで何をしているんだ？");
             if (gsensed)
+/*JP
                 pline_The("other presence vanishes.");
+*/
+                pline("他人の気配は消えた．");
             mongone(guard);
             return;
         }
@@ -651,8 +657,13 @@ register struct monst *grd;
         return -1; /* teleported guard - treat as monster */
 
     if (egrd->witness) {
+#if 0 /*JP*/
         verbalize("How dare you %s that gold, scoundrel!",
                   (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
+#else
+        verbalize("よくもまあ金を%sものだ，悪党め！",
+                  (egrd->witness & GD_EATGOLD) ? "使った" : "壊した");
+#endif
         egrd->witness = 0;
         grd->mpeaceful = 0;
         return -1;
@@ -968,7 +979,10 @@ newpos:
            it and give an inappropriate message */
         mpickgold(grd);
         if (canspotmon(grd))
+/*JP
             pline("%s picks up some gold.", Monnam(grd));
+*/
+            pline("%sは金を拾った．", Monnam(grd));
     } else
         newsym(grd->mx, grd->my);
     restfakecorr(grd);

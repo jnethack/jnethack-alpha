@@ -45,8 +45,13 @@ stoned_dialogue()
         char buf[BUFSZ];
 
         Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
+#if 0 /*JP*/
         if (nolimbs(youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
+#else
+        if (nolimbs(youmonst.data) && strstri(buf, "手足"))
+            (void) strsubst(buf, "手足", "先端");
+#endif
         pline1(buf);
     }
     switch ((int) i) {
@@ -126,7 +131,10 @@ vomiting_dialogue()
     case 2:
         txt = vomiting_texts[4];
         if (cantvomit(youmonst.data))
+/*JP
             txt = "gag uncontrolably.";
+*/
+            txt = "気分の悪さが抑えられなくなった．";
         break;
     case 0:
         stop_occupation();
@@ -218,8 +226,13 @@ slime_dialogue()
         char buf[BUFSZ];
 
         Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
+#if 0 /*JP*/
         if (nolimbs(youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
+#else
+        if (nolimbs(youmonst.data) && strstri(buf, "手足"))
+            (void) strsubst(buf, "手足", "先端");
+#endif
 
         if (index(buf, '%')) {
             if (i == 4L) {  /* "you are turning green" */
@@ -500,7 +513,10 @@ nh_timeout()
                 /* must be declining to die in explore|wizard mode;
                    treat like being cured of strangulation by prayer */
                 if (uamul && uamul->otyp == AMULET_OF_STRANGULATION) {
+/*JP
                     Your("amulet vanishes!");
+*/
+                    Your("魔除けは消えた！");
                     useup(uamul);
                 }
                 break;
@@ -732,7 +748,7 @@ long timeout;
 #if 0 /*JP*/
                 verbalize("Gleep!"); /* Mything eggs :-) */
 #else
-                verbalize("ブォー！");          /* Mything eggs :-) */
+                verbalize("ブォー！"); /* Mything eggs :-) */
 #endif
             }
             break;
@@ -893,8 +909,13 @@ slip_or_trip()
         }
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
+#if 0 /*JP*/
             Sprintf(killer.name, "tripping over %s corpse",
                     an(mons[otmp->corpsenm].mname));
+#else
+            Sprintf(killer.name, "%sの死体につまづいて",
+                    mons[otmp->corpsenm].mname);
+#endif
             instapetrify(killer.name);
         }
     } else if (rn2(3) && is_ice(u.ux, u.uy)) {

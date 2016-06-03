@@ -238,7 +238,10 @@ struct obj *wep;
         if (Race_if(PM_ELF) && !wep->oartifact
             && objects[wep->otyp].oc_material == IRON) {
             /* Elves are averse to wielding cold iron */
+/*JP
             You("have an uneasy feeling about wielding cold iron.");
+*/
+            You("—â‚½‚¢“S‚ğ‘•”õ‚·‚é‚±‚Æ‚É•sˆÀ‚È‹C‚É‚È‚Á‚½.");
             change_luck(-1);
         }
 #endif

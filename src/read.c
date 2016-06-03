@@ -78,6 +78,7 @@ char *buf;
 {
     static const char *shirt_msgs[] = {
         /* Scott Bigham */
+#if 0 /*JP*/
       "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
         "Is that Mjollnir in your pocket or are you just happy to see me?",
       "It's not the size of your sword, it's how #enhance'd you are with it.",
@@ -94,7 +95,26 @@ char *buf;
         "Don't Panic", /* HHGTTG */
         "Furinkan High School Athletic Dept.",                /* Ranma 1/2 */
         "Hel-LOOO, Nurse!",                                   /* Animaniacs */
+#else
+        "私は運命の迷宮を調査していたが，手に入れたのはきたないＴシャツだけだった！",
+        "ポケットにミュルニールが入っているの？それとも私に会えてうれしい？",
+        "剣の大きさが問題なのではない．それが如何に#enhanceされているかなのだ．",
+        "マダム・エルバイラのサキュバス館 永久顧客",
+        "マダム・エルバイラのサキュバス館 今月の最優秀功労者",
+        "ローディオス金庫の番人，それは暗く小さい部屋の中",
+        "イェンダー軍兵士，それは巨大な団体の中",
+        "私はイェンダー軍の新兵訓練所を乗り越えました",
+        "ローディオス会計学校 室内ラクロスチーム",
+        "Oracle(TM) の泉 第１０回濡れＴシャツコンテスト",
+        "おい，黒ドラゴン！こいつを分解しろ！",
+        "馬鹿と一緒にいます → ",
+        "私は悪くない！Izchakに投票したもの！",
+        "あ わ て る な", /* 銀河ヒッチハイクガイド */
+        "風林館高校陸上部",                                   /* Ranma 1/2 */
+        "Ｈｅｌ－ＬＯＯＯ，Ｎｕｒｓｅ！",                     /* Animaniacs */
+#endif
         "=^.^=",
+#if 0 /*JP*/
         "100% goblin hair - do not wash",
         "Aberzombie and Fitch",
         "cK -- Cockatrice touches the Kop",
@@ -112,6 +132,26 @@ char *buf;
         "I am not a pack rat - I am a collector",
         "I bounced off a rubber tree",         /* Monkey Island */
         "Plunder Island Brimstone Beach Club", /* Monkey Island */
+#else
+        "ゴブリン毛100% - 洗えません",
+        "アバゾンビ&フィッチ",
+        "cK -- コカトリスが警官にタッチ",
+        "質問しないで; 私はここを探検しているだけ",
+        "Down with pants!",
+        "dはあなたの犬か殺人者か？",
+        "FREE PUG AND NEWT!",
+        "Go team ant!",
+        "Got newt?",
+        "こんにちはダーリン！", /* Charlie Drake */
+        "やあ！ニンフ！このＴシャツを盗んで！",
+        "I <3 Dungeon of Doom",
+        "I <3 Maud",
+        "私はバルキリーだ．私が走っているのを見たら，ついてこい．",
+        "私はゴミ集めではない．私は収集家だ",
+        "私はゴムの木に跳ね返った",         /* Monkey Island */
+        "略奪島硫黄海岸クラブ", /* Monkey Island */
+#endif
+#if 0 /*JP*/
         "If you can read this, I can hit you with my polearm",
         "I'm confused!",
         "I scored with the princess",
@@ -127,6 +167,24 @@ char *buf;
         "Somebody stole my Mojo!",
         "The Hellhound Gang",
         "The Werewolves",
+#else
+        "これが読めるなら、私の長斧が届くということだ",
+        "私は混乱しています！",
+        "I scored with the princess",
+        "私は永遠に生きるか、そのために死にたい．",
+        "Lichen Park",
+        "考え込んでいます - 捜索隊を出してください",
+        "肉はモルドール",
+        "鉱山街商業改善協会",
+        "鉱山街の見張り",
+ "パーム女史の交渉技術の家 -- とても評判の悪評の家",
+        "鉱山ダッシュ中",
+        "本物の男はクロムを愛する",
+        "誰かが俺のアレを盗んだ！",
+        "The Hellhound Gang",
+        "The Werewolves",
+#endif
+#if 0 /*JP*/
         "They Might Be Storm Giants",
         "Weapons don't kill people, I kill people",
         "White Zombie",
@@ -144,6 +202,25 @@ char *buf;
         "Pudding farmer",
         "Vegetarian",
         "Hello, I'm War!",
+#else
+        "ゼイ・マイト・ビー・ストーム・ジャイアンツ",
+        "武器が人を殺すのではない，私が人を殺すのだ",
+        "White Zombie",
+        "いい加減にして！",
+        "アンフル州立大学 - 火蟻との戦いの本拠地！",
+        "FREE HUGS",
+        "特別昇天者",
+        "本当の男はバルキリーだ",
+        "青年洞窟掘削連盟",
+        "ローディオス砦を占拠せよ",
+        "このＴシャツを買うお金がなかったのでこれは盗んだ！",
+        "マインドフレヤ氏ね",
+        "私はパンツを穿いていません",
+        "Down with the living!",
+        "プリン農家",
+        "ベジタリアン",
+        "やあ，私が『戦争』だ！",
+#endif
     };
 
     Strcpy(buf, shirt_msgs[tshirt->o_id % SIZE(shirt_msgs)]);
@@ -233,6 +310,7 @@ doread()
         return 1;
     } else if (scroll->otyp == CREDIT_CARD) {
         static const char *card_msgs[] = {
+#if 0 /*JP*/
             "Leprechaun Gold Tru$t - Shamrock Card",
             "Magic Memory Vault Charge Card", "Larn National Bank", /* Larn */
             "First Bank of Omega",               /* Omega */
@@ -246,6 +324,21 @@ doread()
             "Yendorian Express - Gold Card",
             "Yendorian Express - Mithril Card",
             "Yendorian Express - Platinum Card", /* must be last */
+#else
+            "レプラコーン信用金庫 - クローバーカード",
+            "魔法記念倉庫クレジットカード", "ラーン国営銀行", /* Larn */
+            "オメガ第一銀行",               /* Omega */
+            "ゾーク銀行 - Bank of Zork - フロボズ魔法カード", /* Zork */
+            "アンクモルポーク商人ギルド 交易カード",
+            "アンクモルポーク盗賊ギルド 無制限取引カード",
+            "ランスマンスベイ貸金業協会",
+            "ゲヘナ銀行 - 利子99%カード",
+            "イェンダー印エキスプレスカード - カッパーカード",
+            "イェンダー印エキスプレスカード - シルバーカード",
+            "イェンダー印エキスプレスカード - ゴールドカード",
+            "イェンダー印エキスプレスカード - ミスリルカード",
+            "イェンダー印エキスプレスカード - プラチナカード", /* must be last */
+#endif
         };
 
         if (Blind) {
@@ -285,7 +378,7 @@ doread()
 /*JP
             You_cant("feel any Braille writing.");
 */
-            You("点字はどうも書いてないようだ．");
+            pline("点字はどうも書いてないようだ．");
             return 0;
         }
         if (flags.verbose)
@@ -345,7 +438,7 @@ doread()
 /*JP
             You_cant("feel any Braille writing.");
 */
-            You("点字はどうも書いてないようだ．");
+            pline("点字はどうも書いてないようだ．");
             return 0;
         }
 /*JP
@@ -1634,12 +1727,23 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 }
         }
         if (!results) {
+#if 0 /*JP*/
             pline("Nothing interesting %s.",
                   !candidates ? "happens" : "seems to happen");
+#else
+            pline("何も面白いことはおこらなかった%s．",
+                  !candidates ? "" : "ようだ");
+#endif
         } else {
+#if 0 /*JP*/
             pline_The("neighborhood %s %sfriendlier.",
                       vis_results ? "is" : "seems",
                       (results < 0) ? "un" : "");
+#else
+            pline_The("お隣との仲が%sくなった%s．",
+                      (results < 0) ? "悪" : "良",
+                      vis_results ? "" : "ようだ");
+#endif
             if (vis_results > 0)
                 known = TRUE;
         }
@@ -1725,7 +1829,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             /* when casting a spell we know we're not confused,
                so inventory must be empty (another message has
                already been given above if reading a scroll) */
+/*JP
             pline("You're not carrying anything to be identified.");
+*/
+            pline("あなたは識別できるものをなにも持っていない．");
         }
         break;
     case SCR_CHARGING:
@@ -1942,7 +2049,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             if (!sblessed) {
                 drop_boulder_on_player(confused, !scursed, TRUE, FALSE);
             } else if (!nboulders)
+/*JP
                 pline("But nothing else happens.");
+*/
+                pline("しかし他に何もおこらなかった．");
         }
         break;
     case SCR_PUNISHMENT:
@@ -2081,9 +2191,15 @@ boolean confused, byu;
             if (mtmp->minvis && !canspotmon(mtmp))
                 map_invisible(mtmp->mx, mtmp->my);
         } else if (u.uswallow && mtmp == u.ustuck)
+#if 0 /*JP*/
             You_hear("something hit %s %s over your %s!",
                      s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH),
                      body_part(HEAD));
+#else
+            You_hear("何かがあなたの%sの上の%sの%sに当たった音を聞いた！",
+                     body_part(HEAD),
+                     s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH));
+#endif
 
         mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
         if (helmet) {
@@ -2117,7 +2233,10 @@ boolean confused, byu;
             if (byu)
                 xkilled(mtmp, 1);
             else {
+/*JP
                 pline("%s is killed.", Monnam(mtmp));
+*/
+                pline("%sは死んだ．", Monnam(mtmp));
                 mondied(mtmp);
             }
         }
@@ -2661,10 +2780,11 @@ int how;
     } else {
         Strcpy(buf, ptr->mname); /* make sure we have standard singular */
         if ((ptr->geno & G_UNIQ) && ptr != &mons[PM_HIGH_PRIEST])
-/*JP
+#if 0 /*JP*/
             which = !type_is_pname(ptr) ? "the " : "";
-*/
-            which = !type_is_pname(ptr) ? "" : "";
+#else
+            which = "";
+#endif
     }
     if (how & REALLY) {
         /* setting no-corpse affects wishing and random tin generation */

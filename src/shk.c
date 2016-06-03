@@ -34,7 +34,9 @@ STATIC_VAR NEARDATA long int followmsg; /* last time of follow message */
 STATIC_VAR const char and_its_contents[] = " and its contents";
 */
 STATIC_VAR const char and_its_contents[] = "中身を合わせて";
+#if 0 /*JP*/
 STATIC_VAR const char the_contents_of[] = "the contents of ";
+#endif
 
 STATIC_DCL void FDECL(append_honorific, (char *));
 STATIC_DCL void FDECL(setpaid, (struct monst *));
@@ -638,9 +640,15 @@ char *enterstring;
 */
         pline("%sは泥棒をののしった．", shkname(shkp));
     } else {
+#if 0 /*JP*/
         verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), plname,
                   eshkp->visitct++ ? " again" : "", s_suffix(shkname(shkp)),
                   shtypes[rt - SHOPBASE].name);
+#else
+        verbalize("%s！%sの%sに%s！", Hello(shkp), shkname(shkp),
+                  shtypes[rt - SHOPBASE].name,
+                  eshkp->visitct++ ? "また来ましたね" : "ようこそ");
+#endif
     }
     /* can't do anything about blocking if teleported in */
     if (!inside_shop(u.ux, u.uy)) {
@@ -2465,16 +2473,28 @@ boolean quietly;
         && obj->otyp == CANDELABRUM_OF_INVOCATION) {
         if (!quietly) {
             if (is_izchak(shkp, TRUE) && !u.uevent.invoked) {
+/*JP
                 verbalize("No thanks, I'd hang onto that if I were you.");
+*/
+                verbalize("いや，いらない．私ならそれを手放さないね．");
                 if (obj->spe < 7)
+#if 0 /*JP*/
                     verbalize(
                              "You'll need %d%s candle%s to go along with it.",
                               (7 - obj->spe), (obj->spe > 0) ? " more" : "",
                               plur(7 - obj->spe));
+#else
+                    verbalize(
+                             "それを使うには%s%d本のろうそくが必要だ．",
+                              (obj->spe > 0) ? "あと" : "", (7 - obj->spe));
+#endif
                 /* [what if hero is already carrying enough candles?
                    should Izchak explain how to attach them instead] */
             } else {
+/*JP
                 verbalize("I won't stock that.  Take it out of here!");
+*/
+                verbalize("それは仕入れないよ．持っていきなさい！");
             }
         }
         return TRUE;
@@ -2605,7 +2625,10 @@ struct monst *shkp;
     eshkp = ESHK(shkp);
 
     if (eshkp->billct == BILLSZ) {
+/*JP
         You("got that for free!");
+*/
+        You("それをただで手に入れた！");
         return;
     }
 
@@ -2895,11 +2918,13 @@ char *buf;
         };
 #endif
     Strcat(buf, honored[rn2(SIZE(honored) - 1) + u.uevent.udemigod]);
+#if 0 /*JP*//*日本語ではそこまでしない*/
     if (is_vampire(youmonst.data))
         Strcat(buf, (flags.female) ? " dark lady" : " dark lord");
     else if (is_elf(youmonst.data))
         Strcat(buf, (flags.female) ? " hiril" : " hir");
     else
+#endif
 #if 0 /*JP*/
         Strcat(buf, !is_human(youmonst.data) ? " creature" : (flags.female)
                                                                  ? " lady"
@@ -3323,9 +3348,15 @@ xchar x, y;
                       currency(delta));
 #endif
             else
+#if 0 /*JP*/
                 pline("%ld %s added to your credit; total is now %ld %s.",
                       delta, currency(delta), eshkp->credit,
                       currency(eshkp->credit));
+#else
+                pline("預け金に%ld%s追加された; 合計は%ld%sになった．.",
+                      delta, currency(delta), eshkp->credit,
+                      currency(eshkp->credit));
+#endif
         }
 
         if (!offer) {
@@ -4918,7 +4949,7 @@ boolean silent;
         pline_The("Kop%s (disappointed) vanish%s into thin air.",
                   plur(cnt), (cnt == 1) ? "es" : "");
 #else
-        pline("がっかりした警官は空気にとけて消えた．");
+        pline("警官は(がっかりして)姿を消した．");
 #endif
 }
 
@@ -5021,11 +5052,20 @@ boolean altusage;
         fmt = "%s%s値段は%ld%s(イェンダー燃料税)だ．";
     } else if (altusage && (otmp->otyp == BAG_OF_TRICKS
                             || otmp->otyp == HORN_OF_PLENTY)) {
+/*JP
         fmt = "%s%sEmptying that will cost you %ld %s.";
+*/
+        fmt = "%s%sそれの使用料は%ld%sだ．";
         if (!rn2(3))
+/*JP
             arg1 = "Whoa!  ";
+*/
+            arg1 = "うわ！";
         if (!rn2(3))
+/*JP
             arg1 = "Watch it!  ";
+*/
+            arg1 = "気をつけろ！";
     } else {
 /*JP
         fmt = "%s%sUsage fee, %ld %s.";

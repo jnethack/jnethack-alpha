@@ -65,17 +65,17 @@ amulet()
 /*JP
                     pline("%s hot!", Tobjnam(amu, "feel"));
 */
-                        pline("%s‚Í”M‚­Š´‚¶‚½I", xname(amu));
+                    pline("%s‚Í”M‚­Š´‚¶‚½I", xname(amu));
                 else if (du <= 64)
 /*JP
                     pline("%s very warm.", Tobjnam(amu, "feel"));
 */
-                        pline("%s‚Í‚Æ‚Ä‚à’g‚©‚­Š´‚¶‚½D", xname(amu));
+                    pline("%s‚Í‚Æ‚Ä‚à’g‚©‚­Š´‚¶‚½D", xname(amu));
                 else if (du <= 144)
 /*JP
                     pline("%s warm.", Tobjnam(amu, "feel"));
 */
-                        pline("%s‚Í’g‚©‚­Š´‚¶‚½D", xname(amu));
+                    pline("%s‚Í’g‚©‚­Š´‚¶‚½D", xname(amu));
                 /* else, the amulet feels normal */
                 break;
             }

@@ -252,7 +252,7 @@ int ef_flags;
 /*JP
                 Your("%s %s not affected.", ostr, vtense(ostr, "are"));
 */
-                Your("%sは影響を受けなかった．",ostr);
+                Your("%sは影響を受けなかった．", ostr);
             else if (vismon)
 #if 0 /*JP*/
                 pline("%s %s %s not affected.", s_suffix(Monnam(victim)),
@@ -281,8 +281,12 @@ int ef_flags;
                       mon_nam(victim), ostr);
 #endif
             else if (visobj)
+#if 0 /*JP*/
                 pline("Somehow, the %s %s not affected.", ostr,
                       vtense(ostr, "are"));
+#else
+                pline("なぜか，%sは影響を受けなかった．", ostr);
+#endif
         }
         /* We assume here that if the object is protected because it
          * is blessed, it still shows some minor signs of wear, and
@@ -339,12 +343,23 @@ int ef_flags;
         return ER_DAMAGED;
     } else if (ef_flags & EF_DESTROY) {
         if (victim == &youmonst)
+/*JP
             Your("%s %s away!", ostr, vtense(ostr, action[type]));
+*/
+            Your("%sは完全に%s！", ostr, action[type]);
         else if (vismon)
+#if 0 /*JP*/
             pline("%s %s %s away!", s_suffix(Monnam(victim)), ostr,
                   vtense(ostr, action[type]));
+#else
+            pline("%sの%sは完全に%s！", Monnam(victim), ostr,
+                  action[type]);
+#endif
         else if (visobj)
+/*JP
             pline("The %s %s away!", ostr, vtense(ostr, action[type]));
+*/
+            pline("%sは完全に%s！", ostr, action[type]);
 
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
@@ -1469,7 +1484,10 @@ unsigned trflags;
                                      SUPPRESS_SADDLE, FALSE));
 #endif
             } else if (adj_pit) {
+/*JP
                 You("move into an adjacent pit.");
+*/
+                You("隣の落し穴に移動した．");
             } else {
 #if 0 /*JP*/
                 Strcpy(verbbuf,
@@ -1502,7 +1520,7 @@ unsigned trflags;
 /*JP
             const char *predicament = "on a set of sharp iron spikes";
 */
-            const char *predicament = "鋭い鉄のトゲトゲの上に落ちた";
+            const char *predicament = "鋭い鉄のトゲトゲの上に";
 
             if (u.usteed) {
 #if 0 /*JP*/
@@ -1511,16 +1529,16 @@ unsigned trflags;
                                        SUPPRESS_SADDLE, FALSE)),
                       adj_pit ? "steps" : "lands", predicament);
 #else
-                pline("%sは%s！",
+                pline("%sは%s%s！",
                       upstart(x_monnam(u.usteed, steed_article, "かわいそうな",
                                        SUPPRESS_SADDLE, FALSE)),
-                      predicament);
+                      predicament, adj_pit ? "落ちた" : "降りた");
 #endif
             } else
 #if 0 /*JP*/
                 You("%s %s!", adj_pit ? "step" : "land", predicament);
 #else
-                You("%s！", predicament);
+                You("%s%s！", predicament, adj_pit ? "落ちた" : "降りた");
 #endif
         }
         u.utrap = rn1(6, 2);
@@ -3004,7 +3022,7 @@ register struct monst *mtmp;
 /*JP
             fallverb = "falls";
 */
-            fallverb = "落ちる";
+            fallverb = "落ちた";
             if (is_flyer(mptr) || is_floater(mptr)
                 || (mtmp->wormno && count_wsegs(mtmp) > 5)
                 || is_clinger(mptr)) {
@@ -3024,7 +3042,7 @@ register struct monst *mtmp;
 #if 0 /*JP*/
                 fallverb = "is dragged"; /* sokoban pit */
 #else
-                fallverb = "ずり落ちる"; /* sokoban pit */
+                fallverb = "ずり落ちた"; /* sokoban pit */
 #endif
             }
             if (!passes_walls(mptr))
@@ -3035,7 +3053,7 @@ register struct monst *mtmp;
                       a_your[trap->madeby_u]);
 #else
                 pline("%sは%s落し穴に%s！", Monnam(mtmp),
-                      set_you[trap->madeby_u], jpast(fallverb));
+                      set_you[trap->madeby_u], fallverb);
 #endif
                 if (mptr == &mons[PM_PIT_VIPER]
                     || mptr == &mons[PM_PIT_FIEND])
@@ -3569,7 +3587,7 @@ float_up()
 /*JP
         You("gain control over your movements.");
 */
-        You("うまく歩けるようになった．");
+        You("うまく動けるようになった．");
     } else {
 /*JP
         You("start to float in the air!");
@@ -3592,7 +3610,10 @@ float_up()
         }
     }
     if (Flying)
+/*JP
         You("are no longer able to control your flight.");
+*/
+        You("空中でうまく動けなくなった．");
     BFlying |= I_SPECIAL;
     return;
 }
@@ -3638,7 +3659,10 @@ long hmask, emask; /* might cancel timeout */
         /* controlled flight no longer overridden by levitation */
         BFlying &= ~I_SPECIAL;
         if (Flying) {
+/*JP
             You("have stopped levitating and are now flying.");
+*/
+            You("空中浮遊を止めて空を飛びはじめた．");
             return 1;
         }
     }
@@ -3745,12 +3769,22 @@ long hmask, emask; /* might cancel timeout */
                     selftouch("落ちながら，あなたは");
                 } else if (u.usteed && (is_floater(u.usteed->data)
                                         || is_flyer(u.usteed->data))) {
+/*JP
                     You("settle more firmly in the saddle.");
+*/
+                    You("よりしっかりと鞍に納まった．");
                 } else if (Hallucination) {
+#if 0 /*JP*/
                     pline("Bummer!  You've %s.",
                           is_pool(u.ux, u.uy)
                              ? "splashed down"
                              : "hit the ground");
+#else
+                    pline("やめてぇ！あなたは%sに叩きつけられた．",
+                          is_pool(u.ux, u.uy)
+                             ? "水面"
+                             : "地面");
+#endif
                 } else {
 /*JP
                     You("float gently to the %s.", surface(u.ux, u.uy));
@@ -3795,7 +3829,10 @@ climb_pit()
 
     if (Passes_walls) {
         /* marked as trapped so they can pick things up */
+/*JP
         You("ascend from the pit.");
+*/
+        You("落し穴を上っていった．");
         u.utrap = 0;
         fill_pit(u.ux, u.uy);
         vision_full_recalc = 1; /* vision limits change */
@@ -3803,28 +3840,49 @@ climb_pit()
         Your("%s gets stuck in a crevice.", body_part(LEG));
         display_nhwindow(WIN_MESSAGE, FALSE);
         clear_nhwindow(WIN_MESSAGE);
+/*JP
         You("free your %s.", body_part(LEG));
+*/
+        Your("%sは自由になった．", body_part(LEG));
     } else if ((Flying || is_clinger(youmonst.data)) && !Sokoban) {
         /* eg fell in pit, then poly'd to a flying monster;
            or used '>' to deliberately enter it */
+/*JP
         You("%s from the pit.", Flying ? "fly" : "climb");
+*/
+        You("落し穴から%sいった．", Flying ? "上って" : "登って");
         u.utrap = 0;
         fill_pit(u.ux, u.uy);
         vision_full_recalc = 1; /* vision limits change */
     } else if (!(--u.utrap)) {
+#if 0 /*JP*/
         You("%s to the edge of the pit.",
             (Sokoban && Levitation)
                 ? "struggle against the air currents and float"
                 : u.usteed ? "ride" : "crawl");
+#else
+        You("%s落し穴の端にたどり着いた．",
+            (Sokoban && Levitation)
+                ? "空気の流れの中でもがきながら" : "");
+#endif
         fill_pit(u.ux, u.uy);
         vision_full_recalc = 1; /* vision limits change */
     } else if (u.dz || flags.verbose) {
         if (u.usteed)
+/*JP
             Norep("%s is still in a pit.", upstart(y_monnam(u.usteed)));
+*/
+            Norep("%sはまだ落し穴の中にいる．", y_monnam(u.usteed));
         else
+#if 0 /*JP*/
             Norep((Hallucination && !rn2(5))
                       ? "You've fallen, and you can't get up."
                       : "You are still in a pit.");
+#else
+            Norep((Hallucination && !rn2(5))
+                      ? "あなたは落ち，上がれない．"
+                      : "あなたはまだ落し穴の中にいる．");
+#endif
     }
 }
 
@@ -4373,7 +4431,7 @@ boolean force;
                             : (one ? "Another" : "More"),
                   bufp, vtense(bufp, "explode"));
 #else
-            pline("薬瓶が爆発した！");
+            pline("%sは爆発した！", bufp);
 #endif
             if (acid_ctx.ctx_valid) {
                 if (obj->dknown)
@@ -4678,9 +4736,11 @@ crawl:
            because lifesaving resets them */
         pool_of_water = waterbody_name(u.ux, u.uy);
         killer.format = KILLED_BY_AN;
+#if 0 /*JP*/
         /* avoid "drowned in [a] water" */
         if (!strcmp(pool_of_water, "water"))
             pool_of_water = "deep water", killer.format = KILLED_BY;
+#endif
         Strcpy(killer.name, pool_of_water);
         done(DROWNING);
         /* oops, we're still alive.  better get out of the water. */

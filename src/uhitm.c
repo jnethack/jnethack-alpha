@@ -1514,7 +1514,10 @@ struct obj *otmp;
 #endif
 
     /* stealing this corpse is fatal... */
+/*JP
     instapetrify(corpse_xname(otmp, "stolen", CXN_ARTICLE));
+*/
+    instapetrify(corpse_xname(otmp, "盗まれた", CXN_ARTICLE));
     /* apparently wasn't fatal after all... */
     return TRUE;
 }
@@ -2253,8 +2256,14 @@ register struct attack *mattk;
 
             if (!type_is_pname(pd))
                 mname = an(mname);
+/*JP
             You("englut %s.", mon_nam(mdef));
+*/
+            You("%sを飲み込んだ．", mon_nam(mdef));
+/*JP
             Sprintf(kbuf, "swallowing %s whole", mname);
+*/
+            Sprintf(kbuf, "%sを飲み込んで", mname);
             instapetrify(kbuf);
         } else {
             start_engulf(mdef);
@@ -2478,7 +2487,10 @@ register struct attack *mattk;
 boolean wouldhavehit;
 {
     if (wouldhavehit) /* monk is missing due to penalty for wearing suit */
+/*JP
         Your("armor is rather cumbersome...");
+*/
+        Your("防具は少し邪魔だ．．．");
 
     if (could_seduce(&youmonst, mdef, mattk))
 /*JP
@@ -2920,9 +2932,14 @@ boolean wep_was_destroyed;
                         You("%sのにらみで一瞬硬直した！",
                             s_suffix(mon_nam(mon)));
                     } else if (Hallucination && rn2(4)) {
+#if 0 /*JP*/
                         pline("%s looks %s%s.", Monnam(mon),
                               !rn2(2) ? "" : "rather ",
                               !rn2(2) ? "numb" : "stupified");
+#else
+                        pline("%sは%sばかになったようだ．", Monnam(mon),
+                              !rn2(2) ? "" : "少し");
+#endif
                     } else {
 /*JP
                         You("are frozen by %s gaze!", s_suffix(mon_nam(mon)));

@@ -496,8 +496,13 @@ boolean mkspecl;
     int atype;
 
     /* 3.6.0 tribute */
+#if 0 /*JP*/
     if (mkspecl && (!strcmp(shp->name, "rare books")
                     || !strcmp(shp->name, "second-hand bookstore"))) {
+#else
+    if (mkspecl && (!strcmp(shp->name, "å∂ÇÃñ{âÆ")
+                    || !strcmp(shp->name, "å√èëìX"))) {
+#endif
         struct obj *novel = mksobj_at(SPE_NOVEL, sx, sy, FALSE, FALSE);
 
         if (novel)

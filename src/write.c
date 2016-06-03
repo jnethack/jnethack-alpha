@@ -155,7 +155,10 @@ register struct obj *pen;
             return 1;
         } else if (paper->oclass == SPBOOK_CLASS) {
             /* can't write a magic book while blind */
+/*JP
             pline("%s can't create braille text.",
+*/
+            pline("%sでは点字を作れない．",
                   upstart(ysimple_name(pen)));
             return 1;
         }
@@ -387,7 +390,10 @@ found:
            have passed the write-an-unknown scroll test
            above we can still fail this one, so it's doubly
            hard to write an unknown scroll while blind */
+/*JP
         You("fail to write the scroll correctly and it disappears.");
+*/
+        You("巻物に正しく書くのに失敗した．巻物は消えた．");
         useup(paper);
         obfree(new_obj, (struct obj *) 0);
         return 1;
@@ -437,6 +443,7 @@ new_book_description(booktype, outbuf)
 int booktype;
 char *outbuf;
 {
+#if 0 /*JP*//*日本語では不要*/
     /* subset of description strings from objects.c; if it grows
        much, we may need to add a new flag field to objects[] instead */
     static const char *const compositions[] = {
@@ -457,6 +464,9 @@ char *outbuf;
             break;
 
     Sprintf(outbuf, "%s%s", *comp_p ? "into " : "", descr);
+#else /*JP:単純にコピー*/
+    Strcpy(outbuf, OBJ_DESCR(objects[booktype]));
+#endif
     return outbuf;
 }
 

@@ -498,7 +498,10 @@ struct obj *scroll;
         }
     } else if (scroll && scroll->blessed) {
         /* (this used to be handled in seffects()) */
+/*JP
         if (yn("Do you wish to teleport?") == 'n')
+*/
+        if (yn("uŠÔˆÚ“®‚µ‚Ü‚·‚©H") == 'n')
             return TRUE;
         result = TRUE;
     }

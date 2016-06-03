@@ -1613,7 +1613,10 @@ dosacrifice()
     highaltar = ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))
                  && (levl[u.ux][u.uy].altarmask & AM_SHRINE));
 
+/*JP
     otmp = floorfood("sacrifice", 1);
+*/
+    otmp = floorfood("捧げる", 1);
     if (!otmp)
         return 0;
     /*
@@ -1868,14 +1871,31 @@ dosacrifice()
                 if (u.ualign.record > -99)
                     u.ualign.record = -99;
                 /*[apparently shrug/snarl can be sensed without being seen]*/
+#if 0 /*JP*/
                 pline("%s shrugs and retains dominion over %s,", Moloch,
                       u_gname());
+#else
+                pline("%sは肩をすくめ，%sに対する優勢を維持した．", Moloch,
+                      u_gname());
+#endif
+/*JP
                 pline("then mercilessly snuffs out your life.");
+*/
+                pline("そして無慈悲にあなたの命を奪った．");
+/*JP
+*/
+#if 0 /*JP*/
                 Sprintf(killer.name, "%s indifference", s_suffix(Moloch));
+#else
+                Sprintf(killer.name, "冷淡な%s", Moloch);
+#endif
                 killer.format = KILLED_BY;
                 done(DIED);
                 /* life-saved (or declined to die in wizard/explore mode) */
+/*JP
                 pline("%s snarls and tries again...", Moloch);
+*/
+                pline("%sはののしり，もう一度試した．．．", Moloch);
                 fry_by_god(A_NONE, TRUE); /* wrath of Moloch */
                 /* declined to die in wizard or explore mode */
                 pline(cloud_of_smoke, hcolor(NH_BLACK));
@@ -2615,6 +2635,7 @@ aligntyp alignment;
 }
 
 static const char *hallu_gods[] = {
+#if 0 /*JP*/
     "the Flying Spaghetti Monster", /* Church of the FSM */
     "Eris",                         /* Discordianism */
     "the Martians",                 /* every science fiction ever */
@@ -2629,6 +2650,22 @@ static const char *hallu_gods[] = {
     "the Ori",                      /* Stargate */
     "destiny",                      /* why not? */
     "your Friend the Computer",     /* Paranoia */
+#else
+    "空飛ぶスパゲッティモンスター", /* Church of the FSM */
+    "エリス",                       /* Discordianism */
+    "火星人",                       /* every science fiction ever */
+    "ゾム",                         /* Crawl */
+    "アンドール・ドラコン",         /* ADOM */
+    "イェンダー中央銀行",           /* economics */
+    "歯の妖精",                     /* real world(?) */
+    "オム",                         /* Discworld */
+    "ヨーグモス",                   /* Magic: the Gathering */
+    "モルゴス",                     /* LoTR */
+    "クトゥルフ",                   /* Lovecraft */
+    "オーライ",                     /* Stargate */
+    "ネ申",                         /* why not? */
+    "親愛なるコンピュータ",         /* Paranoia */
+#endif
 };
 
 /* hallucination handling for priest/minion names: select a random god

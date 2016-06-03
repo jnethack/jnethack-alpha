@@ -824,7 +824,10 @@ struct monst *steed;
         }
     }
     if (wasimmobile && !steed->msleeping && steed->mcanmove)
+/*JP
         pline("%s wakes up.", Monnam(steed));
+*/
+        pline("%sは起きた．", Monnam(steed));
     /* regardless of waking, terminate any meal in progress */
     finish_meating(steed);
 }
@@ -840,12 +843,18 @@ boolean checkfeeding;
     if (steed) {
         /* check whether steed can move */
         if (steed->msleeping || !steed->mcanmove) {
+/*JP
             pline("%s won't move!", upstart(y_monnam(steed)));
+*/
+            pline("%sは動けない！", y_monnam(steed));
             return TRUE;
         }
         /* optionally check whether steed is in the midst of a meal */
         if (checkfeeding && steed->meating) {
+/*JP
             pline("%s is still eating.", upstart(y_monnam(steed)));
+*/
+            pline("%sはまだ食べている．", y_monnam(steed));
             return TRUE;
         }
     }

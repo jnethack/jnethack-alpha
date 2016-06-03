@@ -2917,7 +2917,10 @@ doeat()
         pline("息もできないのに，どうやって食べたらいいんだい？");
         return 0;
     }
+/*JP
     if (!(otmp = floorfood("eat", 0)))
+*/
+    if (!(otmp = floorfood("食べる", 0)))
         return 0;
     if (check_capacity((char *) 0))
         return 0;
@@ -3600,8 +3603,13 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
     register struct obj *otmp;
     char qbuf[QBUFSZ];
     char c;
+#if 0 /*JP*/
     boolean feeding = !strcmp(verb, "eat"),    /* corpsecheck==0 */
         offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
+#else
+    boolean feeding = !strcmp(verb, "食べる"), /* corpsecheck==0 */
+        offering = !strcmp(verb, "捧げる");    /* corpsecheck==1 */
+#endif
 
 #if 1 /*JP*/
     const char *jverb = trans_verb(verb)->jp;

@@ -2,7 +2,27 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
+
+#if 1 /*JP*/
+STATIC_DCL char *FDECL(beastname, (const char *));
+
+/*JP 「ジャッカル人間」から「ジャッカル」を取り出す */
+STATIC_OVL char *
+beastname(name)
+const char *name;
+{
+    static char werebuf[BUFSZ];
+    strcpy(werebuf, name);
+    werebuf[strlen(werebuf) - 4] = '\0';
+    return werebuf;
+}
+#endif
 
 void
 were_change(mon)
@@ -115,7 +135,7 @@ register struct monst *mon;
               is_human(&mons[pm]) ? "human" : mons[pm].mname + 4);
 #else
         pline("%sは%sの姿になった．", Monnam(mon),
-              is_human(&mons[pm]) ? "人間" : mons[pm].mname + 4);
+              is_human(&mons[pm]) ? "人間" : beastname(mons[pm].mname));
 #endif
 
     set_mon_data(mon, &mons[pm], 0);
@@ -204,9 +224,9 @@ you_were()
         /* `+4' => skip "were" prefix to get name of beast */
         Sprintf(qbuf, "Do you want to change into %s?",
                 an(mons[u.ulycn].mname + 4));
-#else /*JP: 日本語ではそこまでしない */
-        Sprintf(qbuf,"%sに変化しますか？",
-                mons[u.ulycn].mname + 4);
+#else
+        Sprintf(qbuf, "%sに変化しますか？",
+                beastname(mons[u.ulycn].mname));
 #endif
         if (yn(qbuf) == 'n')
             return;

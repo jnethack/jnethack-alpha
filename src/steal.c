@@ -647,24 +647,39 @@ int ochance, achance; /* percent chance for ordinary item, artifact */
         if (cansee(mon->mx, mon->my)) {
             const char *MonName = Monnam(mon);
 
+#if 0 /*JP*//*日本語では不要*/
             /* mon might be invisible; avoid "It pulls ... and absorbs it!" */
             if (!strcmp(MonName, "It"))
                 MonName = "Something";
+#endif
+#if 0 /*JP*/
             pline("%s pulls %s away from you and absorbs %s!", MonName,
                   yname(obj), (obj->quan > 1L) ? "them" : "it");
+#else
+            pline("%sは%sを引っぱり込んで吸収した！", MonName,
+                  yname(obj));
+#endif
         } else {
             const char *hand_s = body_part(HAND);
 
             if (bimanual(obj))
                 hand_s = makeplural(hand_s);
+#if 0 /*JP*/
             pline("%s %s pulled from your %s!", upstart(yname(obj)),
                   otense(obj, "are"), hand_s);
+#else
+            pline("%sはあなたの%sから引っぱり込まれた！", upstart(yname(obj)),
+                  hand_s);
+#endif
         }
         freeinv(obj);
     } else {
         /* not carried; presumably thrown or kicked */
         if (canspotmon(mon))
+/*JP
             pline("%s absorbs %s!", Monnam(mon), yname(obj));
+*/
+            pline("%sは%sを吸収した！", Monnam(mon), yname(obj));
     }
     /* add to mon's inventory */
     (void) mpickobj(mon, obj);
@@ -751,8 +766,13 @@ boolean is_pet; /* If true, pet should keep wielded/worn items */
     /* vault guard's gold goes away rather than be dropped... */
     if (mtmp->isgd && (otmp = findgold(mtmp->minvent)) != 0) {
         if (canspotmon(mtmp))
+#if 0 /*JP*/
             pline("%s gold %s.", s_suffix(Monnam(mtmp)),
                   canseemon(mtmp) ? "vanishes" : "seems to vanish");
+#else
+            pline("%sの金は消えた%s．", Monnam(mtmp),
+                  canseemon(mtmp) ? "" : "ようだ");
+#endif
         obj_extract_self(otmp);
         obfree(otmp, (struct obj *) 0);
     } /* isgd && has gold */

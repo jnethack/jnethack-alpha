@@ -164,7 +164,11 @@ struct obj *bp;
 */
         pline("この本は接触型の毒で覆われている！");
         if (uarmg) {
+#if 0 /*JP*/
             erode_obj(uarmg, "gloves", ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
+#else
+            erode_obj(uarmg, "小手", ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
+#endif
             break;
         }
         /* temp disable in_use; death should not destroy the book */
@@ -534,7 +538,10 @@ register struct obj *spellbook;
 
     /* attempting to read dull book may make hero fall asleep */
     if (!confused && booktype != SPE_BLANK_PAPER
+/*JP
         && !strcmp(OBJ_DESCR(objects[booktype]), "dull")) {
+*/
+        && !strcmp(OBJ_DESCR(objects[booktype]), "鉛色の魔法書")) {
         const char *eyes;
         int dullbook = rnd(25) - ACURR(A_WIS);
 
@@ -546,7 +553,10 @@ register struct obj *spellbook;
             eyes = body_part(EYE);
             if (eyecount(youmonst.data) > 1)
                 eyes = makeplural(eyes);
+/*JP
             pline("This book is so dull that you can't keep your %s open.",
+*/
+            pline("この本は退屈すぎて%sを開けていられない．",
                   eyes);
             dullbook += rnd(2 * objects[booktype].oc_level);
             fall_asleep(-dullbook, TRUE);
@@ -700,7 +710,7 @@ register struct obj *spellbook;
 /*JP
     set_occupation(learn, "studying", 0);
 */
-        set_occupation(learn, "学ぶ", 0);
+    set_occupation(learn, "学ぶ", 0);
     return 1;
 }
 
@@ -754,7 +764,10 @@ rejectcasting()
 {
     /* rejections which take place before selecting a particular spell */
     if (Stunned) {
+/*JP
         You("are too impaired to cast a spell.");
+*/
+        You("魔法を唱えられない．");
         return TRUE;
     } else if (!freehand()) {
         /* Note: !freehand() occurs when weapon and shield (or two-handed
@@ -1565,24 +1578,51 @@ losespells()
  *      appended to the end of the list?
  */
 static const char *spl_sortchoices[] = {
+/*JP
     "by casting letter",
+*/
+    "選択する文字順",
 #define SORTBY_LETTER 0
+/*JP
     "alphabetically",
+*/
+    "文字コード順",
 #define SORTBY_ALPHA 1
+/*JP
     "by level, low to high",
+*/
+    "レベル昇順",
 #define SORTBY_LVL_LO 2
+/*JP
     "by level, high to low",
+*/
+    "レベル降順",
 #define SORTBY_LVL_HI 3
+/*JP
     "by skill group, alphabetized within each group",
+*/
+    "スキルグループ毎に文字コード順",
 #define SORTBY_SKL_AL 4
+/*JP
     "by skill group, low to high level within group",
+*/
+    "スキルグループ毎にレベル昇順",
 #define SORTBY_SKL_LO 5
+/*JP
     "by skill group, high to low level within group",
+*/
+    "スキルグループ毎にレベル降順",
 #define SORTBY_SKL_HI 6
+/*JP
     "maintain current ordering",
+*/
+    "現在の順序を維持",
 #define SORTBY_CURRENT 7
     /* a menu choice rather than a sort choice */
+/*JP
     "reassign casting letters to retain current order",
+*/
+    "現在の順序を変えずに選択する文字を再割り当て",
 #define SORTRETAINORDER 8
 };
 static int spl_sortmode = 0;   /* index into spl_sortchoices[] */

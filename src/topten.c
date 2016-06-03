@@ -2,6 +2,11 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 #include "dlb.h"
 #ifdef SHORT_FILENAMES
@@ -856,6 +861,11 @@ boolean so;
 #endif
 #if 0 /*JP*/
     if (!strncmp("escaped", t1->death, 7)) {
+#else
+    if (!strncmp("’Eo‚µ‚½", jdeath, 8)
+        || !strncmp("escaped", jdeath, 7)) {
+#endif
+#if 0 /*JP*/
         Sprintf(eos(linebuf), "escaped the dungeon %s[max level %d]",
                 !strncmp(" (", t1->death + 7, 2) ? t1->death + 7 + 2 : "",
                 t1->maxlvl);
@@ -863,42 +873,40 @@ boolean so;
         if ((bp = index(linebuf, ')')) != 0)
             *bp = (t1->deathdnum == astral_level.dnum) ? '\0' : ' ';
 #else
-        if (!strncmp("’Eo‚µ‚½", jdeath, 8)
-            || !strncmp("escaped", jdeath, 7)) {
-            char jbuf[BUFSZ];
-            strncpy(jbuf, t1->death, jdeath - t1->death);
-            jbuf[jdeath - t1->death] = '\0';
-            Sprintf(action, "%s–À‹{‚©‚ç’Eo‚µ‚½[Å‘å’n‰º%dŠK]",
-                    jbuf, t1->maxlvl);
+        char jbuf[BUFSZ];
+        strncpy(jbuf, t1->death, jdeath - t1->death);
+        jbuf[jdeath - t1->death] = '\0';
+        Sprintf(action, "%s–À‹{‚©‚ç’Eo‚µ‚½[Å‘å’n‰º%dŠK]",
+                jbuf, t1->maxlvl);
 #endif
         second_line = FALSE;
 #if 0 /*JP*/
     } else if (!strncmp("ascended", t1->death, 8)) {
 #else
-        } else if (!strncmp("¸“V‚µ‚½", jdeath, 8)
-                   || !strncmp("ascended", jdeath, 8)) {
+    } else if (!strncmp("¸“V‚µ‚½", jdeath, 8)
+               || !strncmp("ascended", jdeath, 8)) {
 #endif
 #if 0 /*JP:T*/
         Sprintf(eos(linebuf), "ascended to demigod%s-hood",
                 (t1->plgend[0] == 'F') ? "dess" : "");
 #else
-            Sprintf(action, "¸“V‚µ%s_‚Æ‚È‚Á‚½",
-                    (t1->plgend[0] == 'F') ? "—" : "");
+        Sprintf(action, "¸“V‚µ%s_‚Æ‚È‚Á‚½",
+                (t1->plgend[0] == 'F') ? "—" : "");
 #endif
         second_line = FALSE;
     } else {
 /*JP
         if (!strncmp(t1->death, "quit", 4)) {
 */
-            if (!strncmp(jdeath, "”²‚¯‚½", 4)) {
+        if (!strncmp(jdeath, "”²‚¯‚½", 4)) {
 #if 0 /*JP*/
             Strcat(linebuf, "quit");
 #else
-                Strcat(action, t1->death);
+            Strcat(action, t1->death);
 #endif
             second_line = FALSE;
 #if 1 /*JP*/
-            }
+        }
 #else
         } else if (!strncmp(t1->death, "died of st", 10)) {
             Strcat(linebuf, "starved to death");
