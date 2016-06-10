@@ -411,7 +411,10 @@ savestateinlock()
         if (tricked_fileremoved(fd, whynot))
             return;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
         (void) read(fd, (genericptr_t) &hpid, sizeof(hpid));
+#pragma GCC diagnostic pop
         if (hackpid != hpid) {
             Sprintf(whynot, "Level #0 pid (%d) doesn't match ours (%d)!",
                     hpid, hackpid);
@@ -428,11 +431,17 @@ savestateinlock()
             done(TRICKED);
             return;
         }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
         (void) write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
+#pragma GCC diagnostic pop
         if (flags.ins_chkpt) {
             int currlev = ledger_no(&u.uz);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
             (void) write(fd, (genericptr_t) &currlev, sizeof(currlev));
+#pragma GCC diagnostic pop
             save_savefile_name(fd);
             store_version(fd);
             store_savefileinfo(fd);

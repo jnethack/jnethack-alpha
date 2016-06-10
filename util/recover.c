@@ -116,8 +116,11 @@ char *argv[];
         && strcmp(dir, HACKDIR)
 #endif
             ) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
         (void) setgid(getgid());
         (void) setuid(getuid());
+#pragma GCC diagnostic pop
     }
 #endif /* SECURE && !VMS */
 
@@ -352,7 +355,10 @@ char *basename;
             if (lfd >= 0) {
                 /* any or all of these may not exist */
                 levc = (xchar) lev;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
                 write(sfd, (genericptr_t) &levc, sizeof(levc));
+#pragma GCC diagnostic pop
                 copy_bytes(lfd, sfd);
                 Close(lfd);
                 (void) unlink(lock);

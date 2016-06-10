@@ -1303,6 +1303,8 @@ static int
 kanji2index(c1, c2)
 unsigned char c1, c2;
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmultichar"
 #if (('')==0x8181)
 	/* SJIS */
 	if (c1 >= 0xe0) c1 -= 0x40;
@@ -1315,6 +1317,7 @@ unsigned char c1, c2;
     	return (((int)c1 & 0x7f) - 0x21) * (0x7e - 0x21 + 1) +
 	       (((int)c2 & 0x7f) - 0x21);
 #endif
+#pragma GCC diagnostic pop
 }
 
 int

@@ -409,7 +409,10 @@ linux_mapon()
 {
 #ifdef TTY_GRAPHICS
     if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
         write(1, "\033(B", 3);
+#pragma GCC diagnostic pop
     }
 #endif
 }
@@ -419,7 +422,10 @@ linux_mapoff()
 {
 #ifdef TTY_GRAPHICS
     if (!strcmp(windowprocs.name, "tty") && linux_flag_console) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
         write(1, "\033(U", 3);
+#pragma GCC diagnostic pop
     }
 #endif
 }

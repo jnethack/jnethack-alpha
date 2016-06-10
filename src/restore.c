@@ -1197,8 +1197,11 @@ int fd;
 char *plbuf;
 {
     int pltmpsiz = 0;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
     (void) read(fd, (genericptr_t) &pltmpsiz, sizeof(pltmpsiz));
     (void) read(fd, (genericptr_t) plbuf, pltmpsiz);
+#pragma GCC diagnostic pop
     return;
 }
 
