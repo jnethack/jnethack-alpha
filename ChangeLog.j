@@ -1,3 +1,9 @@
+Sun Jun 11 2016  Kentaro Shirakata  <argrath@ub32.org>
+
+	* JNetHack-3.6.0-0.6ƒŠƒŠ[ƒX
+	* GCC‚Å‚ÌŒx‚ğ—}§
+	* –|–ó’Ç‰ÁC³
+
 Sun Apr  3 2016  Kentaro Shirakata  <argrath@ub32.org>
 
 	* JNetHack-3.6.0-0.5ƒŠƒŠ[ƒX
