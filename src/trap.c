@@ -1559,7 +1559,7 @@ unsigned trflags;
                            ? "‚í‚´‚í‚´ƒgƒQ‚¾‚ç‚¯‚Ì—‚µŒŠ‚É“Ë“ü‚µ‚Ä"
                            : adj_pit ? "ƒgƒQ‚¾‚ç‚¯‚Ì—‚µŒŠ‚É“¥‚İ‚ñ‚Å"
                                      : "ƒgƒQ‚¾‚ç‚¯‚Ì—‚µŒŠ‚É—‚¿‚Ä",
-                       NO_KILLER_PREFIX);
+                       KILLED_BY);
 #endif
                 if (!rn2(6))
 #if 0 /*JP*/
@@ -1590,7 +1590,7 @@ unsigned trflags;
                     losehp(Maybe_Half_Phys(rnd(6)),
                            plunged ? "‚í‚´‚í‚´—‚µŒŠ‚É“Ë“ü‚µ‚Ä"
                                    : "—‚µŒŠ‚É—‚¿‚Ä",
-                           NO_KILLER_PREFIX);
+                           KILLED_BY);
 #endif
             }
             if (Punished && !carried(uball)) {

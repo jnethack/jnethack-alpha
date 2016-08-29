@@ -702,7 +702,11 @@ dosinkfall()
 */
         You("è∞Ç…í@Ç´Ç¬ÇØÇÁÇÍÇΩÅI");
         dmg = rn1(8, 25 - (int) ACURR(A_CON));
+#if 0 /*JP*/
         losehp(Maybe_Half_Phys(dmg), fell_on_sink, NO_KILLER_PREFIX);
+#else
+        losehp(Maybe_Half_Phys(dmg), fell_on_sink, KILLED_BY);
+#endif
         exercise(A_DEX, FALSE);
 /*JP
         selftouch("Falling, you");

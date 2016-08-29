@@ -1248,11 +1248,13 @@ rehumanize()
 {
     /* You can't revert back while unchanging */
     if (Unchanging && (u.mh < 1)) {
+#if 0 /*JP*/
         killer.format = NO_KILLER_PREFIX;
-/*JP
         Strcpy(killer.name, "killed while stuck in creature form");
-*/
+#else
+        killer.format = KILLED_BY;
         Strcpy(killer.name, "Œ³‚ÌŽp‚Ö–ß‚ê‚¸‚É");
+#endif
         done(DIED);
     }
 

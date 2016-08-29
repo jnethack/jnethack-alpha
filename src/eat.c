@@ -599,11 +599,13 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             pline("Ingesting that is fatal.");
 */
             pline("Žæ‚èž‚ñ‚¾‚ç‚·‚®‚ÉŽ€‚ñ‚Å‚µ‚Ü‚Á‚½D");
-/*JP
+#if 0 /*JP*/
             Sprintf(killer.name, "unwisely ate the brain of %s", pd->mname);
-*/
-            Sprintf(killer.name, "‹ð‚©‚É‚à%s‚Ì‘Ì‚ðH‚×‚Ä", pd->mname);
             killer.format = NO_KILLER_PREFIX;
+#else
+            Sprintf(killer.name, "‹ð‚©‚É‚à%s‚Ì‘Ì‚ðH‚×‚Ä", pd->mname);
+            killer.format = KILLED_BY;
+#endif
             done(DIED);
             /* life-saving needed to reach here */
             exercise(A_WIS, FALSE);

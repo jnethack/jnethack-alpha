@@ -431,7 +431,11 @@ boolean force;      /* Quietly force this animal */
                          SUPPRESS_IT | SUPPRESS_INVISIBLE
                              | SUPPRESS_HALLUCINATION,
                          TRUE));
+#if 0 /*JP*/
         losehp(Maybe_Half_Phys(rn1(5, 10)), buf, NO_KILLER_PREFIX);
+#else
+        losehp(Maybe_Half_Phys(rn1(5, 10)), buf, KILLED_BY);
+#endif
         return (FALSE);
     }
 

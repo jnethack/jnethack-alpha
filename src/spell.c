@@ -1269,10 +1269,11 @@ boolean atme;
 #if 0 /*JP*/
                             Sprintf(buf, "zapped %sself with a spell",
                                     uhim());
+                            losehp(damage, buf, NO_KILLER_PREFIX);
 #else
                             Strcpy(buf, "自分自身の魔法を浴びて");
+                            losehp(damage, buf, KILLED_BY);
 #endif
-                            losehp(damage, buf, NO_KILLER_PREFIX);
                         }
                     } else {
                         explode(u.dx, u.dy,
@@ -1344,7 +1345,11 @@ boolean atme;
                     Strcpy(buf, "自分自身の魔法を浴びて");
                     if (physical_damage)
                         damage = Maybe_Half_Phys(damage);
+#if 0 /*JP*/
                     losehp(damage, buf, NO_KILLER_PREFIX);
+#else
+                    losehp(damage, buf, KILLED_BY);
+#endif
                 }
             } else
                 weffects(pseudo);

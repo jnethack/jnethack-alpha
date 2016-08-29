@@ -2283,7 +2283,7 @@ dozap()
             Sprintf(buf, "zapped %sself with a wand", uhim());
             losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
 #else
-            losehp(Maybe_Half_Phys(damage), "©•ª©g‚Ìñ‚Ì—Í‚ğ—‚Ñ‚Ä", NO_KILLER_PREFIX);
+            losehp(Maybe_Half_Phys(damage), "©•ª©g‚Ìñ‚Ì—Í‚ğ—‚Ñ‚Ä", KILLED_BY);
 #endif
         }
     } else {
@@ -2552,11 +2552,13 @@ boolean ordinary;
             break;
         }
         learn_it = TRUE;
-/*JP
+#if 0 /*JP*/
         Sprintf(killer.name, "shot %sself with a death ray", uhim());
-*/
-        Strcpy(killer.name, "©•ª‚ªŒ‚‚Á‚½€‚ÌŒõü‚É‚æ‚Á‚Ä");
         killer.format = NO_KILLER_PREFIX;
+#else
+        Strcpy(killer.name, "©•ª‚ªŒ‚‚Á‚½€‚ÌŒõü‚É‚æ‚Á‚Ä");
+        killer.format = KILLED_BY;
+#endif
 /*JP
         You("irradiate yourself with pure energy!");
 */
@@ -2732,7 +2734,11 @@ int amt;          /* pseudo-damage used to determine blindness duration */
         Sprintf(buf, "%s %sself with %s", ordinary ? "zapped" : "blasted",
                 uhim(), how);
         /* might rehumanize(); could be fatal, but only for Unchanging */
+#if 0 /*JP*/
         losehp(Maybe_Half_Phys(dmg), buf, NO_KILLER_PREFIX);
+#else
+        losehp(Maybe_Half_Phys(dmg), buf, KILLED_BY);
+#endif
     }
     return dmg;
 }

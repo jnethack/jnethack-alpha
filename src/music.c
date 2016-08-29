@@ -472,7 +472,7 @@ int force;
                                    "fell into a chasm", NO_KILLER_PREFIX);
 #else
                             losehp(Maybe_Half_Phys(rnd(6)),
-                                   "地割れに落ちて", NO_KILLER_PREFIX);
+                                   "地割れに落ちて", KILLED_BY);
 #endif
 /*JP
                             selftouch("Falling, you");
@@ -494,7 +494,7 @@ int force;
                                    "hurt in a chasm", NO_KILLER_PREFIX);
 #else
                             losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
-                                   "地割れで傷ついて", NO_KILLER_PREFIX);
+                                   "地割れで傷ついて", KILLED_BY);
 #endif
                             if (keepfooting)
                                 exercise(A_DEX, TRUE);

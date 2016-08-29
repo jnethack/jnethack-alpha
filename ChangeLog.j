@@ -1,3 +1,5 @@
+	* 一部の死因で「死んだ」が表示されない問題を修正 (#36579)
+
 Sun Jun 11 2016  Kentaro Shirakata  <argrath@ub32.org>
 
 	* JNetHack-3.6.0-0.6リリース
