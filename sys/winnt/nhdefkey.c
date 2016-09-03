@@ -262,6 +262,11 @@ INPUT_RECORD *ir;
     return retval;
 }
 
+#if 1 /*JP*/
+static INPUT_RECORD irbuf[2];
+static int irbufnext = 0;
+#endif
+
 int __declspec(dllexport) __stdcall CheckInput(hConIn, ir, count, numpad,
                                                mode, mod, cc)
 HANDLE hConIn;
@@ -285,7 +290,24 @@ coord *cc;
         if (dwWait == WAIT_FAILED)
             return '\033';
 #endif
+#if 0 /*JP*/
         ReadConsoleInput(hConIn, ir, 1, count);
+#else
+        /*JP
+          Windows8以降では日本語を入力すると2バイトまとめて返ってくるので
+          2バイト目をキャッシュして1バイトずつ返す。
+        */
+        if (irbufnext == 1) {
+            memcpy(ir, &irbuf[1], sizeof(INPUT_RECORD));
+            irbufnext = 0;
+        } else {
+            ReadConsoleInput(hConIn, irbuf, 2, count);
+            memcpy(ir, &irbuf[0], sizeof(INPUT_RECORD));
+            if (*count == 2) {
+                irbufnext = 1;
+            }
+        }
+#endif
         if (mode == 0) {
             if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
                 ch = ProcessKeystroke(hConIn, ir, &valid, numpad, 0);
