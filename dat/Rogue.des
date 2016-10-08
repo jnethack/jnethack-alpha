@@ -47,9 +47,9 @@ $place = { (33,0), (0,12), (25,20), (75,05) }
 SHUFFLE: $place
 
 STAIR:$place[0],down
-MONSTER:('m',"giant mimic"), $place[1], m_feature "staircase down"
-MONSTER:('m',"large mimic"), $place[2], m_feature "staircase down"
-MONSTER:('m',"small mimic"), $place[3], m_feature "staircase down"
+MONSTER:('m',"giant mimic"), $place[1], m_feature "‰º‚èŠK’i"
+MONSTER:('m',"large mimic"), $place[2], m_feature "‰º‚èŠK’i"
+MONSTER:('m',"small mimic"), $place[3], m_feature "‰º‚èŠK’i"
 # Portal arrival point
 BRANCH:(19,09,19,09),(0,0,0,0)
 # Doors (secret)
