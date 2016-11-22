@@ -553,7 +553,7 @@ const struct Role roles[] = {
         { "中級弓兵", 0 },
         { "上級弓兵", 0 },
         { "上級弓兵", 0 } },
-      "Mercury", "_Venus", "Mars", /* Roman/planets */
+      "マーキュリー", "_ビーナス", "マーズ", /* Roman/planets */
 #endif
       "Ran",
 #if 0 /*JP*/
@@ -674,14 +674,14 @@ const struct Role roles[] = {
         { "航海者", 0 },
         { "探検家", 0 },
         { "冒険者", 0 } },
-      "盲目のイロ", "_＜女神＞", "オフラー", /* Discworld */
+      "盲目のイオ", "_＜女神＞", "オフラー", /* Discworld */
 #endif
       "Tou",
 #if 0 /*JP*/
       "Ankh-Morpork",
       "the Thieves' Guild Hall",
 #else
-      "冒険者",
+      "アンクモルポーク",
       "盗賊ギルド",
 #endif
       PM_TOURIST,
