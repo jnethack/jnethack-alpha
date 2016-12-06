@@ -1,7 +1,10 @@
+Wed Dec  7 2016  Kentaro Shirakata  <argrath@ub32.org>
+
 	* 一部の死因で「死んだ」が表示されない問題を修正 (#36579)
 	* Windows10のttyで日本語が入力できない問題を修正 (#36599)
 	* 盗賊クエストとジョウビレックスフロアで「障害発生」が出る問題を修正
 	  (#36640)
+	* 翻訳追加修正
 
 Sun Jun 11 2016  Kentaro Shirakata  <argrath@ub32.org>
 
