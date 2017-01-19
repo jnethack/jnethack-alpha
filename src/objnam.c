@@ -3507,6 +3507,11 @@ struct obj *no_wish;
         goto any;
     }
 
+#if 0 /*JP*/
+    /*JP
+      英語なら XXXXX potion は不確定名、potion of XXXXX は確定名という
+      区別が付くが、日本語ではどちらも「XXXXXの薬」なのでここでは判別しない
+      */
     /* Search for class names: XXXXX potion, scroll of XXXXX.  Avoid */
     /* false hits on, e.g., rings for "ring mail". */
     if (strncmpi(bp, "enchant ", 8) && strncmpi(bp, "destroy ", 8)
@@ -3539,6 +3544,7 @@ struct obj *no_wish;
                 goto srch;
             }
         }
+#endif
 
     /* Wishing in wizard mode can create traps and furniture.
      * Part I:  distinguish between trap and object for the two
@@ -3648,8 +3654,18 @@ srch:
             typ = i;
             goto typfnd;
         }
+#if 0 /*JP*/
         if (dn && (zn = OBJ_DESCR(objects[i])) != 0
             && wishymatch(dn, zn, FALSE)) {
+#else /*JP
+       * 「イェンダーの魔除け」を願ったときにここでは偽物に
+       * ならないようにする。
+       * 非ウィザードモードでの入れ替え処理は後にある。
+       */
+        if (i != FAKE_AMULET_OF_YENDOR &&
+            dn && (zn = OBJ_DESCR(objects[i])) != 0
+            && wishymatch(dn, zn, FALSE)) {
+#endif
             /* don't match extra descriptions (w/o real name) */
             if (!OBJ_NAME(objects[i]))
                 return (struct obj *) 0;
