@@ -4480,10 +4480,17 @@ register int dx, dy;
             bounce = 0;
             range--;
             if (range && isok(lsx, lsy) && cansee(lsx, lsy)) {
+#if 0 /*JP*/
                     pline("%s %s!", The(fltxt),
                           Is_airlevel(&u.uz)
                           ? "vanishes into the aether"
                           : "bounces");
+#else
+                    pline("%sは%s！", The(fltxt),
+                          Is_airlevel(&u.uz)
+                          ? "エーテル空間に消えた"
+                          : "反射した");
+#endif
                     if (Is_airlevel(&u.uz)) goto get_out_buzz;
             }
             if (!dx || !dy || !rn2(20)) {
