@@ -801,7 +801,10 @@ const char **firstmatch;
         /* when sym is the default background character, we process
            i == 0 three times: unexplored, stone, dark part of a room */
         if (alt_i < 2) {
+/*JP
             x_str = !alt_i++ ? "unexplored" : "stone";
+*/
+            x_str = !alt_i++ ? "–¢’Tõ" : "Šâ”Õ";
             i = 0; /* for second iteration, undo loop increment */
             /* alt_i is now 1 or 2 */
         } else {
