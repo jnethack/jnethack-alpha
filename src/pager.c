@@ -479,7 +479,7 @@ char *buf, *monbuf;
 /*JP
                 Strcpy(buf, "stone");
 */
-                Strcpy(buf, "êŒ");
+                Strcpy(buf, "ä‚î’");
                 break;
             }
             /*else FALLTHRU*/
