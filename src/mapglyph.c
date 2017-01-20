@@ -2,6 +2,11 @@
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2016            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 #include "hack.h"
 #if defined(TTY_GRAPHICS)
 #include "wintty.h" /* for prototype of has_color() only */
@@ -317,6 +322,11 @@ const char *str;
                 break;
             }
         }
+#if 1 /*JP*/
+        if (is_kanji(*(unsigned char *)cp)) {
+            *put++ = *cp++;
+        }
+#endif
         *put++ = *cp++;
     }
     *put = '\0';
