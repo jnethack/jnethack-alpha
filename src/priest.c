@@ -331,6 +331,13 @@ char *pname; /* caller-supplied output buffer */
 */
         Strcat(pname, "— Ø‚èÒ‚Ì");
 
+#if 1 /*JP*//*‘®«‚Í‚±‚±‚Å•t‚¯‚é*/
+    if (do_hallu || !high_priest || !Is_astralevel(&u.uz)
+        || distu(mon->mx, mon->my) <= 2 || program_state.gameover) {
+        Strcat(pname, halu_gname(mon_aligntyp(mon)));
+        Strcat(pname, "‚Ì");
+    }
+#endif
     if (mon->ispriest || aligned_priest) { /* high_priest implies ispriest */
         if (!aligned_priest && !high_priest) {
             ; /* polymorphed priest; use ``what'' as is */
@@ -375,14 +382,14 @@ char *pname; /* caller-supplied output buffer */
     }
 
     Strcat(pname, what);
+#if 0 /*JP*//*‘®«‚Í‚·‚Å‚É•t‚¯‚Ä‚¢‚é*/
     /* same as distant_monnam(), more or less... */
     if (do_hallu || !high_priest || !Is_astralevel(&u.uz)
         || distu(mon->mx, mon->my) <= 2 || program_state.gameover) {
-#if 0 /*JP*/
         Strcat(pname, " of ");
         Strcat(pname, halu_gname(mon_aligntyp(mon)));
-#endif
     }
+#endif
     return pname;
 }
 
