@@ -2679,7 +2679,10 @@ int held;
         /* even if the trap fails, you've used up this turn */
         if (multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
+/*JP
             multi_reason = "opening a container";
+*/
+            multi_reason = "” ‚ðŠJ‚¯‚Ä‚¢‚éŽž‚É";
             nomovemsg = "";
         }
         return 1;
@@ -3360,7 +3363,10 @@ struct obj *box; /* or bag */
         /* even if the trap fails, you've used up this turn */
         if (multi >= 0) { /* in case we didn't become paralyzed */
             nomul(-1);
+/*JP
             multi_reason = "tipping a container";
+*/
+            multi_reason = "” ‚ð‚Ð‚Á‚­‚è•Ô‚µ‚Ä‚¢‚éŽž‚É";
             nomovemsg = "";
         }
     } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {

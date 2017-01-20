@@ -1177,7 +1177,10 @@ register int pm;
             if (u.usteed)
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
+/*JP
             multi_reason = "pretending to be a pile of gold";
+*/
+            multi_reason = "‹à‰İ‚ÌR‚Ì^—‚ğ‚µ‚Ä‚¢‚é‚É";
             Sprintf(buf,
                     Hallucination
 /*JP
@@ -1875,7 +1878,10 @@ struct obj *obj;
         pline("¢ŠE‚ª‰ñ“]‚µC%s%sD", where, what);
         incr_itimeout(&HDeaf, duration);
         nomul(-duration);
+/*JP
         multi_reason = "unconscious from rotten food";
+*/
+        multi_reason = "•…‚Á‚½H‚×•¨‚ÅˆÓ¯‚ğ¸‚Á‚Ä‚¢‚éŠÔ‚É";
 /*JP
         nomovemsg = "You are conscious again.";
 */
@@ -3464,7 +3470,10 @@ boolean incr;
                     selftouch("—‚¿‚È‚ª‚çC‚ ‚È‚½‚Í");
                 incr_itimeout(&HDeaf, duration);
                 nomul(-duration);
+/*JP
                 multi_reason = "fainted from lack of food";
+*/
+                multi_reason = "‹ó• ‚Å‘²“|‚µ‚Ä‚¢‚éŠÔ‚É";
 /*JP
                 nomovemsg = "You regain consciousness.";
 */
@@ -3734,7 +3743,10 @@ vomit() /* A good idea from David Neves */
     else
         make_sick(0L, (char *) 0, TRUE, SICK_VOMITABLE);
     nomul(-2);
+/*JP
     multi_reason = "vomiting";
+*/
+    multi_reason = "šq“f‚µ‚Ä‚¢‚éÅ’†‚É";
     nomovemsg = You_can_move_again;
 }
 

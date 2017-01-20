@@ -6081,7 +6081,10 @@ boolean disarm;
 */
                 pline("“Ë‘R‚»‚Ìê‚Å“®‚¯‚È‚­‚È‚Á‚½I");
                 nomul(-d(5, 6));
+/*JP
                 multi_reason = "frozen by a trap";
+*/
+                multi_reason = "ã©‚Åd’¼‚µ‚Ä‚¢‚é‚É";
                 exercise(A_DEX, FALSE);
                 nomovemsg = You_can_move_again;
             } else

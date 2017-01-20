@@ -1189,7 +1189,10 @@ struct obj **optr;
 */
     You("%s‚ğ”`‚«‚±‚ñ‚¾DDD", the(xname(obj)));
     nomul(-rnd(10));
+/*JP
     multi_reason = "gazing into a crystal ball";
+*/
+    multi_reason = "…»‹…‚ğ”`‚«‚ñ‚Å‚¢‚é‚É";
     nomovemsg = "";
     if (obj->spe <= 0)
 /*JP

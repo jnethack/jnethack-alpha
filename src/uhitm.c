@@ -2331,7 +2331,10 @@ register struct attack *mattk;
                         if (Slow_digestion)
                             tmp *= 2;
                         nomul(-tmp);
+/*JP
                         multi_reason = "digesting something";
+*/
+                        multi_reason = "Á‰»’†‚É";
                         nomovemsg = msgbuf;
                     } else
                         pline1(msgbuf);
@@ -2946,7 +2949,10 @@ boolean wep_was_destroyed;
 */
                         You("%s‚Ì‚É‚ç‚İ‚Å“®‚¯‚È‚­‚È‚Á‚½I", mon_nam(mon));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
+/*JP
                         multi_reason = "frozen by a monster's gaze";
+*/
+                        multi_reason = "‰ö•¨‚Ì‚É‚ç‚İ‚Åd’¼‚µ‚Ä‚¢‚é‚É";
                         nomovemsg = 0;
                     }
                 } else {
@@ -2972,7 +2978,10 @@ boolean wep_was_destroyed;
                 You("%s‚É‚æ‚Á‚Ä“®‚¯‚È‚­‚È‚Á‚½I", mon_nam(mon));
                 nomovemsg = You_can_move_again;
                 nomul(-tmp);
+/*JP
                 multi_reason = "frozen by a monster";
+*/
+                multi_reason = "‰ö•¨‚É‚æ‚Á‚Äd’¼‚µ‚Ä‚¢‚é‚É";
                 exercise(A_DEX, FALSE);
             }
             break;

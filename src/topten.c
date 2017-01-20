@@ -317,10 +317,17 @@ struct toptenentry *tt;
     else
         (void) fprintf(rfile, fmt33, tt->plrole, tt->plrace, tt->plgend,
                        tt->plalign);
+#if 0 /*JP*/
     (void) fprintf(rfile, fmtX, onlyspace(tt->name) ? "_" : tt->name,
                    tt->death,
                    (multi ? ", while " : ""),
                    (multi ? (multi_reason ? multi_reason : "helpless") : ""));
+#else
+    (void) fprintf(rfile, fmtX, onlyspace(tt->name) ? "_" : tt->name,
+                   (multi ? (multi_reason ? multi_reason : "–³—Í‚ÈŠÔ‚É") : ""),
+                   tt->death,
+                   "");
+#endif
 
 #ifdef NO_SCAN_BRACK
     nsb_unmung_line(tt->name);
@@ -355,8 +362,13 @@ struct toptenentry *tt;
             buf, /* (already includes separator) */
             XLOG_SEP, plname, XLOG_SEP, tt->death);
     if (multi)
+#if 0 /*JP*/
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 multi_reason ? multi_reason : "helpless");
+#else
+        Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
+                multi_reason ? multi_reason : "–³—Í‚ÈŠÔ‚É");
+#endif
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
             encodeconduct(), XLOG_SEP, moves, XLOG_SEP, encodeachieve());
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,

@@ -1092,7 +1092,10 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                 resisted = TRUE;
             } else {
                 nomul(-3);
+/*JP
                 multi_reason = "being scared stiff";
+*/
+                multi_reason = "‹°•|‚Å˜T”‚‚µ‚½Œ„‚É";
                 nomovemsg = "";
                 if (magr && magr == u.ustuck && sticks(youmonst.data)) {
                     u.ustuck = (struct monst *) 0;

@@ -1437,7 +1437,10 @@ register struct attack *mattk;
                     pline("%s‚É‚æ‚Á‚Ä“®‚¯‚È‚­‚È‚Á‚½I", mon_nam(mtmp));
                 nomovemsg = You_can_move_again;
                 nomul(-rnd(10));
+/*JP
                 multi_reason = "paralyzed by a monster";
+*/
+                multi_reason = "‰ö•¨‚É–ƒáƒ‚³‚¹‚ç‚ê‚½Œ„‚É";
                 exercise(A_DEX, FALSE);
             }
         }

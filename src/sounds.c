@@ -1073,7 +1073,10 @@ register struct monst *mtmp;
 */
         You("一瞬凍りついた．");
         nomul(-2);
+/*JP
         multi_reason = "scared by rattling";
+*/
+        multi_reason = "骨のカタカタ言う音におびえた隙に";
         nomovemsg = 0;
         break;
     case MS_LAUGH: {

@@ -1348,7 +1348,10 @@ struct obj *obj;
                 /* you ought to be able to let go; tough luck */
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));
+/*JP
                 multi_reason = "stuck in a spider web";
+*/
+                multi_reason = "‚­‚à‚Ì‘ƒ‚É•ß‚Ü‚Á‚Ä‚¢‚éŠÔ‚É";
 /*JP
                 nomovemsg = "You pull free.";
 */

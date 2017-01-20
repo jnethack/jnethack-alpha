@@ -2067,7 +2067,10 @@ domove()
     /* must come after we finished picking up, in spoteffects() */
     if (cause_delay) {
         nomul(-2);
+/*JP
         multi_reason = "dragging an iron ball";
+*/
+        multi_reason = "“S‹…‚Éˆø‚«‚¸‚ç‚ê‚Ä‚¢‚éŽž‚É";
         nomovemsg = "";
     }
 

@@ -862,7 +862,10 @@ boolean verbose;
         return; /* paranoia */
 
     nomul(-range);
+/*JP
     multi_reason = "moving through the air";
+*/
+    multi_reason = "‹ó’†‚ðˆÚ“®‚µ‚Ä‚¢‚éŽž‚É";
     nomovemsg = ""; /* it just happens */
     if (verbose)
 /*JP

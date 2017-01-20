@@ -1078,7 +1078,10 @@ struct obj *obj;
                         pline("‚¨‚ìI‚ ‚È‚½‚Í“®‚¯‚È‚­‚È‚Á‚½I");
                     if (!Hallucination || !rn2(4)) {
                         nomul(-rnd(MAXULEV + 6 - u.ulevel));
+/*JP
                         multi_reason = "gazing into a mirror";
+*/
+                        multi_reason = "‹¾‚É”½Ë‚µ‚½‹ü‚Åd’¼‚µ‚Ä‚¢‚éŠÔ‚É";
                     }
                     nomovemsg = 0; /* default, "you can move again" */
                 }
@@ -2257,7 +2260,10 @@ int magic; /* 0=Physical, otherwise skill level */
         teleds(cc.x, cc.y, TRUE);
         sokoban_guilt();
         nomul(-1);
+/*JP
         multi_reason = "jumping around";
+*/
+        multi_reason = "’µ‚Ë‰ñ‚Á‚Ä‚¢‚é‚É";
         nomovemsg = "";
         morehungry(rnd(25));
         return 1;

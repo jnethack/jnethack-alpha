@@ -537,7 +537,10 @@ ghost_from_bottle()
 */
         You("まっさおになって驚き，動けなくなった．");
     nomul(-3);
+/*JP
     multi_reason = "being frightened to death";
+*/
+    multi_reason = "死ぬほど驚いた隙に";
 /*JP
     nomovemsg = "You regain your composure.";
 */
@@ -969,7 +972,10 @@ register struct obj *otmp;
                 You("動けなくなった！");
 #endif
             nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
+/*JP
             multi_reason = "frozen by a potion";
+*/
+            multi_reason = "薬で硬直している時に";
             nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         }
@@ -2054,7 +2060,10 @@ register struct obj *obj;
 */
             pline("%sがあなたをつかまえているような気がした．", Something);
             nomul(-rnd(5));
+/*JP
             multi_reason = "frozen by a potion";
+*/
+            multi_reason = "薬で硬直している時に";
             nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
@@ -2071,7 +2080,10 @@ register struct obj *obj;
 */
             You("すこし疲れた．");
             nomul(-rnd(5));
+/*JP
             multi_reason = "sleeping off a magical draught";
+*/
+            multi_reason = "魔法的に眠っている間に";
             nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else

@@ -1737,7 +1737,10 @@ dosacrifice()
 */
                     You("‹°•|‚Å“®‚¯‚È‚­‚È‚Á‚½D");
                     nomul(-3);
+/*JP
                     multi_reason = "being terrified of a demon";
+*/
+                    multi_reason = "ˆ«—ì‚É‹°•|‚µ‚Ä‚¢‚é‚É";
                     nomovemsg = 0;
                 } else
 /*JP
@@ -2366,7 +2369,10 @@ dopray()
         }
     }
     nomul(-3);
+/*JP
     multi_reason = "praying";
+*/
+    multi_reason = "‹F‚Á‚Ä‚¢‚é‚É";
 /*JP
     nomovemsg = "You finish your prayer.";
 */
@@ -2573,7 +2579,10 @@ doturn()
         }
     }
     nomul(-5);
+/*JP
     multi_reason = "trying to turn the monsters";
+*/
+    multi_reason = "‰ö•¨‚ğ“y‚É–ß‚»‚¤‚Æ‚µ‚Ä‚¢‚é‚É";
     nomovemsg = You_can_move_again;
     return 1;
 }

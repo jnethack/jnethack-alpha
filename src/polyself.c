@@ -1722,7 +1722,10 @@ dogaze()
                                   ? -d((int) mtmp->m_lev + 1,
                                        (int) mtmp->data->mattk[0].damd)
                                   : -200);
+/*JP
                         multi_reason = "frozen by a monster's gaze";
+*/
+                        multi_reason = "‰ö•¨‚Ì‚É‚ç‚İ‚Åd’¼‚µ‚Ä‚¢‚é‚É";
                         nomovemsg = 0;
                         return 1;
                     } else

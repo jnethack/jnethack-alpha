@@ -853,7 +853,10 @@ int spellnum;
 */
                 You("ˆêud’¼‚µ‚½D");
             nomul(-1);
+/*JP
             multi_reason = "paralyzed by a monster";
+*/
+            multi_reason = "‰ö•¨‚É–ƒáƒ‚³‚¹‚ç‚ê‚½Œ„‚É";
         } else {
             if (multi >= 0)
 /*JP
@@ -864,7 +867,10 @@ int spellnum;
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
             nomul(-dmg);
+/*JP
             multi_reason = "paralyzed by a monster";
+*/
+            multi_reason = "‰ö•¨‚É–ƒáƒ‚³‚¹‚ç‚ê‚½Œ„‚É";
         }
         nomovemsg = 0;
         dmg = 0;

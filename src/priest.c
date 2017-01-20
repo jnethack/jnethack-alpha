@@ -600,7 +600,10 @@ int roomno;
 */
                 You("‚Ü‚Á‚³‚¨‚É‚È‚Á‚Ä‹Á‚«C“®‚¯‚È‚­‚È‚Á‚½D");
             nomul(-3);
+/*JP
             multi_reason = "being terrified of a demon";
+*/
+            multi_reason = "ˆ«—ì‚É‹°•|‚µ‚Ä‚¢‚é‚É";
 /*JP
             nomovemsg = "You regain your composure.";
 */

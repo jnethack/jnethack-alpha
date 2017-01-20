@@ -71,7 +71,10 @@ stoned_dialogue()
     case 3: /* limbs turned to stone */
         stop_occupation();
         nomul(-3); /* can't move anymore */
+/*JP
         multi_reason = "getting stoned";
+*/
+        multi_reason = "Î‰»‚µ‚Â‚Â‚ ‚é‚É";
         nomovemsg = You_can_move_again; /* not unconscious */
         break;
     default:
@@ -526,7 +529,10 @@ nh_timeout()
                 if (u.umoved && !Levitation) {
                     slip_or_trip();
                     nomul(-2);
+/*JP
                     multi_reason = "fumbling";
+*/
+                    multi_reason = "‚Ö‚Ü‚ğ‚µ‚½Œ„‚É";
                     nomovemsg = "";
                     /* The more you are carrying the more likely you
                      * are to make noise when you fumble.  Adjustments
@@ -562,7 +568,10 @@ boolean wakeup_msg;
 {
     stop_occupation();
     nomul(how_long);
+/*JP
     multi_reason = "sleeping";
+*/
+    multi_reason = "–°‚è‚Ì‚³‚È‚©‚É";
     /* generally don't notice sounds while sleeping */
     if (wakeup_msg && multi == how_long) {
         /* caller can follow with a direct call to Hear_again() if
@@ -1610,7 +1619,10 @@ do_storms()
         if (!u.uinvulnerable) {
             stop_occupation();
             nomul(-3);
+/*JP
             multi_reason = "hiding from thunderstorm";
+*/
+            multi_reason = "—‹‚Ì—’‚ğ”ğ‚¯‚Ä‚¢‚é‚É";
             nomovemsg = 0;
         }
     } else

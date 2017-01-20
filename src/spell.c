@@ -423,7 +423,10 @@ learn(VOID_ARGS)
         context.spbook.book = 0; /* no longer studying */
         context.spbook.o_id = 0;
         nomul(context.spbook.delay); /* remaining delay is uninterrupted */
+/*JP
         multi_reason = "reading a book";
+*/
+        multi_reason = "–{‚ð“Ç‚ñ‚Å‚¢‚éŽž‚É";
         nomovemsg = 0;
         context.spbook.delay = 0;
         return 0;
@@ -667,7 +670,10 @@ register struct obj *spellbook;
             boolean gone = cursed_book(spellbook);
 
             nomul(context.spbook.delay); /* study time */
+/*JP
             multi_reason = "reading a book";
+*/
+            multi_reason = "–{‚ð“Ç‚ñ‚Å‚¢‚éŽž‚É";
             nomovemsg = 0;
             context.spbook.delay = 0;
             if (gone || !rn2(3)) {
@@ -688,7 +694,10 @@ register struct obj *spellbook;
                 spellbook->in_use = FALSE;
             }
             nomul(context.spbook.delay);
+/*JP
             multi_reason = "reading a book";
+*/
+            multi_reason = "–{‚ð“Ç‚ñ‚Å‚¢‚éŽž‚É";
             nomovemsg = 0;
             context.spbook.delay = 0;
             return 1;
