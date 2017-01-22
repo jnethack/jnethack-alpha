@@ -9,492 +9,492 @@
 # equals        =  gender not specified, personal name
 
 # misc.
-jumbo shrimp
-giant pigmy
-gnu
-killer penguin
-giant cockroach
-giant slug
-maggot
-pterodactyl
-tyrannosaurus rex
-basilisk
-beholder
-nightmare
-efreeti
-marid
-rot grub
-bookworm
-master lichen
-shadow
-hologram
-jester
-attorney
-sleazoid
-killer tomato
-amazon
-robot
-battlemech
-rhinovirus
-harpy
-lion-dog
-rat-ant
-Y2K bug
-angry mariachi
-arch-pedant
-bluebird of happiness
-cardboard golem
-duct tape golem
-diagonally moving grid bug
-evil overlord
-newsgroup troll
-ninja pirate zombie robot
-octarine dragon
-gonzo journalist
-lag monster
-loan shark
-possessed waffle iron
-poultrygeist
-stuffed raccoon puppet
-viking
-wee green blobbie
-wereplatypus
-hag of bolding
-blancmange
-raging nerd
-spelling bee
-land octopus
-frog prince
-pigasus
-_Semigorgon
-conventioneer
-large microbat
-small megabat
-uberhulk
-tofurkey
-+Dudley
+巨大甘エビ
+巨大ピグミー
+ヌー
+殺人ペンギン
+巨大ゴキブリ
+巨大ナメクジ
+蛆虫
+プテロダクティルス
+ティラノザウルス・レックス
+バジリスク
+ビホルダー
+ナイトメア
+イフリート
+マリッド
+腐ったうじ虫
+紙魚
+マスターノリッチ
+シャドウ
+ホログラム
+道化師
+弁護士
+おちょうし者
+キラートマト
+アマゾン
+ロボット
+バトルメック
+ライノウイルス
+ハーピー
+狛犬
+ネズミ蟻
+2000年問題
+怒れるマリアッチ
+衒学趣味者
+幸せの青い鳥
+段ボールのゴーレム
+ダクトテープのゴーレム
+斜めに動くグリッドバグ
+魔王
+ニュースグループ・トロル
+忍者海賊ゾンビロボット
+オクタリンドラゴン
+気違いジャーナリスト
+遅延の怪物
+高利貸し
+狂気のワッフル焼き器
+鶏肉霊魂
+アライグマのぬいぐるみ
+ヴァイキング
+ちっちゃな緑ブロッッビー
+カモノハシ人間
+軽薄化の泡
+ブラマンシェ
+怒り狂うオタク
+スペリング競争
+丘ダコ
+カエルの王子様
+天豚
+_準ゴルゴン
+大会参加者
+大型ココウモリ
+小型オオコウモリ
+ウーバーハルク
+トーファーキー
++ダッドリー
 
 # Quendor (Zork, &c.)
-grue
-Christmas-tree monster
-luck sucker
-paskald
-brogmoid
-dornbeast
+グルー
+クリスマスツリーの怪物
+厄病神
+パスカルド
+ブログモイド
+ドルンビースト
 
 # Moria
-Ancient Multi-Hued Dragon
-+Evil Iggy
+古代万色ドラゴン
++邪悪なるイギー
 
 # Rogue V5 http://rogue.rogueforge.net/vade-mecum/
-rattlesnake
-ice monster
-phantom
-quagga
-aquator
-griffin
-emu
-kestrel
-xeroc
-venus flytrap
+がらがらへび
+氷の怪物
+幽霊
+大つのじか
+水ごけの怪物
+翼ライオン
+大うずら
+大はやぶさ
+ものまねの怪物
+はえとりぐさ
 
 # Wizardry
-creeping coins
+クリーピングコイン
 
 # Greek legend
-hydra
-siren
+ヒドラ
+セイレーン
 
 # Monty Python
-killer bunny
+兇悪ウサちゃん
 
 # The Princess Bride
-rodent of unusual size
+異常な大きさのリスちゃん
 
 # Wallace & Gromit
-were-rabbit
+うさぎ人間
 
 # "Only you can prevent forest fires!
-+Smokey Bear
++森林火災防止熊スモーキー
 
 # Discworld
-Luggage
+＜荷物＞
 
 # Lord of the Rings
-Ent
+エント
 
 # Xanth
-tangle tree
-nickelpede
-wiggle
+触手木
+ニッケルさそり
+ぴくぴく虫
 
 # Lewis Carroll
-white rabbit
-snark
+白うさぎ
+スナーク
 
 # Dr. Dolittle
-pushmi-pullyu
+オシツオサレツ
 
 # The Smurfs
-smurf
+スマーフ
 
 # Star Trek
-tribble
-Klingon
-Borg
+トリブル
+クリンゴン
+ボーグ
 
 # Star Wars
-Ewok
+イウォーク
 
 # Tonari no Totoro
-Totoro
+となりのトトロ
 
 # Nausicaa
-ohmu
+王蟲
 
 # Sailor Moon
-youma
+妖魔
 
 # Pokemon (Meowth)
-nyaasu
+ニャース
 
 # monster movies
--Godzilla
-+King Kong
+-ゴジラ
++キングコング
 
 # old L of SH
-earthquake beast
+大ナマズ
 
 # Robotech
-Invid
+インビッド
 
 # The Terminator
-Terminator
+ターミネーター
 
 # Bubblegum Crisis
-boomer
+ブーマー
 
 # Dr. Who ("Exterminate!")
-Dalek
+ダーレク
 
 # HGttG
-microscopic space fleet
-Ravenous Bugblatter Beast of Traal
+超微細宇宙艦隊
+がつがつむしゃむしゃトラアル獣
 
 # TMNT
-teenage mutant ninja turtle
+激亀忍者
 
 # Usagi Yojimbo
-samurai rabbit
+侍兎
 
 # Cerebus
-aardvark
+ツチブタ
 
 # Little Shop of Horrors
-=Audrey II
+=オードリーII
 
 # 50's rock 'n' roll
-witch doctor
-one-eyed one-horned flying purple people eater
+呪術医
+一目一角飛行紫食人族
 
 # saccharine kiddy TV
-+Barney the dinosaur
++恐竜バーニーちゃん
 
 # Angband
-+Morgoth
++モルゴス
 
 # Babylon 5
-Vorlon
+ヴォーロン
 
 # King Arthur
-questing beast
+探求のけもの
 
 # Movie
-Predator
+プレデター
 
 # common pest
-mother-in-law
+姑
 
 # Actual creatures
-praying mantis
-beluga whale
-chicken
-coelacanth
-star-nosed mole
-lungfish
-slow loris
-sea cucumber
-tapeworm
-liger
-velociraptor
-corpulent porpoise
-quokka
-potoo
+オオカマキリ
+シロイルカ
+ニワトリ
+シーラカンス
+ホシバナモグラ
+肺魚
+スローロリス
+ナマコ
+サナダムシ
+ライガー
+ヴェロキラプトル
+太ったネズミイルカ
+クワッカ
+タチヨタカ
 
 # european cryptids
-wolpertinger
-elwedritsche
-skvader
-+Nessie
-tatzelwurm
-dahu
+ヴォルペルティンガー
+エルヴェドリッチェ
+スクヴェイダー
++ネッシー
+タッツェルヴルム
+ダウ
 
 # fictitious beasts
-dropbear
-wild haggis
-jackalope
-flying pig
-hippocampus
-hippogriff
-kelpie
-catoblepas
-phoenix
-amphisbaena
+肉食コアラ
+野生のハギス
+ジャッカロープ
+空飛ぶ豚
+ヒッポカムポス
+ヒポグリフ
+ケルピー
+カトブレパス
+フェニックス
+アンフィスバエナ
 
 # Unusually animate body parts
-bouncing eye
-floating nose
-wandering eye
+跳ね回る目
+さまよう鼻
+さすらう目
 
 # Computerese
-buffer overflow
-dangling pointer
-walking disk drive
-floating point
-regex engine
-netsplit
+バッファ・オーバーフロー
+ダングリング・ポインタ
+お散歩ディスクドライブ
+浮動小数点
+正規表現エンジン
+ネット・スプリット
 wiki
-peer
+ピア
 COBOL
 
 # bugs
-bohrbug
-mandelbug
-schroedinbug
-heisenbug
+ボーアバグ
+マンデルバグ
+シュレーディンバグ
+ハイゼンバグ
 
 # DooM
-cacodemon
-scrag
+カコデーモン
+スクラグ
 
 # MST3K
 +Crow T. Robot
 
 # Items and stuff
-chess pawn
-chocolate pudding
-ooblecks
-terracotta warrior
-hearse
-roomba
-miniature blimp
-dust speck
+ポーン
+チョコレートプリン
+ウーブレック
+兵馬俑
+霊柩車
+ルンバ
+ミニ飛行船
+一片の塵芥
 
 # DnD monster
-gazebo
+ガゼボ
 
 # SciFi elements
-gray goo
-magnetic monopole
-first category perpetual motion device
+グレイ・グー
+磁気単極子
+第一種永久機関
 
 # Ultima
-+Lord British
++ロード・ブリティッシュ
 
 # They Might Be Giants
-particle man
+パーティクルマン
 
 # Robot Finds Kitten
-kitten prospecting robot
+ロボットが探している子猫
 
 # Typography
-guillemet
-solidus
-obelus
-dingbat
-bold face
-boustrophedon
-ligature
-rebus
+装飾付括弧
+分割斜線
+除算記号
+絵記号
+太字
+犂耕体
+合字
+判じ絵紋
 
 # Their actual character
-apostrophe golem
-voluptuous ampersand
+アポストロフィのゴーレム
+色っぽいアンパサンド
 
 # Web comics and animation
-+Bob the angry flower
-+Strong Bad
-+Magical Trevor
++怒れる花ボブ
++ストロング・バッド
++マジカルトレバー
 
 # KoL
-one-winged dewinged stab-bat
+片翼の突き刺しコウモリ
 
 # deities
-Invisible Pink Unicorn
-Flying Spaghetti Monster
+見えざるピンクのユニコーン
+空飛ぶスパゲッティモンスター
 
 # Monkey Island
-three-headed monkey
-+El Pollo Diablo
+三つ首の猿
++鶏の悪魔
 
 # modern folklore
-little green man
+緑の小人
 
 # Portal
-weighted Companion Cube
+コンパニオンキューブ
 
 # /b/
 /b/tard
 
 # South Park
-manbearpig
+ヒトクマブタ
 
 # internet memes
-bonsai-kitten
-tie-thulu
-+Domo-kun
-looooooooooooong cat
+盆栽子猫
+ネクタイ・クトゥルー
++どーもくん
+胴の長ーーーい猫
 nyan cat
 
 # the Internet is made for cat pix
-ceiling cat
-basement cat
-monorail cat
+天井猫
+地下室猫
+モノレール猫
 
 # POWDER
-tridude
+トリジュード
 
 # Radomir Dopieralski
-orcus cosmicus
+オルクス・コズミクス
 
 # Angband
-yeek
-quylthulg
-Greater Hell Beast
+イーク
+クイルスルグ
+グレーター・ヘル=ビースト
 
 # Souljazz
-+Vendor of Yizard
++イィザードの商法使い
 
 # Dungeon Crawl Stone Soup
-+Sigmund
-lernaean hydra
-+Ijyb
-+Gloorx Vloq
-+Blork the orc
++『シグムンド』
+『レルネーのヒドラ』
++『イジェィブ』
++『グロゥルクス・ヴロック』
++オークの『ブロルク』
 
 # Wil Wheaton, John Scalzi
-unicorn pegasus kitten
+ユニコーン・ペガサス・小猫ちゃん
 
 # Minecraft
-enderman
+エンダーマン
 
 # Pun
-wight supremacist
+ワイト至上主義者
 
 # Starcraft 2
-zergling
+ザーグリング
 
 # Feelings
-existential angst
-figment of your imagination
-flash of insight
+実存的不安
+絵空事
+ひらめき
 
 # Fish
 ghoti
 
 # Roald Dahl
-vermicious knid
+害獣クニッド
 
 # Carcassonne
-meeple
+ミープル
 
 # The Wombles
-womble
+ウォンブル
 
 # Fraggle Rock
-fraggle
+フラグル
 
 # Spoonerism
-mock role
+いぐもわら
 
 # Truly scary things
-clown
-mime
-peddler
-haggler
+道化師
+パントマイム
+行商人
+値切り客
 
 # soundex and typos of monsters
-gloating eye
-flush golem
-martyr orc
-mortar orc
-acid blog
-acute blob
-aria elemental
-aliasing priest
-aligned parasite
-aligned parquet
-aligned proctor
-baby balky dragon
-baby blues dragon
-baby caricature
-baby crochet
-baby grainy dragon
-baby bong worm
-baby long word
-baby parable worm
-barfed devil
-beer wight
-boor wight
-brawny mold
-rave spider
-clue golem
-bust vortex
-errata elemental
-elastic eel
-electrocardiogram eel
-fir elemental
-tire elemental
-flamingo sphere
-fallacy golem
-frizzed centaur
-forest centerfold
-fierceness sphere
-frosted giant
-geriatric snake
-gnat ant
-giant bath
-grant beetle
-grind bug
-giant mango
-glossy golem
-gnome laureate
-gnome dummy
-gooier ooze
-green slide
-guardian nacho
-hell hound pun
-high purist
-hairnet devil
-ice trowel
-killer beet
-feather golem
-lounge worm
-mountain lymph
-pager golem
-pie fiend
-prophylactic worm
-sock mole
-rogue piercer
-seesawing sphere
-simile mimic
-moldier ant
-stain vortex
-scone giant
-umbrella hulk
-vampire mace
-verbal jabberwock
-water lemon
-water melon
-winged grizzly
-yellow wight
+満足そうな目
+フラッシュのゴーレム
+殉教オーク
+モルタールのオーク
+酸のブログ
+鋭いブロッブ
+旋律の精
+エイリアシングの僧侶
+寄生虫
+寄せ木細工
+試験監督者
+頑固ドラゴンの子供
+憂鬱ドラゴンの子供
+戯画の子供
+クロケットの子供
+石目ドラゴンの子供
+ゴーンワームの子供
+ロングワードの子供
+寓話ワームの子供
+嘔吐の悪魔
+ビール・ワイト
+不作法ワイト
+筋肉質モールド
+熱弁グモ
+糸玉のゴーレム
+破産の渦
+正誤の精
+ゴムウナギ
+心電図ウナギ
+モミの木の精
+疲労の精
+フラミンゴの球体
+誤謬のゴーレム
+縮れのケンタウロス
+森のケンタフォールド
+激しさの球体
+霜降り巨人
+小老なヘビ
+ブヨ蟻
+巨大フロ
+グラインドバグ
+授与カブトムシ
+巨大マンゴー
+光沢仕上げのゴーレム
+ノームの受賞者
+ノームのダミー
+ぬめぬめウーズ
+緑スライド
+守護のナッチョ
+ヘルハウンドの駄洒落
+高位の修辞者
+ヘアネットの悪魔
+氷のコテ
+殺人甜菜
+羽毛のゴーレム
+ラウンジワーム
+山のリンパ液
+ポケベルのゴーレム
+パイの悪霊
+コンドームワーム
+靴下もぐら
+盗賊つらら
+浮沈の球体
+直喩のミミック
+巨黴蟻
+汚れの渦
+スコーンの巨人
+日傘ハルク
+吸血鬼のメイス
+口先ジャバウォック
+ウォーターレモン
+ウォーターメロン
+羽のある灰色熊
+黄色ワイト
