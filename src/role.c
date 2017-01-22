@@ -2138,10 +2138,16 @@ winid where;
     /* [g and a don't constrain anything sufficiently
        to narrow something done to a single choice] */
 
+/*JP
     Sprintf(buf, "%12s ", "name:");
+*/
+    Sprintf(buf, "%12s ", "ñºëO:");
     Strcat(buf, (which == RS_NAME) ? choosing : !*plname ? not_yet : plname);
     putstr(where, 0, buf);
+/*JP
     Sprintf(buf, "%12s ", "role:");
+*/
+    Sprintf(buf, "%12s ", "êEã∆:");
     Strcat(buf, (which == RS_ROLE) ? choosing : (r == ROLE_NONE)
                                                     ? not_yet
                                                     : (r == ROLE_RANDOM)
@@ -2215,21 +2221,36 @@ winid where;
     c = flags.initrace;
     switch (which) {
     case RS_NAME:
+/*JP
         what = "name";
+*/
+        what = "ñºëO";
         break;
     case RS_ROLE:
+/*JP
         what = "role";
+*/
+        what = "êEã∆";
         f = r;
         for (i = 0; i < SIZE(roles); ++i)
             if (i != f && !filter.roles[i])
                 break;
         if (i == SIZE(roles)) {
+/*JP
             constrainer = "filter";
+*/
+            constrainer = "çiÇËçûÇ›";
+/*JP
             forcedvalue = "role";
+*/
+            forcedvalue = "êEã∆";
         }
         break;
     case RS_RACE:
+/*JP
         what = "race";
+*/
+        what = "éÌë∞";
         f = flags.initrace;
         c = ROLE_NONE; /* override player's setting */
         if (r >= 0) {
@@ -2237,19 +2258,31 @@ winid where;
             if (allowmask == MH_HUMAN)
                 c = 0; /* races[human] */
             if (c >= 0) {
+/*JP
                 constrainer = "role";
+*/
+                constrainer = "êEã∆";
                 forcedvalue = races[c].noun;
             } else if (f >= 0
                        && (allowmask & ~filter.mask) == races[f].selfmask) {
                 /* if there is only one race choice available due to user
                    options disallowing others, race menu entry is disabled */
+/*JP
                 constrainer = "filter";
+*/
+                constrainer = "çiÇËçûÇ›";
+/*JP
                 forcedvalue = "race";
+*/
+                forcedvalue = "éÌë∞";
             }
         }
         break;
     case RS_GENDER:
+/*JP
         what = "gender";
+*/
+        what = "ê´ï ";
         f = flags.initgend;
         g = ROLE_NONE;
         if (r >= 0) {
@@ -2259,19 +2292,31 @@ winid where;
             else if (allowmask == ROLE_FEMALE)
                 g = 1; /* genders[female] */
             if (g >= 0) {
+/*JP
                 constrainer = "role";
+*/
+                constrainer = "êEã∆";
                 forcedvalue = genders[g].adj;
             } else if (f >= 0
                        && (allowmask & ~filter.mask) == genders[f].allow) {
                 /* if there is only one gender choice available due to user
                    options disallowing other, gender menu entry is disabled */
+/*JP
                 constrainer = "filter";
+*/
+                constrainer = "çiÇËçûÇ›";
+/*JP
                 forcedvalue = "gender";
+*/
+                forcedvalue = "ê´ï ";
             }
         }
         break;
     case RS_ALGNMNT:
+/*JP
         what = "alignment";
+*/
+        what = "ëÆê´";
         f = flags.initalign;
         a = ROLE_NONE;
         if (r >= 0) {
@@ -2283,7 +2328,10 @@ winid where;
             else if (allowmask == AM_CHAOTIC)
                 a = 2; /* aligns[chaotic] */
             if (a >= 0)
+/*JP
                 constrainer = "role";
+*/
+                constrainer = "êEã∆";
         }
         if (c >= 0 && !constrainer) {
             allowmask = races[c].allow & ROLE_ALIGNMASK;
@@ -2294,17 +2342,30 @@ winid where;
             else if (allowmask == AM_CHAOTIC)
                 a = 2; /* aligns[chaotic] */
             if (a >= 0)
+/*JP
                 constrainer = "race";
+*/
+                constrainer = "éÌë∞";
         }
         if (f >= 0 && !constrainer
             && (ROLE_ALIGNMASK & ~filter.mask) == aligns[f].allow) {
             /* if there is only one alignment choice available due to user
                options disallowing others, algn menu entry is disabled */
+/*JP
             constrainer = "filter";
+*/
+            constrainer = "çiÇËçûÇ›";
+/*JP
             forcedvalue = "alignment";
+*/
+            forcedvalue = "ëÆê´";
         }
         if (a >= 0)
+#if 0 /*JP:ì˙ñ{åÍÇ≈ÇÕñºéåÇ™é©ëR*/
             forcedvalue = aligns[a].adj;
+#else
+            forcedvalue = aligns[a].noun;
+#endif
         break;
     }
 
@@ -2312,26 +2373,47 @@ winid where;
     if (constrainer) {
         any.a_int = 0;
         /* use four spaces of padding to fake a grayed out menu choice */
+/*JP
         Sprintf(buf, "%4s%s forces %s", "", constrainer, forcedvalue);
+*/
+        Sprintf(buf, "%4sÇ±ÇÃ%sÇ≈ÇÕ%sÇÃÇ›", "", constrainer, forcedvalue);
         add_menu(where, NO_GLYPH, &any, ' ', 0, ATR_NONE, buf,
                  MENU_UNSELECTED);
     } else if (what) {
         any.a_int = RS_menu_arg(which);
+/*JP
         Sprintf(buf, "Pick%s %s first", (f >= 0) ? " another" : "", what);
+*/
+        Sprintf(buf, "%s%sÇêÊÇ…ëIÇ‘", (f >= 0) ? "ëºÇÃ" : "", what);
         add_menu(where, NO_GLYPH, &any, RS_menu_let[which], 0, ATR_NONE, buf,
                  MENU_UNSELECTED);
     } else if (which == RS_filter) {
         any.a_int = RS_menu_arg(RS_filter);
+#if 0 /*JP*/
         add_menu(where, NO_GLYPH, &any, '~', 0, ATR_NONE,
                  "Reset role/race/&c filtering", MENU_UNSELECTED);
+#else
+        add_menu(where, NO_GLYPH, &any, '~', 0, ATR_NONE,
+                 "êEã∆/éÌë∞Ç»Ç«ÇÃçiÇËçûÇ›ÇâèúÇ∑ÇÈ", MENU_UNSELECTED);
+#endif
     } else if (which == ROLE_RANDOM) {
         any.a_int = ROLE_RANDOM;
+#if 0 /*JP*/
         add_menu(where, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
                  MENU_UNSELECTED);
+#else
+        add_menu(where, NO_GLYPH, &any, '*', 0, ATR_NONE, "ÉâÉìÉ_ÉÄ",
+                 MENU_UNSELECTED);
+#endif
     } else if (which == ROLE_NONE) {
         any.a_int = ROLE_NONE;
+#if 0 /*JP*/
         add_menu(where, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
                  MENU_UNSELECTED);
+#else
+        add_menu(where, NO_GLYPH, &any, 'q', 0, ATR_NONE, "î≤ÇØÇÈ",
+                 MENU_UNSELECTED);
+#endif
     } else {
         impossible("role_menu_extra: bad arg (%d)", which);
     }

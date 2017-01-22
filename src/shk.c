@@ -2707,18 +2707,18 @@ const char *arg;
     }
     obj_name = doname(obj);
     /* Use an alternate message when extra information is being provided */
+#if 0 /*JP*//*“ú–{Œê‚Å‚Í“¯‚¶ˆµ‚¢*/
     if (was_unknown) {
-#if 0 /*JP*/
         Sprintf(fmtbuf, "%%s; you %s", fmt);
         obj_name[0] = highc(obj_name[0]);
         pline(fmtbuf, obj_name, (obj->quan > 1L) ? "them" : "it", amt,
               plur(amt), arg);
-#else
-        pline(fmt, obj_name, amt, "", arg);
-#endif
     } else {
         You(fmt, obj_name, amt, plur(amt), arg);
     }
+#else
+    You(fmt, obj_name, amt, "", arg);
+#endif
 }
 
 /* decide whether a shopkeeper thinks an item belongs to her */

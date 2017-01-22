@@ -439,7 +439,10 @@ makepicks:
                     if (gotrolefilter())
                         role_menu_extra(RS_filter, win);
                     role_menu_extra(ROLE_NONE, win); /* quit */
+/*JP
                     Strcpy(pbuf, "Pick a role or profession");
+*/
+                    Strcpy(pbuf, "職業を選んでください");
                     end_menu(win, pbuf);
                     n = select_menu(win, PICK_ONE, &selected);
                     choice = (n == 1) ? selected[0].item.a_int : ROLE_NONE;
@@ -523,7 +526,10 @@ makepicks:
                         if (gotrolefilter())
                             role_menu_extra(RS_filter, win);
                         role_menu_extra(ROLE_NONE, win); /* quit */
+/*JP
                         Strcpy(pbuf, "Pick a race or species");
+*/
+                        Strcpy(pbuf, "種族を選んでください");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         choice = (n == 1) ? selected[0].item.a_int
@@ -612,7 +618,10 @@ makepicks:
                         if (gotrolefilter())
                             role_menu_extra(RS_filter, win);
                         role_menu_extra(ROLE_NONE, win); /* quit */
+/*JP
                         Strcpy(pbuf, "Pick a gender or sex");
+*/
+                        Strcpy(pbuf, "性別を選んでください");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         choice = (n == 1) ? selected[0].item.a_int
@@ -697,7 +706,10 @@ makepicks:
                         if (gotrolefilter())
                             role_menu_extra(RS_filter, win);
                         role_menu_extra(ROLE_NONE, win); /* quit */
+/*JP
                         Strcpy(pbuf, "Pick an alignment or creed");
+*/
+                        Strcpy(pbuf, "属性を選んでください");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         choice = (n == 1) ? selected[0].item.a_int
@@ -1067,18 +1079,29 @@ int role, race, gend;
         if (filtering)
             any.a_int = i + 1;
         else
+/*JP
             any.a_string = aligns[i].adj;
+*/
+            any.a_string = aligns[i].noun;
 /*JP
         this_ch = *aligns[i].adj;
 */
         this_ch = lowc(*aligns[i].filecode);
         /* (see setup_racemenu for explanation of selector letters
            and setup_rolemenu for preselection) */
+#if 0 /*JP*/
         add_menu(win, NO_GLYPH, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
                  ATR_NONE, aligns[i].adj,
                  (!filtering && !algn_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+#else
+        add_menu(win, NO_GLYPH, &any,
+                 filtering ? this_ch : highc(this_ch),
+                 filtering ? highc(this_ch) : 0,
+                 ATR_NONE, aligns[i].noun,
+                 (!filtering && !algn_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+#endif
     }
 }
 
