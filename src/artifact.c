@@ -2060,12 +2060,55 @@ long *abil;
     return (struct obj *) 0;
 }
 
+#if 1 /*JP*/
+/*JP colornamesは設定ファイルで使うので翻訳せず、
+     日本語専用の配列を別に用意する。
+*/
+static const struct {
+    const char *name;
+    const int color;
+} colornames2[] = {
+    { "黒い", CLR_BLACK },
+    { "赤い", CLR_RED },
+    { "緑色の", CLR_GREEN },
+    { "茶色い", CLR_BROWN },
+    { "青い", CLR_BLUE },
+    { "マゼンタ色の", CLR_MAGENTA },
+    { "シアン色の", CLR_CYAN },
+    { "灰色の", CLR_GRAY },
+    { "灰色の", CLR_GRAY },
+    { "オレンジ色の", CLR_ORANGE },
+    { "淡緑色の", CLR_BRIGHT_GREEN },
+    { "黄色い", CLR_YELLOW },
+    { "淡青色の", CLR_BRIGHT_BLUE },
+    { "明るいマゼンタ色の", CLR_BRIGHT_MAGENTA },
+    { "明るいシアン色の", CLR_BRIGHT_CYAN },
+    { "白い", CLR_WHITE }
+};
+
+static const char *
+clr2colorname2(clr)
+int clr;
+{
+    int i;
+
+    for (i = 0; i < SIZE(colornames2); i++)
+        if (colornames2[i].color == clr)
+            return colornames2[i].name;
+    return (char *) 0;
+}
+#endif
+
 const char *
 glow_color(arti_indx)
 int arti_indx;
 {
     int colornum = artilist[arti_indx].acolor;
+#if 0 /*JP*/
     const char *colorstr = clr2colorname(colornum);
+#else
+    const char *colorstr = jconj_adj(clr2colorname2(colornum));
+#endif
 
     return hcolor(colorstr);
 }
