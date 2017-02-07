@@ -1453,11 +1453,16 @@ boolean with_price;
             if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
                 /* presumably can be felt when blind */
 #if 0 /*JP*/
-                Strcat(bp, " (");
+                Strcat(bp, " (glowing");
                 if (!Blind)
-                    Sprintf(eos(bp), "%sF‚É", glow_color(obj->oartifact));
-                Strcat(bp, "‹P‚¢‚Ä‚¢‚é)");
+                    Sprintf(eos(bp), " %s", glow_color(obj->oartifact));
+                Strcat(bp, ")");
 #else
+                if (Blind)
+                    Strcat(bp, " (”M‚ðŽ‚Á‚Ä‚¢‚é)");
+                else
+                    Sprintf(eos(bp), " (%s‹P‚¢‚Ä‚¢‚é)",
+                            glow_color(obj->oartifact));
 #endif
             }
         }
