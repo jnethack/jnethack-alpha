@@ -799,7 +799,10 @@ boolean by_hero;
 
     if (mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ)) {
         if (by_hero && cansee(x,y))
+/*JP
             pline("%s twitches feebly.",
+*/
+            pline("%sÇÕÇÌÇ∏Ç©Ç…·zùπÇµÇΩÅD",
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
         return (struct monst *) 0;
     }
@@ -852,13 +855,22 @@ boolean by_hero;
             shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
 
         if (cansee(x, y))
+#if 0 /*JP*/
             pline(
                 "%s glows iridescently.",
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
+#else
+            pline(
+                "%sÇÕì¯êFÇ…ãPÇ¢ÇΩÅD",
+                upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
+#endif
         else if (shkp)
             /* need some prior description of the corpse since
                stolen_value() will refer to the object as "it" */
+/*JP
             pline("A corpse is resuscitated.");
+*/
+            pline("éÄëÃÇ™ëhê∂ÇµÇΩÅD");
 
         /* don't charge for shopkeeper's own corpse if we just revived him */
         if (shkp && mtmp != shkp)
