@@ -5673,20 +5673,26 @@ retry:
                             || levl[u.ux][u.uy].typ >= ICE)
                             ? "Oops!  %s away from you!"
                             : "Oops!  %s to the floor!");
-#else
-            *oops_msg = (u.uswallow
-                         ? "おっと，届かないところに%s！"
-                         : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                            || levl[u.ux][u.uy].typ < IRONBARS
-                            || levl[u.ux][u.uy].typ >= ICE)
-                            ? "おっと，手から%s！"
-                            : "おっと，床に%s！");
-#endif
 
         /* The(aobjnam()) is safe since otmp is unidentified -dlc */
         (void) hold_another_object(otmp, oops_msg,
                                    The(aobjnam(otmp, verb)),
                                    (const char *) 0);
+#else
+            *oops_msg = (u.uswallow
+                         ? "おっと，%%sが届かないところに%s！"
+                         : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
+                            || levl[u.ux][u.uy].typ < IRONBARS
+                            || levl[u.ux][u.uy].typ >= ICE)
+                            ? "おっと，%%sが手から%s！"
+                            : "おっと，%%sが床に%s！");
+        char oopsbuf[BUFSZ];
+        Sprintf(oopsbuf, oops_msg, verb);
+
+        (void) hold_another_object(otmp, oopsbuf,
+                                   xname(otmp),
+                                   (const char *) 0);
+#endif
         u.ublesscnt += rn1(100, 50); /* the gods take notice */
     }
 }
