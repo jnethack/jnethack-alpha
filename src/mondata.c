@@ -757,6 +757,7 @@ const char *in_str;
             if (m_i_len == slen) {
                 return i; /* exact match */
             } else if (slen > m_i_len
+#if 0 /*JP*/
                        && (str[m_i_len] == ' '
                            || !strcmpi(&str[m_i_len], "s")
                            || !strncmpi(&str[m_i_len], "s ", 2)
@@ -766,6 +767,9 @@ const char *in_str;
                            || !strncmpi(&str[m_i_len], "'s ", 3)
                            || !strcmpi(&str[m_i_len], "es")
                            || !strncmpi(&str[m_i_len], "es ", 3))) {
+#else
+                       && !strncmp(&str[m_i_len], "‚Ì", 2)) {
+#endif
                 mntmp = i;
                 len = m_i_len;
             }

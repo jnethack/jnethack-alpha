@@ -3333,7 +3333,7 @@ struct obj *no_wish;
     }
 #endif
 
-#if 0 /*JP*//*日本語では処理しない*/
+#if 0 /*JP*/
     /* intercept pudding globs here; they're a valid wish target,
      * but we need them to not get treated like a corpse.
      *
@@ -3365,7 +3365,6 @@ struct obj *no_wish;
                 *p = 0;
         }
     }
-#endif
     /* Find corpse type w/o "of" (red dragon scale mail, yeti corpse) */
     if (strncmpi(bp, "samurai sword", 13))   /* not the "samurai" monster! */
         if (strncmpi(bp, "wizard lock", 11)) /* not the "wizard" monster! */
@@ -3396,6 +3395,14 @@ struct obj *no_wish;
                                 mntmp = NON_PM;
                             }
                         }
+#else /*JP:「(怪物名)の(アイテム)」対応 */
+    {
+        if ((mntmp = name_to_mon(bp)) >= LOW_PM) {
+            char *mp = mons[mntmp].mname;
+            bp = strstri(bp, mp) + strlen(mp) + 2;
+        }
+    }
+#endif
 
 #if 0 /*JP*//*単数化はしない*/
     /* first change to singular if necessary */
@@ -3434,6 +3441,7 @@ struct obj *no_wish;
     }
 #endif
 
+#if 0 /*JP*/
     /* dragon scales - assumes order of dragons */
     if (!strcmpi(bp, "scales") && mntmp >= PM_GRAY_DRAGON
         && mntmp <= PM_YELLOW_DRAGON) {
@@ -3441,6 +3449,22 @@ struct obj *no_wish;
         mntmp = NON_PM; /* no monster */
         goto typfnd;
     }
+#else
+    /*JP: 「鱗鎧」を先に処理しておく */
+    if (!strcmpi(bp, "鱗鎧") && mntmp >= PM_GRAY_DRAGON
+        && mntmp <= PM_YELLOW_DRAGON) {
+        typ = GRAY_DRAGON_SCALE_MAIL + mntmp - PM_GRAY_DRAGON;
+        mntmp = NON_PM; /* no monster */
+        goto typfnd;
+    }
+
+    if (!strcmpi(bp, "鱗") && mntmp >= PM_GRAY_DRAGON
+        && mntmp <= PM_YELLOW_DRAGON) {
+        typ = GRAY_DRAGON_SCALES + mntmp - PM_GRAY_DRAGON;
+        mntmp = NON_PM; /* no monster */
+        goto typfnd;
+    }
+#endif
 
     p = eos(bp);
 #if 0 /*JP*/
