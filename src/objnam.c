@@ -96,7 +96,7 @@ register const char *pref;
     register int i = (int) strlen(pref);
 
     if (i > PREFIX) {
-        impossible("PREFIX too short (for %d).%s//%s", i, s, pref);
+        impossible("PREFIX too short (for %d).", i);
         return s;
     }
     s -= i;
