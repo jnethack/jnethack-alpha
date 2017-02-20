@@ -1234,8 +1234,9 @@ register int pm;
     case PM_SANDESTIN: /* moot--they don't leave corpses */
         if (Unchanging) {
 #if 0 /*JP*/
-            You_feel("ˆêuˆá‚Á‚½Š´‚¶‚ª‚µ‚½D"); /* same as poly trap */
+            You_feel("momentarily different."); /* same as poly trap */
 #else
+            You_feel("ˆêuˆá‚Á‚½Š´‚¶‚ª‚µ‚½D"); /* same as poly trap */
 #endif
         } else {
 /*JP

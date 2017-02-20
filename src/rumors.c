@@ -571,6 +571,9 @@ struct monst *oracl;
         if (umoney <= (long) minor_cost /* don't even ask */
             || (oracle_cnt == 1 || oracle_flg < 0))
             return 0;
+/*JP
+        Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
+*/
         Sprintf(qbuf, "「ならば汝，高位の神託を受けるか？」(%d%s)",
                 major_cost, currency((long) major_cost));
         if (yn(qbuf) != 'y')

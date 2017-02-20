@@ -488,6 +488,7 @@ register struct monst *mtmp;
 /*JP
         Strcat(info, ", shapechanger");
 */
+        Strcat(info, ", •Ï‰»");
       
     /* pets eating mimic corpses mimic while eating, so this comes first */
     if (mtmp->meating)

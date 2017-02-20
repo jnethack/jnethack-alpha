@@ -2518,7 +2518,7 @@ dodip()
 
     if (potion->otyp == POT_WATER && obj->otyp == TOWEL) {
 /*JP
-        pline_The("towel soak up!");
+        pline_The("towel soaks it up!");
 */
         pline_The("ƒ^ƒIƒ‹‚Í…‚ğ‹z‚¢‚ñ‚¾I");
         /* wetting towel already done via water_damage() in H2Opotion_dip */

@@ -3865,7 +3865,7 @@ boolean croaked;
 
     if (saw_untrap) {
 #if 0 /*JP*/
-        Sprintf(trapmsg, "% trap",
+        Sprintf(trapmsg, "%s trap%s",
                 (saw_untrap > 3) ? "several" : (saw_untrap > 1) ? "some"
                                                                 : "a",
                 plur(saw_untrap));
