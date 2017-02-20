@@ -607,13 +607,24 @@ newgame()
         com_pager(1);
     }
 
+#if 1 /*C360-19*/
     urealtime.realtime = 0L;
     urealtime.start_timing = getnow();
+#endif
 #ifdef INSURANCE
     save_currentstate();
 #endif
     program_state.something_worth_saving++; /* useful data now exists */
 
+#if 0 /*C360-19*/
+    urealtime.realtime = 0L;
+#if defined(BSD) && !defined(POSIX_TYPES)
+    (void) time((long *) &urealtime.restored);
+#else
+    (void) time(&urealtime.restored);
+#endif
+
+#endif
     /* Success! */
     welcome(TRUE);
     return;

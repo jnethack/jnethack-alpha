@@ -16,7 +16,9 @@
 #include "func_tab.h" /* for extended commands */
 #include "winMS.h"
 #include <assert.h>
+#if 1 /*W360-1*/
 #include <mmsystem.h>
+#endif
 #include "mhmap.h"
 #include "mhstatus.h"
 #include "mhtext.h"
@@ -1653,8 +1655,10 @@ mswin_getlin(const char *question, char *input)
                         len--;
 #endif
                     input[len] = '\0';
+#if 1 /*W360-1*/
                 } else if (len>=(BUFSZ-1)) {
                     PlaySound((LPCSTR)SND_ALIAS_SYSTEMEXCLAMATION, NULL, SND_ALIAS_ID|SND_ASYNC);
+#endif
                 } else {
                     input[len++] = c;
 #if 1 /*JP*//*2バイト文字ならその場でもう1バイト読み込む*/

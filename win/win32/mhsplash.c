@@ -94,9 +94,14 @@ mswin_display_splash_window(BOOL show_ver)
     if (show_ver) {
         /* Show complete version information */
         dlb *f;
+
+#if 0 /*W360-1*/
+        getversionstring(buf + strsize);
+        strcat(buf, "\r\n\r\n");
+#else
         char verbuf[BUFSZ];
         int verstrsize = 0;
- 
+
         getversionstring(verbuf);
         verstrsize = strlen(verbuf);
         if (verstrsize + strlen("\r\n\r\n") + 1  <  BUFSZ - 1)
@@ -110,8 +115,9 @@ mswin_display_splash_window(BOOL show_ver)
                 panic("out of memory");
         }
         strcat(buf, verbuf);
+#endif
         strsize = strlen(buf);
-            
+
         /* Add compile options */
         f = dlb_fopen(OPTIONS_USED, RDTMODE);
         if (f) {

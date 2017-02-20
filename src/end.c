@@ -1115,8 +1115,13 @@ int how;
     /* remember time of death here instead of having bones, rip, and
        topten figure it out separately and possibly getting different
        time or even day if player is slow responding to --More-- */
+#if 0 /*C360-19*/
+    endtime = getnow();
+    urealtime.realtime += (long) (endtime - urealtime.restored);
+#else
     urealtime.finish_time = endtime = getnow();
     urealtime.realtime += (long) (endtime - urealtime.start_timing);
+#endif
 
     /* Sometimes you die on the first move.  Life's not fair.
      * On those rare occasions you get hosed immediately, go out

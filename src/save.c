@@ -309,6 +309,14 @@ register int fd, mode;
 #ifdef SYSFLAGS
     bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
 #endif
+#if 0 /*C360-19*/
+    urealtime.realtime += (long) (getnow() - urealtime.restored);
+    bwrite(fd, (genericptr_t) &u, sizeof(struct you));
+    bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
+    bwrite(fd, (genericptr_t) &urealtime.realtime,
+           sizeof(urealtime.realtime));
+    bwrite(fd, yyyymmddhhmmss(urealtime.restored), 14);
+#else
     urealtime.finish_time = getnow();
     urealtime.realtime += (long) (urealtime.finish_time
                                   - urealtime.start_timing);
@@ -318,6 +326,7 @@ register int fd, mode;
     bwrite(fd, yyyymmddhhmmss(urealtime.start_timing), 14);  /** Why? **/
     /* this is the value to use for the next update of urealtime.realtime */
     urealtime.start_timing = urealtime.finish_time;
+#endif
     save_killers(fd, mode);
 
     /* must come before migrating_objs and migrating_mons are freed */
