@@ -1161,7 +1161,7 @@ struct obj **optr;
                 pline("Oh wow... like a kaleidoscope!");
 */
                 pline("ワーオ．万華鏡のようだ！");
-                 break;
+                break;
             }
             consume_obj_charge(obj, TRUE);
         }

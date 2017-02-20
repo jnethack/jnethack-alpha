@@ -5137,7 +5137,7 @@ register long amount;
             Your("debt increases by %ld %s.", delta, currency(delta));
 */
             Your("Ø‹à‚Í%ld%s‘‚¦‚½D", delta, currency(delta));
-       else
+        else
 /*JP
             You("owe %s %ld %s.", shkname(shkp), delta, currency(delta));
 */

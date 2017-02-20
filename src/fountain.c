@@ -639,7 +639,7 @@ register struct obj *obj;
     case 29: /* You see coins */
         /* We make fountains have more coins the closer you are to the
          * surface.  After all, there will have been more people going
-         * by.  Just like a shopping mall!  Chris Woodbury  */
+         * by.	Just like a shopping mall!  Chris Woodbury  */
 
         if (FOUNTAIN_IS_LOOTED(u.ux, u.uy))
             break;

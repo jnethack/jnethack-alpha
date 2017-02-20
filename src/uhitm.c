@@ -2814,7 +2814,7 @@ boolean wep_was_destroyed;
                 You("are splashed by %s acid!", s_suffix(mon_nam(mon)));
 */
                 You("%s‚Ì_‚ğ—‚Ñ‚¹‚ç‚ê‚½I", s_suffix(mon_nam(mon)));
- 
+
             if (!Acid_resistance)
                 mdamageu(mon, tmp);
             if (!rn2(30))

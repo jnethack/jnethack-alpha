@@ -744,6 +744,7 @@ int *fail_reason;
         "that the historic statue is now gone";
 */
         "—ðŽj“I‚È’¤‘œ‚ª‚È‚­‚È‚Á‚Ä‚µ‚Ü‚Á‚½‚±‚Æ";
+
     if (cant_revive(&mnum, TRUE, statue)) {
         /* mnum has changed; we won't be animating this statue as itself */
         if (mnum != PM_DOPPELGANGER)
