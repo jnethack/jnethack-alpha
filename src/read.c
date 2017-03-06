@@ -2698,7 +2698,7 @@ int how;
 /*JP
             getlin("What monster do you want to genocide? [type the name]",
 */
-            getlin("‚Ç‚Ì‰ö•¨‚ğ‹sE‚µ‚Ü‚·‚©H[–¼‘O‚ğ“ü‚ê‚Ä‚Ë]",
+            getlin("‚Ç‚Ì‰ö•¨‚ğ‹sE‚µ‚Ü‚·‚©H[–¼‘O‚ğ“ú–{Œê‚Å“ü‚ê‚Ä‚Ë]",
                    buf);
             (void) mungspaces(buf);
             /* choosing "none" preserves genocideless conduct */
