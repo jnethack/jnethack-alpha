@@ -115,7 +115,7 @@ boolean talk;
 /*JP
                 You("%s...", stagger(youmonst.data, "stagger"));
 */
-                You("%s．．．", stagger(youmonst.data, "くらくらした"));
+                You("くらくらした．．．");
         }
     }
     if ((!xtime && old) || (xtime && !old))

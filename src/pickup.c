@@ -1661,7 +1661,7 @@ encumber_msg()
             You("%s under your heavy load.  Movement is very hard.",
                 stagger(youmonst.data, "stagger"));
 #else
-            You("荷物の重みでのたうちまわった．動くのが非常にきつい．");
+            You("荷物の重みでよろよろした．動くのが非常にきつい．");
 #endif
             break;
         default:
@@ -1699,7 +1699,7 @@ encumber_msg()
             You("%s under your load.  Movement is still very hard.",
                 stagger(youmonst.data, "stagger"));
 #else
-            You("荷物の重みがずっしりと肩にくる．まだ動くのが非常にきつい．");
+            You("荷物の重みがずっしりとくる．まだ動くのが非常にきつい．");
 #endif
             break;
         }

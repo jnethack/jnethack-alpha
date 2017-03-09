@@ -1037,7 +1037,7 @@ static const char *levitate[4] = { "浮く", "浮く", "よろめく", "よろめく" };
 /*JP
 static const char *flys[4] = { "fly", "Fly", "flutter", "Flutter" };
 */
-static const char *flys[4] = { "飛ぶ", "飛ぶ", "はためく", "はためく" };
+static const char *flys[4] = { "飛ぶ", "飛ぶ", "おののく", "おののく" };
 /*JP
 static const char *flyl[4] = { "fly", "Fly", "stagger", "Stagger" };
 */
@@ -1049,11 +1049,11 @@ static const char *slither[4] = { "滑る", "滑る", "たじろぐ", "たじろぐ" };
 /*JP
 static const char *ooze[4] = { "ooze", "Ooze", "tremble", "Tremble" };
 */
-static const char *ooze[4] = { "にじみ出る", "にじみ出る", "震える", "震える" };
+static const char *ooze[4] = { "にじみ出る", "にじみ出る", "身震いする", "身震いする" };
 /*JP
 static const char *immobile[4] = { "wiggle", "Wiggle", "pulsate", "Pulsate" };
 */
-static const char *immobile[4] = { "震える", "震える", "震える", "震える" };
+static const char *immobile[4] = { "動く", "動く", "震える", "震える" };
 /*JP
 static const char *crawl[4] = { "crawl", "Crawl", "falter", "Falter" };
 */
@@ -1076,6 +1076,12 @@ const char *def;
                         : def);
 }
 
+/*JP:
+ * 「よろめく」を怪物の種類によって変える。
+ * 自分に対して使う場合には既に「くらくらする」が使われているので、
+ * 変化していてもそのままにする。
+ * 相手に対して使う場合は「くらくらする」は不自然なのでこれを使う。
+ */
 const char *
 stagger(ptr, def)
 const struct permonst *ptr;

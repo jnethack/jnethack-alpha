@@ -86,6 +86,7 @@ struct _jconj_tab {
     {"î[ÇﬂÇÈ", J_MA, LOWER, NORMAL},
     {"óéÇøÇÈ", J_TA, UPPER, NORMAL},
     {"óéÇ∑", J_SA, FIFTH, NORMAL},
+    {"Ç®ÇÃÇÃÇ≠", J_KA, FIFTH, ION},
 /* Ç© */
     {"èëÇ≠", J_KA, FIFTH, ION},
     {"Ç©ÇØÇÈ", J_KA, UPPER, NORMAL},
@@ -109,6 +110,7 @@ struct _jconj_tab {
     {"ääÇÈ", J_RA, FIFTH, HATSUON},
     {"Ç∑ÇÈ", J_SA, SAHEN, NORMAL}, 
 /* ÇΩ */
+    {"ÇΩÇ∂ÇÎÇÆ", J_GA, FIFTH, ION},
     {"èoÇ∑", J_SA, FIFTH, NORMAL},
     {"êHÇ◊ÇÈ", J_HA, LOWER, NORMAL}, 
     {"égÇ§", J_WA, FIFTH, HATSUON},
@@ -151,6 +153,7 @@ struct _jconj_tab {
     {"èƒÇ≠", J_KA, FIFTH, ION},
     {"åƒÇ‘", J_BA, FIFTH, SOKUON},
     {"ì«Çﬁ", J_MA, FIFTH, SOKUON},
+    {"ÇÊÇÎÇﬂÇ≠", J_KA, FIFTH, ION},
 /* ÇÁ */
 /* ÇÌ */
     {(void*)0, 0, 0, 0},

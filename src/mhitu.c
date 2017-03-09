@@ -3566,7 +3566,8 @@ register struct attack *mattk;
                 pline("%s %s.", Monnam(mtmp),
                       makeplural(stagger(mtmp->data, "stagger")));
 #else
-                pline("%s‚Í‚­‚ç‚­‚ç‚µ‚½D", Monnam(mtmp));
+                pline("%s‚Í%sD", Monnam(mtmp),
+                      jpast(stagger(mtmp->data, "‚æ‚ë‚ß‚­")));
 #endif
             }
             tmp = 0;

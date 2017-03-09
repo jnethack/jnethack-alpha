@@ -1199,8 +1199,8 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                 pline("%s %s from your powerful strike!", Monnam(mon),
                       makeplural(stagger(mon->data, "stagger")));
 #else
-                pline("%sはあなたの会心の一撃でよろめいた！",
-                      Monnam(mon));
+                pline("%sはあなたの会心の一撃で%s！", Monnam(mon),
+                      jpast(stagger(mon->data, "よろめく")));
 #endif
             /* avoid migrating a dead monster */
             if (mon->mhp > tmp) {
@@ -1646,7 +1646,8 @@ register struct attack *mattk;
             pline("%s %s for a moment.", Monnam(mdef),
                   makeplural(stagger(pd, "stagger")));
 #else
-            pline("%sは一瞬くらくらした．", Monnam(mdef));
+            pline("%sは一瞬%s．", Monnam(mdef),
+                  jpast(stagger(pd, "よろめく")));
 #endif
         mdef->mstun = 1;
         goto physical;

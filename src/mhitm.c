@@ -969,7 +969,8 @@ register struct attack *mattk;
             pline("%s %s for a moment.", Monnam(mdef),
                   makeplural(stagger(pd, "stagger")));
 #else
-            pline("%sはすこしよろめいた．", Monnam(mdef));
+            pline("%sはすこし%s．", Monnam(mdef),
+                  jpast(stagger(pd, "よろめく")));
 #endif
         mdef->mstun = 1;
         goto physical;
@@ -1832,7 +1833,8 @@ int mdead;
                     pline("%s %s...", Monnam(magr),
                           makeplural(stagger(magr->data, "stagger")));
 #else
-                    pline("%sはくらくらした．．．", Monnam(magr));
+                    pline("%sは%s．．．", Monnam(magr),
+                          jpast(stagger(magr->data, "よろめく")));
 #endif
             }
             tmp = 0;
