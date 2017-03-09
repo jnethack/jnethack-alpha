@@ -3398,7 +3398,7 @@ struct obj *no_wish;
 #else /*JP:「(怪物名)の(アイテム)」対応 */
     {
         if ((mntmp = name_to_mon(bp)) >= LOW_PM) {
-            char *mp = mons[mntmp].mname;
+            const char *mp = mons[mntmp].mname;
             bp = strstri(bp, mp) + strlen(mp) + 2;
         }
     }
