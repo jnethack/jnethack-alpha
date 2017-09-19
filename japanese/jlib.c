@@ -17,7 +17,6 @@ int xputc2(int, int);
 
 #define EUC	0
 #define SJIS	1
-#define JIS	2
 
 /* internal kcode */
 /* IC=0 EUC */
@@ -73,8 +72,6 @@ setkcode(c)
 {
     if(c == 'E' || c == 'e' )
       output_kcode = EUC;
-    else if(c == 'J' || c == 'j')
-      output_kcode = JIS;
     else if(c == 'S' || c == 's')
       output_kcode = SJIS;
     else if(c == 'I' || c == 'i')
@@ -141,7 +138,6 @@ str2ic(s)
     static unsigned char buf[1024];
     const unsigned char *up;
     unsigned char *p, *pp;
-    int kin;
 
     if(!s)
       return s;
@@ -167,23 +163,6 @@ str2ic(s)
 	      *(p++) = (unsigned char)*(s++);
 	}
     }
-    else if( IC==EUC && input_kcode == JIS ){
-	kin = 0;
-	while(*s){
-	    if(s[0] == 033 && s[1] == '$' && (s[2] == 'B' || s[3] == '@')){
-		kin = 1;
-		s += 3;
-	    }
-	    else if(s[0] == 033 && s[1] == '(' && (s[2] == 'B' || s[3] == 'J')){
-		kin = 0;
-		s += 3;
-	    }
-	    else if( kin )
-	      *(p++) = (*(s++) | 0x80);
-	    else
-	      *(p++) = *(s++);
-	}
-    }
     else{
 	strcpy((char *)buf, s);
 	return (char *)buf;
@@ -204,7 +183,6 @@ ic2str(s)
     static unsigned char buf[1024];
     const unsigned char *up;
     unsigned char *p, *pp;
-    int kin;
 
     if(!s)
       return s;
@@ -239,39 +217,10 @@ ic2str(s)
 **	primitive function
 */
 
-static int kmode;	/* 0: Kanji out */
-			/* 1: Kanji in */
-
-static void
-tty_reset()
-{
-    if(kmode && output_kcode==JIS ){
-	putchar(033);
-	putchar('(');
-	putchar('B');
-/*
-    if (flags.DECgraphics){
-      putchar(033);
-      putchar('$');
-      putchar(')');
-      putchar('B');
-    }
-*/
-    }
-    kmode = 0;
-}
-
 /* print out 1 byte character to tty (no conversion) */
 static void
 tty_cputc(unsigned int c)
 {
-    if(kmode && output_kcode==JIS ){
-	putchar(033);
-	putchar('(');
-	putchar('B');
-    }
-    kmode = 0;
-
 #if defined(NO_TERMS) && (defined(MSDOS) || defined(WIN32CON))
     xputc(c);
 #else
@@ -283,8 +232,6 @@ tty_cputc(unsigned int c)
 static void
 tty_cputc2(unsigned int c, unsigned int c2)
 {
-    kmode = 1;
-
 #if defined(NO_TERMS) && (defined(MSDOS) || defined(WIN32CON))
     xputc2(c, c2);
 #else
@@ -297,13 +244,6 @@ tty_cputc2(unsigned int c, unsigned int c2)
 static void
 tty_jputc(unsigned int c)
 {
-    if(kmode && output_kcode==JIS ){
-	putchar(033);
-	putchar('(');
-	putchar('B');
-    }
-    kmode = 0;
-
 #if defined(NO_TERMS) && (defined(MSDOS) || defined(WIN32CON))
     xputc(c);
 #else
@@ -315,13 +255,6 @@ tty_jputc(unsigned int c)
 static void
 tty_jputc2(unsigned int c, unsigned int c2)
 {
-    if(!kmode && output_kcode==JIS ){
-	putchar(033);
-	putchar('$');
-	putchar('B');
-    }
-    kmode = 1;
-
 #if defined(NO_TERMS) && (defined(MSDOS) || defined(WIN32CON))
     xputc2(c, c2);
 #else
@@ -338,7 +271,6 @@ int
 jbuffer(
      unsigned int c,
      unsigned int *buf,
-     void (*reset)(),
      void (*f1)(unsigned int),
      void (*f2)(unsigned int, unsigned int))
 {
@@ -348,7 +280,6 @@ jbuffer(
     unsigned char *p;
 
     if(!buf) buf = ibuf;
-    if(!reset) reset = tty_reset;
     if(!f1) f1 = tty_jputc;
     if(!f2) f2 = tty_jputc2;
 
@@ -367,10 +298,6 @@ jbuffer(
 	  ;
 	else if(IC == EUC){
 	    switch(output_kcode){
-	      case JIS:
-		c1 &= 0x7f;
-		c2 &= 0x7f;
-		break;
 	      case SJIS:
 		uc[0] = c1;
 		uc[1] = c2;
@@ -388,10 +315,6 @@ jbuffer(
 	    uc[1] = c2;
 	    p = sj2e(uc);
 	    switch(output_kcode){
-	      case JIS:
-		c1 &= 0x7f;
-		c2 &= 0x7f;
-		break;
 	      case EUC:
 		break;
 	      default:
@@ -407,7 +330,6 @@ jbuffer(
 	f1(c);
 	return 1;
     }
-    reset();
     return -1;
 }
 
@@ -419,14 +341,12 @@ int
 cbuffer(
      unsigned int c,
      unsigned int *buf,
-     void (*reset)(),
      void (*f1)(unsigned int),
      void (*f2)(unsigned int, unsigned int))
 {
     static unsigned int ibuf[2];
 
     if(!buf) buf = ibuf;
-    if(!reset) reset = tty_reset;
     if(!f1) f1 = tty_cputc;
     if(!f2) f2 = tty_cputc2;
 
@@ -444,7 +364,6 @@ cbuffer(
 	f1(c);
 	return 1;
     }
-    reset();
     return -1;
 }
 
@@ -452,13 +371,13 @@ void
 jputchar(int c)
 {
     static unsigned int buf[2];
-    jbuffer((unsigned int)(c & 0xff), buf, NULL, NULL, NULL);
+    jbuffer((unsigned int)(c & 0xff), buf, NULL, NULL);
 }
 void
 cputchar(int c)
 {
     static unsigned int buf[2];
-    cbuffer((unsigned int)(c & 0xff), buf, NULL, NULL, NULL);
+    cbuffer((unsigned int)(c & 0xff), buf, NULL, NULL);
 }
 
 void

@@ -1,3 +1,5 @@
+	* ISO-2022-JP‘Î‰‚ğíœ
+
 Fri Feb 17 2017  Kentaro Shirakata  <argrath@ub32.org>
 
 	* ‰æ–Êã‚Ì‰ö•¨‚ğ/ƒRƒ}ƒ“ƒh‚ÅŒ©‚½Û‚É•¶š‰»‚¯‚·‚é–â‘è‚ğC³ (#36909)

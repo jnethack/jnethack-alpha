@@ -1068,7 +1068,7 @@ VA_DECL(const char *, fmt)
 	{
 	    char *str = buf;
 	    while(*str){
-		jbuffer(*(str++), NULL, NULL, xputc_core, xputc2_core);
+		jbuffer(*(str++), NULL, xputc_core, xputc2_core);
 	    }
 	}
 #endif
