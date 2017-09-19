@@ -2940,7 +2940,10 @@ int final;
 */
         enl_msg("¡‚Ìp‚©‚ç•Ï‰»‚·‚é‚±‚Æ‚ª‚Å‚«‚È", "‚¢", "‚©‚Á‚½", "", from_what(UNCHANGING));
     if (Hate_silver)
+/*JP
         you_are("harmed by silver", "");
+*/
+        enl_msg("‚ ‚È‚½‚Í‹â‚Éã", "‚¢", "‚©‚Á‚½", "", "");
     /* movement and non-armor-based protection */
     if (Fast)
 /*JP
