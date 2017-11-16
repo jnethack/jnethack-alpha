@@ -110,7 +110,9 @@ int how;
         /* PANICKED, TRICKED, QUIT, ESCAPED, ASCENDED */
         "", "", "", "", ""
     };
+#if 0 /*JP*/
     unsigned l;
+#endif
     char *kname = killer.name;
 
     buf[0] = '\0'; /* so strncat() can find the end */
@@ -826,7 +828,11 @@ boolean so;
 {
     boolean second_line = TRUE;
     char linebuf[BUFSZ];
+#if 0 /*JP*/
     char *bp, hpbuf[24], linebuf3[BUFSZ];
+#else
+    char *bp, hpbuf[24];
+#endif
     int hppos, lngr;
 #if 1 /*JP*/
     char who[BUFSZ];

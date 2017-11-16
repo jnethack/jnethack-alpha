@@ -500,7 +500,7 @@ int ch2;
 
     attrs[0] = attrs[1] = attr;
 
-    WriteConsoleOutputAttribute(hConOut,&attrs,2,
+    WriteConsoleOutputAttribute(hConOut,(WORD *)(&attrs),2,
 				cursor,&acount);
     WriteConsoleOutputCharacter(hConOut,buf,2,
 				cursor,&ccount);

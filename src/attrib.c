@@ -926,7 +926,9 @@ int propidx; /* special cases can have negative values */
         static NEARDATA const char because_of[] = "%s‚É‚æ‚Á‚Ä";
 
         if (propidx >= 0) {
+#if 0 /*JP*/
             char *p;
+#endif
             struct obj *obj = (struct obj *) 0;
             int innate = is_innate(propidx);
 

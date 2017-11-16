@@ -986,7 +986,11 @@ boolean vis;               /* whether the action can be seen */
 char *hittee;              /* target's name: "you" or mon_nam(mdef) */
 {
     struct permonst *old_uasmon;
+#if 0 /*JP*/
     const char *verb, *fakename;
+#else
+    const char *verb;
+#endif
     boolean youattack = (magr == &youmonst), youdefend = (mdef == &youmonst),
             resisted = FALSE, do_stun, do_confuse, result;
     int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;

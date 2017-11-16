@@ -1080,9 +1080,11 @@ boolean with_price;
     boolean known, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
     char prefix[PREFIX];
+#if 0 /*JP*/
     char tmpbuf[PREFIX + 1]; /* for when we have to add something at
                                 the start of prefix instead of the
                                 end (Strcat is used on the end) */
+#endif
     register char *bp = xname(obj);
 #if 1 /*JP*//*‡˜“ü‚ê‘Ö‚¦‚Ég‚¤*/
     char preprefix[PREFIX];
@@ -3034,15 +3036,15 @@ struct obj *no_wish;
     int eroded, eroded2, erodeproof;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
+#if 0 /*JP*/
     int tmp, tinv, tvariety;
+#else
+    int tvariety;
+#endif
     int wetness;
     struct fruit *f;
     int ftype = context.current_fruit;
     char fruitbuf[BUFSZ];
-#if 1 /*JP*/
-    char buf[BUFSZ];
-    char pfx[BUFSZ];
-#endif
     /* Fruits may not mess up the ability to wish for real objects (since
      * you can leave a fruit in a bones file and it will be added to
      * another person's game), so they must be checked for last, after

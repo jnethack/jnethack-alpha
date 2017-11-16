@@ -718,7 +718,11 @@ register struct monst *mtmp;
 
         if (!rn2(10) && !mtmp->mcan) {
             int numseen, numhelp;
+#if 0 /*JP*/
             char buf[BUFSZ], genericwere[BUFSZ];
+#else
+            char genericwere[BUFSZ];
+#endif
 
 /*JP
             Strcpy(genericwere, "creature");

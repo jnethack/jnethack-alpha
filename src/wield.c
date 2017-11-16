@@ -483,7 +483,9 @@ struct obj *obj;
 const char *verb; /* "rub",&c */
 {
     const char *what;
+#if 0 /*JP*/
     boolean more_than_1;
+#endif
 
     if (obj == uwep)
         return TRUE; /* nothing to do if already wielding it */

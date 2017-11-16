@@ -268,7 +268,9 @@ boolean talk;
 {
     long old = Blinded;
     boolean u_could_see, can_see_now;
+#if 0 /*JP*/
     const char *eyes;
+#endif
 
     /* we need to probe ahead in case the Eyes of the Overworld
        are or will be overriding blindness */

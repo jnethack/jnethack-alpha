@@ -1393,7 +1393,9 @@ struct obj *obj;
 int mnum;
 char *buf;
 {
+#if 0 /*JP*/
     char buf2[BUFSZ];
+#endif
     int r = tin_variety(obj, TRUE);
 
     if (obj && buf) {

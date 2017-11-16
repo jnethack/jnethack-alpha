@@ -1947,7 +1947,11 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 */
     const char *defprompt = "適当にキャラクターを選んでよいですか？[ynaq] ";
     int num_post_attribs = 0;
+#if 0 /*JP*/
     char tmpbuf[BUFSZ], *p;
+#else
+    char tmpbuf[BUFSZ];
+#endif
 
     if (buflen < QBUFSZ)
         return (char *) defprompt;

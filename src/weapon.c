@@ -719,7 +719,9 @@ register struct monst *mon;
          */
         if (mw_tmp && mwelded(mw_tmp)) {
             if (canseemon(mon)) {
+#if 0 /*JP*/
                 char welded_buf[BUFSZ];
+#endif
                 const char *mon_hand = mbodypart(mon, HAND);
 
                 if (bimanual(mw_tmp))

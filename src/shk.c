@@ -2690,7 +2690,11 @@ const char *fmt; /* "%s %ld %s %s", doname(obj), amt, plur(amt), arg */
 long amt;
 const char *arg;
 {
+#if 0 /*JP*/
     char *obj_name, fmtbuf[BUFSZ];
+#else
+    char *obj_name;
+#endif
     boolean was_unknown = !obj->dknown;
 
     obj->dknown = TRUE;
@@ -3451,7 +3455,11 @@ xchar x, y;
         }
     } else {
         char qbuf[BUFSZ], qsfx[BUFSZ];
+#if 0 /*JP*/
         boolean short_funds = (offer > shkmoney), one;
+#else
+        boolean short_funds = (offer > shkmoney);
+#endif
 
         if (short_funds)
             offer = shkmoney;

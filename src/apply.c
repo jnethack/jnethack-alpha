@@ -240,7 +240,9 @@ int rx, ry, *resp;
 {
     char buf[BUFSZ];
     boolean more_corpses;
+#if 0 /*JP*/
     struct permonst *mptr;
+#endif
     struct obj *corpse = sobj_at(CORPSE, rx, ry),
                *statue = sobj_at(STATUE, rx, ry);
 

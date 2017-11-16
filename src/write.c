@@ -100,7 +100,11 @@ dowrite(pen)
 register struct obj *pen;
 {
     register struct obj *paper;
+#if 0 /*JP*/
     char namebuf[BUFSZ], *nm, *bp;
+#else
+    char namebuf[BUFSZ], *nm;
+#endif
     register struct obj *new_obj;
     int basecost, actualcost;
     int curseval;

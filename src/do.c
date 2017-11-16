@@ -1819,7 +1819,9 @@ boolean at_stairs, falling, portal;
 #endif
         };
         const char *mesg;
+#if 0 /*JP*/
         char buf[BUFSZ];
+#endif
         int which = rn2(4);
 
         if (Hallucination)

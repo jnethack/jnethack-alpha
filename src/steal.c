@@ -100,8 +100,10 @@ register struct monst *mtmp;
     register struct obj *fgold = g_at(u.ux, u.uy);
     register struct obj *ygold;
     register long tmp;
+#if 0 /*JP*/
     struct monst *who;
     const char *whose, *what;
+#endif
 
     /* skip lesser coins on the floor */
     while (fgold && fgold->otyp != GOLD_PIECE)

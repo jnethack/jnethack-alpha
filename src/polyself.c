@@ -541,7 +541,11 @@ int psflags;
                     You("óÿÇÃäZÇ∆àÍëÃâªÇµÇΩÅD");
                 } else { /* dragon scale mail */
                     /* d.scale mail first reverts to scales */
+#if 0 /*JP*/
                     char *p, *dsmail;
+#else
+                    char *dsmail;
+#endif
 
                     /* similar to noarmor(invent.c),
                        shorten to "<color> scale mail" */
@@ -1183,7 +1187,11 @@ drop_weapon(alone)
 int alone;
 {
     struct obj *otmp;
+#if 0 /*JP*/
     const char *what, *which, *whichtoo;
+#else
+    const char *which, *whichtoo;
+#endif
     boolean candropwep, candropswapwep;
 
     if (uwep) {
