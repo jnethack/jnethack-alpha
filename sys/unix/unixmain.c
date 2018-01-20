@@ -391,11 +391,19 @@ char *argv[];
 #endif
         case 'u':
             if (argv[0][2])
+#if 0 /*JP*/
                 (void) strncpy(plname, argv[0] + 2, sizeof(plname) - 1);
+#else
+                (void) strncpy(plname, str2ic(argv[0] + 2), sizeof(plname) - 1);
+#endif
             else if (argc > 1) {
                 argc--;
                 argv++;
+#if 0 /*JP*/
                 (void) strncpy(plname, argv[0], sizeof(plname) - 1);
+#else
+                (void) strncpy(plname, str2ic(argv[0]), sizeof(plname) - 1);
+#endif
             } else
                 raw_print("Player name expected after -u");
             break;
