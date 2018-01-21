@@ -64,6 +64,7 @@
                      * For example, platforms using the GNU libraries,
                      * Linux, Solaris 2.x
                      */
+#define POSIX_ICONV /* use POSIX iconv functions */
 
 /* #define OPENWINBUG */  /* avoid a problem using OpenWindows 3.0 for
                              X11 on SunOS 4.1.x, x>= 2.  Do not define

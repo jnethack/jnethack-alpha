@@ -10,6 +10,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "hack.h"
+#ifdef POSIX_ICONV
+#include <iconv.h>
+#endif
 
 int xputc(CHAR_P);
 int xputc2(int, int);
@@ -17,6 +20,20 @@ int xputc2(int, int);
 
 #define EUC	0
 #define SJIS	1
+#define UTF8	2
+
+#ifdef POSIX_ICONV
+static char* ccode[]={
+    "EUC-JP-MS",
+    "CP932",
+    "UTF-8"
+};
+static char* ccode_alt[]={
+    "EUC-JP",
+    "ShiftJIS",
+    "UTF-8"
+};
+#endif
 
 /* internal kcode */
 /* IC=0 EUC */
@@ -47,6 +64,10 @@ int xputc2(int, int);
 
 static int	output_kcode = OUTPUT_KCODE;
 static int	input_kcode = INPUT_KCODE;
+#ifdef POSIX_ICONV
+static iconv_t	output_dsc = 0;
+static iconv_t	input_dsc = 0;
+#endif
 
 /*
 **	Kanji code library....
@@ -74,6 +95,8 @@ setkcode(c)
       output_kcode = EUC;
     else if(c == 'S' || c == 's')
       output_kcode = SJIS;
+    else if(c == 'U' || c == 'u')
+      output_kcode = UTF8;
     else if(c == 'I' || c == 'i')
 #ifdef MSDOS
       output_kcode = SJIS;
@@ -84,6 +107,27 @@ setkcode(c)
 	output_kcode = IC;
     }
     input_kcode = output_kcode;
+
+#ifdef POSIX_ICONV
+    if (output_dsc)
+        iconv_close(output_dsc);
+    output_dsc = iconv_open(ccode[output_kcode], ccode[IC]);
+    if ((size_t)output_dsc == -1)
+        output_dsc = iconv_open(ccode_alt[output_kcode], ccode[IC]);
+    if ((size_t)output_dsc == -1)
+        output_dsc = iconv_open(ccode[output_kcode], ccode_alt[IC]);
+    if ((size_t)output_dsc == -1)
+        output_dsc = iconv_open(ccode_alt[output_kcode], ccode_alt[IC]);
+    if(input_dsc)
+        iconv_close(input_dsc);
+    input_dsc = iconv_open(ccode[IC] ,ccode[input_kcode]);
+    if ((size_t)input_dsc == -1)
+        input_dsc = iconv_open(ccode_alt[IC] ,ccode[input_kcode]);
+    if ((size_t)input_dsc == -1)
+        input_dsc = iconv_open(ccode[IC] ,ccode_alt[input_kcode]);
+    if ((size_t)input_dsc == -1)
+        input_dsc = iconv_open(ccode_alt[IC] ,ccode_alt[input_kcode]);
+#endif
 }
 /*
 **	EUC->SJIS
@@ -150,6 +194,17 @@ str2ic(s)
     }
 
     p = buf;
+#ifdef POSIX_ICONV
+    if (input_dsc) {
+        size_t src_len, dst_len;
+        up = s;
+        src_len = strlen(s);
+        dst_len = sizeof(buf);
+        if (iconv(input_dsc, (char**)&up, &src_len,
+                (char**)&p, &dst_len) == (size_t)-1)
+            goto noconvert;
+    }
+#else
     if( IC==EUC && input_kcode == SJIS ){
 	while(*s){
 	    up = s;
@@ -163,7 +218,9 @@ str2ic(s)
 	      *(p++) = (unsigned char)*(s++);
 	}
     }
+#endif
     else{
+noconvert:
 	strcpy((char *)buf, s);
 	return (char *)buf;
     }
@@ -172,7 +229,6 @@ str2ic(s)
     return (char *)buf;
 }
 
-#ifdef SJIS_FILESYSTEM
 /*
 **	translate string to output kcode
 */
@@ -190,6 +246,17 @@ ic2str(s)
     buf[0] = '\0';
 
     p = buf;
+#ifdef POSIX_ICONV
+    if(output_dsc){
+        size_t src_len, dst_len;
+        up = s;
+        src_len = strlen(s);
+        dst_len = sizeof(buf);
+        if(iconv(output_dsc, (char**)&up, &src_len,
+                (char**)&p, &dst_len) == (size_t)-1)
+            goto noconvert;
+    }
+#else
     if( IC==EUC && output_kcode == SJIS ){
 	while(*s){
 	    up = s;
@@ -203,7 +270,9 @@ ic2str(s)
 	      *(p++) = (unsigned char)*(s++);
 	}
     }
+#endif
     else{
+noconvert:
 	strcpy((char *)buf, s);
 	return (char *)buf;
     }
@@ -211,7 +280,6 @@ ic2str(s)
     *(p++) = '\0';
     return (char *)buf;
 }
-#endif /* MSDOS */
 
 /*
 **	primitive function
@@ -295,6 +363,24 @@ jbuffer(
 	c2 = c;
 
 	if(IC == output_kcode)
+#ifdef POSIX_ICONV
+            f2(c1, c2);
+        else if (output_dsc) {
+            char buf_in[2], buf_out[16];
+            char *src = buf_in, *dst=buf_out;
+            size_t src_len = 2, dst_len = sizeof(buf_out);
+            *buf_in = c1;
+            *(buf_in + 1) = c2;
+            if (iconv(output_dsc, &src,
+                      &src_len, &dst, &dst_len) == (size_t)-1) {
+                f2(c1, c2);
+            } else {
+                *dst = '\0';
+                dst = buf_out;
+                while(*dst) f1(*(dst++));
+            }
+        }
+#else
 	  ;
 	else if(IC == EUC){
 	    switch(output_kcode){
@@ -323,6 +409,7 @@ jbuffer(
 	    }
 	}
 	f2(c1, c2);
+#endif
 	buf[0] = 0;
 	return 2;
     }
@@ -350,6 +437,15 @@ cbuffer(
     if(!f1) f1 = tty_cputc;
     if(!f2) f2 = tty_cputc2;
 
+#ifdef POSIX_ICONV
+    if (output_kcode == UTF8) {
+        if (c) {
+            f1(c);
+            return 1;
+        }
+    }
+    else
+#endif
     if(!(buf[0]) && is_kanji(c)){
 	buf[1] = c;
 	++buf[0];
@@ -370,14 +466,12 @@ cbuffer(
 void
 jputchar(int c)
 {
-    static unsigned int buf[2];
-    jbuffer((unsigned int)(c & 0xff), buf, NULL, NULL);
+    jbuffer((unsigned int)(c & 0xff), NULL, NULL, NULL);
 }
 void
 cputchar(int c)
 {
-    static unsigned int buf[2];
-    cbuffer((unsigned int)(c & 0xff), buf, NULL, NULL);
+    cbuffer((unsigned int)(c & 0xff), NULL, NULL, NULL);
 }
 
 void

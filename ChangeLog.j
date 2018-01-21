@@ -1,4 +1,5 @@
 	* ISO-2022-JP‘Î‰‚ğíœ
+	* UTF-8o—Í‚É‘Î‰ (#37910)
 
 Fri Feb 17 2017  Kentaro Shirakata  <argrath@ub32.org>
 
