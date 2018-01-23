@@ -156,8 +156,15 @@ getlin_hook_proc hook;
             } else
                 tty_nhbell();
 #if 1 /*JP*/
-	    if(is_kanji2(tmp, bufp-tmp))
-	      goto moreback;
+            {
+                int n;
+                n = offset_in_kanji(tmp, bufp - tmp);
+                if (n > 0) {
+                    /* Œã‚Å1ƒoƒCƒgˆø‚©‚ê‚é‚Ì‚Å‚»‚Ì•ª‚Í‚±‚±‚Å‚Íˆø‚©‚È‚¢ */
+                    bufp = bufp - (n - 1);
+                    goto moreback;
+                }
+            }
 #endif
 #if defined(apollo)
         } else if (c == '\n' || c == '\r') {
@@ -231,8 +238,7 @@ getlin_hook_proc hook;
     ttyDisplay->inread--;
     clear_nhwindow(WIN_MESSAGE); /* clean up after ourselves */
 #if 1 /*JP*/
-/*	Strcpy(bfp, str2ic(tmp)); JPTB not need for no convert? */
-	Strcpy(bfp, tmp);
+    Strcpy(bfp, str2ic(tmp));
 #endif
 }
 

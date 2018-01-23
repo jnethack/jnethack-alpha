@@ -532,6 +532,54 @@ is_kanji1(s, pos)
 }
 
 /*
+ * 漢字の先頭位置まで何バイト戻る必要があるかを計算する
+ */
+int
+offset_in_kanji(s, pos)
+     const unsigned char *s;
+     int pos;
+{
+    static int mask[7] = {
+        0,
+        0xc0,
+        0xe0,
+        0xf0,
+        0xf8,
+        0xfc,
+        0xfe,
+    };
+    if (output_kcode == UTF8) {
+        int c = 1;
+        int i;
+
+        /* 先頭なら常に0 */
+        if (pos == 0) {
+            return 0;
+        }
+        
+        pos--;
+        /* 直前の文字はASCII */
+        if ((s[pos] & 0x80) == 0x00) {
+            return 0;
+        }
+
+        for (i = pos; i >= 0; i--) {
+            if ((s[i] & 0xc0) == 0xc0)
+                break;
+            c++;
+        }
+
+        if (s[i] < mask[c]) {
+            return 0;
+        } else {
+            return c;
+        }
+    } else {
+        return is_kanji2(s, pos);
+    }
+}
+
+/*
 ** 8ビットスルーなisspace()
 */
 int

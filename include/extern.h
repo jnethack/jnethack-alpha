@@ -2794,6 +2794,7 @@ E void FDECL(jputchar,(int));
 E void FDECL(jputs,(const char *));
 E int FDECL(is_kanji2, (const char *,int));
 E int FDECL(is_kanji1, (const char *,int));
+E int FDECL(offset_in_kanji, (const unsigned char *, int));
 E int FDECL(isspace_8, (int));
 E void FDECL(split_japanese, (char *,char *,char *,int));
 E void FDECL(jrndm_replace, (char *));
