@@ -2100,10 +2100,11 @@ int final;
 */
             Strcpy(buf, "”±‚ðŽó‚¯‚Ä");
         }
-/*JP
+#if 0 /*JP*/
         you_are(buf, "");
-*/
+#else
         you_are_ing(buf, "");
+#endif
     }
     if (u.utrap) {
         char predicament[BUFSZ];
@@ -2903,10 +2904,11 @@ int final;
         Sprintf(buf, "%s‚É•Ï‰»‚µ‚Ä", youmonst.data->mname);
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
-/*JP
+#if 0 /*JP*/
         you_are(buf, "");
-*/
+#else
         you_are_ing(buf, "");
+#endif
     }
     if (lays_eggs(youmonst.data) && flags.female) /* Upolyd */
 /*JP
@@ -3449,10 +3451,11 @@ int msgflag;          /* for variant message phrasing */
     if (via_enlghtmt) {
         int final = msgflag; /* 'final' is used by you_are() macro */
 
-/*JP
+#if 0 /*JP*/
         you_are(buf, "");
-*/
+#else
         enl_msg(buf, "‚Ä‚¢‚é", "‚Ä‚¢‚½", "", "");
+#endif
     } else {
         /* for dohide(), when player uses '#monster' command */
 #if 0 /*JP*/

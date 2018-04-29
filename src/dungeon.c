@@ -2621,10 +2621,11 @@ branch *br;
 */
         return closed_portal ? "••ˆó‚³‚ê‚½–‚–@‚Ì“üŒû" : "–‚–@‚Ì“üŒû";
     case BR_NO_END1:
-/*JP
+#if 0 /*JP*/
         return "Connection";
-*/
+#else
         return "Ú‘±•”";
+#endif
     case BR_NO_END2:
 /*JP
         return br->end1_up ? "One way stairs up" : "One way stairs down";
