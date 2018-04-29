@@ -4422,7 +4422,10 @@ register int dx, dy;
                     if (is_rider(mon->data)
                         && abs(type) == ZT_BREATH(ZT_DEATH)) {
                         if (canseemon(mon)) {
+/*JP
                             hit(fltxt, mon, ".");
+*/
+                            hit(fltxt, mon, "ÅD");
 /*JP
                             pline("%s disintegrates.", Monnam(mon));
 */

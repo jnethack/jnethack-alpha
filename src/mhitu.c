@@ -2971,7 +2971,10 @@ register struct monst *mon;
             if (ring->owornmask && uarmg) {
                 /* don't take off worn ring if gloves are in the way */
                 if (!tried_gloves++)
+/*JP
                     mayberem(uarmg, "gloves");
+*/
+                    mayberem(uarmg, "è¨éË");
                 if (uarmg)
                     continue; /* next ring might not be worn */
             }
