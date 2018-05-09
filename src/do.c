@@ -1,5 +1,6 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1446975464 2015/11/08 09:37:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1472809073 2016/09/02 09:37:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Contains code for 'd', 'D' (drop), '>', '<' (up, down) */
@@ -39,7 +40,8 @@ dodrop()
     result = drop(getobj(&drop_types[i], "drop"));
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
-    reset_occupations();
+    if (result)
+        reset_occupations();
 
     return result;
 }
@@ -131,10 +133,13 @@ boolean pushing;
                 You("いつのまにか乾いた場所にいた！");
             } else if (lava && distu(rx, ry) <= 2) {
                 int dmg;
-/*JP
-                You("are hit by molten lava%c", Fire_resistance ? '.' : '!');
-*/
-                You("どろどろの溶岩でダメージを受けた%s", Fire_resistance ? "．" : "！");
+#if 0 /*JP:T*/
+                You("are hit by molten %s%c",
+                    hliquid("lava"), Fire_resistance ? '.' : '!');
+#else
+                You("どろどろの%sでダメージを受けた%s",
+                    hliquid("溶岩"), Fire_resistance ? "．" : "！");
+#endif
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
 #if 0 /*JP:T*/
@@ -204,7 +209,10 @@ const char *verb;
 #endif
             if (mtmp) {
                 if (!passes_walls(mtmp->data) && !throws_rocks(mtmp->data)) {
-                    if (hmon(mtmp, obj, TRUE) && !is_whirly(mtmp->data))
+                    int dieroll = rnd(20);
+
+                    if (hmon(mtmp, obj, HMON_THROWN, dieroll)
+                        && !is_whirly(mtmp->data))
                         return FALSE; /* still alive */
                 }
                 mtmp->mtrapped = 0;
@@ -254,7 +262,7 @@ const char *verb;
         newsym(x, y);
         return TRUE;
     } else if (is_lava(x, y)) {
-        return fire_damage(obj, FALSE, x, y);
+        return lava_damage(obj, x, y);
     } else if (is_pool(x, y)) {
         /* Reasonably bulky objects (arbitrary) splash when dropped.
          * If you're floating above the water even small things make
@@ -295,15 +303,13 @@ const char *verb;
 #endif
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
-        while (obj
-               && (otmp = obj_nexto_xy(obj->otyp, x, y, obj->o_id))
-                      != (struct obj *) 0) {
+        while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
             pudding_merge_message(obj, otmp);
             /* intentionally not getting the melded object; obj_meld may set
              * obj to null. */
             (void) obj_meld(&obj, &otmp);
         }
-        return (boolean) (obj == NULL);
+        return (boolean) !obj;
     }
     return FALSE;
 }
@@ -359,6 +365,8 @@ register struct obj *obj;
 STATIC_DCL void
 polymorph_sink()
 {
+    uchar sym = S_sink;
+
     if (levl[u.ux][u.uy].typ != SINK)
         return;
 
@@ -367,30 +375,36 @@ polymorph_sink()
     switch (rn2(4)) {
     default:
     case 0:
+        sym = S_fountain;
         levl[u.ux][u.uy].typ = FOUNTAIN;
         level.flags.nfountains++;
         break;
     case 1:
+        sym = S_throne;
         levl[u.ux][u.uy].typ = THRONE;
         break;
     case 2:
+        sym = S_altar;
         levl[u.ux][u.uy].typ = ALTAR;
         levl[u.ux][u.uy].altarmask = Align2amask(rn2((int) A_LAWFUL + 2) - 1);
         break;
     case 3:
+        sym = S_room;
         levl[u.ux][u.uy].typ = ROOM;
         make_grave(u.ux, u.uy, (char *) 0);
+        if (levl[u.ux][u.uy].typ == GRAVE)
+            sym = S_grave;
         break;
     }
-#if 0 /*JP*/
-    pline_The("sink transforms into %s!", (levl[u.ux][u.uy].typ == THRONE)
-                                              ? "a throne"
-                                              : an(surface(u.ux, u.uy)));
-#else
-    pline_The("流し台は%sに変化した！", (levl[u.ux][u.uy].typ == THRONE)
-                                              ? "玉座"
-                                              : an(surface(u.ux, u.uy)));
-#endif
+    /* give message even if blind; we know we're not levitating,
+       so can feel the outcome even if we can't directly see it */
+    if (levl[u.ux][u.uy].typ != ROOM)
+/*JP
+        pline_The("sink transforms into %s!", an(defsyms[sym].explanation));
+*/
+        pline_The("流し台は%sに変化した！", defsyms[sym].explanation);
+    else
+        pline_The("sink vanishes.");
     newsym(u.ux, u.uy);
 }
 
@@ -492,44 +506,50 @@ register struct obj *obj;
         break;
     case RIN_SUSTAIN_ABILITY: /* KMH */
 /*JP
-        pline_The("water flow seems fixed.");
+        pline_The("%s flow seems fixed.", hliquid("water"));
 */
-        pline("水の流れが一定になったようだ．");
+        pline("%sの流れが一定になったようだ．", hliquid("水"));
         break;
     case RIN_GAIN_STRENGTH:
-#if 0 /*JP*/
-        pline_The("water flow seems %ser now.",
+#if 0 /*JP:T*/
+        pline_The("%s flow seems %ser now.",
+                  hliquid("water"),
                   (obj->spe < 0) ? "weak" : "strong");
 #else
-        pline("水の流れが%sなったようだ．",
-              (obj->spe<0) ? "弱く" : "強く");
+        pline("%sの流れが%sくなったようだ．",
+                  hliquid("水"),
+                  (obj->spe < 0) ? "弱" : "強");
 #endif
         break;
     case RIN_GAIN_CONSTITUTION:
-#if 0 /*JP*/
-        pline_The("water flow seems %ser now.",
+#if 0 /*JP:T*/
+        pline_The("%s flow seems %ser now.",
+                  hliquid("water"),
                   (obj->spe < 0) ? "less" : "great");
 #else
-        pline("流れる水の量が%sなったようだ．",
-              (obj->spe < 0) ? "少なく" : "多く");
+        pline("流れる%sの量が%sくなったようだ．",
+                  hliquid("水"),
+                  (obj->spe < 0) ? "少な" : "多");
 #endif
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
-#if 0 /*JP*/
-        pline_The("water flow %s the drain.",
+#if 0 /*JP:T*/
+        pline_The("%s flow %s the drain.",
+                  hliquid("water"),
                   (obj->spe < 0) ? "misses" : "hits");
 #else
-        pline_The("水が排水口%sようになった．",
+        pline("%sが排水口%sようになった．",
+                  hliquid("水"),
                   (obj->spe < 0) ? "から反れる" : "めがけて流れる");
 #endif
         break;
     case RIN_INCREASE_DAMAGE:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline_The("water's force seems %ser now.",
                   (obj->spe < 0) ? "small" : "great");
 #else
-        pline_The("水の勢いが%sなったようだ．",
-                  (obj->spe < 0) ? "弱く" : "強く");
+        pline("水の勢いが%sくなったようだ．",
+                  (obj->spe < 0) ? "弱" : "強");
 #endif
         break;
     case RIN_HUNGER:
@@ -558,11 +578,27 @@ register struct obj *obj;
 */
         pline("数匹のハエがブンブン流し台の回りを飛びまわった．");
         break;
+    case RIN_TELEPORTATION:
+        nosink = teleport_sink();
+        /* give message even if blind; we know we're not levitating,
+           so can feel the outcome even if we can't directly see it */
+/*JP
+            pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
+*/
+            pline_The("流し台は%s消えた．", nosink ? "" : "一瞬");
+        ideed = FALSE;
+        break;
+    case RIN_POLYMORPH:
+        polymorph_sink();
+        nosink = TRUE;
+        /* for S_room case, same message as for teleportation is given */
+        ideed = (levl[u.ux][u.uy].typ != ROOM);
+        break;
     default:
         ideed = FALSE;
         break;
     }
-    if (!Blind && !ideed && obj->otyp != RIN_HUNGER) {
+    if (!Blind && !ideed) {
         ideed = TRUE;
         switch (obj->otyp) { /* effects that need eyes */
         case RIN_ADORNMENT:
@@ -605,16 +641,20 @@ register struct obj *obj;
             pline("一瞬，流し台が床に溶けこんだように見えた．");
             break;
         case RIN_FIRE_RESISTANCE:
-/*JP
-            pline_The("hot water faucet flashes brightly for a moment.");
-*/
+#if 0 /*JP*/
+            pline_The("hot %s faucet flashes brightly for a moment.",
+                      hliquid("water"));
+#else /*とりあえずhliquid()は使わない形に*/
             pline("一瞬，熱湯の蛇口が明るく輝いた．");
+#endif
             break;
         case RIN_COLD_RESISTANCE:
-/*JP
-            pline_The("cold water faucet flashes brightly for a moment.");
-*/
+#if 0 /*JP*/
+            pline_The("cold %s faucet flashes brightly for a moment.",
+                      hliquid("water"));
+#else /*とりあえずhliquid()は使わない形に*/
             pline("一瞬，冷水の蛇口が明るく輝いた．");
+#endif
             break;
         case RIN_PROTECTION_FROM_SHAPE_CHAN:
 /*JP
@@ -623,27 +663,19 @@ register struct obj *obj;
             pline("流し台は泉とはまったく違うもののように見えた．");
             break;
         case RIN_PROTECTION:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("sink glows %s for a moment.",
                       hcolor((obj->spe < 0) ? NH_BLACK : NH_SILVER));
 #else
             pline("流し台は一瞬%s輝いた．",
-                  jconj_adj(hcolor((obj->spe<0) ? NH_BLACK : NH_SILVER)));
+                      jconj_adj(hcolor((obj->spe < 0) ? NH_BLACK : NH_SILVER)));
 #endif
             break;
         case RIN_WARNING:
-#if 0 /*JP*/
-            pline_The("sink glows %s for a moment.", hcolor(NH_WHITE));
-#else
-            pline("流し台は一瞬%s輝いた．", jconj_adj(hcolor(NH_WHITE)));
-#endif
-            break;
-        case RIN_TELEPORTATION:
-            nosink = teleport_sink();
 /*JP
-            pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
+            pline_The("sink glows %s for a moment.", hcolor(NH_WHITE));
 */
-            pline_The("流し台は%s消えた．", nosink ? "" : "一瞬");
+            pline("流し台は一瞬%s輝いた．", jconj_adj(hcolor(NH_WHITE)));
             break;
         case RIN_TELEPORT_CONTROL:
 /*JP: "beam aboard" はスタートレックの「転送」*/
@@ -652,16 +684,14 @@ register struct obj *obj;
 */
             pline("流し台はどこかに転送されようとしているように見えた．");
             break;
-        case RIN_POLYMORPH:
-            polymorph_sink();
-            nosink = TRUE;
-            break;
         case RIN_POLYMORPH_CONTROL:
             pline_The(
 /*JP
                 "sink momentarily looks like a regularly erupting geyser.");
 */
                 "流し台は一瞬規則正しく噴出する間欠泉のように見えた．");
+            break;
+        default:
             break;
         }
     }
@@ -680,6 +710,12 @@ register struct obj *obj;
         pline("流し台が逆流して，%sが戻ってきた．", doname(obj));
         obj->in_use = FALSE;
         dropx(obj);
+    } else if (!rn2(5)) {
+        freeinv(obj);
+        obj->in_use = FALSE;
+        obj->ox = u.ux;
+        obj->oy = u.uy;
+        add_to_buried(obj);
     } else
         useup(obj);
 }
@@ -775,7 +811,7 @@ register struct obj *obj;
             You("drop %s into %s %s.", doname(obj), buf,
                 mbodypart(u.ustuck, STOMACH));
 #else
-            You("%sを%sの%sに置いた．", doname(obj), buf,
+            You("%sを%s%sに置いた．", doname(obj), buf,
                 mbodypart(u.ustuck, STOMACH));
 #endif
         }
@@ -955,6 +991,10 @@ doddrop()
 {
     int result = 0;
 
+    if (!invent) {
+        You("have nothing to drop.");
+        return 0;
+    }
     add_valid_menu_class(0); /* clear any classes already there */
     if (*u.ushops)
         sellobj_state(SELL_DELIBERATE);
@@ -963,7 +1003,8 @@ doddrop()
         result = menu_drop(result);
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
-    reset_occupations();
+    if (result)
+        reset_occupations();
 
     return result;
 }
@@ -1004,6 +1045,7 @@ int retry;
         free((genericptr_t) pick_list);
     } else if (flags.menu_style == MENU_COMBINATION) {
         unsigned ggoresults = 0;
+
         all_categories = FALSE;
         /* Gather valid classes via traditional NetHack method */
         i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
@@ -1038,12 +1080,15 @@ int retry;
         bypass_objlist(invent, FALSE);
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
-/*JP
-        n = query_objlist("What would you like to drop?", invent,
-*/
-        n = query_objlist("どれを置きますか？", invent,
-                          USE_INVLET | INVORDER_SORT, &pick_list, PICK_ANY,
+#if 0 /*JP*/
+        n = query_objlist("What would you like to drop?", &invent,
+                          (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
+#else
+        n = query_objlist("どれを置きますか？", &invent,
+                          (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
+                          all_categories ? allow_all : allow_category);
+#endif
         if (n > 0) {
             /*
              * picklist[] contains a set of pointers into inventory, but
@@ -1148,12 +1193,18 @@ dodown()
                 ladder_down =
                     (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnladder);
         }
-#if 0 /*JP*/
-        floating_above(stairs_down ? "stairs" : ladder_down
+        if (Is_airlevel(&u.uz))
+            You("are floating in the %s.", surface(u.ux, u.uy));
+        else if (Is_waterlevel(&u.uz))
+            You("are floating in %s.",
+                is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
+        else
+#if 0 /*JP:T*/
+            floating_above(stairs_down ? "stairs" : ladder_down
                                                     ? "ladder"
                                                     : surface(u.ux, u.uy));
 #else
-        floating_above(stairs_down ? "階段" : ladder_down
+            floating_above(stairs_down ? "階段" : ladder_down
                                                     ? "はしご"
                                                     : surface(u.ux, u.uy));
 #endif
@@ -1395,11 +1446,12 @@ boolean at_stairs, falling, portal;
 {
     int fd, l_idx;
     xchar new_ledger;
-    boolean cant_go_back, up = (depth(newlevel) < depth(&u.uz)),
-                          newdungeon = (u.uz.dnum != newlevel->dnum),
-                          was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
-                          familiar = FALSE;
-    boolean new = FALSE; /* made a new level? */
+    boolean cant_go_back, great_effort,
+            up = (depth(newlevel) < depth(&u.uz)),
+            newdungeon = (u.uz.dnum != newlevel->dnum),
+            was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
+            familiar = FALSE,
+            new = FALSE; /* made a new level? */
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
@@ -1534,6 +1586,7 @@ boolean at_stairs, falling, portal;
 #ifdef USE_TILES
     substitute_tiles(newlevel);
 #endif
+    check_gold_symbol();
     /* record this level transition as a potential seen branch unless using
      * some non-standard means of transportation (level teleport).
      */
@@ -1606,16 +1659,18 @@ boolean at_stairs, falling, portal;
                 u_on_dnstairs();
             /* you climb up the {stairs|ladder};
                fly up the stairs; fly up along the ladder */
+            great_effort = (Punished && !Levitation);
+            if (flags.verbose || great_effort)
 #if 0 /*JP*/
-            pline("%s %s up%s the %s.",
-                  (Punished && !Levitation) ? "With great effort you" : "You",
-                  Flying ? "fly" : "climb",
-                  (Flying && at_ladder) ? " along" : "",
-                  at_ladder ? "ladder" : "stairs");
-#else
-            pline("%s%sを上った．",
-                  (Punished && !Levitation) ? "やっとこさ" : "",
-                  at_ladder ? "はしご" : "階段");
+                pline("%s %s up%s the %s.",
+                      great_effort ? "With great effort, you" : "You",
+                      Levitation ? "float" : Flying ? "fly" : "climb",
+                      (Flying && at_ladder) ? " along" : "",
+                      at_ladder ? "ladder" : "stairs");
+#else /* 飛んだりしていても「上った」 */
+                pline("%s%sを上った．",
+                      great_effort ? "やっとこさ" : "",
+                      at_ladder ? "はしご" : "階段");
 #endif
         } else { /* down */
             if (at_ladder)
@@ -1628,15 +1683,15 @@ boolean at_stairs, falling, portal;
                 ; /* stayed on same level? (no transit effects) */
             } else if (Flying) {
                 if (flags.verbose)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("fly down %s.",
                         at_ladder ? "along the ladder" : "the stairs");
 #else
                     You("%s飛んで降りた．",
                         at_ladder ? "はしごに沿って" : "階段を");
 #endif
-            } else if (near_capacity() > UNENCUMBERED || Punished
-                       || Fumbling) {
+            } else if (near_capacity() > UNENCUMBERED
+                       || Punished || Fumbling) {
 /*JP
                 You("fall down the %s.", at_ladder ? "ladder" : "stairs");
 */
@@ -1896,7 +1951,7 @@ boolean at_stairs, falling, portal;
     save_currentstate();
 #endif
 
-    if ((annotation = get_annotation(&u.uz)))
+    if ((annotation = get_annotation(&u.uz)) != 0)
 /*JP
         You("remember this level as %s.", annotation);
 */
@@ -1905,7 +1960,14 @@ boolean at_stairs, falling, portal;
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
     (void) pickup(1);
-    context.polearm.hitmon = NULL;
+
+    /* discard context which applied to previous level */
+    maybe_reset_pick(); /* for door or for box not accompanying hero */
+    reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
+    iflags.travelcc.x = iflags.travelcc.y = -1; /* travel destination cache */
+    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+    /* digging context is level-aware and can actually be resumed if
+       hero returns to the previous level without any intervening dig */
 }
 
 STATIC_OVL void

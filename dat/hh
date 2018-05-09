@@ -26,7 +26,7 @@ S       save    ゲームを(後で続けるために)中断する．
 !       sh      (もしできるなら)シェルを実行する．
 ^Z      suspend ゲームを中断する．
 O       options オプションを設定する．
-/       whatis  画面の記号が何かを知る．
+/       what-is 画面の記号が何かを知る．
 \       known   今までに発見した道具の一覧を表示する．
 v       version バージョンを表示する．
 V       history ゲームの歴史を表示する．
@@ -36,6 +36,7 @@ V       history ゲームの歴史を表示する．
 ^P      prevmsg 前のメッセージを見る．(^Pは繰り返し使える)
 `               オリジナルモードと日本語モードの切り替え
 #               拡張コマンド(#?でヘルプ)
+&       what-does キーを押して起動するコマンドを説明する．
 
 ゲーム:
 ^D      kick    蹴る．(扉等)
@@ -59,7 +60,7 @@ o       open    扉を開ける．
 p       pay     勘定を払う．(店の中で)
 P       puton   アクセサリを身につける．(指輪，魔除けなど)
 q       quaff   何かを飲む(水薬, 水, など)
-Q       quiver  装填するものを選択する．
+Q       quiver  装填するものを選択する．(終了は'#quit')
 r       read    巻物や魔法の本を読む．
 R       remove  アクセサリをはずす．(指輪，魔除けなど)
 s       search  秘密の扉，隠れた罠，怪物を探す．
@@ -68,7 +69,7 @@ T       takeoff 鎧を脱ぐ．
 w       wield   武器を装備する．(w-  何も装備しない)
 W       wear    鎧を着る．
 x       xchange 左右の武器を交換する．
-X       twoweapon 二刀流を切り替える．
+X       twoweapon 二刀流を切り替える．(探索モードは'#explore')
 z       zap     杖を振りかざす．(number_pad が -1 なら z ではなく y)
 Z       Zap     呪文を唱える．(number_pad が -1 なら Z ではなく Y)
 <       up      階段を昇る．
@@ -92,21 +93,27 @@ _       travel  マップで示された点に最小経路アルゴリズムで移動する．
 M-?             拡張コマンドヘルプの表示 (プラットフォームが許せば)
 M-2     twoweapon 二刀流の切り替え (number_pad が無効なら)
 M-a     adjust  持ち物一覧の調整
+M-A     annotate 現在の階に1行メモを追加する(M-O参照)
 M-c     chat    誰かと話す
+M-C     conduct 自発的挑戦を表示する
 M-d     dip     何かに物を浸す．
-M-e     enhance 武器の技量を高めるまたは見る    
+M-e     enhance 武器の技量を高めるまたは見る
 M-f     force   鍵をこじあける．
 M-i     invoke  物の特別な力を使う．
 M-j     jump    他の位置に飛びうつる．
 M-l     loot    床の上の箱の中身を略奪する．
 M-m     monster 怪物の特別能力を使う．
 M-n     name    特定の怪物，個々のアイテム，アイテムの種類に名前をつける．
+M-N     name    M-nの別名
 M-o     offer   神に供物を捧げる．
+M-O     overview 訪れた階に関する情報とメモを表示する
 M-p     pray    神に祈る．
 M-q     quit    ゲームをやめる
 M-r     rub     ランプをこする．
+M-R     ride    騎乗するまたは騎乗をやめる
 M-s     sit     座る．
 M-t     turn    アンデットを土に返す．
+M-T     tip     入れ物をひっくり返す
 M-u     untrap  罠をはずす．
 M-v     version コンパイル時のオプションを表示する．
 M-w     wipe    顔を拭う．

@@ -1,4 +1,4 @@
-/* NetHack 3.6	write.c	$NHDT-Date: 1446078770 2015/10/29 00:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6	write.c	$NHDT-Date: 1450261366 2015/12/16 10:22:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -63,7 +63,7 @@ register struct obj *otmp;
 }
 
 /* decide whether the hero knowns a particular scroll's label;
-   unfortunately, we can't track things are haven't been added to
+   unfortunately, we can't track things that haven't been added to
    the discoveries list and aren't present in current inventory,
    so some scrolls with ought to yield True will end up False */
 STATIC_OVL boolean
@@ -101,9 +101,9 @@ register struct obj *pen;
 {
     register struct obj *paper;
 #if 0 /*JP*/
-    char namebuf[BUFSZ], *nm, *bp;
+    char namebuf[BUFSZ] = DUMMY, *nm, *bp;
 #else
-    char namebuf[BUFSZ], *nm;
+    char namebuf[BUFSZ] = DUMMY, *nm;
 #endif
     register struct obj *new_obj;
     int basecost, actualcost;
@@ -156,7 +156,7 @@ register struct obj *pen;
             You("don't know if that %s is blank or not.", typeword);
 */
             You("%sが白紙かどうかわからない！", typeword);
-            return 1;
+            return 0;
         } else if (paper->oclass == SPBOOK_CLASS) {
             /* can't write a magic book while blind */
 /*JP
@@ -164,7 +164,7 @@ register struct obj *pen;
 */
             pline("%sでは点字を作れない．",
                   upstart(ysimple_name(pen)));
-            return 1;
+            return 0;
         }
     }
     paper->dknown = 1;
@@ -421,17 +421,26 @@ found:
     new_obj->cursed = (curseval < 0);
 #ifdef MAIL
     if (new_obj->otyp == SCR_MAIL)
-        new_obj->spe = 1;
+        /* 0: delivered in-game via external event (or randomly for fake mail);
+           1: from bones or wishing; 2: written with marker */
+        new_obj->spe = 2;
 #endif
+    /* unlike alchemy, for example, a successful result yields the
+       specifically chosen item so hero recognizes it even if blind;
+       the exception is for being lucky writing an undiscovered scroll,
+       where the label associated with the type-name isn't known yet */
+    new_obj->dknown = label_known(new_obj->otyp, invent) ? 1 : 0;
+
 #if 0 /*JP*/
-    new_obj =
-        hold_another_object(new_obj, "Oops!  %s out of your grasp!",
-                            The(aobjnam(new_obj, "slip")), (const char *) 0);
+    new_obj = hold_another_object(new_obj, "Oops!  %s out of your grasp!",
+                                  The(aobjnam(new_obj, "slip")),
+                                  (const char *) 0);
 #else
     new_obj =
         hold_another_object(new_obj, "おっと！%sはあなたの手から滑り落ちた！",
                             xname(new_obj), (const char *) 0);
 #endif
+    nhUse(new_obj); /* try to avoid complaint about dead assignment */
     return 1;
 }
 

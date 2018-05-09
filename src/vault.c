@@ -1,5 +1,6 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1446078792 2015/10/29 00:33:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1452132199 2016/01/07 02:03:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -202,6 +203,13 @@ findgd()
     return (struct monst *) 0;
 }
 
+void
+vault_summon_gd()
+{
+    if (vault_occupied(u.urooms) && !findgd())
+        u.uinvault = (VAULT_GUARD_TIME - 1);
+}
+
 char
 vault_occupied(array)
 char *array;
@@ -232,8 +240,9 @@ invault()
     vaultroom -= ROOMOFFSET;
 
     guard = findgd();
-    if (++u.uinvault % 30 == 0 && !guard) { /* if time ok and no guard now. */
-        char buf[BUFSZ];
+    if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
+        /* if time ok and no guard now. */
+        char buf[BUFSZ] = DUMMY;
         register int x, y, dd, gx, gy;
         int lx = 0, ly = 0;
         long umoney;
@@ -361,9 +370,9 @@ invault()
         if (u.uswallow) {
             /* can't interrogate hero, don't interrogate engulfer */
 /*JP
-            verbalize("What's going on here?");
+            if (!Deaf) verbalize("What's going on here?");
 */
-            verbalize("ここで何をしているんだ？");
+            if (!Deaf) verbalize("ここで何をしているんだ？");
             if (gsensed)
 /*JP
                 pline_The("other presence vanishes.");
@@ -375,11 +384,13 @@ invault()
         if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
             if (youmonst.m_ap_type == M_AP_OBJECT
                 && youmonst.mappearance != GOLD_PIECE)
-/*JP
-                verbalize("Hey! Who left that %s in here?",
-*/
-                verbalize("おい！だれがこの%sをここに置いて行ったんだ？",
-                          mimic_obj_name(&youmonst));
+#if 0 /*JP*/
+                if (!Deaf) verbalize("Hey! Who left that %s in here?",
+                                    mimic_obj_name(&youmonst));
+#else
+                if (!Deaf) verbalize("おい！だれがこの%sをここに置いて行ったんだ？",
+                                    mimic_obj_name(&youmonst));
+#endif
             /* You're mimicking some object or you're hidden. */
 /*JP
             pline("Puzzled, %s turns around and leaves.", mhe(guard));
@@ -392,6 +403,9 @@ invault()
             /* [we ought to record whether this this message has already
                been given in order to vary it upon repeat visits, but
                discarding the monster and its egd data renders that hard] */
+            if (Deaf)
+                pline("%s huffs and turns to leave.", noit_Monnam(guard));
+            else
 /*JP
             verbalize("I'll be back when you're ready to speak to me!");
 */
@@ -407,15 +421,18 @@ invault()
         }
         trycount = 5;
         do {
-/*JP
-            getlin("\"Hello stranger, who are you?\" -", buf);
-*/
-            getlin("「見ない顔だな，おまえは誰だ？」-", buf);
+#if 0 /*JP*/
+            getlin(Deaf ? "You are required to supply your name. -"
+                        : "\"Hello stranger, who are you?\" -", buf);
+#else
+            getlin(Deaf ? "名前を言うように求められた．-"
+                        : "「見ない顔だな，おまえは誰だ？」-", buf);
+#endif
             (void) mungspaces(buf);
 #if 0 /*JP*/
-        } while (!letter(buf[0]) && --trycount > 0);
+        } while (!buf[0] && --trycount > 0);
 #else
-        } while (!letter(buf[0]) && !is_kanji(buf[0]) && --trycount > 0);
+        } while (!buf[0] && !is_kanji(buf[0]) && --trycount > 0);
 #endif
 
         if (u.ualign.type == A_LAWFUL
@@ -433,18 +450,32 @@ invault()
         || !strcmp(buf, "クロイソス") || !strcmp(buf, "クレオソート")) {
 #endif
             if (!mvitals[PM_CROESUS].died) {
-                verbalize(
+                if (Deaf) {
+                    if (!Blind)
+                        pline("%s waves goodbye.", noit_Monnam(guard));
+                } else {
+                    verbalize(
 /*JP
                     "Oh, yes, of course.  Sorry to have disturbed you.");
 */
                     "いや，こりゃ，えーと，お騒がせしました．");
+                }
                 mongone(guard);
             } else {
-                setmangry(guard);
-/*JP
-                verbalize("Back from the dead, are you?  I'll remedy that!");
-*/
-                verbalize("ほう！死の世界から戻ってきたのか？うそなら上手につけ！");
+                setmangry(guard, FALSE);
+                if (Deaf) {
+                   if (!Blind)
+                        pline("%s mouths something and looks very angry!",
+                              noit_Monnam(guard));
+                } else {
+#if 0 /*JP:T*/
+                   verbalize(
+                           "Back from the dead, are you?  I'll remedy that!");
+#else
+                   verbalize(
+                           "ほう！死の世界から戻ってきたのか？うそなら上手につけ！");
+#endif
+                }
                 /* don't want guard to waste next turn wielding a weapon */
                 if (!MON_WEP(guard)) {
                     guard->weapon_check = NEED_HTH_WEAPON;
@@ -453,25 +484,44 @@ invault()
             }
             return;
         }
+        if (Deaf)
+            pline("%s doesn't %srecognize you.", noit_Monnam(guard),
+                    (Blind) ? "" : "appear to ");
+        else
 /*JP
         verbalize("I don't know you.");
 */
         verbalize("知らんな．");
         umoney = money_cnt(invent);
-        if (Deaf) {
-            ;
-        } else if (!umoney && !hidden_gold()) {
+        if (!umoney && !hidden_gold()) {
+            if (Deaf)
+                pline("%s stomps%s.", noit_Monnam(guard),
+                      (Blind) ? "" : " and beckons");
+            else
 /*JP
             verbalize("Please follow me.");
 */
             verbalize("私の後についてきなさい．");
         } else {
-            if (!umoney)
+            if (!umoney) {
+                if (Deaf) {
+                    if (!Blind)
+                        pline("%s glares at you%s.", noit_Monnam(guard),
+                              invent ? "r stuff" : "");
+                } else {
 /*JP
                 verbalize("You have hidden gold.");
 */
                 verbalize("まだ金貨を隠してるな．");
-            verbalize(
+                }
+            }
+            if (Deaf) {
+                if (!Blind)
+                    pline(
+                       "%s holds out %s palm and beckons with %s other hand.",
+                          noit_Monnam(guard), mhis(guard), mhis(guard));
+            } else {
+                verbalize(
 /*JP
                 "Most likely all your gold was stolen from this vault.");
 */
@@ -480,6 +530,7 @@ invault()
             verbalize("Please drop that gold and follow me.");
 */
             verbalize("それをそっくり戻してから，私の後についてきなさい．");
+            }
         }
         EGD(guard)->gdx = gx;
         EGD(guard)->gdy = gy;
@@ -657,12 +708,13 @@ register struct monst *grd;
         return -1; /* teleported guard - treat as monster */
 
     if (egrd->witness) {
+        if (!Deaf)
 #if 0 /*JP*/
-        verbalize("How dare you %s that gold, scoundrel!",
-                  (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
+            verbalize("How dare you %s that gold, scoundrel!",
+                      (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
 #else
-        verbalize("よくもまあ金を%sものだ，悪党め！",
-                  (egrd->witness & GD_EATGOLD) ? "使った" : "壊した");
+            verbalize("よくもまあ金を%sものだ，悪党め！",
+                      (egrd->witness & GD_EATGOLD) ? "使った" : "壊した");
 #endif
         egrd->witness = 0;
         grd->mpeaceful = 0;
@@ -766,18 +818,28 @@ register struct monst *grd;
             }
             if (egrd->warncnt < 6) {
                 egrd->warncnt = 6;
-                if (!Deaf)
+                if (Deaf) {
+                    if (!Blind)
+                        pline("%s holds out %s palm demandingly!",
+                              noit_Monnam(grd), mhis(grd));
+                } else {
 /*JP
                     verbalize("Drop all your gold, scoundrel!");
 */
                     verbalize("金を全部置いてゆけ，ならずもの！");
+                }
                 return 0;
             } else {
-                if (!Deaf)
+                if (Deaf) {
+                    if (!Blind)
+                        pline("%s rubs %s hands with enraged delight!",
+                              noit_Monnam(grd), mhis(grd));
+                } else {
 /*JP
                     verbalize("So be it, rogue!");
 */
                     verbalize("盗人め！");
+                }
                 grd->mpeaceful = 0;
                 return -1;
             }
@@ -895,7 +957,7 @@ nextpos:
     else
         ny += dy;
 
-    while ((typ = (crm = &levl[nx][ny])->typ) != 0) {
+    while ((typ = (crm = &levl[nx][ny])->typ) != STONE) {
         /* in view of the above we must have IS_WALL(typ) or typ == POOL */
         /* must be a wall here */
         if (isok(nx + nx - x, ny + ny - y) && !IS_POOL(typ)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1446854232 2015/11/06 23:57:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1519662898 2018/02/26 16:34:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -151,6 +151,31 @@ boolean only_if_injured; /* determines whether maxhp <= 5 matters */
     return (boolean) (curhp <= 5 || curhp * divisor <= maxhp);
 }
 
+/* return True if surrounded by impassible rock, regardless of the state
+   of your own location (for example, inside a doorless closet) */
+boolean
+stuck_in_wall()
+{
+    int i, j, x, y, count = 0;
+
+    if (Passes_walls)
+        return FALSE;
+    for (i = -1; i <= 1; i++) {
+        x = u.ux + i;
+        for (j = -1; j <= 1; j++) {
+            if (!i && !j)
+                continue;
+            y = u.uy + j;
+            if (!isok(x, y)
+                || (IS_ROCK(levl[x][y].typ)
+                    && (levl[x][y].typ != SDOOR || levl[x][y].typ != SCORR))
+                || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
+                ++count;
+        }
+    }
+    return (count == 8) ? TRUE : FALSE;
+}
+
 /*
  * Return 0 if nothing particular seems wrong, positive numbers for
  * serious trouble, and negative numbers for comparative annoyances.
@@ -169,7 +194,7 @@ STATIC_OVL int
 in_trouble()
 {
     struct obj *otmp;
-    int i, j, count = 0;
+    int i;
 
     /*
      * major troubles
@@ -194,19 +219,8 @@ in_trouble()
         return TROUBLE_LYCANTHROPE;
     if (near_capacity() >= EXT_ENCUMBER && AMAX(A_STR) - ABASE(A_STR) > 3)
         return TROUBLE_COLLAPSING;
-
-    for (i = -1; i <= 1; i++)
-        for (j = -1; j <= 1; j++) {
-            if (!i && !j)
-                continue;
-            if (!isok(u.ux + i, u.uy + j)
-                || IS_ROCK(levl[u.ux + i][u.uy + j].typ)
-                || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
-                count++;
-        }
-    if (count == 8 && !Passes_walls)
+    if (stuck_in_wall())
         return TROUBLE_STUCK_IN_WALL;
-
     if (Cursed_obj(uarmf, LEVITATION_BOOTS)
         || stuck_ring(uleft, RIN_LEVITATION)
         || stuck_ring(uright, RIN_LEVITATION))
@@ -276,18 +290,21 @@ worst_cursed_item()
        with taking off a ring or putting on a shield */
     if (welded(uwep) && (uright || bimanual(uwep))) { /* weapon */
         otmp = uwep;
-        /* gloves come next, due to rings */
+    /* gloves come next, due to rings */
     } else if (uarmg && uarmg->cursed) { /* gloves */
         otmp = uarmg;
-        /* then shield due to two handed weapons and spells */
+    /* then shield due to two handed weapons and spells */
     } else if (uarms && uarms->cursed) { /* shield */
         otmp = uarms;
-        /* then cloak due to body armor */
+    /* then cloak due to body armor */
     } else if (uarmc && uarmc->cursed) { /* cloak */
         otmp = uarmc;
     } else if (uarm && uarm->cursed) { /* suit */
         otmp = uarm;
-    } else if (uarmh && uarmh->cursed) { /* helmet */
+    /* if worn helmet of opposite alignment is making you an adherent
+       of the current god, he/she/it won't uncurse that for you */
+    } else if (uarmh && uarmh->cursed /* helmet */
+               && uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT) {
         otmp = uarmh;
     } else if (uarmf && uarmf->cursed) { /* boots */
         otmp = uarmf;
@@ -300,14 +317,14 @@ worst_cursed_item()
     } else if (uright && uright->cursed) { /* right ring */
         otmp = uright;
     } else if (ublindf && ublindf->cursed) { /* eyewear */
-        otmp = ublindf;                      /* must be non-blinding lenses */
-        /* if weapon wasn't handled above, do it now */
+        otmp = ublindf; /* must be non-blinding lenses */
+    /* if weapon wasn't handled above, do it now */
     } else if (welded(uwep)) { /* weapon */
         otmp = uwep;
-        /* active secondary weapon even though it isn't welded */
+    /* active secondary weapon even though it isn't welded */
     } else if (uswapwep && uswapwep->cursed && u.twoweap) {
         otmp = uswapwep;
-        /* all worn items ought to be handled by now */
+    /* all worn items ought to be handled by now */
     } else {
         for (otmp = invent; otmp; otmp = otmp->nobj) {
             if (!otmp->cursed)
@@ -367,14 +384,12 @@ int trouble;
         You("are back on solid ground.");
 */
         You("固い地面に戻った．");
-        /* teleport should always succeed, but if not,
-         * just untrap them.
-         */
+        /* teleport should always succeed, but if not, just untrap them */
         if (!safe_teleds(FALSE))
             u.utrap = 0;
         break;
     case TROUBLE_STARVING:
-        losestr(-1);
+        /* temporarily lost strength recovery now handled by init_uhunger() */
         /*FALLTHRU*/
     case TROUBLE_HUNGRY:
 /*JP
@@ -431,8 +446,7 @@ int trouble;
             if ((otmp = stuck_ring(uleft, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uleft)
                     what = leftglow;
-            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY))
-                       != 0) {
+            } else if ((otmp = stuck_ring(uright, RIN_SUSTAIN_ABILITY)) != 0) {
                 if (otmp == uright)
                     what = rightglow;
             }
@@ -441,12 +455,25 @@ int trouble;
         }
         break;
     case TROUBLE_STUCK_IN_WALL:
+        /* no control, but works on no-teleport levels */
+        if (safe_teleds(FALSE)) {
 /*JP
         Your("surroundings change.");
 */
         Your("環境が変化した．");
-        /* no control, but works on no-teleport levels */
-        (void) safe_teleds(FALSE);
+        } else {
+            /* safe_teleds() couldn't find a safe place; perhaps the
+               level is completely full.  As a last resort, confer
+               intrinsic wall/rock-phazing.  Hero might get stuck
+               again fairly soon....
+               Without something like this, fix_all_troubles can get
+               stuck in an infinite loop trying to fix STUCK_IN_WALL
+               and repeatedly failing. */
+            set_itimeout(&HPasses_walls, (long) (d(4, 4) + 4)); /* 8..20 */
+            /* how else could you move between packed rocks or among
+               lattice forming "solid" rock? */
+            You_feel("much slimmer.");
+        }
         break;
     case TROUBLE_CURSED_LEVITATION:
         if (Cursed_obj(uarmf, LEVITATION_BOOTS)) {
@@ -527,7 +554,7 @@ int trouble;
                  jconj_adj(hcolor(NH_AMBER)));
 #endif
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
-            otmp->bknown = TRUE;
+            otmp->bknown = !Hallucination;
         }
         uncurse(otmp);
         update_inventory();
@@ -596,9 +623,8 @@ int trouble;
     }
 }
 
-/* "I am sometimes shocked by...  the nuns who never take a bath without
- * wearing a bathrobe all the time.  When asked why, since no man can see
- * them,
+/* "I am sometimes shocked by... the nuns who never take a bath without
+ * wearing a bathrobe all the time.  When asked why, since no man can see them,
  * they reply 'Oh, but you forget the good God'.  Apparently they conceive of
  * the Deity as a Peeping Tom, whose omnipotence enables Him to see through
  * bathroom walls, but who is foiled by bathrobes." --Bertrand Russell, 1943
@@ -625,8 +651,10 @@ aligntyp resp_god;
             pline("%sはパリパリになった！", Monnam(u.ustuck));
             /* Yup, you get experience.  It takes guts to successfully
              * pull off this trick on your god, anyway.
+             * Other credit/blame applies (luck or alignment adjustments),
+             * but not direct kill count (pacifist conduct).
              */
-            xkilled(u.ustuck, 0);
+            xkilled(u.ustuck, XKILL_NOMSG | XKILL_NOCONDUCT);
         } else
 /*JP
             pline("%s seems unaffected.", Monnam(u.ustuck));
@@ -674,7 +702,7 @@ aligntyp resp_god;
             pline("%s disintegrates into a pile of dust!", Monnam(u.ustuck));
 */
             pline("%sはちりの山になった！", Monnam(u.ustuck));
-            xkilled(u.ustuck, 2); /* no corpse */
+            xkilled(u.ustuck, XKILL_NOMSG | XKILL_NOCORPSE | XKILL_NOCONDUCT);
         } else
 /*JP
             pline("%s seems unaffected.", Monnam(u.ustuck));
@@ -700,9 +728,9 @@ aligntyp resp_god;
             (void) destroy_arm(uarm);
         if (uarmu && !uarm && !uarmc)
             (void) destroy_arm(uarmu);
-        if (!Disint_resistance)
+        if (!Disint_resistance) {
             fry_by_god(resp_god, TRUE);
-        else {
+        } else {
 /*JP
             You("bask in its %s glow for a minute...", NH_BLACK);
 */
@@ -1148,6 +1176,7 @@ aligntyp g_align;
         switch (min(action, 5)) {
         case 5:
             pat_on_head = 1;
+            /*FALLTHRU*/
         case 4:
             do
                 fix_worst_trouble(trouble);
@@ -1292,7 +1321,7 @@ aligntyp g_align;
                     break;
                 }
             }
-        /* Otherwise, falls into next case */
+            /*FALLTHRU*/
         case 2:
             if (!Blind)
 /*JP
@@ -1315,8 +1344,15 @@ aligntyp g_align;
             ABASE(A_STR) = AMAX(A_STR);
             if (u.uhunger < 900)
                 init_uhunger();
+            /* luck couldn't have been negative at start of prayer because
+               the prayer would have failed, but might have been decremented
+               due to a timed event (delayed death of peaceful monster hit
+               by hero-created stinking cloud) during the praying interval */
             if (u.uluck < 0)
                 u.uluck = 0;
+            /* superfluous; if hero was blinded we'd be handling trouble
+               rather than issuing a pat-on-head */
+            u.ucreamed = 0;
             make_blinded(0L, TRUE);
             context.botl = 1;
             break;
@@ -1335,7 +1371,9 @@ aligntyp g_align;
 */
                 You("%sオーラにつつまれた．", an(hcolor(NH_LIGHT_BLUE)));
             for (otmp = invent; otmp; otmp = otmp->nobj) {
-                if (otmp->cursed) {
+                if (otmp->cursed
+                    && (otmp != uarmh /* [see worst_cursed_item()] */
+                        || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)) {
                     if (!Blind) {
 #if 0 /*JP*/
                         pline("%s %s.", Yobjnam2(otmp, "softly glow"),
@@ -1410,7 +1448,8 @@ aligntyp g_align;
             if (u.ualign.record >= PIOUS && !u.uevent.uhand_of_elbereth) {
                 gcrownu();
                 break;
-            } /* else FALLTHRU */
+            }
+            /*FALLTHRU*/
         case 6: {
             struct obj *otmp;
             int sp_no, trycnt = u.ulevel + 1;
@@ -1933,15 +1972,15 @@ dosacrifice()
 */
                 "どこからともなく聖歌隊の歌が聞こえ，あなたは光に包まれた．．．");
 /*JP
-                godvoice(altaralign, "Congratulations, mortal!");
+                godvoice(altaralign, "Mortal, thou hast done well!");
 */
-                godvoice(altaralign, "よくやった！定命の者よ！");
+                godvoice(altaralign, "定命の者よ，よくやった！");
                 display_nhwindow(WIN_MESSAGE, FALSE);
                 verbalize(
 /*JP
           "In return for thy service, I grant thee the gift of Immortality!");
 */
-          "汝の偉業に対し，不死の体を捧げようぞ！");
+          "汝の偉業に対し，不死の体を授けようぞ！");
 #if 0 /*JP*/
                 You("ascend to the status of Demigod%s...",
                     flags.female ? "dess" : "");
@@ -2578,7 +2617,7 @@ doturn()
             }
         }
     }
-    nomul(-5);
+    nomul(-(5 - ((u.ulevel - 1) / 6))); /* -5 .. -1 */
 /*JP
     multi_reason = "trying to turn the monsters";
 */

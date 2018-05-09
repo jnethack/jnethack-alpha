@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1446713641 2015/11/05 08:54:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1452992329 2016/01/17 00:58:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -155,8 +155,8 @@ dosounds()
                         You_hear("誰かが捜索している音を聞いた．");
                     break;
                 }
-                /* fall into... (yes, even for hallucination) */
             }
+                /*FALLTHRU*/
             case 0:
 /*JP
                 You_hear("the footsteps of a guard on patrol.");
@@ -571,40 +571,40 @@ register struct monst *mtmp;
         switch (mtmp->data->msound) {
         case MS_MEW:
 /*JP
-            yelp_verb = "yowl";
+            yelp_verb = (!Deaf) ? "yowl" : "arch";
 */
-            yelp_verb = "悲しく鳴いた";
+            yelp_verb = (!Deaf) ? "悲しく鳴いた" : "arch";
             break;
         case MS_BARK:
         case MS_GROWL:
 /*JP
-            yelp_verb = "yelp";
+            yelp_verb = (!Deaf) ? "yelp" : "recoil";
 */
-            yelp_verb = "キャンキャン鳴いた";
+            yelp_verb = (!Deaf) ? "キャンキャン鳴いた" : "尻込みした";
             break;
         case MS_ROAR:
 /*JP
-            yelp_verb = "snarl";
+            yelp_verb = (!Deaf) ? "snarl" : "bluff";
 */
-            yelp_verb = "うなった";
+            yelp_verb = (!Deaf) ? "うなった" : "やせ我慢した";
             break;
         case MS_SQEEK:
 /*JP
-            yelp_verb = "squeal";
+            yelp_verb = (!Deaf) ? "squeal" : "quiver";
 */
-            yelp_verb = "キーキー鳴いた";
+            yelp_verb = (!Deaf) ? "キーキー鳴いた" : "震えた";
             break;
         case MS_SQAWK:
 /*JP
-            yelp_verb = "screak";
+            yelp_verb = (!Deaf) ? "screak" : "thrash";
 */
-            yelp_verb = "金切り声を立てた";
+            yelp_verb = (!Deaf) ? "金切り声を立てた" : "のたうち回った";
             break;
         case MS_WAIL:
 /*JP
-            yelp_verb = "wail";
+            yelp_verb = (!Deaf) ? "wail" : "cringe";
 */
-            yelp_verb = "悲しく鳴いた";
+            yelp_verb = (!Deaf) ? "悲しく鳴いた" : "身をすくめた";
             break;
         }
     if (yelp_verb) {
@@ -713,7 +713,7 @@ register struct monst *mtmp;
     char verbuf[BUFSZ];
     register const char *pline_msg = 0, /* Monnam(mtmp) will be prepended */
         *verbl_msg = 0,                 /* verbalize() */
-            *verbl_msg_mcan = 0;        /* verbalize() if cancelled */
+        *verbl_msg_mcan = 0;            /* verbalize() if cancelled */
     struct permonst *ptr = mtmp->data;
     int msound = ptr->msound;
 
@@ -963,7 +963,8 @@ register struct monst *mtmp;
 */
                 pline_msg = "ニャーニャー鳴いた．";
             break;
-        } /* else FALLTHRU */
+        }
+        /*FALLTHRU*/
     case MS_GROWL:
 /*JP
         pline_msg = mtmp->mpeaceful ? "snarls." : "growls!";
@@ -1150,7 +1151,7 @@ register struct monst *mtmp;
             }
             break;
         }
-    /* else FALLTHRU */
+        /*FALLTHRU*/
     case MS_HUMANOID:
         if (!mtmp->mpeaceful) {
             if (In_endgame(&u.uz) && is_mplayer(ptr))
@@ -1261,6 +1262,7 @@ register struct monst *mtmp;
         break;
     case MS_SEDUCE: {
         int swval;
+
         if (SYSOPT_SEDUCE) {
             if (ptr->mlet != S_NYMPH
                 && could_seduce(mtmp, &youmonst, (struct attack *) 0) == 1) {
@@ -1419,66 +1421,63 @@ register struct monst *mtmp;
                                     : soldier_foe_msg[rn2(3)];
         break;
     }
-    case MS_RIDER:
-        /* 3.6.0 tribute */
-        if (ptr == &mons[PM_DEATH]
-            && !context.tribute.Deathnotice && u_have_novel()) {
-            struct obj *book = u_have_novel();
-            const char *tribtitle = (char *)0;
+    case MS_RIDER: {
+        const char *tribtitle;
+        struct obj *book = 0;
+        boolean ms_Death = (ptr == &mons[PM_DEATH]);
 
-            if (book) {
-                int novelidx = book->novelidx;
-
-                tribtitle = noveltitle(&novelidx);
-            }
-            if (tribtitle) {
+        /* 3.6 tribute */
+        if (ms_Death && !context.tribute.Deathnotice
+            && (book = u_have_novel()) != 0) {
+            if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
 /*JP
                 Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
 */
                 Sprintf(verbuf, "ああ、/%s/を持っているのか．", tribtitle);
                 /* no Death featured in these two, so exclude them */
-                if (!(strcmpi(tribtitle, "Snuff") == 0
-                      || strcmpi(tribtitle, "The Wee Free Men") == 0))
+                if (strcmpi(tribtitle, "Snuff")
+                    && strcmpi(tribtitle, "The Wee Free Men"))
 /*JP
-                    Strcat(verbuf, " I may have been misquoted there.");
+                    Strcat(verbuf, "  I may have been misquoted there.");
 */
-                    Strcat(verbuf, "ここでは引用が間違っているかもしれない．");
+                    Strcat(verbuf, "  ここでは引用が間違っているかもしれない．");
                 verbl_msg = verbuf;
-                context.tribute.Deathnotice = 1;
             }
-        } else if (ptr == &mons[PM_DEATH]
-                   && !rn2(2) && Death_quote(verbuf, BUFSZ)) {
-                verbl_msg = verbuf;
-        }
+            context.tribute.Deathnotice = 1;
+        } else if (ms_Death && rn2(3) && Death_quote(verbuf, sizeof verbuf)) {
+            verbl_msg = verbuf;
         /* end of tribute addition */
-        else if (ptr == &mons[PM_DEATH] && !rn2(10))
+
+        } else if (ms_Death && !rn2(10)) {
 /*JP
             pline_msg = "is busy reading a copy of Sandman #8.";
 */
             pline_msg = "「サンドマン」の8巻を読むのに忙しい．";
-        else
+        } else
 /*JP
             verbl_msg = "Who do you think you are, War?";
 */
             verbl_msg = "ウォーよ，自分が何者か考えたことがあるか？";
         break;
-    }
+    } /* case MS_RIDER */
+    } /* switch */
 
-    if (pline_msg)
+    if (pline_msg) {
 /*JP
         pline("%s %s", Monnam(mtmp), pline_msg);
 */
         pline("%sは%s", Monnam(mtmp), pline_msg);
-    else if (mtmp->mcan && verbl_msg_mcan)
+    } else if (mtmp->mcan && verbl_msg_mcan) {
         verbalize1(verbl_msg_mcan);
-    else if (verbl_msg) {
+    } else if (verbl_msg) {
 #if 0 /*JP*//*デスを特別扱いしない*/
+        /* more 3.6 tribute */
         if (ptr == &mons[PM_DEATH]) {
             /* Death talks in CAPITAL LETTERS
                and without quotation marks */
             char tmpbuf[BUFSZ];
-            Sprintf(tmpbuf, "%s", verbl_msg);
-            pline1(ucase(tmpbuf));
+
+            pline1(ucase(strcpy(tmpbuf, verbl_msg)));
         } else {
             verbalize1(verbl_msg);
         }

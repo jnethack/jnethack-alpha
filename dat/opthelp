@@ -2,25 +2,39 @@
 ('O'コマンドを使用して現在のオプションの設定をチェックし，どのオプションが
 あなたのバージョンにあるか知ることができる)
 
+acoustics      can your character hear anything                        [TRUE]
+autodescribe   describe the terrain under cursor                       [FALSE]
 autodig        掘る道具を装備して移動した場合は掘る                    [FALSE]
 autoopen       扉に向かって移動すると開けようとする                    [TRUE]
 autopickup     移動したとき自動で物を拾う                              [TRUE]
 autoquiver     何かを射るときに矢筒(など)が空の場合，適当な武器を
                装填する．                                              [FALSE]
+BIOS           allow the use of IBM ROM BIOS calls                     [FALSE]
+blind          your character is permanently blind                     [FALSE]
+bones          allow loading bones files                               [TRUE]
+clicklook      look at map by clicking right mouse button              [FALSE]
 cmdassist      方向やその他のコマンドでエラー時にヘルプを表示する      [TRUE]
 confirm        ペットや友好的な怪物を攻撃する前に確認する              [TRUE]
-DECgraphics    ダンジョンにDEC/VTの罫線を使用する                      [FALSE]
+dark_room      show floor not in sight in different color              [TRUE]
 eight_bit_tty  8-bitキャラクタを端末にそのまま送信する                 [FALSE]
 extmenu        拡張コマンド (#) を選択するときにメニューを使用する     [FALSE]
 fixinv         できるだけ，同じ物は同じ文字に当てる                    [TRUE]
+force_invmenu  commands asking for inventory item show a menu          [FALSE]
+goldX          when filtering objects by bless/curse state,            [FALSE]
+               whether to classify gold as X (unknown) or U (uncursed)
 help           '/'コマンド時にさらなる情報を見るか確認する             [TRUE]
-IBMgraphics    ダンジョンにIBM拡張文字を使用する                       [FALSE]
+herecmd_menu   show menu of some possible commands when clicking
+               on yourself or next to you with mouse                   [FALSE]
 ignintr        ブレークを含むインタラプトシグナルを無視する            [FALSE]
 implicit_uncursed 可能なら持ち物表示の時に「呪われていない」表示を除く [TRUE]
 legacy         ゲーム最初にイントロダクションを表示する                [TRUE]
 lit_corridor   暗い回廊でもプレーヤの周囲を明るく表示する              [FALSE]
 lootabc        箱を開けたときにo/i/bではなくa/b/cを使う                [FALSE]
 mail           メールデーモンの存在を許す                              [TRUE]
+mention_walls  give feedback when walking against a wall               [FALSE]
+menu_objsyms   show object symbols in menus if it is selectable        [FALSE]
+menu_overlay   overlay menus on the screen and align to right          [TRUE]
+nudist         start your character without armor                      [FALSE]
 null           端末にヌルを送る．                                      [TRUE]
                移動する物体が部屋をテレポートしているように見えるなら
                ば，このオプションをオフにせよ．(強制的にディレイコード
@@ -32,16 +46,15 @@ pushweapon     何かを新しく装備するとき，右手の武器を左手に持ち替える  [FALSE]
 rawio          raw I/Oの仕様を許可する                                 [FALSE]
 rest_on_space  スペースバーで休憩する                                  [FALSE]
 safe_pet       (わかっているなら)ペットを攻撃するのを避ける            [TRUE]
+sanity_check   perform data sanity checks                              [FALSE]
 showexp        経験値を表示する                                        [FALSE]
 showrace       自分自身を職業でなく種族で表示する                      [FALSE]
 silent         端末のベルを鳴らさない                                  [TRUE]
 sortpack       似たような種類の物をまとめる                            [TRUE]
-sound          キャラクタが聞いたものについてのメッセージを表示する    [TRUE]
-               (注意: これはあなたのコンピューターのオーディオ機能に
-               何かをするものではない．また定期的にリセットされる．)
 sparkle        魔法攻撃にレジストしたとき(火への耐性を持つ怪物に       [TRUE]
                火の攻撃を行ったときなど)にエフェクトを表示する
 standout       --More--を太字で表示する                                [FALSE]
+status_updates update the status lines                                 [TRUE]
 time           ゲームの経過時間を表示する                              [FALSE]
 tombstone      死んだとき墓石を表示する                                [TRUE]
 toptenwin      トップ10を標準出力ではなくウィンドウに表示する          [FALSE]
@@ -50,7 +63,8 @@ travel         地図の特定の位置に最小経路アルゴリズムを用いて移動する
 use_darkgray   黒いシンボルの時に青ではなく黒の太字を使う              [TRUE]
 use_inverse    感知した怪物をハイライトして表示する                    [FALSE]
 verbose        ゲームのコメントを詳しく表示する                        [TRUE]
-
+whatis_menu    show menu when getting a map location                   [FALSE]
+whatis_moveskip skip same glyphs when getting a map location           [FALSE]
 
 
 コンパイル時の設定によってはさらに真偽オプションが存在する．
@@ -74,6 +88,7 @@ showscore      スコアを表示する                                        [FALSE]
 コンパイル時に TEXTCOLOR が設定されているならば:
 color          画面の物の色々な色を使用する                  [TRUE for micros]
 hilite_pet     ペットを強調表示する                                    [FALSE]
+hilite_pile    display item piles in a highlighted manner              [FALSE]
 
 コンパイル時に TIMED_DELAY が設定されているならば(tty インターフェースのみ):
 timed_delay    UNIXやVMSではディスプレイへ表示をポーズする代りに       [TRUE]
@@ -83,14 +98,17 @@ timed_delay    UNIXやVMSではディスプレイへ表示をポーズする代りに       [TRUE]
 
 Amigaか、コンパイル時にALTMETAが設定されているならば:
 altmeta        Amigaで、Alt+キーをMeta+キーとして扱う．                [TRUE]
-altmeta        unixとVMSで，jnethackがプレイヤーのキーボードからコマンドを得る
-               時，2文字並び"ESC c"をM-c(Meta+c,最上位ビット設定)として扱う．
-                                                                       [FALSE]
+altmeta        unixとVMSで，jnethackがプレイヤーのキーボードから       [FALSE]
+               コマンドを得る時，2文字並び"ESC c"をM-c(Meta+c,
+               最上位ビット設定)として扱う．
 
 コンパイル時に USE_TILES が設定されているならば (MSDOS プロテクトモードのみ):
-preload_tiles  ゲーム開始時にタイルを予め RAM に読み込むかを制御する．
+preload_tiles  ゲーム開始時にタイルを予め RAM に読み込むかを制御する． [TRUE]
                これによりタイルグラフィックの性能が向上するが，
-               より多くのメモリを使う．                                [TRUE]
+               より多くのメモリを使う．
+
+Boolean option if TTY_TILES_ESCCODES was set at compile time (tty only):
+vt_tiledata    insert extra data escae code markers into output        [FALSE]
 
 任意の真偽オプションは'!'や'no'をつけることにより否定できる．
 
@@ -99,11 +117,18 @@ preload_tiles  ゲーム開始時にタイルを予め RAM に読み込むかを制御する．
 
 ゲーム中に設定できるパラメータつきオプションは:
 
-boulder        巨岩の文字を他のものに変える [`]
-disclose       ゲーム終了時に見る情報の種類 [ni na nv ng nc no]
+boulder        巨岩の文字を変える                                      [`]
+disclose       ゲーム終了時に見る情報の種類                [ni na nv ng nc no]
+              (space separated list of two-character values;
+              prefix: '+' always disclose, '-' never disclose,
+              'n' prompt with default "no", 'y' prompt with default "yes",
+              'a' prompt to select sorting order (for suffix 'v' only);
+              suffix: 'i' inventory, 'a' attributes, 'v' vanquished
+              monsters, 'g' genocided and extinct monsters, 'c' conduct,
+              'o' dungeon overview)
 fruit          好物の果物の名前 [slime mold]
                (基本的にNetHackが気まぐれで使ってきた)
-menustyle      複数オブジェクトを選択するときのユーザーインタフェース
+menustyle      複数オブジェクトを選択するときのユーザーインタフェース   [Full]
                Traditional -- 対象とするクラスを入力し，それからそのクラスのア
                               イテムを一つずつ選ぶ
                Combination -- 対象とするクラスを入力し，それからアイテムを選ぶ
@@ -112,21 +137,25 @@ menustyle      複数オブジェクトを選択するときのユーザーインタフェース
                               ムを選ぶのにメニューを使う
                Partial     -- クラス選択を使用せず，全てのアイテムのメニューを
                               使う
-               最初の一文字('T', 'C', 'P', 'F')で決定．'N' は 'T' と同様の意
-               味．[Full]
-number_pad     移動に英字を使うか数字を使うか:
+               最初の一文字('T', 'C', 'F', 'P')で決定．
+              (With Traditional, many actions allow pseudo-class 'm' to
+              request a menu for choosing items: one-shot Combination.)
+number_pad     移動に英字を使うか数字を使うか: [0]
                0 -- 伝統的な hjkl + yubn 移動 (デフォルト);
                1 -- テンキー用に数字で移動;
                2 -- 1と同様だが'5'は'G'ではなく'g'接頭辞として動作;
                3 -- 携帯電話の数字キー (1,2,3は上, 7,8,9は下);
-               4 -- 携帯電話数字キー(3)とMSDOS互換(2)の組み合わせ;
-              -1 -- 英字移動だが'z'と'y'を交換する．[0]
-packorder      背負い袋内の物の順番を決めるシンボル [")[%?+!=/(*`0_]
+               4 -- 携帯電話数字キー(3)と'5'に関する設定(2)の組み合わせ;
+              -1 -- 英字移動だが'z'と'y'を交換する．
+              Setting number_pad (to a positive value) affects how all
+              digit keys are handled, not just those on numeric keypad.
+packorder      'sortpack'オプションがオンの時に、持ち物一覧の [")[%?+!=/(*`0_]
+               順番を決めるシンボル
                (いくつかの物体しか特定しない場合，残りのはデフォルトの
                順番に並ぶ)
 paranoid_confirmation  想定と違う問い合わせをする状況の空白区切りのリスト
               [paranoid_confirmation:pray]
-              Confirm -- yesが必要なとき，否定にはnoが必要
+              Confirm -- "yes"が必要なとき，否定には"no"が必要
               quit    -- 抜けたり探索モードに入る確認はyesかyか
               die     -- (探索やデバッグモードで)死ぬときの確認はyesかyか
               bones   -- デバッグモードで骨を残す確認はyesかyか
@@ -134,20 +163,20 @@ paranoid_confirmation  想定と違う問い合わせをする状況の空白区切りのリスト
               pray    -- 祈るときにyで確認する; デフォルトでon
               Remove  -- 外すことができるアイテムが一つの時も'R'や'T'で確認
                          するか
-pickup_burden  何かを持ちあげようとしてふらめく状態になったときに，続けるか
+pickup_burden  何かを持ちあげようとしてふらめく状態になったときに，続けるか[S]
                どうかの確認をする．(通常:U，よろめき:B，圧迫:S，限界:N，
-               荷重:N，超過:T)  [S]
-pickup_types   自動で拾いあげる物のシンボル [all]
-pile_limit     アイテムが落ちている床の上を歩く時，アイテムの一覧ではなく
+               荷重:N，超過:T)
+pickup_types   自動で拾いあげる物のシンボル．空は全てを意味する．           []
+pile_limit     アイテムが落ちている床の上を歩く時，アイテムの一覧ではなく  [5]
               「ここにはたくさんのものがある」と表示する閾値．
-               (0は「常にアイテムの一覧を表示」．)  [5]
-runmode        (様々な移動コマンドやトラベルコマンドによって)複数マス移動する
-               場合に地図ウィンドウを更新する頻度を指定する:
+               (0は「常にアイテムの一覧を表示」．)
+runmode        (様々な移動コマンドやトラベルコマンドによって)複数マス    [run]
+               移動する場合に地図ウィンドウを更新する頻度を指定する:
                teleport -- 移動が終了するまで更新しない;
                run      -- 時々地図を更新する (間隔は 7 マス);
                walk     -- 一歩毎に地図を更新する;
                crawl    -- walk と同様だが、一歩毎にウェイトを入れる;
-               (これは画面表示にのみ作用し，実際の移動には影響しない．) [run]
+               (これは画面表示にのみ作用し，実際の移動には影響しない．)
 scores         ゲーム終了時に見るスコアの種類 [!own/3 top/2 around]
                トップスコア，トップスコアの周辺，あなた自身のスコアの
                組み合せを選ぶ． 
@@ -155,105 +184,94 @@ suppress_alert 例えばゲーム終了コマンドは以前は 'Q' だったが今は #quit、
                といった、ゲームプレイやユーザーインターフェースのバージョン
                間の違いに関する警告メッセージを無効化する．
                (例: suppress_alert:3.3.1 とすると、このバージョン以前に加えら
-               れた警告メッセージが停止される．) [(none)]
-kcode          端末の漢字コード [EUC]
+               れた警告メッセージが停止される．)
+whatis_coord  controls whether to include map coordinates when          [n]
+              autodescribe is active for the '/' and ';' commands.
+              Value is the first letter of one of
+              compass      -- (relative to you; 'east' or '3s' or '2n,4w')
+              full compass -- ('east' or '3south' or '2north,4west')
+              map          -- <x,y>        (map column x=0 is not used)
+              screen       -- [row,column] (row is offset to match tty usage)
+              none         -- no coordinates shown.
+whatis_filter controls how to filter eligible map coordinates when      [n]
+              getting a map location for eg. the travel command.
+              Value is the one of
+              n - no filtering
+              v - locations in view only
+              a - locations in same area (room, corridor, etc)
+kcode          端末の漢字コード                                         [EUC]
 
 スタート時にのみ設定できるパラメータつきオプションは:
 
-align      ゲームスタート時の属性(align:lawful, align:neutral, align:chaotic
-           のいずれか)．最初の一文字を指定するだけでよい．[RANDOM]
-catname    冒険を供にする最初の猫の名前 [NONE]
-dogname    冒険を供にする最初の犬の名前 [NONE]
-dungeon
-           ダンジョンを描画するためにデフォルトの代わりに用いるシンボルのリス
-           ト．
-           シンボルは沢山の処理をこなせるようになっている，
-           コントロールキャラクタ ^xやメタキャラクタ \Mxはもちろん
-           \nや \081のような C言語ライクなエスケープを使える．
-           普通, \は次の文字を強制的に文字通りにする．デフォルトのシン
-           ボルの多くが重複され使用されているので，ここではいくつかの注
-           意とともにシンボルの代りに名前を与える:
-
-           stone                                   (固い岩，普通は ' ' )
-           vwall hwall tlcorn trcorn blcorn brcorn            (部屋の壁)
-           crwall tuwall tdwall tlwall trwall   (まがりくねった迷路の壁)
-           nodoor vodoor hodoor             (なし，垂直，水平の開いた扉)
-           vcdoor hcdoor                          (垂直，水平の閉じた扉)
-           irocnbars tree room darkcorr litcorr
-           upstair dnstair upladder dnladder
-           altar grave throne sink fountain pool ice lava
-           vodbridge hodbridge                (垂直，水平の開いた跳ね橋)
-           vcdbridge hcdbridge                (垂直，水平の降りた跳ね橋)
-           air cloud water
-           default:  \ |--------||.-|++.##<><>_\\#{}.}..##\ #}
-effects
-           dungeon 同様だが，特殊効果の描画に使われるもの．
-           vbeam hbeam lslant rslant                  (普通は杖のビーム)
-           digbeam flashbeam              (穴掘りとカメラの特殊なビーム)
-           boomleft boomright                               (ブーメラン)
-           ss1 ss2 ss3 ss4                                  (防御の課程)
-           sw_topl, sw_topm, sw_topr,           (飲み込まれたときの上段)
-           sw_midl, sw_midr,                    (飲み込まれたときの中段)
-           sw_botl, sw_botm, sw_botr            (飲み込まれたときの下段)
-           extl extm extr                                   (爆発の上段)
-           exml exmm exmr                                   (爆発の中段)
-           exbl exbm exbr                                   (爆発の下段)
-           default:  |-\\/*!)(0#@*/-\\||\\-//-\\|\ |\\-/
-gender     ゲーム開始時の性別(gender:male または gender:female)．最初の
-           1 文字を指定するだけでよい．male や female オプションも使用でき
+align      ゲームスタート時の属性(lawful, neutral, chaotic, random    [random]
+           のいずれか)．
+           多くの職業は属性の選択に制限を与える。
+           最初の一文字を指定するだけでよい．
+catname    冒険を供にする最初の猫の名前 [none]
+dogname    冒険を供にする最初の犬の名前 [none]
+           Several roles who start with a dog have one whose name is
+           pre-set (for example, "Hachi" for Samurai), but that name
+           will be overridden if you specify dogname.
+gender     ゲーム開始時の性別(male, female, random)．最初の           [random]
+           1 文字を指定するだけでよい．古い male, female オプションも使用でき
            るが，gender オプションが優先する．
-horsename  冒険を供にする最初の馬の名前 [NONE]
+horsename  冒険を供にする最初の馬の名前                               [none]
 menu_*     メニューコマンドで使用する一文字のキャラクタ．以下にあるのは
-           全てのコマンドのメニューである．それぞれに続く( )内文字の意味
-           は次の通り: 'x' = x11, 't' = tty, 'g' = Gem, 'a' = Amiga.
-           menu_deselect_all  全てのアイテムを非選択 [-](gxta)
-           menu_deselect_page 現在表示されているページのアイテムを非選択 [\](gta)
-           menu_first_page    メニューの最初のページへ [^](gta)
-           menu_invert_all    全てのアイテムを反転 [@](gxta)
-           menu_invert_page   現在表示されているページのアイテムを反転 [~](gta)
-           menu_last_page     メニューの最後のページへ [|](gta)
-           menu_next_page     次のメニューのページへ [>](gta)
-           menu_previous_page 前のメニューのページへ [<](gta)
-           menu_search        メニューの検索 [:](gxta)
-           menu_select_all    全てのアイテムを選択 [.](gxta)
-           menu_select_page   現在表示されている全てのアイテムを選択 [,](gta)
-monsters
-           dungeon同様，怪物のためのシンボル．
-           デフォルト:  abcdefghijklmnopqrstuvwxyz
-                        ABCDEFGHIJKLMNOPQRSTUVWXYZ@\ \\&;:~]
+           全てのコマンドのメニューとデフォルトのキー．それぞれに続く
+           ( )内文字の意味は次の通り:
+           'x' = x11, 't' = tty, 'g' = Gem, 'a' = Amiga.
+           menu_deselect_all  全てのアイテムを非選択             [-](xtga)
+           menu_deselect_page 現在のページのアイテムを非選択     [\](tga)
+           menu_first_page    メニューの最初のページへ           [^](tga)
+           menu_invert_all    全てのアイテムを反転               [@](xtga)
+           menu_invert_page   現在のページのアイテムを反転       [~](tga)
+           menu_last_page     メニューの最後のページへ           [|](tga)
+           menu_next_page     次のメニューのページへ             [>](tga)
+           menu_previous_page 前のメニューのページへ             [<](tga)
+           menu_search        メニューの検索                     [:](xtga)
+           menu_select_all    全てのアイテムを選択               [.](xtga)
+           menu_select_page   現在のページの全てのアイテムを選択 [,](tga)
 msghistory 先頭行に表示されたメッセージ履歴の保存数 [20]
-name       あなたの名前 [システムかあなたに名前を尋ねて得られたもの]
-objects    dungeon同様，オブジェクトのシンボル
-           デフォルト:  ])[="(%!?+/$*`0_.
-pettype    あなたのキャラクタがどちらも使えるなら，あなたの好きな
-           ペットの種類(猫か犬か)．'none' とするとペットなしになる．[RANDOM]
+name       あなたの名前       [defaults to username on multi-
+           user systems, asks "who are you?" on single-user systems or if
+           the username is classified as generic like "games"]
+           MS Windows is treated as single-user even though it supports
+           usernames.  If character name is specified on the command
+           line (typically via 'nethack -u myname' depending upon type
+           of system and method of access to it), that name overrides
+           'name' from your options.
+pettype    あなたの好きなペットの種類 (cat, dog, horse, random,    [random]
+           or none), if your role allows more than one type (or if you
+           want to avoid a starting pet).  Most roles allow dog or cat
+           but not horse.  For roles which force a particular type,
+           pettype is ignored unless it specifies 'none'.
 playmode   通常(normal)プレイかスコアの残らない探索(explore)モードかデバッグ
            (debug)モードか [normal]
-race       ゲーム開始時の種族 (例 race:Human, race:Elf) [RANDOM]
-role       ゲーム開始時の職業 (例 race:Barbarian, role: Valk)
+race       ゲーム開始時の種族 (例 race:Human, race:Elf)             [random]
+           ほとんどの職業は種族の選択に制限を与える．
+role       ゲーム開始時の職業 (例 race:Barbarian, role: Valk)       [random]
            最初の一文字を指定するだけでよいが，単に最初にマッチした
            職業を選ぶだけである．完全に識別可能な文字を記述すること
            をお薦めする．名前の後に職業を指定することも可能であるが，
            (例 Vic-V)roleオプションが優先する．
-traps
-           dungeon同様，罠のためのシンボル．
-           arrow_trap dart_trap falling_rock_trap squeaky_board
-           bear_trap land_mine rolling_boulder_trap sleeping_gas_trap
-           rust_trap fire_trap pit spiked_pit hole trap_door
-           teleportation_trap level_teleporter magic_portal web statue_trap
-           magic_trap anti_magic_trap polymorph_trap
-           デフォルト:  ^^^^^^^^^^^^^^^^^"^^^^
-windowtype 使用するウインドゥシステム [システム依存]
+windowtype 使用するウインドゥシステム [システムとコンパイル設定依存]
+           if more than one choice is available.
+           Most instances of the program support only one window-type;
+           when that is the case, you don't need to specify anything.
+           The list of supported window-types in your program can be
+           seen while the program is running by using the #version
+           command or from outside the program by examining the text file
+           named 'options' which is generated when building it.
 
 コンパイル時に TTY_GRAPHICS が設定されているならば:
-msg_window 使用するメッセージウィンドウの種類:
+msg_window 使用するメッセージウィンドウの種類:                      [single]
            single      -- 一度に 1 メッセージずつ
            full        -- 保存されている全てのメッセージを降るウィンドウで表示
            reverse     -- full と同様だが、新しいメッセージから順に表示
            combination -- 1 メッセージを 2 回、その後は full
-           default:  single
+           default:  
+
 
 オプションの例:
 !autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around
-female,nonews,dogname:Rover,dungeon: |--------||.-|++.##<><>_\\#{}.}..## #}
-rest_on_space,!verbose,menustyle:traditional
+female,nonews,dogname:Rover,rest_on_space,!verbose,menustyle:traditional

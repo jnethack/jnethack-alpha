@@ -1,3 +1,7 @@
+# NetHack 3.6  bogusmon.txt       $NHDT-Date: 1524689579 2018/04/25 20:52:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.7 $
+# Copyright (c) 2016 by Pasi Kallinen
+# NetHack may be freely redistributed.  See license for details.
+#
 # Hallucinatory monsters
 #
 #
@@ -73,6 +77,9 @@ _準ゴルゴン
 ウーバーハルク
 トーファーキー
 +ダッドリー
+shrinking violet
+shallow one
+spherical cow
 
 # Quendor (Zork, &c.)
 グルー
@@ -119,6 +126,7 @@ _準ゴルゴン
 
 # Discworld
 ＜荷物＞
+吸血スイカ
 
 # Lord of the Rings
 エント
@@ -230,6 +238,7 @@ _準ゴルゴン
 太ったネズミイルカ
 クワッカ
 タチヨタカ
+レミング
 
 # european cryptids
 ヴォルペルティンガー
@@ -297,6 +306,7 @@ COBOL
 グレイ・グー
 磁気単極子
 第一種永久機関
+巨大物体
 
 # Ultima
 +ロード・ブリティッシュ

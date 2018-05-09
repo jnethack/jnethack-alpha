@@ -1,5 +1,6 @@
 /* NetHack 3.6	exper.c	$NHDT-Date: 1446975467 2015/11/08 09:37:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -304,12 +305,17 @@ boolean incr; /* true iff via incremental experience growth */
             u.uexp = newuexp(u.ulevel);
         }
         ++u.ulevel;
+#if 0 /*JP*/
+        pline("Welcome %sto experience level %d.",
+              u.ulevelmax < u.ulevel ? "" : "back ",
+              u.ulevel);
+#else
+        pline("%sレベル%dにようこそ．",
+              u.ulevelmax < u.ulevel ? "" : "再び",
+              u.ulevel);
+#endif
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
-/*JP
-        pline("Welcome to experience level %d.", u.ulevel);
-*/
-        pline("レベル%dにようこそ．", u.ulevel);
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
         reset_rndmonst(NON_PM);          /* new monster selection */
     }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1446808448 2015/11/06 11:14:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1517877381 2018/02/06 00:36:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,7 +11,7 @@
  * This file contains the different functions designed to manipulate the
  * musical instruments and their various effects.
  *
- * Actually the list of instruments / effects is :
+ * The list of instruments / effects is :
  *
  * (wooden) flute       may calm snakes if player has enough dexterity
  * magic flute          may put monsters to sleep:  area of effect depends
@@ -81,7 +81,9 @@ int distance;
                 && (mtmp->mstrategy & STRAT_WAITMASK) != 0)
                 mtmp->mstrategy &= ~STRAT_WAITMASK;
             else if (distm < distance / 3
-                     && !resist(mtmp, TOOL_CLASS, 0, NOTELL))
+                     && !resist(mtmp, TOOL_CLASS, 0, NOTELL)
+                     /* some monsters are immune */
+                     && onscary(0, 0, mtmp))
                 monflee(mtmp, 0, FALSE, TRUE);
         }
     }
@@ -286,7 +288,7 @@ int force;
     for (x = start_x; x <= end_x; x++)
         for (y = start_y; y <= end_y; y++) {
             if ((mtmp = m_at(x, y)) != 0) {
-                wakeup(mtmp); /* peaceful monster will become hostile */
+                wakeup(mtmp, TRUE); /* peaceful monster will become hostile */
                 if (mtmp->mundetected && is_hider(mtmp->data)) {
                     mtmp->mundetected = 0;
                     if (cansee(x, y))
@@ -347,7 +349,7 @@ int force;
                         pline_The("throne falls into a chasm.");
 */
                         pline("玉座は地割れに落ちた．");
-                /* Falls into next case */
+                    /*FALLTHRU*/
                 case ROOM:
                 case CORR: /* Try to make a pit */
                 do_pit:
@@ -414,35 +416,35 @@ int force;
                             mselftouch(mtmp, "Falling, ", TRUE);
 */
                             mselftouch(mtmp, "落下中，", TRUE);
-                            if (mtmp->mhp > 0)
-                                if ((mtmp->mhp -=
-                                     rnd(m_already_trapped ? 4 : 6)) <= 0) {
-                                    if (!cansee(x, y))
+                            if (mtmp->mhp > 0) {
+                                mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
+                                if (mtmp->mhp <= 0) {
+                                    if (!cansee(x, y)) {
 /*JP
                                         pline("It is destroyed!");
 */
                                         pline("何者かは死んだ！");
-                                    else {
+                                    } else {
 #if 0 /*JP*/
                                         You("destroy %s!",
                                             mtmp->mtame
-                                                ? x_monnam(
-                                                      mtmp, ARTICLE_THE,
-                                                      "poor",
-                                                      (has_mname(mtmp))
-                                                          ? SUPPRESS_SADDLE
-                                                          : 0,
-                                                      FALSE)
-                                                : mon_nam(mtmp));
-#else
+                                              ? x_monnam(mtmp, ARTICLE_THE,
+                                                         "poor",
+                                                         has_mname(mtmp)
+                                                           ? SUPPRESS_SADDLE
+                                                           : 0,
+                                                         FALSE)
+                                              : mon_nam(mtmp));
+#else /*JP:TODO サドル関連は未処理 */
                                         pline("%s%sは死んだ！",
                                               mtmp->mtame
                                               ? "かわいそうな" : "",
                                               mon_nam(mtmp));
 #endif
                                     }
-                                    xkilled(mtmp, 0);
+                                    xkilled(mtmp, XKILL_NOMSG);
                                 }
+                            }
                         }
                     } else if (x == u.ux && y == u.uy) {
                         if (Levitation || Flying
@@ -534,6 +536,23 @@ int force;
         }
 }
 
+const char *
+generic_lvl_desc()
+{
+    if (Is_astralevel(&u.uz))
+        return "astral plane";
+    else if (In_endgame(&u.uz))
+        return "plane";
+    else if (Is_sanctum(&u.uz))
+        return "sanctum";
+    else if (In_sokoban(&u.uz))
+        return "puzzle";
+    else if (In_V_tower(&u.uz))
+        return "tower";
+    else
+        return "dungeon";
+}
+
 /*
  * The player is trying to extract something from his/her instrument.
  */
@@ -541,8 +560,7 @@ STATIC_OVL int
 do_improvisation(instr)
 struct obj *instr;
 {
-    int damage, do_spec = !Confusion;
-#if defined(MAC) || defined(AMIGA) || defined(VPIX_MUSIC) || defined(PCMUSIC)
+    int damage, mode, do_spec = !(Stunned || Confusion);
     struct obj itmp;
 
     itmp = *instr;
@@ -567,32 +585,66 @@ struct obj *instr;
 #ifdef PCMUSIC
     pc_speaker(&itmp, "C");
 #endif
-#endif /* MAC || AMIGA || VPIX_MUSIC || PCMUSIC */
 
-    if (!do_spec)
+#define PLAY_NORMAL   0x00
+#define PLAY_STUNNED  0x01
+#define PLAY_CONFUSED 0x02
+#define PLAY_HALLU    0x04
+    mode = PLAY_NORMAL;
+    if (Stunned)
+        mode |= PLAY_STUNNED;
+    if (Confusion)
+        mode |= PLAY_CONFUSED;
+    if (Hallucination)
+        mode |= PLAY_HALLU;
+
+    switch (mode) {
+    case PLAY_NORMAL:
+/*JP
+        You("start playing %s.", yname(instr));
+*/
+        You("%sを奏ではじめた．", yname(instr));
+        break;
+    case PLAY_STUNNED:
+/*JP
+        You("produce an obnoxious droning sound.");
+*/
+        break;
+    case PLAY_CONFUSED:
+        You("produce a raucous noise.");
+        break;
+    case PLAY_HALLU:
+        You("produce a kaleidoscopic display of floating butterfiles.");
+        break;
+    /* TODO? give some or all of these combinations their own feedback;
+       hallucination ones should reference senses other than hearing... */
+    case PLAY_STUNNED | PLAY_CONFUSED:
+    case PLAY_STUNNED | PLAY_HALLU:
+    case PLAY_CONFUSED | PLAY_HALLU:
+    case PLAY_STUNNED | PLAY_CONFUSED | PLAY_HALLU:
+    default:
 /*JP
         pline("What you produce is quite far from music...");
 */
         pline("あなたが奏でたものは音楽とはとても呼べない．．．");
-    else
-/*JP
-        You("start playing %s.", the(xname(instr)));
-*/
-        You("%sを奏ではじめた．", the(xname(instr)));
+        break;
+    }
+#undef PLAY_NORMAL
+#undef PLAY_STUNNED
+#undef PLAY_CONFUSED
+#undef PLAY_HALLU
 
-    switch (instr->otyp) {
+    switch (itmp.otyp) { /* note: itmp.otyp might differ from instr->otyp */
     case MAGIC_FLUTE: /* Make monster fall asleep */
-        if (do_spec && instr->spe > 0) {
-            consume_obj_charge(instr, TRUE);
+        consume_obj_charge(instr, TRUE);
 
 /*JP
             You("produce %s music.", Hallucination ? "piped" : "soft");
 */
             You("%sを奏でた．", Hallucination ? "ＢＧＭ" : "軟らかい曲");
-            put_monsters_to_sleep(u.ulevel * 5);
-            exercise(A_DEX, TRUE);
-            break;
-        }              /* else FALLTHRU */
+        put_monsters_to_sleep(u.ulevel * 5);
+        exercise(A_DEX, TRUE);
+        break;
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
 /*JP
@@ -605,32 +657,30 @@ struct obj *instr;
         break;
     case FIRE_HORN:  /* Idem wand of fire */
     case FROST_HORN: /* Idem wand of cold */
-        if (do_spec && instr->spe > 0) {
-            consume_obj_charge(instr, TRUE);
+        consume_obj_charge(instr, TRUE);
 
-            if (!getdir((char *) 0)) {
+        if (!getdir((char *) 0)) {
 /*JP
                 pline("%s.", Tobjnam(instr, "vibrate"));
 */
                 pline("%sは震えた．", xname(instr));
-                break;
-            } else if (!u.dx && !u.dy && !u.dz) {
-                if ((damage = zapyourself(instr, TRUE)) != 0) {
-                    char buf[BUFSZ];
+            break;
+        } else if (!u.dx && !u.dy && !u.dz) {
+            if ((damage = zapyourself(instr, TRUE)) != 0) {
+                char buf[BUFSZ];
 
 /*JP
                     Sprintf(buf, "using a magical horn on %sself", uhim());
 */
                     Strcpy(buf, "自分自身の魔法のホルンの力を浴びて");
-                    losehp(damage, buf, KILLED_BY); /* fire or frost damage */
-                }
-            } else {
-                buzz((instr->otyp == FROST_HORN) ? AD_COLD - 1 : AD_FIRE - 1,
-                     rn1(6, 6), u.ux, u.uy, u.dx, u.dy);
+                losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
-            makeknown(instr->otyp);
-            break;
-        }             /* else FALLTHRU */
+        } else {
+            buzz((instr->otyp == FROST_HORN) ? AD_COLD - 1 : AD_FIRE - 1,
+                 rn1(6, 6), u.ux, u.uy, u.dx, u.dy);
+        }
+        makeknown(instr->otyp);
+        break;
     case TOOLED_HORN: /* Awaken or scare monsters */
 /*JP
         You("produce a frightful, grave sound.");
@@ -641,28 +691,26 @@ struct obj *instr;
         break;
     case BUGLE: /* Awaken & attract soldiers */
 /*JP
-        You("extract a loud noise from %s.", the(xname(instr)));
+        You("extract a loud noise from %s.", yname(instr));
 */
-        You("%sから大きな耳障りな音を出した．", the(xname(instr)));
+        You("%sから大きな耳障りな音を出した．", yname(instr));
         awaken_soldiers(&youmonst);
         exercise(A_WIS, FALSE);
         break;
     case MAGIC_HARP: /* Charm monsters */
-        if (do_spec && instr->spe > 0) {
-            consume_obj_charge(instr, TRUE);
+        consume_obj_charge(instr, TRUE);
 
 /*JP
             pline("%s very attractive music.", Tobjnam(instr, "produce"));
 */
             pline("%sはとても魅力的な音楽を奏でた．", xname(instr));
-            charm_monsters((u.ulevel - 1) / 3 + 1);
-            exercise(A_DEX, TRUE);
-            break;
-        }             /* else FALLTHRU */
+        charm_monsters((u.ulevel - 1) / 3 + 1);
+        exercise(A_DEX, TRUE);
+        break;
     case WOODEN_HARP: /* May calm Nymph */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
 #if 0 /*JP*/
-        pline("%s %s.", The(xname(instr)),
+        pline("%s %s.", Yname2(instr),
               do_spec ? "produces a lilting melody" : "twangs");
 #else
         You("%s．", 
@@ -673,23 +721,21 @@ struct obj *instr;
         exercise(A_DEX, TRUE);
         break;
     case DRUM_OF_EARTHQUAKE: /* create several pits */
-        if (do_spec && instr->spe > 0) {
-            consume_obj_charge(instr, TRUE);
+        consume_obj_charge(instr, TRUE);
 
 /*JP
             You("produce a heavy, thunderous rolling!");
 */
             You("重厚な雷のような音を奏でた！");
 /*JP
-            pline_The("entire dungeon is shaking around you!");
+        pline_The("entire %s is shaking around you!", generic_lvl_desc());
 */
-            pline("あなたの回りの迷宮が揺れた！");
-            do_earthquake((u.ulevel - 1) / 3 + 1);
-            /* shake up monsters in a much larger radius... */
-            awaken_monsters(ROWNO * COLNO);
-            makeknown(DRUM_OF_EARTHQUAKE);
-            break;
-        }              /* else FALLTHRU */
+        pline("あなたの回りの%sが揺れた！", generic_lvl_desc());
+        do_earthquake((u.ulevel - 1) / 3 + 1);
+        /* shake up monsters in a much larger radius... */
+        awaken_monsters(ROWNO * COLNO);
+        makeknown(DRUM_OF_EARTHQUAKE);
+        break;
     case LEATHER_DRUM: /* Awaken monsters */
 /*JP
         You("beat a deafening row!");
@@ -698,10 +744,11 @@ struct obj *instr;
         awaken_monsters(u.ulevel * 40);
         incr_itimeout(&HDeaf, rn1(20, 30));
         exercise(A_WIS, FALSE);
+        context.botl = TRUE;
         break;
     default:
         impossible("What a weird instrument (%d)!", instr->otyp);
-        break;
+        return 0;
     }
     return 2; /* That takes time */
 }
@@ -713,7 +760,7 @@ int
 do_play_instrument(instr)
 struct obj *instr;
 {
-    char buf[BUFSZ], c = 'y';
+    char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;
     int x, y;
     boolean ok;
@@ -734,7 +781,8 @@ struct obj *instr;
         You("%sを演奏する能力がない．", the(distant_name(instr, xname)));
         return 0;
     }
-    if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE) {
+    if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE
+        && !(Stunned || Confusion || Hallucination)) {
 /*JP
         c = ynq("Improvise?");
 */
@@ -742,6 +790,7 @@ struct obj *instr;
         if (c == 'q')
             goto nevermind;
     }
+
     if (c == 'n') {
         if (u.uevent.uheard_tune == 2)
 /*JP

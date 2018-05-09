@@ -1,4 +1,4 @@
-# NetHack 3.6	quest.txt	$NHDT-Date: 1448540693 2015/11/26 12:24:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $
+# NetHack 3.6	quest.txt	$NHDT-Date: 1505170340 2017/09/11 22:52:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.34 $
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -27,8 +27,11 @@
 #	QT_FIRSTLOCATE	35
 #	QT_NEXTLOCATE	36
 #
-#	QT_FIRSTACQUIRE	40
-#	QT_NEXTACQUIRE	41
+#	QT_FIRSTGOAL	40	/* %n (nemesis) and %o (artifact) will always
+#				   be present on first visit in normal play */
+#	QT_NEXTGOAL	41	/* subsequent visits to goal level */
+#	QT_ALTGOAL	42	/* alternate to NEXTGOAL if quest artifact
+#				   is absent from the level (optional) */
 #
 #	QT_FIRSTNEMESIS	50
 #	QT_NEXTNEMESIS	51
@@ -209,6 +212,12 @@
 %E [This strange feeling must be the presence of %o.]
 %Cp Arc 00041
 %oの存在が空気を通してつたわってきた．
+%E
+# delivered instead of 00041 if %o is not on the level anymore;
+# hero might already be carrying it, so don't say anything like
+# "%o's presence can't be felt"
+%Cp Arc 00042
+%nsのねぐらに帰ってきた．
 %E
 %Cc Arc 00050
 「け！%pよ，お前は%oを奪回できると思っているだろう，だが
@@ -916,8 +925,8 @@
 %E [You are a failure as a healer.]
 %Cc Hea 00019
 「ああ！%pよ，お前はまだこの様な難しい仕事をこなすに
-  はあまりにも未熟だ．安心してこの探索に送り出す前には，植物学，獣医学，
-  錬金術の知識を利用できなければならぬ．
+  はあまりにも未熟だ．安心してこの探索に送り出す前には，植物学，錬金術，
+  獣医学の知識を利用できなければならぬ．
 
 「%Raの蛇杖を身につけたら戻って来るのだ．」
 %E [You are too inexperienced.  Return when you are %Ra.]
@@ -2477,6 +2486,9 @@
 %nの地へもう一度戻るときは，%oだけを考えて
 いるような気がした．
 %E
+%Cp Sam 00042
+再び%nの地に帰ってきた．
+%E
 %Cp Sam 00050
 「おまえか，%pよ．切腹するという手段が残っているぞよ．
   お前が望むなら，介錯人になろうぞ．」
@@ -2725,6 +2737,9 @@
 %Cp Tou 00041
 あなたはもう少ししたら%oと共になれる，
 ということで自信を取り戻した．
+%E
+%Cp Tou 00042
+%nsのねぐらに帰ってきた．
 %E
 %Cc Tou 00050
 「ほほう，%p，%lはお前ごときが私から
@@ -3234,6 +3249,9 @@
 %E
 %Cp Wiz 00041
 %oのオーラのせいで，あなたの知覚のへりがひりひりした．
+%E
+%Cp Wiz 00042
+%nsのねぐらに帰ってきた．
 %E
 %Cc Wiz 00050
 「おお，%p，君か．つまり，%lはわたしから%oを

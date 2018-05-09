@@ -169,7 +169,7 @@ Widget w;
 }
 
 /* Swap foreground and background colors (this is the best I can do with */
-/* a label widget, unless I can get some init hook in there).            */
+/* a label widget, unless I can get some init hook in there).		 */
 void
 hilight_value(w)
 Widget w;

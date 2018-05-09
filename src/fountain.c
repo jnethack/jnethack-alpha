@@ -1,5 +1,5 @@
-/* NetHack 3.6	fountain.c	$NHDT-Date: 1444937416 2015/10/15 19:30:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
-/*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
+/* NetHack 3.6	fountain.c	$NHDT-Date: 1455402364 2016/02/13 22:26:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.56 $ */
+/*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -243,6 +243,7 @@ boolean isyou;
                     continue;
                 if (is_watch(mtmp->data) && couldsee(mtmp->mx, mtmp->my)
                     && mtmp->mpeaceful) {
+                    if (!Deaf) {
 /*JP
                     pline("%s yells:", Amonnam(mtmp));
 */
@@ -251,6 +252,15 @@ boolean isyou;
                     verbalize("Hey, stop using that fountain!");
 */
                     verbalize("おい，泉を汚すな！");
+                    } else {
+                        pline("%s earnestly %s %s %s!",
+                              Amonnam(mtmp),
+                              nolimbs(mtmp->data) ? "shakes" : "waves",
+                              mhis(mtmp),
+                              nolimbs(mtmp->data)
+                                      ? mbodypart(mtmp, HEAD)
+                                      : makeplural(mbodypart(mtmp, ARM)));
+                    }
                     break;
                 }
             }
@@ -449,6 +459,7 @@ drinkfountain()
                 dofindgem();
                 break;
             }
+            /*FALLTHRU*/
         case 28: /* Water Nymph */
             dowaternymph();
             break;
@@ -456,10 +467,13 @@ drinkfountain()
         {
             register struct monst *mtmp;
 
-/*JP
-            pline("This water gives you bad breath!");
-*/
-            pline("水を飲んだら息が臭くなった！");
+#if 0 /*JP:T*/
+            pline("This %s gives you bad breath!",
+                  hliquid("water"));
+#else
+            pline("%sを飲んだら息が臭くなった！",
+                  hliquid("水"));
+#endif
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (DEADMONSTER(mtmp))
                     continue;
@@ -471,10 +485,13 @@ drinkfountain()
             dogushforth(TRUE);
             break;
         default:
-/*JP
-            pline("This tepid water is tasteless.");
-*/
-            pline("このなまぬるい水は味がない．");
+#if 0 /*JP*/
+            pline("This tepid %s is tasteless.",
+                  hliquid("water"));
+#else
+            pline("このなまぬるい%sは味がない．",
+                  hliquid("水"));
+#endif
             break;
         }
     }
@@ -500,11 +517,13 @@ register struct obj *obj;
         && !exist_artifact(LONG_SWORD, artiname(ART_EXCALIBUR))) {
         if (u.ualign.type != A_LAWFUL) {
             /* Ha!  Trying to cheat her. */
-            pline(
-/*JP
-             "A freezing mist rises from the water and envelopes the sword.");
-*/
-             "氷の霧が水から立ち昇り，剣をつつんだ．");
+#if 0 /*JP*/
+            pline("A freezing mist rises from the %s and envelopes the sword.",
+                  hliquid("water"));
+#else
+            pline("冷たい霧が%sから立ち昇り，剣をつつんだ．",
+                  hliquid("水"));
+#endif
 /*JP
             pline_The("fountain disappears!");
 */
@@ -564,9 +583,9 @@ register struct obj *obj;
         if (obj->cursed) {
             if (!Blind)
 /*JP
-                pline_The("water glows for a moment.");
+                pline_The("%s glows for a moment.", hliquid("water"));
 */
-                pline("水は輝きだした．");
+                pline_The("%sは輝きだした．", hliquid("水"));
             uncurse(obj);
         } else {
 /*JP
@@ -589,6 +608,7 @@ register struct obj *obj;
             dofindgem();
             break;
         }
+        /*FALLTHRU*/
     case 25: /* Water gushes forth */
         dogushforth(FALSE);
         break;
@@ -639,7 +659,7 @@ register struct obj *obj;
     case 29: /* You see coins */
         /* We make fountains have more coins the closer you are to the
          * surface.  After all, there will have been more people going
-         * by.	Just like a shopping mall!  Chris Woodbury  */
+         * by.  Just like a shopping mall!  Chris Woodbury  */
 
         if (FOUNTAIN_IS_LOOTED(u.ux, u.uy))
             break;
@@ -648,10 +668,13 @@ register struct obj *obj;
                                    + 1) * 2) + 5),
                       u.ux, u.uy);
         if (!Blind)
-/*JP
-            pline("Far below you, you see coins glistening in the water.");
-*/
-            You("遥か下の水中に金貨の輝きをみつけた．");
+#if 0 /*JP:T*/
+            pline("Far below you, you see coins glistening in the %s.",
+                  hliquid("water"));
+#else
+            pline("遥か下で、%sの中で金貨が輝いているのをみつけた．",
+                  hliquid("水"));
+#endif
         exercise(A_WIS, TRUE);
         newsym(u.ux, u.uy);
         break;
@@ -692,21 +715,21 @@ drinksink()
     switch (rn2(20)) {
     case 0:
 /*JP
-        You("take a sip of very cold water.");
+        You("take a sip of very cold %s.", hliquid("water"));
 */
-        You("とても冷たい水を一口飲んだ．");
+        You("とても冷たい%sを一口飲んだ．", hliquid("水"));
         break;
     case 1:
 /*JP
-        You("take a sip of very warm water.");
+        You("take a sip of very warm %s.", hliquid("water"));
 */
-        You("とてもあたたかい水を一口飲んだ．");
+        You("とてもあたたかい%sを一口飲んだ．", hliquid("水"));
         break;
     case 2:
 /*JP
-        You("take a sip of scalding hot water.");
+        You("take a sip of scalding hot %s.", hliquid("water"));
 */
-        You("とても熱い水を一口飲んだ．");
+        You("とても熱い%sを一口飲んだ．", hliquid("湯"));
         if (Fire_resistance)
 /*JP
             pline("It seems quite tasty.");
@@ -774,18 +797,18 @@ drinksink()
             newsym(u.ux, u.uy);
         } else
 /*JP
-            pline("Some dirty water backs up in the drain.");
+            pline("Some dirty %s backs up in the drain.", hliquid("water"));
 */
-            pline("汚水が排水口から逆流してきた．");
+            pline("汚い%sが排水口から逆流してきた．", hliquid("水"));
         break;
     case 6:
         breaksink(u.ux, u.uy);
         break;
     case 7:
 /*JP
-        pline_The("water moves as though of its own will!");
+        pline_The("%s moves as though of its own will!", hliquid("water"));
 */
-        pline("水が意思を持っているかのように動いた！");
+        pline_The("%sが意思を持っているかのように動いた！", hliquid("水"));
         if ((mvitals[PM_WATER_ELEMENTAL].mvflags & G_GONE)
             || !makemon(&mons[PM_WATER_ELEMENTAL], u.ux, u.uy, NO_MM_FLAGS))
 /*JP
@@ -795,9 +818,9 @@ drinksink()
         break;
     case 8:
 /*JP
-        pline("Yuk, this water tastes awful.");
+        pline("Yuk, this %s tastes awful.", hliquid("water"));
 */
-        pline("オェ，とてもひどい味がする．");
+        pline("オェ，この%sはとてもひどい味がする．", hliquid("水"));
         more_experienced(1, 0);
         newexplevel();
         break;
@@ -811,9 +834,9 @@ drinksink()
         break;
     case 10:
 /*JP
-        pline("This water contains toxic wastes!");
+        pline("This %s contains toxic wastes!", hliquid("water"));
 */
-        pline("この水は有毒な排水を含んでいる！");
+        pline("この%sは有毒な廃棄物を含んでいる！", hliquid("水"));
         if (!Unchanging) {
 /*JP
             You("undergo a freakish metamorphosis!");
@@ -843,13 +866,16 @@ drinksink()
             pline("暗い排水口から，手が伸びてきた．．--おっと--");
             break;
         }
+        /*FALLTHRU*/
     default:
 #if 0 /*JP*/
-        You("take a sip of %s water.",
-            rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot");
+        You("take a sip of %s %s.",
+            rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot",
+            hliquid("water"));
 #else
-        You("%s水を一口飲んだ．",
-            rn2(3) ? (rn2(2) ? "冷たい" : "あたたかい") : "熱い");
+        You("%s%sを一口飲んだ．",
+            rn2(3) ? (rn2(2) ? "冷たい" : "あたたかい") : "熱い",
+            hliquid("水"));
 #endif
     }
 }

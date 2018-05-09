@@ -1,5 +1,6 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1449269915 2015/12/04 22:58:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1517913682 2018/02/06 10:41:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -21,12 +22,14 @@ STATIC_DCL int FDECL(adj_pit_checks, (coord *, char *));
 STATIC_DCL void FDECL(pit_flow, (struct trap *, SCHAR_P));
 
 /* Indices returned by dig_typ() */
-#define DIGTYP_UNDIGGABLE 0
-#define DIGTYP_ROCK 1
-#define DIGTYP_STATUE 2
-#define DIGTYP_BOULDER 3
-#define DIGTYP_DOOR 4
-#define DIGTYP_TREE 5
+enum dig_types {
+    DIGTYP_UNDIGGABLE = 0,
+    DIGTYP_ROCK,
+    DIGTYP_STATUE,
+    DIGTYP_BOULDER,
+    DIGTYP_DOOR,
+    DIGTYP_TREE
+};
 
 STATIC_OVL boolean
 rm_waslit()
@@ -241,9 +244,9 @@ int x, y;
     } else if (Is_waterlevel(&u.uz)) {
         if (verbose)
 /*JP
-            pline_The("water splashes and subsides.");
+            pline_The("%s splashes and subsides.", hliquid("water"));
 */
-            pline("水がピシャッと跳ねた．");
+            pline_The("%sがピシャッと跳ねた．", hliquid("水"));
         return FALSE;
     } else if ((IS_ROCK(levl[x][y].typ) && levl[x][y].typ != SDOOR
                 && (levl[x][y].wall_info & W_NONDIGGABLE) != 0)
@@ -497,7 +500,7 @@ dig(VOID_ARGS)
             }
         } else if (IS_WALL(lev->typ)) {
             if (shopedge) {
-                add_damage(dpx, dpy, 10L * ACURRSTR);
+                add_damage(dpx, dpy, SHOP_WALL_DMG);
 /*JP
                 dmgtxt = "damage";
 */
@@ -529,7 +532,7 @@ dig(VOID_ARGS)
 */
             digtxt = "扉を通り抜けた．";
             if (shopedge) {
-                add_damage(dpx, dpy, 400L);
+                add_damage(dpx, dpy, SHOP_DOOR_COST);
 /*JP
                 dmgtxt = "break";
 */
@@ -884,8 +887,8 @@ int ttyp;
                     }
                     if (mtmp->isshk)
                         make_angry_shk(mtmp, 0, 0);
-                    migrate_to_level(mtmp, ledger_no(&tolevel), MIGR_RANDOM,
-                                     (coord *) 0);
+                    migrate_to_level(mtmp, ledger_no(&tolevel),
+                                     MIGR_RANDOM, (coord *) 0);
                 }
             }
         }
@@ -912,9 +915,9 @@ const char *fillmsg;
 
     if (fillmsg)
 /*JP
-        pline(fillmsg, typ == LAVAPOOL ? "lava" : "water");
+        pline(fillmsg, hliquid(typ == LAVAPOOL ? "lava" : "water"));
 */
-        pline(fillmsg, typ == LAVAPOOL ? "溶岩" : "水");
+        pline(fillmsg, hliquid(typ == LAVAPOOL ? "溶岩" : "水"));
     if (u_spot && !(Levitation || Flying)) {
         if (typ == LAVAPOOL)
             (void) lava_effects();
@@ -964,10 +967,10 @@ coord *cc;
     } else if (is_pool_or_lava(dig_x, dig_y)) {
 #if 0 /*JP:T*/
         pline_The("%s sloshes furiously for a moment, then subsides.",
-                  is_lava(dig_x, dig_y) ? "lava" : "water");
+                  hliquid(is_lava(dig_x, dig_y) ? "lava" : "water"));
 #else
         pline("%sは激しく波うった．",
-                  is_lava(dig_x, dig_y) ? "溶岩" : "水");
+                  hliquid(is_lava(dig_x, dig_y) ? "溶岩" : "水"));
 #endif
         wake_nearby(); /* splashing */
 
@@ -1050,7 +1053,7 @@ coord *cc;
 #endif
         return TRUE;
 
-        /* the following two are here for the wand of digging */
+    /* the following two are here for the wand of digging */
     } else if (IS_THRONE(lev->typ)) {
 /*JP
         pline_The("throne is too hard to break apart.");
@@ -1145,9 +1148,8 @@ coord *cc;
         You("unearth a corpse.");
 */
         You("死体を掘り起した．");
-        if (!!(otmp = mk_tt_object(CORPSE, dig_x, dig_y)))
+        if ((otmp = mk_tt_object(CORPSE, dig_x, dig_y)) != 0)
             otmp->age -= 100; /* this is an *OLD* corpse */
-        ;
         break;
     case 2:
         if (!Blind)
@@ -1362,19 +1364,20 @@ struct obj *obj;
 */
                 pline("ガツン！");
                 wake_nearby();
-            } else if (IS_TREE(lev->typ))
+            } else if (IS_TREE(lev->typ)) {
 /*JP
                 You("need an axe to cut down a tree.");
 */
                 You("木を切るには斧が必要だ．");
-            else if (IS_ROCK(lev->typ))
+            } else if (IS_ROCK(lev->typ)) {
 /*JP
                 You("need a pick to dig rock.");
 */
                 You("掘るにはつるはしが必要だ．");
-            else if (!ispick && (sobj_at(STATUE, rx, ry)
-                                 || sobj_at(BOULDER, rx, ry))) {
+            } else if (!ispick && (sobj_at(STATUE, rx, ry)
+                                   || sobj_at(BOULDER, rx, ry))) {
                 boolean vibrate = !rn2(3);
+
 #if 0 /*JP:T*/
                 pline("Sparks fly as you whack the %s.%s",
                       sobj_at(STATUE, rx, ry) ? "statue" : "boulder",
@@ -1395,6 +1398,7 @@ struct obj *obj;
                        && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
                        && !conjoined_pits(trap, trap_with_u, FALSE)) {
                 int idx;
+
                 for (idx = 0; idx < 8; idx++) {
                     if (xdir[idx] == u.dx && ydir[idx] == u.dy)
                         break;
@@ -1402,6 +1406,7 @@ struct obj *obj;
                 /* idx is valid if < 8 */
                 if (idx < 8) {
                     int adjidx = (idx + 4) % 8;
+
                     trap_with_u->conjoined |= (1 << idx);
                     trap->conjoined |= (1 << adjidx);
 /*JP
@@ -1417,11 +1422,12 @@ struct obj *obj;
 #else
                 You("%sを振り回したが，破片の行き場所がない．", xname(obj));
 #endif
-            } else
+            } else {
 /*JP
                 You("swing %s through thin air.", yobjnam(obj, (char *) 0));
 */
                 You("空中で%sを振り回した．", xname(obj));
+            }
         } else {
 #if 0 /*JP*/
             static const char *const d_action[6] = { "swinging", "digging",
@@ -1447,13 +1453,15 @@ struct obj *obj;
                 "木を切る"
               };
 #endif
+
             did_dig_msg = FALSE;
             context.digging.quiet = FALSE;
             if (context.digging.pos.x != rx || context.digging.pos.y != ry
                 || !on_level(&context.digging.level, &u.uz)
                 || context.digging.down) {
                 if (flags.autodig && dig_target == DIGTYP_ROCK
-                    && !context.digging.down && context.digging.pos.x == u.ux
+                    && !context.digging.down
+                    && context.digging.pos.x == u.ux
                     && context.digging.pos.y == u.uy
                     && (moves <= context.digging.lastdigtime + 2
                         && moves >= context.digging.lastdigtime)) {
@@ -1653,8 +1661,9 @@ register struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
         draft_message(FALSE); /* "You feel a draft." */
         return FALSE;
-    } else if (!IS_ROCK(here->typ) && !IS_TREE(here->typ)) /* no dig */
+    } else if (!IS_ROCK(here->typ) && !IS_TREE(here->typ)) { /* no dig */
         return FALSE;
+    }
 
     /* Only rock, trees, and walls fall through to this point. */
     if ((here->wall_info & W_NONDIGGABLE) != 0) {
@@ -1792,7 +1801,7 @@ zap_dig()
                 You("pierce %s %s wall!", s_suffix(mon_nam(mtmp)),
                     mbodypart(mtmp, STOMACH));
 #else
-                You("%sの%sの壁に穴を開けた！", s_suffix(mon_nam(mtmp)),
+                You("%sの%sの壁に穴を開けた！", mon_nam(mtmp),
                     mbodypart(mtmp, STOMACH));
 #endif
             mtmp->mhp = 1; /* almost dead */
@@ -1906,7 +1915,7 @@ zap_dig()
             }
         } else if (closed_door(zx, zy) || room->typ == SDOOR) {
             if (*in_rooms(zx, zy, SHOPBASE)) {
-                add_damage(zx, zy, 400L);
+                add_damage(zx, zy, SHOP_DOOR_COST);
                 shopdoor = TRUE;
             }
             if (room->typ == SDOOR)
@@ -1926,7 +1935,7 @@ zap_dig()
             if (IS_WALL(room->typ)) {
                 if (!(room->wall_info & W_NONDIGGABLE)) {
                     if (*in_rooms(zx, zy, SHOPBASE)) {
-                        add_damage(zx, zy, 200L);
+                        add_damage(zx, zy, SHOP_WALL_COST);
                         shopwall = TRUE;
                     }
                     room->typ = ROOM;
@@ -1963,7 +1972,7 @@ zap_dig()
                 break;
             if (IS_WALL(room->typ) || room->typ == SDOOR) {
                 if (*in_rooms(zx, zy, SHOPBASE)) {
-                    add_damage(zx, zy, 200L);
+                    add_damage(zx, zy, SHOP_WALL_COST);
                     shopwall = TRUE;
                 }
                 watch_dig((struct monst *) 0, zx, zy, TRUE);
@@ -2189,36 +2198,47 @@ struct obj *
 buried_ball(cc)
 coord *cc;
 {
-    xchar check_x, check_y;
-    struct obj *otmp, *otmp2;
+    int odist, bdist = COLNO;
+    struct obj *otmp, *ball = 0;
 
-    if (u.utraptype == TT_BURIEDBALL)
-        for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
-            otmp2 = otmp->nobj;
+    /* FIXME:
+     *  This is just approximate; if multiple buried balls meet the
+     *  criterium (within 2 steps of tethered hero's present location)
+     *  it will find an arbitrary one rather than the one which used
+     *  to be uball.  Once 3.6.{0,1} save file compatibility is broken,
+     *  we should add context.buriedball_oid and then we can find the
+     *  actual former uball, which might be extra heavy or christened
+     *  or not the one buried directly underneath the target spot.
+     *
+     *  [Why does this search within a radius of two when trapmove()
+     *  only lets hero get one step away from the buried ball?]
+     */
+
+    if (u.utrap && u.utraptype == TT_BURIEDBALL)
+        for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj) {
             if (otmp->otyp != HEAVY_IRON_BALL)
                 continue;
-            /* try the exact location first */
+            /* if found at the target spot, we're done */
             if (otmp->ox == cc->x && otmp->oy == cc->y)
                 return otmp;
-            /* Now try the vicinity */
-            /*
-             * (x-2,y-2)       (x+2,y-2)
-             *           (x,y)
-             * (x-2,y+2)       (x+2,y+2)
+            /* find nearest within allowable vicinity: +/-2
+             *  4 5 8
+             *  1 2 5
+             *  0 1 4
              */
-            for (check_x = cc->x - 2; check_x <= cc->x + 2; ++check_x)
-                for (check_y = cc->y - 2; check_y <= cc->y + 2; ++check_y) {
-                    if (check_x == cc->x && check_y == cc->y)
-                        continue;
-                    if (isok(check_x, check_y)
-                        && (otmp->ox == check_x && otmp->oy == check_y)) {
-                        cc->x = check_x;
-                        cc->y = check_y;
-                        return otmp;
-                    }
-                }
+            odist = dist2(otmp->ox, otmp->oy, cc->x, cc->y);
+            if (odist <= 8 && (!ball || odist < bdist)) {
+                /* remember nearest buried ball but keep checking others */
+                ball = otmp;
+                bdist = odist;
+            }
         }
-    return (struct obj *) 0;
+    if (ball) {
+        /* found, but not at < cc->x, cc->y > */
+        cc->x = ball->ox;
+        cc->y = ball->oy;
+    }
+    return ball;
 }
 
 void
@@ -2226,6 +2246,7 @@ buried_ball_to_punishment()
 {
     coord cc;
     struct obj *ball;
+
     cc.x = u.ux;
     cc.y = u.uy;
     ball = buried_ball(&cc);
@@ -2249,6 +2270,7 @@ buried_ball_to_freedom()
 {
     coord cc;
     struct obj *ball;
+
     cc.x = u.ux;
     cc.y = u.uy;
     ball = buried_ball(&cc);
@@ -2347,16 +2369,33 @@ bury_objs(x, y)
 int x, y;
 {
     struct obj *otmp, *otmp2;
+    struct monst *shkp;
+    long loss = 0L;
+    boolean costly;
+
+    costly = ((shkp = shop_keeper(*in_rooms(x, y, SHOPBASE)))
+              && costly_spot(x, y));
 
     if (level.objects[x][y] != (struct obj *) 0) {
         debugpline2("bury_objs: at <%d,%d>", x, y);
     }
-    for (otmp = level.objects[x][y]; otmp; otmp = otmp2)
+    for (otmp = level.objects[x][y]; otmp; otmp = otmp2) {
+        if (costly) {
+            loss += stolen_value(otmp, x, y, (boolean) shkp->mpeaceful, TRUE);
+            if (otmp->oclass != COIN_CLASS)
+                otmp->no_charge = 1;
+        }
         otmp2 = bury_an_obj(otmp, (boolean *) 0);
+    }
 
     /* don't expect any engravings here, but just in case */
     del_engr_at(x, y);
     newsym(x, y);
+
+    if (costly && loss) {
+        You("owe %s %ld %s for burying merchandise.", mon_nam(shkp), loss,
+            currency(loss));
+    }
 }
 
 /* move objects from buriedobjlist to fobj/nexthere lists */
@@ -2374,7 +2413,8 @@ int x, y;
     for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->ox == x && otmp->oy == y) {
-            if (bball && otmp == bball && u.utraptype == TT_BURIEDBALL) {
+            if (bball && otmp == bball
+                && u.utrap && u.utraptype == TT_BURIEDBALL) {
                 buried_ball_to_punishment();
             } else {
                 obj_extract_self(otmp);
@@ -2498,7 +2538,7 @@ struct monst *mtmp;
     }
 
     mtmp->mburied = TRUE;
-    wakeup(mtmp);       /* at least give it a chance :-) */
+    wakeup(mtmp, FALSE);       /* at least give it a chance :-) */
     newsym(mtmp->mx, mtmp->my);
 }
 

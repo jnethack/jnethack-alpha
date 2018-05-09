@@ -1,5 +1,6 @@
 /* NetHack 3.6	minion.c	$NHDT-Date: 1432512773 2015/05/25 00:12:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -62,6 +63,13 @@ struct monst *mon;
 
     if (mon) {
         ptr = mon->data;
+
+        if (uwep && uwep->oartifact == ART_DEMONBANE && is_demon(ptr)) {
+            if (canseemon(mon))
+                pline("%s looks puzzled for a moment.", Monnam(mon));
+            return 0;
+        }
+
         atyp = mon->ispriest ? EPRI(mon)->shralign
                              : mon->isminion ? EMIN(mon)->min_align
                                              : (ptr->maligntyp == A_NONE)
@@ -305,7 +313,8 @@ register struct monst *mtmp;
 */
             pline("‰°•a‚È’è–½‚Ì‚à‚Ì‚ðÎ‚¢‚È‚ª‚çC%s‚ÍÁ‚¦‚½D",
                   Amonnam(mtmp));
-        } else if (offer > 0L && (long) rnd(40) > (demand - offer)) {
+        } else if (offer > 0L
+                   && (long) rnd(5 * ACURR(A_CHA)) > (demand - offer)) {
 /*JP
             pline("%s scowls at you menacingly, then vanishes.",
 */
@@ -329,7 +338,7 @@ long
 bribe(mtmp)
 struct monst *mtmp;
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     long offer;
     long umoney = money_cnt(invent);
 

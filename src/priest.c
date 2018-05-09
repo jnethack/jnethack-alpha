@@ -1,4 +1,4 @@
-/* NetHack 3.6	priest.c	$NHDT-Date: 1446892452 2015/11/07 10:34:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	priest.c	$NHDT-Date: 1501725407 2017/08/03 01:56:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -586,14 +586,17 @@ int roomno;
         if (!rn2(5)
             && (mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS))
                    != 0) {
-            /* [TODO: alter this (at a minimum, by switching from
-               an exclamation to a simple declaration) if hero has
-               already killed enough ghosts.] */
+            int ngen = mvitals[PM_GHOST].born;
             if (canspotmon(mtmp))
-/*JP
-                pline("An enormous ghost appears next to you!");
-*/
-                pline("巨大な幽霊があなたのすぐそばに現われた！");
+#if 0 /*JP:T*/
+                pline("A%s ghost appears next to you%c",
+                      ngen < 5 ? "n enormous" : "",
+                      ngen < 10 ? '!' : '.');
+#else
+                pline("%s幽霊があなたのすぐそばに現われた%s",
+                      ngen < 5 ? "巨大な" : "",
+                      ngen < 10 ? "！" : "．");
+#endif
             else
 /*JP
                 You("sense a presence close by!");
@@ -608,9 +611,9 @@ int roomno;
                 You("まっさおになって驚き，動けなくなった．");
             nomul(-3);
 /*JP
-            multi_reason = "being terrified of a demon";
+            multi_reason = "being terrified of a ghost";
 */
-            multi_reason = "悪霊に恐怖している時に";
+            multi_reason = "幽霊に恐怖している時に";
 /*JP
             nomovemsg = "You regain your composure.";
 */
@@ -939,11 +942,13 @@ struct monst *priest;
               a_gname_at(ax, ay));
         break;
     case 1:
-/*JP
+#if 0 /*JP*/
         pline("%s voice booms:  \"How darest thou harm my servant!\"",
-*/
-        pline("%sの声が響いた：「わが下僕に苦しむがよい！」",
               s_suffix(a_gname_at(ax, ay)));
+#else
+        pline("%sの声が響いた：「わが下僕に苦しむがよい！」",
+              a_gname_at(ax, ay));
+#endif
         break;
     default:
 /*JP
@@ -968,7 +973,8 @@ angry_priest()
     if ((priest = findpriest(temple_occupied(u.urooms))) != 0) {
         struct epri *eprip = EPRI(priest);
 
-        wakeup(priest);
+        wakeup(priest, FALSE);
+        setmangry(priest, FALSE);
         /*
          * If the altar has been destroyed or converted, let the
          * priest run loose.
@@ -1022,6 +1028,424 @@ boolean ghostly;
         if (ghostly)
             assign_level(&(EPRI(mtmp)->shrlevel), &u.uz);
     }
+}
+
+/*
+ * align_str(), piousness(), mstatusline() and ustatusline() used to be
+ * in pline.c, presumeably because the latter two generate one line of
+ * output.  The USE_OLDARGS config gets warnings from 2016ish-vintage
+ * gcc (for -Wint-to-pointer-cast, activated by -Wall or -W) when they
+ * follow pline() itself.  Fixing up the variadic calls like is done for
+ * lev_comp would be needlessly messy there.
+ *
+ * They don't belong here.  If/when enlightenment ever gets split off
+ * from cmd.c (which definitely doesn't belong there), they should go
+ * with it.
+ */
+
+const char *
+align_str(alignment)
+aligntyp alignment;
+{
+    switch ((int) alignment) {
+    case A_CHAOTIC:
+/*JP
+        return "chaotic";
+*/
+        return "混沌";
+    case A_NEUTRAL:
+/*JP
+        return "neutral";
+*/
+        return "中立";
+    case A_LAWFUL:
+/*JP
+        return "lawful";
+*/
+        return "秩序";
+    case A_NONE:
+/*JP
+        return "unaligned";
+*/
+        return "無心";
+    }
+/*JP
+    return "unknown";
+*/
+    return "不明";
+}
+
+/* used for self-probing */
+char *
+piousness(showneg, suffix)
+boolean showneg;
+const char *suffix;
+{
+    static char buf[32]; /* bigger than "insufficiently neutral" */
+    const char *pio;
+
+    /* note: piousness 20 matches MIN_QUEST_ALIGN (quest.h) */
+    if (u.ualign.record >= 20)
+/*JP
+        pio = "piously";
+*/
+        pio = "敬虔な";
+    else if (u.ualign.record > 13)
+/*JP
+        pio = "devoutly";
+*/
+        pio = "信心深い";
+    else if (u.ualign.record > 8)
+/*JP
+        pio = "fervently";
+*/
+        pio = "熱心な";
+    else if (u.ualign.record > 3)
+/*JP
+        pio = "stridently";
+*/
+        pio = "大げさな";
+    else if (u.ualign.record == 3)
+        pio = "";
+    else if (u.ualign.record > 0)
+/*JP
+        pio = "haltingly";
+*/
+        pio = "不完全な";
+    else if (u.ualign.record == 0)
+/*JP
+        pio = "nominally";
+*/
+        pio = "形だけの";
+    else if (!showneg)
+/*JP
+        pio = "insufficiently";
+*/
+        pio = "不十分な";
+    else if (u.ualign.record >= -3)
+/*JP
+        pio = "strayed";
+*/
+        pio = "迷いを持った";
+    else if (u.ualign.record >= -8)
+/*JP
+        pio = "sinned";
+*/
+        pio = "罪を負った";
+    else
+/*JP
+        pio = "transgressed";
+*/
+        pio = "逸脱した";
+
+    Sprintf(buf, "%s", pio);
+    if (suffix && (!showneg || u.ualign.record >= 0)) {
+        if (u.ualign.record != 3)
+            Strcat(buf, " ");
+        Strcat(buf, suffix);
+    }
+    return buf;
+}
+
+/* stethoscope or probing applied to monster -- one-line feedback */
+void
+mstatusline(mtmp)
+struct monst *mtmp;
+{
+    aligntyp alignment = mon_aligntyp(mtmp);
+    char info[BUFSZ], monnambuf[BUFSZ];
+
+    info[0] = 0;
+    if (mtmp->mtame) {
+/*JP
+        Strcat(info, ", tame");
+*/
+        Strcat(info, ", 飼いならされている");
+        if (wizard) {
+            Sprintf(eos(info), " (%d", mtmp->mtame);
+            if (!mtmp->isminion)
+                Sprintf(eos(info), "; hungry %ld; apport %d",
+                        EDOG(mtmp)->hungrytime, EDOG(mtmp)->apport);
+            Strcat(info, ")");
+        }
+    } else if (mtmp->mpeaceful)
+/*JP
+        Strcat(info, ", peaceful");
+*/
+        Strcat(info, ", 友好的");
+
+    if (mtmp->data == &mons[PM_LONG_WORM]) {
+        int segndx, nsegs = count_wsegs(mtmp);
+
+        /* the worm code internals don't consider the head of be one of
+           the worm's segments, but we count it as such when presenting
+           worm feedback to the player */
+        if (!nsegs) {
+            Strcat(info, ", single segment");
+        } else {
+            ++nsegs; /* include head in the segment count */
+            segndx = wseg_at(mtmp, bhitpos.x, bhitpos.y);
+            Sprintf(eos(info), ", %d%s of %d segments",
+                    segndx, ordin(segndx), nsegs);
+        }
+    }
+    if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])
+        /* don't reveal the innate form (chameleon, vampire, &c),
+           just expose the fact that this current form isn't it */
+/*JP
+        Strcat(info, ", shapechanger");
+*/
+        Strcat(info, ", 変化");
+    /* pets eating mimic corpses mimic while eating, so this comes first */
+    if (mtmp->meating)
+/*JP
+        Strcat(info, ", eating");
+*/
+        Strcat(info, ", 食事中");
+    /* a stethoscope exposes mimic before getting here so this
+       won't be relevant for it, but wand of probing doesn't */
+    if (mtmp->mundetected || mtmp->m_ap_type)
+        mhidden_description(mtmp, TRUE, eos(info));
+    if (mtmp->mcan)
+/*JP
+        Strcat(info, ", cancelled");
+*/
+        Strcat(info, ", 無力");
+    if (mtmp->mconf)
+/*JP
+        Strcat(info, ", confused");
+*/
+        Strcat(info, ", 混乱状態");
+    if (mtmp->mblinded || !mtmp->mcansee)
+/*JP
+        Strcat(info, ", blind");
+*/
+        Strcat(info, ", 盲目");
+    if (mtmp->mstun)
+/*JP
+        Strcat(info, ", stunned");
+*/
+        Strcat(info, ", くらくら状態");
+    if (mtmp->msleeping)
+/*JP
+        Strcat(info, ", asleep");
+*/
+        Strcat(info, ", 睡眠状態");
+#if 0 /* unfortunately mfrozen covers temporary sleep and being busy \
+         (donning armor, for instance) as well as paralysis */
+    else if (mtmp->mfrozen)
+        Strcat(info, ", paralyzed");
+#else
+    else if (mtmp->mfrozen || !mtmp->mcanmove)
+/*JP
+        Strcat(info, ", can't move");
+*/
+        Strcat(info, ", 動けない");
+#endif
+    /* [arbitrary reason why it isn't moving] */
+    else if (mtmp->mstrategy & STRAT_WAITMASK)
+/*JP
+        Strcat(info, ", meditating");
+*/
+        Strcat(info, ", 冥想中");
+    if (mtmp->mflee)
+/*JP
+        Strcat(info, ", scared");
+*/
+        Strcat(info, ", 怯えている");
+    if (mtmp->mtrapped)
+/*JP
+        Strcat(info, ", trapped");
+*/
+        Strcat(info, ", 罠にかかっている");
+    if (mtmp->mspeed)
+#if 0 /*JP:T*/
+        Strcat(info, (mtmp->mspeed == MFAST) ? ", fast"
+                      : (mtmp->mspeed == MSLOW) ? ", slow"
+                         : ", [? speed]");
+#else
+        Strcat(info, (mtmp->mspeed == MFAST) ? ", 素早い"
+                      : (mtmp->mspeed == MSLOW) ? ", 遅い"
+                         : ", 速度不明");
+#endif
+    if (mtmp->minvis)
+/*JP
+        Strcat(info, ", invisible");
+*/
+        Strcat(info, ", 不可視");
+    if (mtmp == u.ustuck)
+#if 0 /*JP*/
+        Strcat(info, sticks(youmonst.data) ? ", held by you"
+                      : !u.uswallow ? ", holding you"
+                         : attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST)
+                            ? ", digesting you"
+                            : is_animal(u.ustuck->data) ? ", swallowing you"
+                               : ", engulfing you");
+#else
+        Strcat(info, sticks(youmonst.data) ? ", あなたが掴まえている"
+                      : !u.uswallow ? ", 掴まえている"
+                         : attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST)
+                            ? ", 消化している"
+                            : is_animal(u.ustuck->data) ? ", 飲み込んでいる"
+                               : ", 巻き込んでいる");
+#endif
+    if (mtmp == u.usteed)
+/*JP
+        Strcat(info, ", carrying you");
+*/
+        Strcat(info, ", あなたを乗せている");
+
+    /* avoid "Status of the invisible newt ..., invisible" */
+    /* and unlike a normal mon_nam, use "saddled" even if it has a name */
+    Strcpy(monnambuf, x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                               (SUPPRESS_IT | SUPPRESS_INVISIBLE), FALSE));
+
+/*JP
+    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", monnambuf,
+*/
+    pline("%sの状態 (%s)： Level %d  HP %d(%d)  AC %d%s", monnambuf,
+          align_str(alignment), mtmp->m_lev, mtmp->mhp, mtmp->mhpmax,
+          find_mac(mtmp), info);
+}
+
+/* stethoscope or probing applied to hero -- one-line feedback */
+void
+ustatusline()
+{
+    char info[BUFSZ];
+
+    info[0] = '\0';
+    if (Sick) {
+#if 0 /*JP*/
+        Strcat(info, ", dying from");
+        if (u.usick_type & SICK_VOMITABLE)
+            Strcat(info, " food poisoning");
+        if (u.usick_type & SICK_NONVOMITABLE) {
+            if (u.usick_type & SICK_VOMITABLE)
+                Strcat(info, " and");
+            Strcat(info, " illness");
+        }
+#else
+        Strcat(info, ", ");
+        if (u.usick_type & SICK_VOMITABLE)
+            Strcat(info, "食中毒");
+        if (u.usick_type & SICK_NONVOMITABLE) {
+            if (u.usick_type & SICK_VOMITABLE)
+                Strcat(info, "と");
+            Strcat(info, "病気");
+        }
+        Strcat(info, "で死につつある");
+#endif
+    }
+    if (Stoned)
+/*JP
+        Strcat(info, ", solidifying");
+*/
+        Strcat(info, ", 石化しつつある");
+    if (Slimed)
+/*JP
+        Strcat(info, ", becoming slimy");
+*/
+        Strcat(info, ", スライムになりつつある");
+    if (Strangled)
+/*JP
+        Strcat(info, ", being strangled");
+*/
+        Strcat(info, ", 首を絞められている");
+    if (Vomiting)
+#if 0 /*JP*/
+        Strcat(info, ", nauseated"); /* !"nauseous" */
+#else
+        Strcat(info, ", 吐き気がする");
+#endif
+    if (Confusion)
+/*JP
+        Strcat(info, ", confused");
+*/
+        Strcat(info, ", 混乱状態");
+    if (Blind) {
+#if 0 /*JP*/
+        Strcat(info, ", blind");
+        if (u.ucreamed) {
+            if ((long) u.ucreamed < Blinded || Blindfolded
+                || !haseyes(youmonst.data))
+                Strcat(info, ", cover");
+            Strcat(info, "ed by sticky goop");
+        } /* note: "goop" == "glop"; variation is intentional */
+#else
+        Strcat(info, ", ");
+        if (u.ucreamed) {
+            Strcat(info, "ねばねばべとつくもので");
+            if ((long)u.ucreamed < Blinded || Blindfolded
+                || !haseyes(youmonst.data))
+              Strcat(info, "覆われて");
+        }
+        Strcat(info, "盲目状態");
+#endif
+    }
+    if (Stunned)
+/*JP
+        Strcat(info, ", stunned");
+*/
+        Strcat(info, ", くらくら状態");
+    if (!u.usteed && Wounded_legs) {
+        const char *what = body_part(LEG);
+        if ((Wounded_legs & BOTH_SIDES) == BOTH_SIDES)
+            what = makeplural(what);
+/*JP
+        Sprintf(eos(info), ", injured %s", what);
+*/
+        Sprintf(eos(info), ", %sにけがをしている", what);
+    }
+    if (Glib)
+/*JP
+        Sprintf(eos(info), ", slippery %s", makeplural(body_part(HAND)));
+*/
+        Sprintf(eos(info), ", %sがぬるぬる", makeplural(body_part(HAND)));
+    if (u.utrap)
+/*JP
+        Strcat(info, ", trapped");
+*/
+        Strcat(info, ", 罠にかかっている");
+    if (Fast)
+/*JP
+        Strcat(info, Very_fast ? ", very fast" : ", fast");
+*/
+        Strcat(info, Very_fast ? ", とても素早い" : ", 素早い");
+    if (u.uundetected)
+/*JP
+        Strcat(info, ", concealed");
+*/
+        Strcat(info, ", 隠れている");
+    if (Invis)
+/*JP
+        Strcat(info, ", invisible");
+*/
+        Strcat(info, ", 不可視");
+    if (u.ustuck) {
+#if 0 /*JP*/
+        if (sticks(youmonst.data))
+            Strcat(info, ", holding ");
+        else
+            Strcat(info, ", held by ");
+        Strcat(info, mon_nam(u.ustuck));
+#else
+        Strcat(info, ", ");
+        Strcat(info, mon_nam(u.ustuck));
+        if (sticks(youmonst.data))
+            Strcat(info, "を掴まえている");
+        else
+            Strcat(info, "に掴まえられている");
+#endif
+    }
+
+/*JP
+    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", plname,
+*/
+    pline("%sの状態 (%s)： Level %d  HP %d(%d)  AC %d%s", plname,
+          piousness(FALSE, align_str(u.ualign.type)),
+          Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
+          Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
 }
 
 /*priest.c*/

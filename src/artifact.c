@@ -1,5 +1,6 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1446369462 2015/11/01 09:17:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -26,16 +27,16 @@ extern boolean notonhead; /* for long worms */
 #define get_artifact(o) \
     (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] : 0)
 
-STATIC_DCL boolean
-FDECL(bane_applies, (const struct artifact *, struct monst *));
+STATIC_DCL boolean FDECL(bane_applies, (const struct artifact *,
+                                        struct monst *));
 STATIC_DCL int FDECL(spec_applies, (const struct artifact *, struct monst *));
 STATIC_DCL int FDECL(arti_invoke, (struct obj *));
-STATIC_DCL boolean
-FDECL(Mb_hit, (struct monst * magr, struct monst *mdef, struct obj *, int *,
-               int, BOOLEAN_P, char *));
+STATIC_DCL boolean FDECL(Mb_hit, (struct monst * magr, struct monst *mdef,
+                                struct obj *, int *, int, BOOLEAN_P, char *));
 STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
 STATIC_DCL uchar FDECL(abil_to_adtyp, (long *));
 STATIC_DCL boolean FDECL(untouchable, (struct obj *, BOOLEAN_P));
+STATIC_DCL int FDECL(count_surround_traps, (int, int));
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
@@ -470,12 +471,13 @@ boolean being_worn;
  */
 void
 set_artifact_intrinsic(otmp, on, wp_mask)
-register struct obj *otmp;
+struct obj *otmp;
 boolean on;
 long wp_mask;
 {
     long *mask = 0;
-    register const struct artifact *oart = get_artifact(otmp);
+    register const struct artifact *art, *oart = get_artifact(otmp);
+    register struct obj *obj;
     register uchar dtyp;
     register long spfx;
 
@@ -497,19 +499,21 @@ long wp_mask;
         mask = &EDisint_resistance;
     else if (dtyp == AD_DRST)
         mask = &EPoison_resistance;
+    else if (dtyp == AD_DRLI)
+        mask = &EDrain_resistance;
 
     if (mask && wp_mask == W_ART && !on) {
-        /* find out if some other artifact also confers this intrinsic */
-        /* if so, leave the mask alone */
-        register struct obj *obj;
-        for (obj = invent; obj; obj = obj->nobj)
+        /* find out if some other artifact also confers this intrinsic;
+           if so, leave the mask alone */
+        for (obj = invent; obj; obj = obj->nobj) {
             if (obj != otmp && obj->oartifact) {
-                register const struct artifact *art = get_artifact(obj);
-                if (art->cary.adtyp == dtyp) {
+                art = get_artifact(obj);
+                if (art && art->cary.adtyp == dtyp) {
                     mask = (long *) 0;
                     break;
                 }
             }
+        }
     }
     if (mask) {
         if (on)
@@ -522,11 +526,11 @@ long wp_mask;
     spfx = (wp_mask != W_ART) ? oart->spfx : oart->cspfx;
     if (spfx && wp_mask == W_ART && !on) {
         /* don't change any spfx also conferred by other artifacts */
-        register struct obj *obj;
         for (obj = invent; obj; obj = obj->nobj)
             if (obj != otmp && obj->oartifact) {
-                register const struct artifact *art = get_artifact(obj);
-                spfx &= ~art->cspfx;
+                art = get_artifact(obj);
+                if (art)
+                    spfx &= ~art->cspfx;
             }
     }
 
@@ -660,16 +664,17 @@ struct monst *mon;
         return 1;
 
     yours = (mon == &youmonst);
-    /* all quest artifacts are self-willed; it this ever changes, `badclass'
+    /* all quest artifacts are self-willed; if this ever changes, `badclass'
        will have to be extended to explicitly include quest artifacts */
     self_willed = ((oart->spfx & SPFX_INTEL) != 0);
     if (yours) {
         badclass = self_willed
                    && ((oart->role != NON_PM && !Role_if(oart->role))
                        || (oart->race != NON_PM && !Race_if(oart->race)));
-        badalign =
-            (oart->spfx & SPFX_RESTR) && oart->alignment != A_NONE
-            && (oart->alignment != u.ualign.type || u.ualign.record < 0);
+        badalign = ((oart->spfx & SPFX_RESTR) != 0
+                    && oart->alignment != A_NONE
+                    && (oart->alignment != u.ualign.type
+                        || u.ualign.record < 0));
     } else if (!is_covetous(mon->data) && !is_mplayer(mon->data)) {
         badclass = self_willed && oart->role != NON_PM
                    && oart != &artilist[ART_EXCALIBUR];
@@ -959,8 +964,18 @@ winid tmpwin; /* supplied by dodiscover() */
  * stun attack.  As of 3.4.1, those effects can occur but
  * will be slightly less likely than they were in 3.3.x.]
  */
+
+enum mb_effect_indices {
+    MB_INDEX_PROBE = 0,
+    MB_INDEX_STUN,
+    MB_INDEX_SCARE,
+    MB_INDEX_CANCEL,
+
+    NUM_MB_INDICES
+};
+
 #define MB_MAX_DIEROLL 8 /* rolls above this aren't magical */
-static const char *const mb_verb[2][4] = {
+static const char *const mb_verb[2][NUM_MB_INDICES] = {
 #if 0 /*JP*/
     { "probe", "stun", "scare", "cancel" },
     { "prod", "amaze", "tickle", "purge" },
@@ -970,10 +985,6 @@ static const char *const mb_verb[2][4] = {
     { "励まし", "驚かせ", "くすぐっ", "清め" },
 #endif
 };
-#define MB_INDEX_PROBE 0
-#define MB_INDEX_STUN 1
-#define MB_INDEX_SCARE 2
-#define MB_INDEX_CANCEL 3
 
 /* called when someone is being hit by Magicbane */
 STATIC_OVL boolean
@@ -986,7 +997,7 @@ boolean vis;               /* whether the action can be seen */
 char *hittee;              /* target's name: "you" or mon_nam(mdef) */
 {
     struct permonst *old_uasmon;
-#if 0 /*JP*/
+#if 0 /*JP*//* not used */
     const char *verb, *fakename;
 #else
     const char *verb;
@@ -1153,7 +1164,7 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
             mdef->mconf = 1;
     }
 
-#if 0 /*JP*//*日本語では不要*/
+#if 0 /*JP*//* not used */
     /* now give message(s) describing side-effects;
        don't let vtense() be fooled by assigned name ending in 's' */
     fakename = youdefend ? "you" : "mon";
@@ -1430,11 +1441,13 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                     return (boolean) (youattack || vis);
                 }
                 if (noncorporeal(mdef->data) || amorphous(mdef->data)) {
-/*JP
+#if 0 /*JP*/
                     pline("%s slices through %s %s.", wepdesc,
-*/
-                    pline("%sは%sの%sを切り落した．", wepdesc,
                           s_suffix(mon_nam(mdef)), mbodypart(mdef, NECK));
+#else
+                    pline("%sは%sの%sを切り落した．", wepdesc,
+                          mon_nam(mdef), mbodypart(mdef, NECK));
+#endif
                     return TRUE;
                 }
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
@@ -1684,8 +1697,8 @@ struct obj *obj;
                 obj->age = 0;
                 return 0;
             }
-            b_effect =
-                obj->blessed && (Role_switch == oart->role || !oart->role);
+            b_effect = (obj->blessed && (oart->role == Role_switch
+                                         || oart->role == NON_PM));
             recharge(otmp, b_effect ? 1 : obj->cursed ? -1 : 0);
             update_inventory();
             break;
@@ -1786,13 +1799,12 @@ struct obj *obj;
             } else
                 otmp->quan += rnd(5);
             otmp->owt = weight(otmp);
-            otmp =
 #if 0 /*JP*/
-                hold_another_object(otmp, "Suddenly %s out.",
-                                    aobjnam(otmp, "fall"), (const char *) 0);
+            otmp = hold_another_object(otmp, "Suddenly %s out.",
+                                       aobjnam(otmp, "fall"), (char *) 0);
 #else
-                hold_another_object(otmp, "突然%sが落ちた．",
-                                    xname(otmp), 0);
+            otmp = hold_another_object(otmp, "突然%sが落ちた．",
+                                       xname(otmp), 0);
 #endif
             break;
         }
@@ -1974,6 +1986,7 @@ long *abil;
         { &EAntimagic, AD_MAGM },
         { &EDisint_resistance, AD_DISN },
         { &EPoison_resistance, AD_DRST },
+        { &EDrain_resistance, AD_DRLI },
     };
     int k;
 
@@ -2028,7 +2041,6 @@ long *abil;
     long wornmask = (W_ARM | W_ARMC | W_ARMH | W_ARMS
                      | W_ARMG | W_ARMF | W_ARMU
                      | W_AMUL | W_RINGL | W_RINGR | W_TOOL
-                     /* [do W_ART and W_ARTI actually belong here?] */
                      | W_ART | W_ARTI);
 
     if (u.twoweap)
@@ -2044,7 +2056,9 @@ long *abil;
 
             if (art) {
                 if (dtyp) {
-                    if (art->cary.adtyp == dtyp || art->defn.adtyp == dtyp)
+                    if (art->cary.adtyp == dtyp /* carried */
+                        || (art->defn.adtyp == dtyp /* defends while worn */
+                            && (obj->owornmask & ~(W_ART | W_ARTI))))
                         return obj;
                 }
                 if (spfx) {
@@ -2177,8 +2191,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
     if (touch_artifact(obj, &youmonst)) {
         char buf[BUFSZ];
         int dmg = 0, tmp;
-        boolean ag =
-                    (objects[obj->otyp].oc_material == SILVER && Hate_silver),
+        boolean ag = (objects[obj->otyp].oc_material == SILVER && Hate_silver),
                 bane = bane_applies(get_artifact(obj), &youmonst);
 
         /* nothing else to do if hero can successfully handle this object */
@@ -2315,11 +2328,15 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
 
     dropit = (dropflag > 0); /* drop all or drop weapon */
     /* check secondary weapon first, before possibly unwielding primary */
-    if (u.twoweap)
+    if (u.twoweap) {
+        bypass_obj(uswapwep); /* so loop below won't process it again */
         (void) untouchable(uswapwep, dropit);
+    }
     /* check primary weapon next so that they're handled together */
-    if (uwep)
+    if (uwep) {
+        bypass_obj(uwep); /* so loop below won't process it again */
         (void) untouchable(uwep, dropit);
+    }
 
     /* in case someone is daft enough to add artifact or silver saddle */
     if (u.usteed && (obj = which_armor(u.usteed, W_SADDLE)) != 0) {
@@ -2355,6 +2372,107 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
 
     if (!--nesting)
         clear_bypasses(); /* reset upon final exit */
+}
+
+static int mkot_trap_warn_count = 0;
+
+STATIC_OVL int
+count_surround_traps(x, y)
+int x, y;
+{
+    struct rm *levp;
+    struct obj *otmp;
+    struct trap *ttmp;
+    int dx, dy, glyph, ret = 0;
+
+    for (dx = x - 1; dx < x + 2; ++dx)
+        for (dy = y - 1; dy < y + 2; ++dy) {
+            if (!isok(dx, dy))
+                continue;
+            /* If a trap is shown here, don't count it; the hero
+             * should be expecting it.  But if there is a trap here
+             * that's not shown, either undiscovered or covered by
+             * something, do count it.
+             */
+            glyph = glyph_at(dx, dy);
+            if (glyph_is_trap(glyph))
+                continue;
+            if ((ttmp = t_at(dx, dy)) != 0) {
+                ++ret;
+                continue;
+            }
+            levp = &levl[dx][dy];
+            if (IS_DOOR(levp->typ) && (levp->doormask & D_TRAPPED) != 0) {
+                ++ret;
+                continue;
+            }
+            for (otmp = level.objects[dx][dy]; otmp; otmp = otmp->nexthere)
+                if (Is_container(otmp) && otmp->otrapped) {
+                    ++ret; /* we're counting locations, so just */
+                    break; /* count the first one in a pile     */
+                }
+        }
+    /*
+     * [Shouldn't we also check inventory for a trapped container?
+     * Even if its trap has already been found, there's no 'tknown'
+     * flag to help hero remember that so we have nothing comparable
+     * to a shown glyph to justify skipping it.]
+     */
+    return ret;
+}
+
+/* sense adjacent traps if wielding MKoT without wearing gloves */
+void
+mkot_trap_warn()
+{
+    static const char *const heat[7] = {
+        "cool", "slightly warm", "warm", "very warm",
+        "hot", "very hot", "like fire"
+    };
+
+    if (!uarmg && uwep && uwep->oartifact == ART_MASTER_KEY_OF_THIEVERY) {
+        int idx, ntraps = count_surround_traps(u.ux, u.uy);
+
+        if (ntraps != mkot_trap_warn_count) {
+            idx = min(ntraps, SIZE(heat) - 1);
+            pline_The("Key feels %s%c", heat[idx], (ntraps > 3) ? '!' : '.');
+        }
+        mkot_trap_warn_count = ntraps;
+    } else
+        mkot_trap_warn_count = 0;
+}
+
+/* Master Key is magic key if its bless/curse state meets our criteria:
+   not cursed for rogues or blessed for non-rogues */
+boolean
+is_magic_key(mon, obj)
+struct monst *mon; /* if null, non-rogue is assumed */
+struct obj *obj;
+{
+    if (((obj && obj->oartifact == ART_MASTER_KEY_OF_THIEVERY)
+         && ((mon == &youmonst) ? Role_if(PM_ROGUE)
+                                : (mon && mon->data == &mons[PM_ROGUE])))
+        ? !obj->cursed : obj->blessed)
+        return TRUE;
+    return FALSE;
+}
+
+/* figure out whether 'mon' (usually youmonst) is carrying the magic key */
+struct obj *
+has_magic_key(mon)
+struct monst *mon; /* if null, hero assumed */
+{
+    struct obj *o;
+    short key = artilist[ART_MASTER_KEY_OF_THIEVERY].otyp;
+
+    if (!mon)
+        mon = &youmonst;
+    for (o = ((mon == &youmonst) ? invent : mon->minvent); o;
+         o = nxtobj(o, key, FALSE)) {
+        if (is_magic_key(mon, o))
+            return o;
+    }
+    return (struct obj *) 0;
 }
 
 /*artifact.c*/

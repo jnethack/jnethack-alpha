@@ -1,123 +1,224 @@
-^       罠の種類を調べる
-^[      コマンドをキャンセルする
-^A      前のコマンドを繰り返す
-^C      ゲームをやめる
-^D      何かを蹴る (普通は扉)
-^E      部屋を探す (デバッグモードのみ)
-^F      その階の地図を画く (デバッグモードのみ)
-^G      怪物をつくる (デバッグモードのみ)
-^I      道具を識別する (デバッグモードのみ)
-^O      特殊な階の場所を知る (デバッグモードのみ)
-^P      前のメッセージを見る
-^R      画面を書きなおす
-^T      その階で瞬間移動する
-^V      違う階へ瞬間移動する (デバッグモードのみ)
-^W      望みをかなえる (デバッグモードのみ)
-^X      あなたの属性を見る (細かい情報は発見・デバッグモードのみ)
-^Z      ゲームを中断する (定義しているなら)
-a       道具を使用する
-A       鎧を全て脱ぐ
-b       南西に歩く
-B       何かにぶつかるまで南西に歩く
-^B      何かが見えるまで南西に歩く
-c       扉を閉める
-C       怪物，個々の物，物の種類に名前をつける
-d       物を置く
-D       種類を選んで物を置く
-e       何か食べる
-E       床のほこりに文字を書く
-g       次に方向を指定すると何かにぶつかるまで歩く
-G       次に方向を指定すると何かが見えるまで歩く
-h       西に歩く (number_padが設定されているときは，ヘルプ)
-H       何かにぶつかるまで西に歩く
-^H      何かが見えるまで西に歩く
-i       あなたの持ち物一覧を見る
-I       種類を選択して持ち物一覧を見る
-j       南に歩く (number_padが設定されているときは，他の場所に飛ぶ)
-J       何かにぶつかるまで南に歩く
-^J      何かが見えるまで南に歩く
-k       北に歩く (number_padが設定されているときは，何かを蹴る)
-K       何かにぶつかるまで北に歩く
-^K      何かが見えるまで北に歩く
-l       東に歩く (number_padが設定されているときは，箱の中身を略奪する)
-L       何かにぶつかるまで東に歩く
-^L      何かが見えるまで東に歩く
-m       次に方向を指定すると，ものを拾わずに移動する
-M       次に方向を指定すると，ものを拾わずに遠くに移動する
-n       南東に歩く
-N       何かにぶつかるまで南東に歩く(number_padが設定されているときは，名前をつける)
-^N      何かが見えるまで南東に歩く
-o       扉を開ける
-O       オプションをセットする (O?はオプションを説明する)
-p       店の勘定を払う
-P       アクセアリを身につける(指輪，魔除け，など)
-q       何かを飲む(水薬, 水, など)
-Q       ゲームをやめる
-r       巻物(または，定義しているなら魔法の本)を読む
-R       アクセサリをはずす(指輪，魔除け，など)
-s       罠や秘密の扉を探す
-S       ゲームを保存する
-t       何かを投げる
-T       鎧を脱ぐ
-u       北東に歩く (number_padが設定されているときは，罠をはずす)
-U       何かにぶつかるまで北東に歩く
-^U      何かが見えるまで北東に歩く
-v       バージョンを見る
-V       バージョンおよび歴史を見る (長文)
-w       武器を装備する
-W       鎧を着る
-x       知っている魔法の一覧 (定義されているなら)
-X       二刀流を切り替える
-y       北西に歩く
-Y       何かにぶつかるまで北西に歩く
-^Y      何かが見えるまで北西に歩く
-z       杖をふる
-Z       魔法を唱える (定義されているなら)
-<       階段を昇る
->       階段を降りる
-/       記号が何に対応しているか調べる
-?       ヘルプ
-&       このコマンドが何か調べる
-!       シェルに抜ける (定義されているなら)
-\       今までに発見された物の一覧
-`       一つの物の種類に対して発見した物の一覧
-_       マップで示された点に最小経路アルゴリズムで移動する
-.       その場で休む
-        何もしないでその場で休む (rest_on_spaceが定義されているなら) 
-:       そこに何があるか見る
-;       画面上の記号が何であるかを調べる
-,       足元の物を拾う
-@       pickupオプションを切り替える
-)       装備している武器を見る
-[       装備している鎧を見る
-=       身につけている指輪を見る
-"       身につけている魔除けを見る
-(       使っている道具を見る
-$       お金を数える
-+       知っている魔法の一覧 (定義されているなら)
-#       拡張コマンド
-M-?     拡張コマンドのヘルプ (対応しているプラットフォームなら)
-M-2     二刀流戦闘の切り替え (number_padが設定されていないなら)
-M-a     持ち物一覧の調整 (fixinvオプションが必要)
-M-A     現在の階に名前をつける
-M-c     誰かに話しかける
-M-C     現在維持している自発的挑戦の一覧
-M-d     物を何かに浸す
-M-e     武器の技量を高めるまたは見る
-M-f     鍵をこじあける
-M-i     物の特別な力を使う
-M-j     他の位置の飛びうつる
-M-l     床の上の箱の中身を略奪する
-M-m     怪物の特別能力を使う (定義されているなら)
-M-n     怪物，個々の物，物の種類に名前をつける
-M-o     神に供物を捧げる
-M-O     探索した迷宮の概要を表示
-M-p     神に祈る
-M-r     ランプをこする
-M-R     鞍の付いた生き物に乗るまたは降りる
-M-s     座る
-M-t     アンデットを土にかえす
-M-T     入れ物を空にする
-M-u     罠をはずす (通常はしかけられた物)
-M-v     コンパイル時のオプションを表示する
-M-w     顔を拭う
+&# cmdhelp
+&	押したキーが何のコマンドかを知らせる
+^	隣にある罠の種類を調べる
+^[	コマンドをキャンセルする(ESCキーと同じ)
+&? debug
+^E	近くの罠，隠し扉，見えない怪物を探す
+^F	その階の地図を書く; 罠と隠し通路は表示するが隠し扉は表示しない
+^G	名前やクラスを指定して怪物をつくる
+^I	全ての持ち物を識別して表示する
+^O	特殊な階の場所を知る
+^V	違う階へ瞬間移動する
+^W	何かを願う
+&: #!debug
+^E	unavailable debugging command
+^F	unavailable debugging command
+^G	unavailable debugging command
+^I	unavailable debugging command
+^O	Shortcut for '#overview': list interesting levels you have visited
+^V	unavailable debugging command
+^W	unavailable debugging command
+&. #?debug
+&? number_pad=0,-1
+b	南西に歩く
+B	何かにぶつかるまで南西に歩く
+h	西に歩く
+H	何かにぶつかるまで西に歩く
+j	南に歩く
+J	何かにぶつかるまで南に歩く
+k	北に歩く
+K	何かにぶつかるまで北に歩く
+l	東に歩く
+L	何かにぶつかるまで東に歩く
+n	南東に歩く
+N	何かにぶつかるまで南東に歩く
+u	北東に歩く
+U	何かにぶつかるまで北東に歩く
+&# y,Y handled below
+&: #number_pad=1,2,3,4
+h	Help: synonym for '?'
+j	Jump: shortcut for '#jump'
+k	Kick: synonym for '^D'
+l	Loot: shortcut for '#loot'
+n	Start a count; continue with digit(s)
+N	Name: shortcut for '#name'
+u	Untrap: shortcut for '#untrap'
+&. #0,-1 vs 1,2,3,4
+a	道具を使用するか杖を折る
+A	鎧を全て脱ぐか全てのアクセサリを外すか装備していない武器を外す
+^A	前のコマンドを繰り返す
+^B	何かが見えるまで南西に歩く
+c	扉を閉める
+C	怪物，個々の物，物の種類に名前をつける
+^C	中断: ゲームを抜ける
+d	物を置く
+D	種類を選んで物を置く
+^D	何かを蹴る (普通は扉)
+e	何か食べる
+E	床のほこりに文字を書く
+f	Fire ammunition from quiver
+F	Followed by direction, fight a monster (even if you don't sense it)
+g	次に方向を指定すると何かにぶつかるまで歩く
+G	次に方向を指定すると何かが見えるまで歩く
+^H	何かが見えるまで西に歩く
+i	あなたの持ち物一覧を見る
+I	種類を選択して持ち物一覧を見る
+^J	何かが見えるまで南に歩く
+^K	何かが見えるまで北に歩く
+^L	何かが見えるまで東に歩く
+m	次に方向を指定すると，ものを拾わずに移動する
+M	次に方向を指定すると，ものを拾わずに遠くに移動する
+^N	何かが見えるまで南東に歩く
+o	扉を開ける
+O	オプションをセットする (O?はオプションを説明する)
+p	店の勘定を払う
+P	アクセアリを身につける(指輪，魔除け，など; 防具にも有効)
+^P	前のメッセージを見る
+q	何かを飲む(水薬, 水, など)
+Q	Select ammunition for quiver (use '#quit' to quit)
+r	巻物(または，定義しているなら魔法の本)を読む
+R	アクセサリをはずす(指輪，魔除け，など; 防具にも有効)
+^R	画面を書きなおす
+s	すぐ隣にある罠や秘密の扉を探す
+S	ゲームを保存する (そして終了する;「保存して続行」はない)
+t	何かを投げる (物を選んでから、目標ではなく方向を指定する)
+T	鎧を脱ぐ (アクセサリにも有効)
+^T	その階で瞬間移動する
+^U	何かが見えるまで北東に歩く
+v	バージョンを見る ('#version'で追加情報を表示)
+V	ゲーム開発の歴史を見る
+w	武器を装備する (複数武器の場合: 'w' 予備武器 'x' 'w' 主武器 'X')
+W	鎧を着る (アクセサリにも有効)
+x	知っている魔法の一覧 (定義されているなら)
+X	二刀流を切り替える
+^X	あなたの属性を見る (細かい情報は発見・デバッグモードのみ)
+&? number_pad=0,1,2,3,4
+&? number_pad=0
+y	北西に歩く
+Y	何かにぶつかるまで北西に歩く
+&.
+^Y	何かが見えるまで北西に歩く
+z	杖をふる
+Z	魔法を唱える (定義されているなら)
+&? suspend
+^Z	ゲームを中断する; 'fg' (foreground) で再開する
+&:
+^Z	unavailable command: suspend
+&.
+&: number_pad=-1
+y	Zap a wand
+Y	Zap (cast) a spell
+&? suspend
+^Y	Suspend game; 'fg' (foreground) to resume
+&:
+^Y	unavailable command: suspend
+&.
+z	Go northwest 1 space
+Z	Go northwest until you are on top of something
+^Z	Go northwest until you are near something
+&. #0,1..4 vs -1
+<	階段を昇る
+>	階段を降りる
+/	記号が何に対応しているか調べる
+?	ヘルプ
+&? shell
+!	シェルに抜ける; 戻るにはシェルを'exit'する
+&:
+!	unavailable command: shell
+&.
+\	今までに発見された物の一覧
+`	一つの物の種類に対して発見した物の一覧
+_	マップで示された点に最小経路アルゴリズムで移動する
+.	その場で休む
+&? rest_on_space
+ 	何もしないでその場で休む
+&.
+:	そこに何があるか見る
+;	画面上の記号が何であるかを調べる
+,	足元の物を拾う
+@	pickupオプションを切り替える
+)	装備している/準備している武器を見る
+[	装備している鎧を見る
+=	身につけている指輪を見る
+"	身につけている魔除けを見る
+(	使っている道具を見る
+*	Show all equipment in use (combination of the ),[,=,",( commands)
+$	お金を数える
++	知っている魔法の一覧 (定義されているなら)
+#	拡張コマンド ('#?'で選択肢の一覧)
+&# number_pad:
+&#  -1 = numpad off, swap y with z (including Y with Z, ^Y with ^Z, M-y &c)
+&#   0 = numpad off (default)
+&#   1 = numpad on, normal keypad layout, '5'->'g'
+&#   2 = numpad on, normal keypad layout, '5'->'G'
+&#   3 = numpad on, phone keypad layout, '5'->'g'
+&#   4 = numpad on, phone keypad layout, '5'->'G'
+&? number_pad = 1,2,3,4
+0	Show inventory
+4	Move west
+6	Move east
+-	'F' prefix; force fight
+&: #-1,0
+0	Continue a count
+4	Start or continue a count
+6	Start or continue a count
+&. #1,2,3,4 vs -1,0
+&? number_pad=1,2
+7	Move northwest
+8	Move north
+9	Move northeast
+1	Move southwest
+2	Move south
+3	Move southeast
+&: number_pad=3,4
+1	Move northwest
+2	Move north
+3	Move northeast
+7	Move southwest
+8	Move south
+9	Move southeast
+&: #-1,0
+1	Start or continue a count
+2	Start or continue a count
+3	Start or continue a count
+7	Start or continue a count
+8	Start or continue a count
+9	Start or continue a count
+&. #1,2 vs 3,4 vs -1,0
+&? number_pad=1,3
+5	'g' movement prefix
+M-5	'G' movement prefix
+&: number_pad=2,4
+5	'G' movement prefix
+M-5	'g' movement prefix
+M-0	Inventory specific item types
+&: #-1,0
+5	Start or continue a count
+M-2	二刀流戦闘の切り替え
+&. #1,3 vs 2,4 vs -1,0
+M-?	拡張コマンドのヘルプ (対応しているプラットフォームなら)
+M-a	持ち物一覧の調整 (fixinvオプションが必要)
+M-A	現在の階に名前をつける
+M-c	隣にいる生物と話す
+M-C	現在維持している自発的挑戦の一覧
+M-d	物を何かに浸す
+M-e	武器の技量を見て，可能なら高める
+M-f	鍵をこじあける
+M-i	物の特別な力を使う
+M-j	近くの位置に飛びうつる
+M-l	床の上の箱の中身を略奪する
+M-m	変化しているときに，怪物の特別能力を使う
+M-n	怪物，個々の物，物の種類に名前をつける
+M-N	怪物，個々の物，物の種類に名前をつける
+M-o	神に供物を捧げる
+M-O	探索した迷宮の概要を表示
+M-p	神に祈る
+M-q	抜ける (保存せずに終了する)
+M-r	ランプや試金石をこする
+M-R	鞍の付いた生き物に乗るまたは降りる
+M-s	座る
+M-t	アンデットを土にかえす
+M-T	入れ物を空にする
+M-u	罠をはずす (通常はしかけられた物)
+M-v	コンパイル時のオプションを表示する
+M-w	顔を拭う

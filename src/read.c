@@ -1,5 +1,6 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1448862378 2015/11/30 05:46:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.125 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1515802375 2018/01/13 00:12:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -34,6 +35,7 @@ STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
 STATIC_DCL void FDECL(display_stinking_cloud_positions, (int));
+STATIC_DCL boolean FDECL(get_valid_stinking_cloud_pos, (int, int));
 STATIC_PTR void FDECL(set_lit, (int, int, genericptr));
 
 STATIC_OVL boolean
@@ -65,6 +67,7 @@ struct obj *otmp;
 char *buf;
 {
     int erosion = greatest_erosion(otmp);
+
     if (erosion)
         wipeout_text(buf, (int) (strlen(buf) * erosion / (2 * MAX_ERODE)),
                      otmp->o_id ^ (unsigned) ubirthday);
@@ -125,10 +128,10 @@ char *buf;
         "Go team ant!",
         "Got newt?",
         "Hello, my darlings!", /* Charlie Drake */
-        "Hey! Nymphs! Steal This T-Shirt!",
+        "Hey!  Nymphs!  Steal This T-Shirt!",
         "I <3 Dungeon of Doom",
         "I <3 Maud",
-        "I am a Valkyrie. If you see me running, try to keep up.",
+        "I am a Valkyrie.  If you see me running, try to keep up.",
         "I am not a pack rat - I am a collector",
         "I bounced off a rubber tree",         /* Monkey Island */
         "Plunder Island Brimstone Beach Club", /* Monkey Island */
@@ -202,6 +205,16 @@ char *buf;
         "Pudding farmer",
         "Vegetarian",
         "Hello, I'm War!",
+        "It is better to light a candle than to curse the darkness",
+        "It is easier to curse the darkness than to light a candle",
+        /* expanded "rock--paper--scissors" featured in TV show "Big Bang
+           Theory" although they didn't create it (and an actual T-shirt
+           with pentagonal diagram showing which choices defeat which) */
+        "rock--paper--scissors--lizard--Spock!",
+        /* "All men must die -- all men must serve" challange and response
+           from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
+           TV show "Game of Thrones" (probably an actual T-shirt too...) */
+        "/Valar morghulis/ -- /Valar dohaeris/",
 #else
         "ゼイ・マイト・ビー・ストーム・ジャイアンツ",
         "武器が人を殺すのではない，私が人を殺すのだ",
@@ -220,6 +233,16 @@ char *buf;
         "プリン農家",
         "ベジタリアン",
         "やあ，私が『戦争』だ！",
+        "It is better to light a candle than to curse the darkness",
+        "It is easier to curse the darkness than to light a candle",
+        /* expanded "rock--paper--scissors" featured in TV show "Big Bang
+           Theory" although they didn't create it (and an actual T-shirt
+           with pentagonal diagram showing which choices defeat which) */
+        "rock--paper--scissors--lizard--Spock!",
+        /* "All men must die -- all men must serve" challange and response
+           from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
+           TV show "Game of Thrones" (probably an actual T-shirt too...) */
+        "/Valar morghulis/ -- /Valar dohaeris/",
 #endif
     };
 
@@ -274,7 +297,9 @@ doread()
         useup(scroll);
         return 1;
     } else if (scroll->otyp == T_SHIRT || scroll->otyp == ALCHEMY_SMOCK) {
-        char buf[BUFSZ];
+        char buf[BUFSZ], *mesg;
+        const char *endpunct;
+
         if (Blind) {
 /*JP
             You_cant("feel any Braille writing.");
@@ -295,24 +320,33 @@ doread()
             return 0;
         }
         u.uconduct.literate++;
-        if (flags.verbose)
+        /* populate 'buf[]' */
+        mesg = (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
+                                         : apron_text(scroll, buf);
+        endpunct = "";
+        if (flags.verbose) {
+            int ln = (int) strlen(mesg);
+
+            /* we will be displaying a sentence; need ending punctuation */
+            if (ln > 0 && !index(".!?", mesg[ln - 1]))
+                endpunct = ".";
 /*JP
             pline("It reads:");
 */
             pline("それを読んだ：");
+        }
 #if 0 /*JP*/
-        pline("\"%s\"", (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
-                                                  : apron_text(scroll, buf));
+        pline("\"%s\"%s", mesg, endpunct);
 #else
-        pline("「%s」", (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
-                                                  : apron_text(scroll, buf));
+        pline("「%s」", mesg);
 #endif
         return 1;
     } else if (scroll->otyp == CREDIT_CARD) {
         static const char *card_msgs[] = {
 #if 0 /*JP*/
             "Leprechaun Gold Tru$t - Shamrock Card",
-            "Magic Memory Vault Charge Card", "Larn National Bank", /* Larn */
+            "Magic Memory Vault Charge Card",
+            "Larn National Bank",                /* Larn */
             "First Bank of Omega",               /* Omega */
             "Bank of Zork - Frobozz Magic Card", /* Zork */
             "Ankh-Morpork Merchant's Guild Barter Card",
@@ -361,10 +395,14 @@ doread()
                       : card_msgs[scroll->o_id % (SIZE(card_msgs) - 1)]);
         }
         /* Make a credit card number */
-        pline("\"%d0%d %d%d1 0%d%d0\"", ((scroll->o_id % 89) + 10),
-              (scroll->o_id % 4), (((scroll->o_id * 499) % 899999) + 100000),
-              (scroll->o_id % 10), (!(scroll->o_id % 3)),
-              ((scroll->o_id * 7) % 10));
+        pline("\"%d0%d %ld%d1 0%d%d0\"%s",
+              (((int) scroll->o_id % 89) + 10),
+              ((int) scroll->o_id % 4),
+              ((((long) scroll->o_id * 499L) % 899999L) + 100000L),
+              ((int) scroll->o_id % 10),
+              (!((int) scroll->o_id % 3)),
+              (((int) scroll->o_id * 7) % 10),
+              (flags.verbose || Blind) ? "." : "");
         u.uconduct.literate++;
         return 1;
     } else if (scroll->otyp == CAN_OF_GREASE) {
@@ -387,7 +425,7 @@ doread()
 */
             pline("それを読んだ：");
 /*JP
-        pline("\"Magic Marker(TM) Red Ink Marker Pen. Water Soluble.\"");
+        pline("\"Magic Marker(TM) Red Ink Marker Pen.  Water Soluble.\"");
 */
         pline("「魔法のマーカ(TM) 赤インクマーカペン．水性．」");
         u.uconduct.literate++;
@@ -403,7 +441,7 @@ doread()
             You("read:");
 */
             pline("それを読んだ：");
-        pline("\"1 Zorkmid. 857 GUE. In Frobs We Trust.\"");
+        pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
         u.uconduct.literate++;
         return 1;
     } else if (scroll->oartifact == ART_ORB_OF_FATE) {
@@ -441,11 +479,13 @@ doread()
             pline("点字はどうも書いてないようだ．");
             return 0;
         }
-/*JP
-        pline("The wrapper reads: \"%s\"",
-*/
-        pline("包み紙の文字を読んだ：「%s」",
+#if 0 /*JP:T*/
+        pline("The wrapper reads: \"%s\".",
               wrapper_msgs[scroll->o_id % SIZE(wrapper_msgs)]);
+#else
+        pline("包み紙の文字を読んだ：「%s」.",
+              wrapper_msgs[scroll->o_id % SIZE(wrapper_msgs)]);
+#endif
         u.uconduct.literate++;
         return 1;
     } else if (scroll->oclass != SCROLL_CLASS
@@ -508,6 +548,8 @@ doread()
     }
     scroll->in_use = TRUE; /* scroll, not spellbook, now being read */
     if (scroll->otyp != SCR_BLANK_PAPER) {
+        boolean silently = !can_chant(&youmonst);
+
         /* a few scroll feedback messages describe something happening
            to the scroll itself, so avoid "it disappears" for those */
         nodisappear = (scroll->otyp == SCR_FIRE
@@ -518,12 +560,12 @@ doread()
             pline(nodisappear
                       ? "You %s the formula on the scroll."
                       : "As you %s the formula on it, the scroll disappears.",
-                  is_silent(youmonst.data) ? "cogitate" : "pronounce");
+                  silently ? "cogitate" : "pronounce");
 #else
             pline(nodisappear
                       ? "あなたは呪文を%sた．"
                       : "呪文を%sると，巻物は消えた．",
-                  is_silent(youmonst.data) ? "念じ" : "唱え");
+                  silently ? "念じ" : "唱え");
 #endif
         else
 #if 0 /*JP*/
@@ -542,8 +584,7 @@ doread()
             else
 #if 0 /*JP*/
                 pline("Being confused, you %s the magic words...",
-                      is_silent(youmonst.data) ? "misunderstand"
-                                               : "mispronounce");
+                      silently ? "misunderstand" : "mispronounce");
 #else
                 pline("混乱しているので，呪文を間違ってしまった．．．");
 #endif
@@ -1124,7 +1165,7 @@ struct obj *sobj;
     unsigned was_peaceful = mtmp->mpeaceful;
 
     if (sobj->cursed) {
-        setmangry(mtmp);
+        setmangry(mtmp, FALSE);
         if (was_peaceful && !mtmp->mpeaceful)
             return -1;
     } else {
@@ -1138,12 +1179,21 @@ struct obj *sobj;
     return 0;
 }
 
+STATIC_OVL boolean
+get_valid_stinking_cloud_pos(x,y)
+int x,y;
+{
+    return (!(!isok(x,y) || !cansee(x, y)
+              || !ACCESSIBLE(levl[x][y].typ)
+              || distu(x, y) >= 32));
+}
+
 boolean
 is_valid_stinking_cloud_pos(x, y, showmsg)
 int x, y;
 boolean showmsg;
 {
-    if (!cansee(x, y) || !ACCESSIBLE(levl[x][y].typ) || distu(x, y) >= 32) {
+    if (!get_valid_stinking_cloud_pos(x,y)) {
         if (showmsg)
 /*JP
             You("smell rotten eggs.");
@@ -1168,7 +1218,7 @@ int state;
             for (dy = -dist; dy <= dist; dy++) {
                 x = u.ux + dx;
                 y = u.uy + dy;
-                if (isok(x, y) && is_valid_stinking_cloud_pos(x, y, FALSE))
+                if (get_valid_stinking_cloud_pos(x,y))
                     tmp_at(x, y);
             }
     } else {
@@ -1197,15 +1247,19 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #ifdef MAIL
     case SCR_MAIL:
         known = TRUE;
-        if (sobj->spe)
+        if (sobj->spe == 2)
+            /* "stamped scroll" created via magic marker--without a stamp */
+            pline("This scroll is marked \"postage due\".");
+        else if (sobj->spe)
+            /* scroll of mail obtained from bones file or from wishing;
+             * note to the puzzled: the game Larn actually sends you junk
+             * mail if you win!
+             */
             pline(
 /*JP
     "This seems to be junk mail addressed to the finder of the Eye of Larn.");
 */
     "Eye of Larnの発見者に宛てられたゴミメイルのようだ．");
-        /* note to the puzzled: the game Larn actually sends you junk
-         * mail if you win!
-         */
         else
             readmail(sobj);
         break;
@@ -1308,9 +1362,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             useup(otmp);
             break;
         }
-        s = scursed ? -1 : otmp->spe >= 9
-                               ? (rn2(otmp->spe) == 0)
-                               : sblessed ? rnd(3 - otmp->spe / 3) : 1;
+        s = scursed ? -1
+                    : (otmp->spe >= 9)
+                       ? (rn2(otmp->spe) == 0)
+                       : sblessed
+                          ? rnd(3 - otmp->spe / 3)
+                          : 1;
         if (s >= 0 && Is_dragon_scales(otmp)) {
             /* dragon scales get turned into dragon scale mail */
 /*JP
@@ -1337,8 +1394,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
               s == 0 ? "violently " : "",
               otense(otmp, Blind ? "vibrate" : "glow"),
               (!Blind && !same_color) ? " " : "",
-              (Blind || same_color) ? ""
-                                    : hcolor(scursed ? NH_BLACK : NH_SILVER),
+              (Blind || same_color)
+                 ? "" : hcolor(scursed ? NH_BLACK : NH_SILVER),
               (s * s > 1) ? "while" : "moment");
 #else
         Your("%sは%s%s%s%s．", xname(otmp),
@@ -1356,6 +1413,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             curse(otmp);
         else if (sblessed && !otmp->blessed)
             bless(otmp);
+        else if (!scursed && otmp->cursed)
+            uncurse(otmp);
         if (s) {
             otmp->spe += s;
             adj_abon(otmp, s);
@@ -1569,6 +1628,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         } else {
             for (obj = invent; obj; obj = obj->nobj) {
                 long wornmask;
+
                 /* gold isn't subject to cursing and blessing */
                 if (obj->oclass == COIN_CLASS)
                     continue;
@@ -1601,8 +1661,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 if (sblessed || wornmask || obj->otyp == LOADSTONE
                     || (obj->otyp == LEASH && obj->leashmon)) {
                     /* water price varies by curse/bless status */
-                    boolean shop_h2o =
-                        (obj->unpaid && obj->otyp == POT_WATER);
+                    boolean shop_h2o = (obj->unpaid && obj->otyp == POT_WATER);
 
                     if (confused) {
                         blessorcurse(obj, 2);
@@ -1647,8 +1706,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
          */
         break;
     case SCR_ENCHANT_WEAPON:
+        /* [What about twoweapon mode?  Proofing/repairing/enchanting both
+           would be too powerful, but shouldn't we choose randomly between
+           primary and secondary instead of always acting on primary?] */
         if (confused && uwep
-            && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))) {
+            && erosion_matters(uwep) && uwep->oclass != ARMOR_CLASS) {
             old_erodeproof = (uwep->oerodeproof != 0);
             new_erodeproof = !scursed;
             uwep->oerodeproof = 0; /* for messages */
@@ -1689,13 +1751,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             uwep->oerodeproof = new_erodeproof ? 1 : 0;
             break;
         }
-        if (!chwepon(sobj,
-                     scursed
-                         ? -1
-                         : !uwep ? 1 : (uwep->spe >= 9)
-                                           ? !rn2(uwep->spe)
-                                           : sblessed ? rnd(3 - uwep->spe / 3)
-                                                      : 1))
+        if (!chwepon(sobj, scursed ? -1
+                             : !uwep ? 1
+                               : (uwep->spe >= 9) ? !rn2(uwep->spe)
+                                 : sblessed ? rnd(3 - uwep->spe / 3)
+                                   : 1))
             sobj = 0; /* nothing enchanted: strange_feeling -> useup */
         break;
     case SCR_TAMING:
@@ -1747,7 +1807,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             if (vis_results > 0)
                 known = TRUE;
         }
-    } break;
+        break;
+    }
     case SCR_GENOCIDE:
         if (!already_known)
 /*JP
@@ -1758,7 +1819,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (sblessed)
             do_class_genocide();
         else
-            do_genocide(!scursed | (2 * !!Confusion));
+            do_genocide((!scursed) | (2 * !!Confusion));
         break;
     case SCR_LIGHT:
         if (!confused || rn2(5)) {
@@ -1774,8 +1835,6 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             (void) create_critters(1, !scursed ? &mons[PM_YELLOW_LIGHT]
                                                : &mons[PM_BLACK_LIGHT],
                                    TRUE);
-            if (!objects[sobj->otyp].oc_uname)
-                docall(sobj);
         }
         break;
     case SCR_TELEPORTATION:
@@ -1903,6 +1962,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             /* do_mapping() already reveals secret passages */
         }
         known = TRUE;
+        /*FALLTHRU*/
     case SPE_MAGIC_MAPPING:
         if (level.flags.nommap) {
 #if 0 /*JP*/
@@ -1957,8 +2017,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             pline("Maudを考えること以外，あなたは全てを忘れてしまった．");
         exercise(A_WIS, FALSE);
         break;
-    case SCR_FIRE:
+    case SCR_FIRE: {
+        coord cc;
+        int dam;
+
+        cc.x = u.ux;
+        cc.y = u.uy;
         cval = bcsign(sobj);
+        dam = (2 * (rn1(3, 3) + 2 * cval) + 1) / 3;
         useup(sobj);
         sobj = 0; /* it's gone */
         if (!already_known)
@@ -1993,20 +2059,35 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         }
         if (Underwater) {
 /*JP
-            pline_The("water around you vaporizes violently!");
+            pline_The("%s around you vaporizes violently!", hliquid("water"));
 */
-            pline("あなたの回りの水は沸騰した！");
+            pline_The("あなたの回りの%sははげしく沸騰した！", hliquid("水"));
         } else {
+            if (sblessed) {
+                if (!already_known)
+                    pline("This is a scroll of fire!");
+                dam *= 5;
+                pline("Where do you want to center the explosion?");
+                getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+                (void) getpos(&cc, TRUE, "the desired position");
+                if (!is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
+                    /* try to reach too far, get burned */
+                    cc.x = u.ux;
+                    cc.y = u.uy;
+                }
+            }
+            if (cc.x == u.ux && cc.y == u.uy) {
 /*JP
             pline_The("scroll erupts in a tower of flame!");
 */
             pline("巻物から火柱が立ち昇った！");
-            iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
-            burn_away_slime();
+                iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
+                burn_away_slime();
+            }
         }
-        explode(u.ux, u.uy, 11, (2 * (rn1(3, 3) + 2 * cval) + 1) / 3,
-                SCROLL_CLASS, EXPL_FIERY);
+        explode(cc.x, cc.y, 11, dam, SCROLL_CLASS, EXPL_FIERY);
         break;
+    }
     case SCR_EARTH:
         /* TODO: handle steeds */
         if (!Is_rogue_level(&u.uz) && has_ceiling(&u.uz)
@@ -2083,7 +2164,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #endif
         cc.x = u.ux;
         cc.y = u.uy;
-        getpos_sethilite(display_stinking_cloud_positions);
+        getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
 /*JP
         if (getpos(&cc, TRUE, "the desired position") < 0) {
 */
@@ -2145,6 +2226,7 @@ boolean confused, helmet_protects, byu, skip_uswallow;
         }
     } else
         dmg = 0;
+    wake_nearto(u.ux, u.uy, 4 * 4);
     /* Must be before the losehp(), for bones files */
 /*JP
     if (!flooreffects(otmp2, u.ux, u.uy, "fall")) {
@@ -2198,7 +2280,7 @@ boolean confused, byu;
 #else
             You_hear("何かがあなたの%sの上の%sの%sに当たった音を聞いた！",
                      body_part(HEAD),
-                     s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH));
+                     mon_nam(mtmp), mbodypart(mtmp, STOMACH));
 #endif
 
         mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
@@ -2230,16 +2312,19 @@ boolean confused, byu;
         }
         mtmp->mhp -= mdmg;
         if (mtmp->mhp <= 0) {
-            if (byu)
-                xkilled(mtmp, 1);
-            else {
+            if (byu) {
+                killed(mtmp);
+            } else {
 /*JP
                 pline("%s is killed.", Monnam(mtmp));
 */
                 pline("%sは死んだ．", Monnam(mtmp));
                 mondied(mtmp);
             }
+        } else {
+            wakeup(mtmp, byu);
         }
+        wake_nearto(x, y, 4 * 4);
     } else if (u.uswallow && mtmp == u.ustuck) {
         obfree(otmp2, (struct obj *) 0);
         /* fall through to player */
@@ -2482,7 +2567,7 @@ STATIC_OVL void
 do_class_genocide()
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     boolean gameover = FALSE; /* true iff killed self */
 
     for (j = 0;; j++) {
@@ -2603,9 +2688,9 @@ do_class_genocide()
                         if (Upolyd) {
                             if (!feel_dead++)
 /*JP
-                                You_feel("dead inside.");
+                                You_feel("%s inside.", udeadinside());
 */
-                                You("魂が死んだような気がした．");
+                                You("魂が%sような気がした．", udeadinside());
                         } else {
                             if (!feel_dead++)
 /*JP
@@ -2678,7 +2763,7 @@ int how;
 /* 3 = forced genocide of player */
 /* 5 (4 | 1) = normal genocide from throne */
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ] = DUMMY;
     register int i, killplayer = 0;
     register int mndx;
     register struct permonst *ptr;
@@ -2692,6 +2777,10 @@ int how;
     } else {
         for (i = 0;; i++) {
             if (i >= 5) {
+                /* cursed effect => no free pass (unless rndmonst() fails) */
+                if (!(how & REALLY) && (ptr = rndmonst()) != 0)
+                    break;
+
                 pline1(thats_enough_tries);
                 return;
             }
@@ -2702,19 +2791,18 @@ int how;
                    buf);
             (void) mungspaces(buf);
             /* choosing "none" preserves genocideless conduct */
-/*JP
-            if (!strcmpi(buf, "none") || !strcmpi(buf, "nothing")) {
-*/
-            if (!strcmpi(buf, "なし") || !strcmpi(buf, "無し")) {
+#if 0 /*JP:T*/
+            if (*buf == '\033' || !strcmpi(buf, "none")
+                || !strcmpi(buf, "nothing")) {
+#else
+            if (*buf == '\033' || !strcmpi(buf, "なし")
+                || !strcmpi(buf, "無し")) {
+#endif
                 /* ... but no free pass if cursed */
-                if (!(how & REALLY)) {
-                    ptr = rndmonst();
-                    if (!ptr)
-                        return; /* no message, like normal case */
-                    mndx = monsndx(ptr);
+                if (!(how & REALLY) && (ptr = rndmonst()) != 0)
                     break; /* remaining checks don't apply */
-                } else
-                    return;
+
+                return;
             }
 
             mndx = name_to_mon(buf);
@@ -2743,14 +2831,15 @@ int how;
 
             if (!(ptr->geno & G_GENO)) {
                 if (!Deaf) {
-                    /* fixme: unconditional "caverns" will be silly in some
-                     * circumstances */
+                    /* FIXME: unconditional "caverns" will be silly in some
+                     * circumstances.  Who's speaking?  Divine pronouncements
+                     * aren't supposed to be hampered by deafness....
+                     */
                     if (flags.verbose)
-                        pline(
 /*JP
-                            "A thunderous voice booms through the caverns:");
+                        pline("A thunderous voice booms through the caverns:");
 */
-                            "雷のような声が洞窟に響いた：");
+                        pline("雷のような声が洞窟に響いた：");
 /*JP
                     verbalize("No, mortal!  That will not be done.");
 */
@@ -2763,6 +2852,7 @@ int how;
                 killplayer++;
             break;
         }
+        mndx = monsndx(ptr); /* needed for the 'no free pass' cases */
     }
 
 /*JP
@@ -2835,9 +2925,9 @@ int how;
             if (Upolyd && ptr != youmonst.data) {
                 delayed_killer(POLYMORPH, killer.format, killer.name);
 /*JP
-                You_feel("dead inside.");
+                You_feel("%s inside.", udeadinside());
 */
-                You("魂が死んだような気がした．");
+                You_feel("魂が%sような気がした．", udeadinside());
             } else
                 done(GENOCIDED);
         } else if (ptr == youmonst.data) {
@@ -2891,7 +2981,7 @@ struct obj *sobj;
         Your("iron ball gets heavier.");
 */
         Your("鉄球はさらに重くなった．");
-        uball->owt += 160 * (1 + sobj->cursed);
+        uball->owt += IRON_BALL_W_INCR * (1 + sobj->cursed);
         return;
     }
     if (amorphous(youmonst.data) || is_whirly(youmonst.data)
@@ -2984,19 +3074,23 @@ struct obj *from_obj;
 boolean
 create_particular()
 {
-    char buf[BUFSZ], *bufp, monclass;
+    char buf[BUFSZ] = DUMMY, *bufp, monclass;
+    char *tmpp;
     int which, tryct, i, firstchoice = NON_PM;
     struct permonst *whichpm = NULL;
     struct monst *mtmp;
-    boolean madeany = FALSE;
-    boolean maketame, makepeaceful, makehostile;
-    boolean randmonst = FALSE;
+    boolean madeany = FALSE, randmonst = FALSE,
+        maketame, makepeaceful, makehostile, saddled, invisible,
+        sleeping;
+    int fem;
 
     tryct = 5;
     do {
         monclass = MAXMCLASSES;
         which = urole.malenum; /* an arbitrary index into mons[] */
         maketame = makepeaceful = makehostile = FALSE;
+        sleeping = saddled = invisible = FALSE;
+        fem = -1; /* gender not specified */
 /*JP
         getlin("Create what kind of monster? [type the name or symbol]", buf);
 */
@@ -3004,6 +3098,28 @@ create_particular()
         bufp = mungspaces(buf);
         if (*bufp == '\033')
             return FALSE;
+        if ((tmpp = strstri(bufp, "saddled ")) != 0) {
+            saddled = TRUE;
+            (void) memset(tmpp, ' ', sizeof "saddled " - 1);
+        }
+        if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
+            sleeping = TRUE;
+            (void) memset(tmpp, ' ', sizeof "sleeping " - 1);
+        }
+        if ((tmpp = strstri(bufp, "invisible ")) != 0) {
+            invisible = TRUE;
+            (void) memset(tmpp, ' ', sizeof "invisible " - 1);
+        }
+        /* check "female" before "male" to avoid false hit mid-word */
+        if ((tmpp = strstri(bufp, "female ")) != 0) {
+            fem = 1;
+            (void) memset(tmpp, ' ', sizeof "female " - 1);
+        }
+        if ((tmpp = strstri(bufp, "male ")) != 0) {
+            fem = 0;
+            (void) memset(tmpp, ' ', sizeof "male " - 1);
+        }
+        bufp = mungspaces(bufp); /* after potential memset(' ') */
         /* allow the initial disposition to be specified */
 #if 0 /*JP*/
         if (!strncmpi(bufp, "tame ", 5)) {
@@ -3088,6 +3204,9 @@ create_particular()
                 /* otherwise try again */
                 continue;
             }
+            /* 'is_FOO()' ought to be called 'always_FOO()' */
+            if (fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
+                mtmp->female = fem; /* ignored for is_neuter() */
             if (maketame) {
                 (void) tamedog(mtmp, (struct obj *) 0);
             } else if (makepeaceful || makehostile) {
@@ -3095,6 +3214,15 @@ create_particular()
                 mtmp->mpeaceful = makepeaceful ? 1 : 0;
                 set_malign(mtmp);
             }
+            if (saddled && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
+                struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
+
+                put_saddle_on_mon(otmp, mtmp);
+            }
+            if (invisible)
+                mon_set_minvis(mtmp);
+            if (sleeping)
+                mtmp->msleeping = 1;
             madeany = TRUE;
             /* in case we got a doppelganger instead of what was asked
                for, make it start out looking like what was asked for */

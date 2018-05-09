@@ -132,11 +132,7 @@ Region region; /* unused */
     nhUse(region);
 
     /* This isn't correct - we need to call the callback with region. */
-#if 0 /*JP*/
-    XtCallCallbacks(w, XtNexposeCallback, (caddr_t) event);
-#else
-    XtCallCallbacks(w, XtNexposeCallback, (XtPointer) event);
-#endif
+    XtCallCallbacks(w, XtNexposeCallback, (XtPointer)event);
 }
 
 /* ARGSUSED */
@@ -144,11 +140,7 @@ static void
 Resize(w)
 Widget w;
 {
-#if 0 /*JP*/
-    XtCallCallbacks(w, XtNresizeCallback, (caddr_t) 0);
-#else
     XtCallCallbacks(w, XtNresizeCallback, (XtPointer) 0);
-#endif
 }
 
 WindowClassRec windowClassRec = {

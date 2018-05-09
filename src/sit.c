@@ -1,5 +1,6 @@
-/* NetHack 3.6	sit.c	$NHDT-Date: 1445906863 2015/10/27 00:47:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	sit.c	$NHDT-Date: 1458341129 2016/03/18 22:45:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -160,9 +161,9 @@ dosit()
             } else if (u.utraptype == TT_LAVA) {
                 /* Must have fire resistance or they'd be dead already */
 /*JP
-                You("sit in the lava!");
+                You("sit in the %s!", hliquid("lava"));
 */
-                You("溶岩の中に座った！");
+                You("%sの中に座った！", hliquid("溶岩"));
                 if (Slimed)
                     burn_away_slime();
                 u.utrap += rnd(4);
@@ -184,7 +185,7 @@ dosit()
             You("sit down.");
 */
             You("座った．");
-            dotrap(trap, 0);
+            dotrap(trap, VIASITTING);
         }
     } else if (Underwater || Is_waterlevel(&u.uz)) {
         if (Is_waterlevel(&u.uz))
@@ -200,9 +201,9 @@ dosit()
     } else if (is_pool(u.ux, u.uy)) {
     in_water:
 /*JP
-        You("sit in the water.");
+        You("sit in the %s.", hliquid("water"));
 */
-        You("水の中で座った．");
+        You("%sの中で座った．", hliquid("水"));
         if (!rn2(10) && uarm)
 /*JP
             (void) water_damage(uarm, "armor", TRUE);
@@ -237,21 +238,21 @@ dosit()
     } else if (is_lava(u.ux, u.uy)) {
         /* must be WWalking */
 /*JP
-        You(sit_message, "lava");
+        You(sit_message, hliquid("lava"));
 */
-        You(sit_message, "溶岩");
+        You(sit_message, hliquid("溶岩"));
         burn_away_slime();
         if (likes_lava(youmonst.data)) {
 /*JP
-            pline_The("lava feels warm.");
+            pline_The("%s feels warm.", hliquid("lava"));
 */
-            pline("溶岩は暖かい．");
+            pline_The("%sは暖かい．", hliquid("溶岩"));
             return 1;
         }
 /*JP
-        pline_The("lava burns you!");
+        pline_The("%s burns you!", hliquid("lava"));
 */
-        You("溶岩で燃えた！");
+        pline_The("%sで燃えた！", hliquid("溶岩"));
         losehp(d((Fire_resistance ? 2 : 10), 10), /* lava damage */
 /*JP
                "sitting on lava", KILLED_BY);
@@ -311,6 +312,7 @@ dosit()
                 if (u.uhp >= (u.uhpmax - 5))
                     u.uhpmax += 4;
                 u.uhp = u.uhpmax;
+                u.ucreamed = 0;
                 make_blinded(0L, TRUE);
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
                 heal_legs();
@@ -377,6 +379,7 @@ dosit()
                  "聖なる玉座に座りし汝に呪いあれ！");
                 if (Luck > 0) {
                     make_blinded(Blinded + rn1(100, 250), TRUE);
+                    change_luck((Luck > 1) ? -rnd(2) : -1);
                 } else
                     rndcurse();
                 break;
@@ -612,6 +615,7 @@ attrcurse()
             You("暖かさを感じた．");
             break;
         }
+        /*FALLTHRU*/
     case 2:
         if (HTeleportation & INTRINSIC) {
             HTeleportation &= ~INTRINSIC;
@@ -621,6 +625,7 @@ attrcurse()
             You("ちょっと落ちついた．");
             break;
         }
+        /*FALLTHRU*/
     case 3:
         if (HPoison_resistance & INTRINSIC) {
             HPoison_resistance &= ~INTRINSIC;
@@ -630,6 +635,7 @@ attrcurse()
             You("少し気分が悪くなった！");
             break;
         }
+        /*FALLTHRU*/
     case 4:
         if (HTelepat & INTRINSIC) {
             HTelepat &= ~INTRINSIC;
@@ -641,6 +647,7 @@ attrcurse()
             Your("五感は麻痺した！");
             break;
         }
+        /*FALLTHRU*/
     case 5:
         if (HCold_resistance & INTRINSIC) {
             HCold_resistance &= ~INTRINSIC;
@@ -650,6 +657,7 @@ attrcurse()
             You("涼しさを感じた．");
             break;
         }
+        /*FALLTHRU*/
     case 6:
         if (HInvis & INTRINSIC) {
             HInvis &= ~INTRINSIC;
@@ -659,6 +667,7 @@ attrcurse()
             You("妄想を抱いた．");
             break;
         }
+        /*FALLTHRU*/
     case 7:
         if (HSee_invisible & INTRINSIC) {
             HSee_invisible &= ~INTRINSIC;
@@ -673,6 +682,7 @@ attrcurse()
 #endif
             break;
         }
+        /*FALLTHRU*/
     case 8:
         if (HFast & INTRINSIC) {
             HFast &= ~INTRINSIC;
@@ -682,6 +692,7 @@ attrcurse()
             You("遅くなったような気がした．");
             break;
         }
+        /*FALLTHRU*/
     case 9:
         if (HStealth & INTRINSIC) {
             HStealth &= ~INTRINSIC;
@@ -691,6 +702,7 @@ attrcurse()
             You("不器用になったような気がした．");
             break;
         }
+        /*FALLTHRU*/
     case 10:
         /* intrinsic protection is just disabled, not set back to 0 */
         if (HProtection & INTRINSIC) {
@@ -701,6 +713,7 @@ attrcurse()
             You("無防備になった気がした．");
             break;
         }
+        /*FALLTHRU*/
     case 11:
         if (HAggravate_monster & INTRINSIC) {
             HAggravate_monster &= ~INTRINSIC;
@@ -710,6 +723,7 @@ attrcurse()
             You("魅力が失せたような気がした．");
             break;
         }
+        /*FALLTHRU*/
     default:
         break;
     }
