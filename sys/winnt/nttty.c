@@ -1555,11 +1555,13 @@ static int CALLBACK EnumFontCallback(
 void
 check_and_set_font()
 {
+#if 0 /*JP*//* コードページは変更しない。932を仮定する。*/
     if (!check_font_widths()) {
         raw_print("WARNING: glyphs too wide in console font."
                   "  Changing code page to 437 and font to Consolas\n");
         set_known_good_console_font();
     }
+#endif
 }
 
 /* check_font_widths returns TRUE if all glyphs in current console font
