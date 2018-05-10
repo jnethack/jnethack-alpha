@@ -1,9 +1,9 @@
-# JNetHack 3.6.0 レポジトリ
+# JNetHack 3.6.1 レポジトリ
 
-JNetHack 3.6.0 のソースレポジトリです。
+JNetHack 3.6.1 の作業中ソースレポジトリです。
 
 ## 現状
 
-WindowsとUbuntuでビルド確認しています。
+Windows(VS2015 Community)とUbuntuで時々ビルド確認しています。
 
-手元の環境はVS2010 Pro, VS2013 Community, VS2015 CommunityがインストールされているのでNetHackの推奨環境と少し違いますので、ひょっとすると他の環境ではビルド出来ないかも知れません。
+JNH 3.6.0のパッチを3.6.1にあてただけなので3.6.1独自の部分は基本未訳です。
