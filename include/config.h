@@ -499,7 +499,7 @@ typedef unsigned char uchar;
  * Only available with POSIX_TYPES or GNU C */
 /* #define MSGHANDLER */
 
-#define STATUS_HILITES         /* support hilites of status fields */
+/* #define STATUS_HILITES         /* support hilites of status fields */
 
 /* #define WINCHAIN */              /* stacked window systems */
 
