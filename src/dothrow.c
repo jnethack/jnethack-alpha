@@ -656,7 +656,10 @@ int x, y;
             const char *s;
 
             if (odoor_diag)
+/*JP
                 You("hit the door edge!");
+*/
+                You("扉の端に当たった！");
 /*JP
             pline("Ouch!");
 */
@@ -770,15 +773,31 @@ int x, y;
         mon->mundetected = 0; /* wakeup() will handle mimic */
         mnam = a_monnam(mon); /* after unhiding */
         pronoun = mhim(mon);
+#if 0 /*JP*/
         if (!strcmp(mnam, "it")) {
+#else
+        if (!strcmp(mnam, "何者か")) {
+#endif
             /* mhim() uses pronoun_gender() which forces neuter if monster
                can't be seen; we want him/her for humanoid sensed by touch */
+#if 0 /*JP*/
             if (!strcmp(pronoun, "it") && humanoid(mon->data))
+#else
+            if (!strcmp(pronoun, "何者か") && humanoid(mon->data))
+#endif
                 pronoun = genders[mon->female].him;
+#if 0 /*JP*/
             mnam = !strcmp(pronoun, "it") ? "something" : "someone";
+#else
+            mnam = !strcmp(pronoun, "何者か") ? "何か" : "何者か";
+#endif
         }
         if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph))
+#if 0 /*JP*/
             You("find %s by bumping into %s.", mnam, pronoun);
+#else
+            You("ぶちあたったことで%sを見つけた．", mnam);
+#endif
         else
 /*JP
             You("bump into %s.", mnam);
@@ -844,7 +863,10 @@ int x, y;
             dotrap(ttmp, 0);
             return FALSE;
         } else if (ttmp->ttyp == VIBRATING_SQUARE) {
+/*JP
             pline("The ground vibrates as you pass it.");
+*/
+            pline("あなたが通過すると地面が震動した．");
             dotrap(ttmp, 0); /* doesn't print messages */
         } else if (ttmp->ttyp == FIRE_TRAP) {
             dotrap(ttmp, 0);
@@ -1550,7 +1572,10 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
                    that slot is empty at the time; since hero will need to
                    explicitly rewield the weapon to get throw-and-return
                    capability back anyway, quivered or not shouldn't matter */
+/*JP
                 pline("%s to return!", Tobjnam(obj, "fail"));
+*/
+                pline("%sは戻るのに失敗した！", xname(obj));
                 /* continue below with placing 'obj' at target location */
             }
         }

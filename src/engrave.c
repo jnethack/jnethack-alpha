@@ -721,7 +721,7 @@ doengrave()
 /*JP
             You("would only make a small smudge on the %s.",
 */
-            You("‚Í%s‚É¬‚³‚È‚µ‚İ‚ğ‚Â‚¯‚é‚±‚Æ‚µ‚©‚Å‚«‚È‚©‚Á‚½D",
+            You("%s‚ğ­‚µ‚æ‚²‚·‚±‚Æ‚µ‚©‚Å‚«‚È‚©‚Á‚½D",
                 surface(u.ux, u.uy));
             return 0;
         } else if (!levl[u.ux][u.uy].disturbed) {

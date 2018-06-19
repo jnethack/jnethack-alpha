@@ -89,7 +89,10 @@ const char *name; /* if null, then format `*objp' */
         } else if (u.uac + tlev <= dieroll - 2) {
             if (onm != onmbuf)
                 Strcpy(onmbuf, onm); /* [modifiable buffer for upstart()] */
+/*JP
             pline("%s %s you.", upstart(onmbuf), vtense(onmbuf, "miss"));
+*/
+            pline("%sは攻撃をはずした．", upstart(onmbuf));
         } else
 /*JP
             You("are almost hit by %s.", onm);
@@ -315,8 +318,10 @@ struct obj *otmp, *mwep;
         }
         m_shot.s = ammo_and_launcher(otmp, mwep) ? TRUE : FALSE;
         Strcpy(trgbuf, mtarg ? mon_nam(mtarg) : "");
+#if 0 /*JP*//*日本語ではmon_namは「何者か」を返すので変更不要*/
         if (!strcmp(trgbuf, "it"))
             Strcpy(trgbuf, humanoid(mtmp->data) ? "someone" : something);
+#endif
 #if 0 /*JP*/
         pline("%s %s %s%s%s!", Monnam(mtmp),
               m_shot.s ? "shoots" : "throws", onm,
@@ -412,8 +417,13 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         mtmp->msleeping = 0;
         if (vis) {
             if (otmp->otyp == EGG)
+#if 0 /*JP*/
                 pline("Splat! %s is hit with %s egg!", Monnam(mtmp),
                       otmp->known ? an(mons[otmp->corpsenm].mname) : "an");
+#else
+                pline("ビチャッ！%sは%s卵に当たった！", Monnam(mtmp),
+                      otmp->known ? s_suffix(mons[otmp->corpsenm].mname) : "");
+#endif
             else
                 hit(distant_name(otmp, mshot_xname), mtmp, exclam(damage));
         } else if (verbose && !target)
@@ -790,7 +800,10 @@ struct obj *obj;         /* missile (or stack providing it) */
                     && (!mesg_given || bhitpos.x != u.ux || bhitpos.y != u.uy)
                     && (cansee(bhitpos.x, bhitpos.y)
                         || (archer && canseemon(archer))))
+/*JP
                     pline("%s misses.", The(mshot_xname(singleobj)));
+*/
+                    pline("%sははずれた．", mshot_xname(singleobj));
                 (void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
             }
             break;
@@ -949,7 +962,10 @@ struct attack  *mattk;
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
                 if (canseemon(mtmp))
+/*JP
                     pline("%s breathes %s!", Monnam(mtmp), breathwep[typ - 1]);
+*/
+                    pline("%sは%sをはいた！", Monnam(mtmp), breathwep[typ - 1]);
                 dobuzz((int) (-20 - (typ - 1)), (int)mattk->damn,
                        mtmp->mx, mtmp->my, sgn(tbx), sgn(tby), FALSE);
                 nomul(0);
@@ -1090,8 +1106,13 @@ struct attack *mattk;
 
     if (mtmp->mcan) {
         if (!Deaf)
+#if 0 /*JP*/
             pline("A dry rattle comes from %s throat.",
                   s_suffix(mon_nam(mtmp)));
+#else
+            pline("乾いたガラガラ音が%sののどから聞こえてきた．",
+                  mon_nam(mtmp));
+#endif
         return 0;
     }
     if (lined_up(mtmp)) {
@@ -1110,7 +1131,10 @@ struct attack *mattk;
         if (!rn2(BOLT_LIM
                  - distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy))) {
             if (canseemon(mtmp))
+/*JP
                 pline("%s spits venom!", Monnam(mtmp));
+*/
+                pline("%sは毒液を吐いた！", Monnam(mtmp));
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(tbx), sgn(tby),
                     distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
             nomul(0);
@@ -1136,9 +1160,15 @@ struct attack *mattk;
         if (mtmp->mcan) {
             if (!Deaf) {
                 if (canseemon(mtmp))
+/*JP
                     pline("%s coughs.", Monnam(mtmp));
+*/
+                    pline("%sはせきをした．", Monnam(mtmp));
                 else
+/*JP
                     You_hear("a cough.");
+*/
+                    You_hear("せきの音を聞いた．");
             }
             return 0;
         }
@@ -1269,9 +1299,15 @@ boolean your_fault, from_invent;
         /* breakage makes its own noises */
         if (obj_type == POT_ACID) {
             if (cansee(barsx, barsy) && !unbreakable)
+/*JP
                 pline_The("iron bars are dissolved!");
+*/
+                pline_The("鉄の棒は融けた！");
             else
+/*JP
                 You_hear(Hallucination ? "angry snakes!" : "a hissing noise.");
+*/
+                You_hear(Hallucination ? "怒ったへびの声を聞いた！" : "シーッという音を聞いた．");
             if (!unbreakable)
                 dissolve_bars(barsx, barsy);
         }

@@ -404,7 +404,10 @@ invault()
                been given in order to vary it upon repeat visits, but
                discarding the monster and its egd data renders that hard] */
             if (Deaf)
+/*JP
                 pline("%s huffs and turns to leave.", noit_Monnam(guard));
+*/
+                pline("%sは不機嫌になって，去っていった．", noit_Monnam(guard));
             else
 /*JP
             verbalize("I'll be back when you're ready to speak to me!");
@@ -452,7 +455,10 @@ invault()
             if (!mvitals[PM_CROESUS].died) {
                 if (Deaf) {
                     if (!Blind)
+/*JP
                         pline("%s waves goodbye.", noit_Monnam(guard));
+*/
+                        pline("%sはさよならと手を振った．", noit_Monnam(guard));
                 } else {
                     verbalize(
 /*JP
@@ -465,8 +471,13 @@ invault()
                 setmangry(guard, FALSE);
                 if (Deaf) {
                    if (!Blind)
+#if 0 /*JP:T*/
                         pline("%s mouths something and looks very angry!",
                               noit_Monnam(guard));
+#else
+                        pline("%sは何かを言っている．とても怒っているようだ！",
+                              noit_Monnam(guard));
+#endif
                 } else {
 #if 0 /*JP:T*/
                    verbalize(
@@ -485,8 +496,12 @@ invault()
             return;
         }
         if (Deaf)
+#if 0 /*JP:T*/
             pline("%s doesn't %srecognize you.", noit_Monnam(guard),
                     (Blind) ? "" : "appear to ");
+#else
+            pline("%sはあなたのことが分からないようだ．", noit_Monnam(guard));
+#endif
         else
 /*JP
         verbalize("I don't know you.");
@@ -495,8 +510,13 @@ invault()
         umoney = money_cnt(invent);
         if (!umoney && !hidden_gold()) {
             if (Deaf)
+#if 0 /*JP:T*/
                 pline("%s stomps%s.", noit_Monnam(guard),
                       (Blind) ? "" : " and beckons");
+#else
+                pline("%sは足を踏み鳴らし%sた．", noit_Monnam(guard),
+                      (Blind) ? "" : "て手招きし");
+#endif
             else
 /*JP
             verbalize("Please follow me.");
@@ -506,8 +526,13 @@ invault()
             if (!umoney) {
                 if (Deaf) {
                     if (!Blind)
+#if 0 /*JP:T*/
                         pline("%s glares at you%s.", noit_Monnam(guard),
                               invent ? "r stuff" : "");
+#else
+                        pline("%sはあなた%sをにらみつけた．", noit_Monnam(guard),
+                              invent ? "の持ち物" : "");
+#endif
                 } else {
 /*JP
                 verbalize("You have hidden gold.");
@@ -517,9 +542,15 @@ invault()
             }
             if (Deaf) {
                 if (!Blind)
+#if 0 /*JP:T*/
                     pline(
                        "%s holds out %s palm and beckons with %s other hand.",
                           noit_Monnam(guard), mhis(guard), mhis(guard));
+#else
+                    pline(
+                       "%sは片手を差し出し，もう片手で手招きした．",
+                          noit_Monnam(guard));
+#endif
             } else {
                 verbalize(
 /*JP
@@ -820,8 +851,13 @@ register struct monst *grd;
                 egrd->warncnt = 6;
                 if (Deaf) {
                     if (!Blind)
+#if 0 /*JP*/
                         pline("%s holds out %s palm demandingly!",
                               noit_Monnam(grd), mhis(grd));
+#else
+                        pline("%sは厳しい調子で手のひらを差し出した！",
+                              noit_Monnam(grd));
+#endif
                 } else {
 /*JP
                     verbalize("Drop all your gold, scoundrel!");
@@ -832,8 +868,13 @@ register struct monst *grd;
             } else {
                 if (Deaf) {
                     if (!Blind)
+#if 0 /*JP:T*/
                         pline("%s rubs %s hands with enraged delight!",
                               noit_Monnam(grd), mhis(grd));
+#else
+                        pline("%sは怒りながら手をすりあわせた！",
+                              noit_Monnam(grd));
+#endif
                 } else {
 /*JP
                     verbalize("So be it, rogue!");

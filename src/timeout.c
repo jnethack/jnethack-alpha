@@ -23,6 +23,7 @@ STATIC_DCL void FDECL(cleanup_burn, (ANY_P *, long));
 
 /* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
    for timeout countdown, where most won't occur in normal play */
+/*JP ウィザードモードでしか使われないようなので翻訳しない */
 const struct propname {
     int prop_num;
     const char *prop_name;
@@ -225,7 +226,10 @@ vomiting_dialogue()
         else if (Hallucination)
             /* "hurl" is short for "hurl chunks" which is slang for
                relatively violent vomiting... */
+/*JP
             txt = "are about to hurl!";
+*/
+            txt = "リバース寸前だ！";
         break;
     case 0:
         stop_occupation();
@@ -240,7 +244,10 @@ vomiting_dialogue()
                [vomit() issues its own message for the cantvomit() case
                and for the FAINTING-or-worse case where stomach is empty] */
             if (u.uhs < FAINTING)
+/*JP
                 You("%s!", !Hallucination ? "vomit" : "hurl chunks");
+*/
+                You("%s！", !Hallucination ? "吐いた" : "リバースした");
         }
         vomit();
         break;
@@ -308,8 +315,13 @@ choke_dialogue()
 }
 
 static NEARDATA const char *const levi_texts[] = {
+#if 0 /*JP*//* %sは使わない */
     "You float slightly lower.",
     "You wobble unsteadily %s the %s."
+#else
+    "あなたの浮き具合は少し低くなった．",
+    "あなたはぐらぐら揺れはじめた．"
+#endif
 };
 
 STATIC_OVL void
@@ -328,6 +340,7 @@ levitation_dialogue()
     if (((HLevitation & TIMEOUT) % 2L) && i > 0L && i <= SIZE(levi_texts)) {
         const char *s = levi_texts[SIZE(levi_texts) - i];
 
+#if 0 /*JP*//* %s は使っていないので単純化 */
         if (index(s, '%')) {
             boolean danger = (is_pool_or_lava(u.ux, u.uy)
                               && !Is_waterlevel(&u.uz));
@@ -335,6 +348,7 @@ levitation_dialogue()
             pline(s, danger ? "over" : "in",
                   danger ? surface(u.ux, u.uy) : "air");
         } else
+#endif
             pline1(s);
     }
 }
@@ -419,8 +433,13 @@ burn_away_slime()
    move between things which are closely packed--like the substance of
    solid rock! */
 static NEARDATA const char *const phaze_texts[] = {
+#if 0 /*JP*/
     "You start to feel bloated.",
     "You are feeling rather flabby.",
+#else
+    "あなたは膨らみはじめた気がする．",
+    "あなたは少したるんだ気がする．",
+#endif
 };
 
 STATIC_OVL void
@@ -674,10 +693,18 @@ nh_timeout()
             case PASSES_WALLS:
                 if (!Passes_walls) {
                     if (stuck_in_wall())
+/*JP
                         You_feel("hemmed in again.");
+*/
+                        You_feel("また閉じ込められたようだ．");
                     else
+#if 0 /*JP*/
                         pline("You're back to your %s self again.",
                               !Upolyd ? "normal" : "unusual");
+#else
+                        pline("あなたは再び通常%sの状態になった．",
+                              !Upolyd ? "" : "ではない");
+#endif
                 }
                 break;
             case STRANGLED:

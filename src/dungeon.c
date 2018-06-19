@@ -1665,6 +1665,7 @@ const char *nam;
     } else {
         /* no matching annotation, check whether they used a name we know */
 
+#if 0 /*JP*//*日本語では処理しない*/
         /* allow strings like "the oracle level" to find "oracle" */
         if (!strncmpi(nam, "the ", 4))
             nam += 4;
@@ -1680,6 +1681,7 @@ const char *nam;
             else
                 nam = "valley";
         }
+#endif
 
         if ((slev = find_level(nam)) != 0)
             dlev = slev->dlevel;
@@ -1797,18 +1799,30 @@ int type;
 {
     switch (type) {
     case BR_PORTAL:
+/*JP
         return "Portal";
+*/
+        return "魔法の入り口";
     case BR_NO_END1:
 /*JP
         return "Connection";
 */
         return "接続部";
     case BR_NO_END2:
+/*JP
         return "One way stair";
+*/
+        return "一方通行の階段";
     case BR_STAIR:
+/*JP
         return "Stair";
+*/
+        return "階段";
     }
+/*JP
     return " (unknown)";
+*/
+    return " (不明)";
 }
 
 STATIC_OVL char
@@ -1835,10 +1849,17 @@ struct lchoice *lchoices_p;
     for (br = branches; br; br = br->next) {
         if (br->end1.dnum == dnum && lower_bound < br->end1.dlevel
             && br->end1.dlevel <= upper_bound) {
+#if 0 /*JP*/
             Sprintf(buf, "%c %s to %s: %d",
                     bymenu ? chr_u_on_lvl(&br->end1) : ' ',
                     br_string(br->type),
                     dungeons[br->end2.dnum].dname, depth(&br->end1));
+#else
+            Sprintf(buf, "%c %sから%s: %d",
+                    bymenu ? chr_u_on_lvl(&br->end1) : ' ',
+                    br_string(br->type),
+                    dungeons[br->end2.dnum].dname, depth(&br->end1));
+#endif
             if (bymenu)
                 tport_menu(win, buf, lchoices_p, &br->end1,
                            unreachable_level(&br->end1, FALSE));
@@ -1876,21 +1897,37 @@ xchar *rdgn;
         if (bymenu && In_endgame(&u.uz) && i != astral_level.dnum)
             continue;
         unplaced = unplaced_floater(dptr);
+/*JP
         descr = unplaced ? "depth" : "level";
+*/
+        descr = unplaced ? "地下" : "レベル";
         nlev = dptr->num_dunlevs;
         if (nlev > 1)
+#if 0 /*JP*/
             Sprintf(buf, "%s: %s %d to %d", dptr->dname, makeplural(descr),
                     dptr->depth_start, dptr->depth_start + nlev - 1);
+#else
+            Sprintf(buf, "%s: %s%dから%d", dptr->dname, descr,
+                    dptr->depth_start, dptr->depth_start + nlev - 1);
+#endif
         else
             Sprintf(buf, "%s: %s %d", dptr->dname, descr, dptr->depth_start);
 
         /* Most entrances are uninteresting. */
         if (dptr->entry_lev != 1) {
             if (dptr->entry_lev == nlev)
+/*JP
                 Strcat(buf, ", entrance from below");
+*/
+                Strcat(buf, ", 下からの入り口");
             else
+#if 0 /*JP*/
                 Sprintf(eos(buf), ", entrance on %d",
                         dptr->depth_start + dptr->entry_lev - 1);
+#else
+                Sprintf(eos(buf), ", %dの入り口",
+                        dptr->depth_start + dptr->entry_lev - 1);
+#endif
         }
         if (bymenu) {
             any = zeroany;
@@ -1933,7 +1970,10 @@ xchar *rdgn;
         menu_item *selected;
         int idx;
 
+/*JP
         end_menu(win, "Level teleport to where:");
+*/
+        end_menu(win, "どこに瞬間移動する：");
         n = select_menu(win, PICK_ONE, &selected);
         destroy_nhwindow(win);
         if (n > 0) {
@@ -1953,11 +1993,19 @@ xchar *rdgn;
         if (br->end1.dnum == n_dgns) {
             if (first) {
                 putstr(win, 0, "");
+/*JP
                 putstr(win, 0, "Floating branches");
+*/
+                putstr(win, 0, "浮動分岐");
                 first = FALSE;
             }
+#if 0 /*JP*/
             Sprintf(buf, "   %s to %s", br_string(br->type),
                     dungeons[br->end2.dnum].dname);
+#else
+            Sprintf(buf, "   %sから%s", br_string(br->type),
+                    dungeons[br->end2.dnum].dname);
+#endif
             putstr(win, 0, buf);
         }
     }
@@ -1965,8 +2013,13 @@ xchar *rdgn;
     /* I hate searching for the invocation pos while debugging. -dean */
     if (Invocation_lev(&u.uz)) {
         putstr(win, 0, "");
+#if 0 /*JP*/
         Sprintf(buf, "Invocation position @ (%d,%d), hero @ (%d,%d)",
                 inv_pos.x, inv_pos.y, u.ux, u.uy);
+#else
+        Sprintf(buf, "発動位置 @ (%d,%d), プレイヤー @ (%d,%d)",
+                inv_pos.x, inv_pos.y, u.ux, u.uy);
+#endif
         putstr(win, 0, buf);
     } else {
         struct trap *trap;

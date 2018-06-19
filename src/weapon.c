@@ -47,14 +47,25 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 
 /* note: entry [0] isn't used */
 STATIC_VAR NEARDATA const char *const odd_skill_names[] = {
+#if 0 /*JP*/
     "no skill", "bare hands", /* use barehands_or_martial[] instead */
     "two weapon combat", "riding", "polearms", "saber", "hammer", "whip",
     "attack spells", "healing spells", "divination spells",
     "enchantment spells", "clerical spells", "escape spells", "matter spells",
+#else
+    "no skill", "‘fè", /* use barehands_or_martial[] instead */
+    "“ñ“—¬", "‹Ræ", "’·•€", "ƒT[ƒxƒ‹", "ƒnƒ“ƒ}[", "•Ú",
+    "UŒ‚", "¡–ü", "—\’m",
+    "•â•", "‘m—µ", "’Eo", "•¨¿",
+#endif
 };
 /* indexed vis `is_martial() */
 STATIC_VAR NEARDATA const char *const barehands_or_martial[] = {
+#if 0 /*JP*/
     "bare handed combat", "martial arts"
+#else
+    "‘fè", "‘Ìp"
+#endif
 };
 
 STATIC_OVL void

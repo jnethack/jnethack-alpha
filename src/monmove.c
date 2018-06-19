@@ -73,12 +73,19 @@ const char *shout;
             /* Sidenote on "A watchman angrily waves her arms!"
              * Female being called watchman is correct (career name).
              */
+#if 0 /*JP*/
             pline("%s angrily %s %s %s!",
                 Amonnam(mon),
                 nolimbs(mon->data) ? "shakes" : "waves",
                 mhis(mon),
                 nolimbs(mon->data) ? mbodypart(mon, HEAD)
                                    : makeplural(mbodypart(mon, ARM)));
+#else
+            pline("%s‚Í“{‚Á‚Ä%s‚ğU‚Á‚½I",
+                Amonnam(mon),
+                nolimbs(mon->data) ? mbodypart(mon, HEAD)
+                                   : makeplural(mbodypart(mon, ARM)));
+#endif
     } else {
         if (canspotmon(mon))
 /*JP
@@ -1776,9 +1783,15 @@ boolean domsg;
     }
 
     if (reslt && domsg) {
+#if 0 /*JP*/
         pline("You %s %s where %s was.",
               !canseemon(mon) ? "now detect" : "observe",
               noname_monnam(mon, ARTICLE_A), oldmtype);
+#else
+        pline("‚ ‚È‚½‚Í%s‚ª‚¢‚½êŠ‚É%s‚ğ%sD",
+              oldmtype, noname_monnam(mon, ARTICLE_A),
+              !canseemon(mon) ? "Š´’m‚µ‚½" : "Œ©‚Â‚¯‚½");
+#endif
     }
 
     return reslt;

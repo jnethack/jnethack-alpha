@@ -1072,8 +1072,13 @@ boolean was_dead;
 
     if (!mtmp->mtame) {
         if (!quietly && canspotmon(mtmp))
+#if 0 /*JP*/
             pline("%s %s.", Monnam(mtmp),
                   mtmp->mpeaceful ? "is no longer tame" : "has become feral");
+#else
+            pline("%sは%s．", Monnam(mtmp),
+                  mtmp->mpeaceful ? "ペットでなくなった" : "野生化した");
+#endif
         newsym(mtmp->mx, mtmp->my);
         /* a life-saved monster might be leashed;
            don't leave it that way if it's no longer tame */

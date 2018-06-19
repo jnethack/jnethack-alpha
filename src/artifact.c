@@ -2425,17 +2425,27 @@ int x, y;
 void
 mkot_trap_warn()
 {
+#if 0 /*JP*/
     static const char *const heat[7] = {
         "cool", "slightly warm", "warm", "very warm",
         "hot", "very hot", "like fire"
     };
+#else
+    static const char *const heat[7] = {
+        "—â‚½‚­", "­‚µ‰·‚©‚­", "‰·‚©‚­", "‚Æ‚Ä‚à‰·‚©‚­",
+        "”M‚­", "‚Æ‚Ä‚à”M‚­", "‰Š‚Ì‚æ‚¤‚É"
+    };
+#endif
 
     if (!uarmg && uwep && uwep->oartifact == ART_MASTER_KEY_OF_THIEVERY) {
         int idx, ntraps = count_surround_traps(u.ux, u.uy);
 
         if (ntraps != mkot_trap_warn_count) {
             idx = min(ntraps, SIZE(heat) - 1);
+/*JP
             pline_The("Key feels %s%c", heat[idx], (ntraps > 3) ? '!' : '.');
+*/
+            pline_The("Œ®‚Í%sŠ´‚¶‚½%s", heat[idx], (ntraps > 3) ? "I" : "D");
         }
         mkot_trap_warn_count = ntraps;
     } else

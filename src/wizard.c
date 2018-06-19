@@ -826,7 +826,7 @@ register struct monst *mtmp;
                       random_insult[rn2(SIZE(random_insult))]);
 #else
             verbalize(rn2(2) ? "今となってもなお汝の命はあえて衰えるのだ，%s！"
-                             : "息を味わっておけ，%s，汝の最期の時だ！",
+                             : "無駄なことをするな，%s，汝の最期の時だ！",
                       random_insult[rn2(SIZE(random_insult))]);
 #endif
         else if (mtmp->mhp < 5 && !rn2(2)) /* Parthian shot */

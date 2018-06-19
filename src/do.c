@@ -404,7 +404,10 @@ polymorph_sink()
 */
         pline_The("流し台は%sに変化した！", defsyms[sym].explanation);
     else
+/*JP
         pline_The("sink vanishes.");
+*/
+        pline("流し台は消えた．");
     newsym(u.ux, u.uy);
 }
 
@@ -992,7 +995,10 @@ doddrop()
     int result = 0;
 
     if (!invent) {
+/*JP
         You("have nothing to drop.");
+*/
+        You("落とすものを何も持っていない．");
         return 0;
     }
     add_valid_menu_class(0); /* clear any classes already there */
@@ -1194,10 +1200,18 @@ dodown()
                     (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnladder);
         }
         if (Is_airlevel(&u.uz))
+/*JP
             You("are floating in the %s.", surface(u.ux, u.uy));
+*/
+            You("%sの中に浮いている．", surface(u.ux, u.uy));
         else if (Is_waterlevel(&u.uz))
+#if 0 /*JP*/
             You("are floating in %s.",
                 is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
+#else
+            You("%sの中に浮いている．",
+                is_pool(u.ux, u.uy) ? "水" : "空気の泡");
+#endif
         else
 #if 0 /*JP:T*/
             floating_above(stairs_down ? "stairs" : ladder_down

@@ -335,7 +335,10 @@ doextcmd(VOID_ARGS)
 
         func = extcmdlist[idx].ef_funct;
         if (!wizard && (extcmdlist[idx].flags & WIZMODECMD)) {
+/*JP
             You("can't do that.");
+*/
+            pline("それはできません．");
             return 0;
         }
         if (iflags.menu_requested && !accept_menu_prefix(func)) {
@@ -394,7 +397,10 @@ doextlist(VOID_ARGS)
         putstr(datawin, 0, buf);
     }
     putstr(datawin, 0, "");
+/*JP
     putstr(datawin, 0, "    Commands marked with a * will be autocompleted.");
+*/
+    putstr(datawin, 0, "    *付きのコマンドは自動補完されます．");
     display_nhwindow(datawin, FALSE);
     destroy_nhwindow(datawin);
     return 0;
@@ -1434,20 +1440,32 @@ doterrain(VOID_ARGS)
     any = zeroany;
     any.a_int = 1;
     add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+/*JP
              "known map without monsters, objects, and traps",
+*/
+             "怪物，物，罠なしの地図",
              MENU_SELECTED);
     any.a_int = 2;
     add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+/*JP
              "known map without monsters and objects",
+*/
+             "怪物，物なしの地図",
              MENU_UNSELECTED);
     any.a_int = 3;
     add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+/*JP
              "known map without monsters",
+*/
+             "怪物なしの地図",
              MENU_UNSELECTED);
     if (discover || wizard) {
         any.a_int = 4;
         add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+/*JP
                  "full map without monsters, objects, and traps",
+*/
+                 "怪物，物，罠なしの完全な地図",
                  MENU_UNSELECTED);
         if (wizard) {
             any.a_int = 5;
@@ -1460,7 +1478,10 @@ doterrain(VOID_ARGS)
                      MENU_UNSELECTED);
         }
     }
+/*JP
     end_menu(men, "View which?");
+*/
+    end_menu(men, "どれを見る？");
 
     n = select_menu(men, PICK_ONE, &sel);
     destroy_nhwindow(men);
@@ -1579,7 +1600,11 @@ char *outbuf;
     /* Protection amount is typically larger than damage or to-hit;
        reduce magnitude by a third in order to stretch modifier ranges
        (small:1..5, moderate:6..10, large:11..19, huge:20+) */
+#if 0 /*JP*/
     if (!strcmp(inctyp, "defense"))
+#else
+    if (!strcmp(inctyp, "防御"))
+#endif
         absamt = (absamt * 2) / 3;
 
     if (absamt <= 3)
@@ -1611,7 +1636,11 @@ char *outbuf;
 */
     bonus = (incamt > 0) ? "ボーナス" : "ペナルティ";
     /* "bonus <foo>" (to hit) vs "<bar> bonus" (damage, defense) */
+#if 0 /*JP*/
     invrt = strcmp(inctyp, "to hit") ? TRUE : FALSE;
+#else
+    invrt = strcmp(inctyp, "命中率") ? TRUE : FALSE;
+#endif
 
 #if 0 /*JP*/
     Sprintf(outbuf, "%s %s %s", modif, invrt ? inctyp : bonus,
@@ -1636,18 +1665,33 @@ int final;
 
     switch (category) {
     case HALF_PHDAM:
+/*JP
         category_name = "physical";
+*/
+        category_name = "物理";
         break;
     case HALF_SPDAM:
+/*JP
         category_name = "spell";
+*/
+        category_name = "呪文";
         break;
     default:
+/*JP
         category_name = "unknown";
+*/
+        category_name = "不明";
         break;
     }
+#if 0 /*JP*/
     Sprintf(buf, " %s %s damage", (final || wizard) ? "half" : "reduced",
             category_name);
     enl_msg(You_, "take", "took", buf, from_what(category));
+#else
+    Sprintf(buf, " %sダメージを%s", (final || wizard) ? "半減" : "減少",
+            category_name);
+    enl_msg(You_, "している", "していた", buf, from_what(category));
+#endif
 }
 
 /* is hero actively using water walking capability on water (or lava)? */
@@ -1976,48 +2020,80 @@ int final;
 
     if (hp < 0)
         hp = 0;
+/*JP
     Sprintf(buf, "%d hit points (max:%d)", hp, hpmax);
+*/
+    Sprintf(buf, "%dヒットポイント(最大:%d)", hp, hpmax);
     you_have(buf, "");
 
+/*JP
     Sprintf(buf, "%d magic power (max:%d)", u.uen, u.uenmax);
+*/
+    Sprintf(buf, "%d魔力ポイント(最大:%d)", u.uen, u.uenmax);
     you_have(buf, "");
 
     Sprintf(buf, "%d", u.uac);
+/*JP
     enl_msg("Your armor class ", "is ", "was ", buf, "");
+*/
+    enl_msg("あなたの防御値は", "である", "であった", buf, "");
 
     if (Upolyd) {
         switch (mons[u.umonnum].mlevel) {
         case 0:
             /* status line currently being explained shows "HD:0" */
+/*JP
             Strcpy(buf, "0 hit dice (actually 1/2)");
+*/
+            Strcpy(buf, "HD0(実際には1/2)");
             break;
         case 1:
+/*JP
             Strcpy(buf, "1 hit die");
+*/
+            Strcpy(buf, "HD1");
             break;
         default:
+/*JP
             Sprintf(buf, "%d hit dice", mons[u.umonnum].mlevel);
+*/
+            Sprintf(buf, "HD%d", mons[u.umonnum].mlevel);
             break;
         }
     } else {
         /* flags.showexp does not matter */
         /* experience level is already shown in the Background section */
+#if 0 /*JP*/
         Sprintf(buf, "%-1ld experience point%s",
                 u.uexp, plur(u.uexp));
+#else
+        Sprintf(buf, "経験値%-1ldポイント",
+                u.uexp);
+#endif
     }
     you_have(buf, "");
 
     /* this is shown even if the 'time' option is off */
+/*JP
     Sprintf(buf, "the dungeon %ld turn%s ago", moves, plur(moves));
+*/
+    Sprintf(buf, "%ldターン前に迷宮に入った", moves);
     /* same phrasing at end of game:  "entered" is unconditional */
-    enlght_line(You_, "entered ", buf, "");
+    enlght_line(You_, "", buf, "");
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
         /* describes what's shown on status line, which is an approximation;
            only show it here if player has the 'showscore' option enabled */
+#if 0 /*JP*/
         Sprintf(buf, "%ld%s", botl_score(),
                 !final ? "" : " before end-of-game adjustments");
         enl_msg("Your score ", "is ", "was ", buf, "");
+#else
+        Sprintf(buf, "%s%ld", botl_score(),
+                !final ? "" : "ゲーム終了時の調整前は");
+        enl_msg("あなたのスコアは", "である", "であった", buf, "");
+#endif
     }
 #endif
 
@@ -2437,9 +2513,15 @@ int final;
         struct obj *saddle = which_armor(u.usteed, W_SADDLE);
 
         if (saddle && saddle->cursed) {
+#if 0 /*JP*/
             Sprintf(buf, "stuck to %s %s", s_suffix(steedname),
                     simpleonames(saddle));
             you_are(buf, "");
+#else
+            Sprintf(buf, "%sの%sにつかまって", steedname,
+                    simpleonames(saddle));
+            you_are_ing(buf, "");
+#endif
         }
     }
     if (Wounded_legs) {
@@ -4106,8 +4188,13 @@ struct ext_func_tab extcmdlist[] = {
     { M('r'), "rub", "ランプをこする", dorub, AUTOCOMPLETE },
 #endif
     { 'S', "save", "save the game and exit", dosave, IFBURIED | GENERALCMD },
+#if 0 /*JP*/
     { 's', "search", "search for traps and secret doors",
             dosearch, IFBURIED, "searching" },
+#else
+    { 's', "search", "罠や隠し扉を探す",
+            dosearch, IFBURIED, "探す" },
+#endif
     { '*', "seeall", "show all equipment in use", doprinuse, IFBURIED },
     { AMULET_SYM, "seeamulet", "show the amulet currently worn",
             dopramulet, IFBURIED },
@@ -4207,8 +4294,13 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "vision", "視界配列を見る",
 #endif
             wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+#if 0 /*JP*/
     { '.', "wait", "rest one move while doing nothing",
             donull, IFBURIED, "waiting" },
+#else
+    { '.', "wait", "一歩分何もしない",
+            donull, IFBURIED, "休憩する" },
+#endif
     { 'W', "wear", "wear a piece of armor", dowear },
     { '&', "whatdoes", "tell what a command does", dowhatdoes, IFBURIED },
     { '/', "whatis", "show what type of thing a symbol corresponds to",
@@ -5421,7 +5513,10 @@ register char *cmd;
            a movement attempt, but that didn't provide for any
            feedback and led to strangeness if the key pressed
            ('u' in particular) was overloaded for num_pad use */
+/*JP
         You_cant("get there from here...");
+*/
+        You_cant("ここからそこへは行けません．．．");
         context.run = 0;
         context.nopick = context.forcefight = FALSE;
         context.move = context.mv = FALSE;
@@ -5459,7 +5554,10 @@ register char *cmd;
         /* current - use *cmd to directly index cmdlist array */
         if ((tlist = Cmd.commands[*cmd & 0xff]) != 0) {
             if (!wizard && (tlist->flags & WIZMODECMD)) {
+/*JP
                 You_cant("do that!");
+*/
+                pline("それはできません！");
                 res = 0;
             } else if (u.uburied && !(tlist->flags & IFBURIED)) {
 /*JP
@@ -6347,7 +6445,10 @@ boolean historical; /* whether to include in message history: True => yes */
     }
 
     if (historical) {
+/*JP
         Sprintf(qbuf, "Count: %ld ", *count);
+*/
+        Sprintf(qbuf, "数: %ld ", *count);
         (void) key2txt((uchar) key, eos(qbuf));
         putmsghistory(qbuf, FALSE);
     }
@@ -6728,7 +6829,10 @@ dosuspend_core()
         dosuspend();
     } else
 #endif
+/*JP
         Norep("Suspend command not available.");
+*/
+        Norep("中断コマンドは利用できません．");
     return 0;
 }
 

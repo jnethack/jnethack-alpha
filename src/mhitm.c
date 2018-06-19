@@ -818,10 +818,18 @@ register struct attack *mattk;
         if (vis) {
             /* 'it' -- previous form is no longer available and
                using that would be excessively verbose */
+#if 0 /*JP*/
             pline("%s expels %s.", Monnam(magr),
                   canspotmon(mdef) ? "it" : something);
+#else
+            pline("%s‚Í%s‚ğ“f‚«o‚µ‚½D", Monnam(magr),
+                  canspotmon(mdef) ? "‰½‚©" : something);
+#endif
             if (canspotmon(mdef))
+/*JP
                 pline("It turns into %s.", a_monnam(mdef));
+*/
+                pline("‚»‚ê‚Í%s‚É‚È‚Á‚½D", a_monnam(mdef));
         }
         return MM_HIT; /* bypass mdamagem() */
     }

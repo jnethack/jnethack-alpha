@@ -487,8 +487,13 @@ dowieldquiver()
         }
         /* offer to split stack if wielding more than 1 */
         if (uwep->quan > 1L && inv_cnt(FALSE) < 52 && splittable(uwep)) {
+#if 0 /*JP:T*/
             Sprintf(qbuf, "You are wielding %ld %s.  Ready %ld of them?",
                     uwep->quan, simpleonames(uwep), uwep->quan - 1L);
+#else
+            Sprintf(qbuf, "あなたは%ld %sを装備している．そのうち %ld を準備する？",
+                    uwep->quan, simpleonames(uwep), uwep->quan - 1L);
+#endif
             switch (ynq(qbuf)) {
             case 'q':
                 return 0;
@@ -500,19 +505,31 @@ dowieldquiver()
             default:
                 break;
             }
+/*JP
             Strcpy(qbuf, "Ready all of them instead?");
+*/
+            Strcpy(qbuf, "代わりにこれら全部を準備する？");
         } else {
             boolean use_plural = (is_plural(uwep) || pair_of(uwep));
 
+#if 0 /*JP*/
             Sprintf(qbuf, "You are wielding %s.  Ready %s instead?",
                     !use_plural ? "that" : "those",
                     !use_plural ? "it" : "them");
+#else /* 不自然だけどとりあえずこれでよしとする */
+            Strcpy(qbuf, "あなたはそれを装備している．代わりにそれを準備する？");
+#endif
         }
         /* require confirmation to ready the main weapon */
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uwep); /* replace qbuf[] contents */
+#if 0 /*JP*/
             pline("%s%s %s wielded.", qbuf,
                   simpleonames(uwep), otense(uwep, "remain"));
+#else
+            pline("%s%sを装備したままにした．", qbuf,
+                  simpleonames(uwep));
+#endif
             return 0;
         }
         /* quivering main weapon, so no longer wielding it */
@@ -522,11 +539,19 @@ dowieldquiver()
     } else if (newquiver == uswapwep) {
         if (uswapwep->quan > 1L && inv_cnt(FALSE) < 52
             && splittable(uswapwep)) {
+#if 0 /*JP*/
             Sprintf(qbuf, "%s %ld %s.  Ready %ld of them?",
                     u.twoweap ? "You are dual wielding"
                               : "Your alternate weapon is",
                     uswapwep->quan, simpleonames(uswapwep),
                     uswapwep->quan - 1L);
+#else /*TODO:二刀流のときはかなり不自然 */
+            Sprintf(qbuf, "%s %ld %sだ．そのうち%ldを準備する？",
+                    u.twoweap ? "あなたがそれぞれ装備しているのは"
+                              : "あなたの予備の武器は",
+                    uswapwep->quan, simpleonames(uswapwep),
+                    uswapwep->quan - 1L);
+#endif
             switch (ynq(qbuf)) {
             case 'q':
                 return 0;
@@ -538,21 +563,35 @@ dowieldquiver()
             default:
                 break;
             }
+/*JP
             Strcpy(qbuf, "Ready all of them instead?");
+*/
+            Strcpy(qbuf, "代わりにこれら全部を準備する？");
         } else {
             boolean use_plural = (is_plural(uswapwep) || pair_of(uswapwep));
 
+#if 0 /*JP*/
             Sprintf(qbuf, "%s your %s weapon.  Ready %s instead?",
                     !use_plural ? "That is" : "Those are",
                     u.twoweap ? "second" : "alternate",
                     !use_plural ? "it" : "them");
+#else
+            Sprintf(qbuf, "それは%s武器だ．代わりにそれを準備する？",
+                    u.twoweap ? "二番目の" : "予備の");
+#endif
         }
         /* require confirmation to ready the alternate weapon */
         if (ynq(qbuf) != 'y') {
             (void) Shk_Your(qbuf, uswapwep); /* replace qbuf[] contents */
+#if 0 /*JP*/
             pline("%s%s %s %s.", qbuf,
                   simpleonames(uswapwep), otense(uswapwep, "remain"),
                   u.twoweap ? "wielded" : "as secondary weapon");
+#else
+            pline("%s%sを%sままにした．", qbuf,
+                  simpleonames(uswapwep),
+                  u.twoweap ? "装備した" : "二番目の武器の");
+#endif
             return 0;
         }
         /* quivering alternate weapon, so no more uswapwep */
@@ -579,10 +618,16 @@ dowieldquiver()
        something we're wielding that's vulnerable to its damage) */
     res = 0;
     if (was_uwep) {
+/*JP
         You("are now empty %s.", body_part(HANDED));
+*/
+        You("武器を持たなくなった．");
         res = 1;
     } else if (was_twoweap && !u.twoweap) {
+/*JP
         You("are no longer wielding two weapons at once.");
+*/
+        You("二刀流をやめた．");
         res = 1;
     }
     return res;

@@ -272,9 +272,9 @@ int ef_flags;
 #else
             pline("‚È‚º‚©C%s%s‚Í%s‚Ì‰e‹¿‚ğó‚¯‚È‚©‚Á‚½D",
                   uvictim ? "‚ ‚È‚½‚Ì"
-                          : !vismon ? "the" /* visobj */
+                          : !vismon ? "" /* visobj */
                                     : s_suffix(mon_nam(victim)),
-                  vtense(ostr, "are"), bythe[type]);
+                  ostr, bythe[type]);
 #endif
         /* We assume here that if the object is protected because it
          * is blessed, it still shows some minor signs of wear, and
@@ -4325,10 +4325,17 @@ xchar x, y;
                when former contents of a burned container get here via
                flooreffects() */
             if (obj == thrownobj || obj == kickedobj)
+#if 0 /*JP*/
                 pline("%s %s up!", is_plural(obj) ? "They" : "It",
                       otense(obj, "burn"));
+#else
+                pline("‚»‚ê‚Í”R‚¦‚Â‚«‚½I");
+#endif
             else
+/*JP
                 You_see("%s hit lava and burn up!", doname(obj));
+*/
+                You_see("%s‚Í—nŠâ‚É“–‚½‚Á‚Ä”R‚¦‚Â‚«‚½I", doname(obj));
         }
         if (carried(obj)) { /* shouldn't happen */
             remove_worn_item(obj, TRUE);
@@ -4437,7 +4444,10 @@ boolean force;
         return ER_DAMAGED; /* contents were damaged */
     } else if (obj->otyp == OILSKIN_SACK) {
         if (carried(obj))
+/*JP
             pline("Some water slides right off your %s.", ostr);
+*/
+            pline("%s‚Í…‚ğ’e‚¢‚½D", ostr);
         makeknown(OILSKIN_SACK);
         /* not actually damaged, but because we /didn't/ get the "water
            gets into!" message, the player now has more information and

@@ -863,42 +863,42 @@ int mntmp;
 /*JP
             pline(use_thec, monsterc, "use your breath weapon");
 */
-            pline(use_thec,monsterc, "‘§‚ğ“f‚«‚©‚¯‚é");
+            pline(use_thec, monsterc, "‘§‚ğ“f‚«‚©‚¯‚é");
         if (attacktype(youmonst.data, AT_SPIT))
 /*JP
             pline(use_thec, monsterc, "spit venom");
 */
-            pline(use_thec,monsterc, "“Å‚ğ“f‚­");
+            pline(use_thec, monsterc, "“Å‚ğ“f‚­");
         if (youmonst.data->mlet == S_NYMPH)
 /*JP
             pline(use_thec, monsterc, "remove an iron ball");
 */
-            pline(use_thec,monsterc, "“S‹…‚ğ‚Í‚¸‚·");
+            pline(use_thec, monsterc, "“S‹…‚ğ‚Í‚¸‚·");
         if (attacktype(youmonst.data, AT_GAZE))
 /*JP
             pline(use_thec, monsterc, "gaze at monsters");
 */
-            pline(use_thec,monsterc, "‰ö•¨‚ğáÉ‚Ş");
+            pline(use_thec, monsterc, "‰ö•¨‚ğáÉ‚Ş");
         if (is_hider(youmonst.data))
 /*JP
             pline(use_thec, monsterc, "hide");
 */
-            pline(use_thec,monsterc, "‰B‚ê‚é");
+            pline(use_thec, monsterc, "‰B‚ê‚é");
         if (is_were(youmonst.data))
 /*JP
             pline(use_thec, monsterc, "summon help");
 */
-            pline(use_thec,monsterc, "’‡ŠÔ‚ğ¢Š«‚·‚é");
+            pline(use_thec, monsterc, "’‡ŠÔ‚ğ¢Š«‚·‚é");
         if (webmaker(youmonst.data))
 /*JP
             pline(use_thec, monsterc, "spin a web");
 */
-            pline(use_thec,monsterc, "‚­‚à‚Ì‘ƒ‚ğ’£‚é");
+            pline(use_thec, monsterc, "‚­‚à‚Ì‘ƒ‚ğ’£‚é");
         if (u.umonnum == PM_GREMLIN)
 /*JP
             pline(use_thec, monsterc, "multiply in a fountain");
 */
-            pline(use_thec,monsterc, "ò‚Ì’†‚Å•ª—ô‚·‚é");
+            pline(use_thec, monsterc, "ò‚Ì’†‚Å•ª—ô‚·‚é");
         if (is_unicorn(youmonst.data))
 /*JP
             pline(use_thec, monsterc, "use your horn");
@@ -2000,7 +2000,8 @@ int part;
                               "spine",     "toe",  "hair",         "blood",
                               "lung",      "nose", "stomach" },
 #else
-        *humanoid_parts[] = { "˜r", "–Ú", "Šç", "w",
+        *humanoid_parts[] = {
+            "˜r", "–Ú", "Šç", "w",
             "wæ", "‘«", "è", "è‚É‚·‚é",
             "“ª", "‘«", "‚ß‚Ü‚¢‚ª‚µ‚½", "ñ",
             "”wœ", "’Üæ", "”¯",  "ŒŒ",
@@ -2015,13 +2016,14 @@ int part;
                            "ripples", "juices", "surface", "sensor",
                            "stomach" },
 #else
-    *jelly_parts[] = { "‹[—Gè", "•‚¢”Á“_", "‘O–Ê",
-        "‹[—Gè‚Ìæ", "‹[—Gè",
-        "‹[—Gè‚ÌŠ²", "Gè", "ˆ¬‚é",
-        "”]‚Ì—Ìˆæ", "‰º•û‚Ì‹[—Gè", "‚Ë‚Î‚Ë‚Î‚µ‚Ä‚«‚½",
-        "’†ŠÔ—Ìˆæ", "•\–Ê",  "‹[—Gè",
-        "”g–ä", "‘Ì‰t", "•\–Ê", "Š´ŠoŠí",
-        "ˆİ"},
+        *jelly_parts[] = {
+            "‹[—Gè", "•‚¢”Á“_", "‘O–Ê",
+            "‹[—Gè‚Ìæ", "‹[—Gè",
+            "‹[—Gè‚ÌŠ²", "Gè", "ˆ¬‚é",
+            "”]‚Ì—Ìˆæ", "‰º•û‚Ì‹[—Gè", "‚Ë‚Î‚Ë‚Î‚µ‚Ä‚«‚½",
+            "’†ŠÔ—Ìˆæ", "•\–Ê",  "‹[—Gè",
+            "”g–ä", "‘Ì‰t", "•\–Ê", "Š´ŠoŠí",
+            "ˆİ"},
 #endif
 #if 0 /*JP*/
         *animal_parts[] = { "forelimb",  "eye",           "face",
@@ -2032,13 +2034,14 @@ int part;
                             "blood",     "lung",          "nose",
                             "stomach" },
 #else
-    *animal_parts[] = { "‘O‘«", "–Ú", "Šç",
-        "‘O’Ü", "’Üæ", "Œã’Ü",
-        "‘O’Ü", "‚Ğ‚Á‚©‚¯‚é", "“ª",
-        "Œã‘«", "‚ß‚Ü‚¢‚ª‚µ‚½", "ñ",
-        "”wœ", "Œã’Üæ", "–Ñ”ç",
-        "ŒŒ", "”x", "•@",
-        "ˆİ"},
+        *animal_parts[] = {
+            "‘O‘«", "–Ú", "Šç",
+            "‘O’Ü", "’Üæ", "Œã’Ü",
+            "‘O’Ü", "‚Ğ‚Á‚©‚¯‚é", "“ª",
+            "Œã‘«", "‚ß‚Ü‚¢‚ª‚µ‚½", "ñ",
+            "”wœ", "Œã’Üæ", "–Ñ”ç",
+            "ŒŒ", "”x", "•@",
+            "ˆİ"},
 #endif
 #if 0 /*JP*/
         *bird_parts[] = { "wing",     "eye",  "face",         "wing",
@@ -2047,11 +2050,12 @@ int part;
                           "spine",    "toe",  "feathers",     "blood",
                           "lung",     "bill", "stomach" },
 #else
-    *bird_parts[] = { "—ƒ", "–Ú", "Šç", "—ƒ",
-        "—ƒ‚Ìæ", "‘«", "—ƒ", "—ƒ‚É‚Æ‚é",
-        "“ª", "‘«", "‚ß‚Ü‚¢‚ª‚µ‚½", "ñ",
-        "”wœ", "’Üæ", "‰H–Ñ", "ŒŒ",
-        "”x", "‚­‚¿‚Î‚µ", "ˆİ" },
+        *bird_parts[] = {
+            "—ƒ", "–Ú", "Šç", "—ƒ",
+            "—ƒ‚Ìæ", "‘«", "—ƒ", "—ƒ‚É‚Æ‚é",
+            "“ª", "‘«", "‚ß‚Ü‚¢‚ª‚µ‚½", "ñ",
+            "”wœ", "’Üæ", "‰H–Ñ", "ŒŒ",
+            "”x", "‚­‚¿‚Î‚µ", "ˆİ" },
 #endif
 #if 0 /*JP*/
         *horse_parts[] = { "foreleg",  "eye",           "face",
@@ -2062,13 +2066,14 @@ int part;
                            "blood",    "lung",          "nose",
                            "stomach" },
 #else
-    *horse_parts[] = { "‘O‘«", "–Ú", "Šç",
-        "‘O’û", "’û", "Œã’û",
-        "‘O’Ü", "’û‚É‚Í‚³‚Ş", "“ª",
-        "Œã‘«", "‚ß‚Ü‚¢‚ª‚µ‚½", "ñ",
-        "”wœ", "Œã’Üæ", "‚½‚Ä‚ª‚İ",
-        "ŒŒ", "”x", "•@",
-        "ˆİ" },
+        *horse_parts[] = {
+            "‘O‘«", "–Ú", "Šç",
+            "‘O’û", "’û", "Œã’û",
+            "‘O’Ü", "’û‚É‚Í‚³‚Ş", "“ª",
+            "Œã‘«", "‚ß‚Ü‚¢‚ª‚µ‚½", "ñ",
+            "”wœ", "Œã’Üæ", "‚½‚Ä‚ª‚İ",
+            "ŒŒ", "”x", "•@",
+            "ˆİ" },
 #endif
 #if 0 /*JP*/
         *sphere_parts[] = { "appendage", "optic nerve", "body", "tentacle",
@@ -2078,7 +2083,8 @@ int part;
                             "lower tentacle tip", "cilia", "life force",
                             "retina", "olfactory nerve", "interior" },
 #else
-        *sphere_parts[] = { "“Ë‹N", "‹Šo_Œo", "‘Ì", "Gè",
+        *sphere_parts[] = {
+            "“Ë‹N", "‹Šo_Œo", "‘Ì", "Gè",
             "Gè‚Ìæ", "‰º‚Ì“Ë‹N", "Gè",
             "Gè‚É‚Â", "‘Ì", "‰º‚ÌGè",
             "‰ñ“]‚µ‚½", "’†Sü", "‘Ì",
@@ -2094,7 +2100,8 @@ int part;
                             "juices",   "gill",        "gill",
                             "interior" },
 #else
-        *fungus_parts[] = { "‹Û…‘Ì", "‹Šo—Ìˆæ", "‘O",
+        *fungus_parts[] = {
+            "‹Û…‘Ì", "‹Šo—Ìˆæ", "‘O",
             "‹Û…", "‹Û…", "ª",
             "Gè", "Gè‚É‚©‚ç‚İ‚Â‚¯‚é", "P",
             "ªŒs", "¬—‚·‚é", "²",
@@ -2111,7 +2118,8 @@ int part;
                             "life force",    "center",        "leading edge",
                             "interior" },
 #else
-        *vortex_parts[] = { "—Ìˆæ", "–Ú", "‘O",
+        *vortex_parts[] = {
+            "—Ìˆæ", "–Ú", "‘O",
             "¬‚³‚¢—¬‚ê", "¬‚³‚¢—¬‚ê", "‰º•”‚Ì—¬‚ê",
             "‰QŠª", "‰Q‚ÉŠª‚­", "‰Q‚Ì’†S",
             "‰º•”‚Ì—¬‚ê", "¬—‚µ‚½", "’†S•”",
@@ -2127,7 +2135,8 @@ int part;
                            "scales", "blood", "lung", "forked tongue",
                            "stomach" },
 #else
-        *snake_parts[] = { "‘Ş‰»‚µ‚½‘«", "–Ú", "Šç", "‘å‚«‚È—Ø",
+        *snake_parts[] = {
+            "‘Ş‰»‚µ‚½‘«", "–Ú", "Šç", "‘å‚«‚È—Ø",
             "‘å‚«‚È—Ø‚Ìæ", "Œã•”•ª", "—Ø‚ÌŒ„ŠÔ",
             "—Ø‚ÌŒ„ŠÔ‚É‚Â‚¯‚é", "“ª", "Œã•”•ª",
             "‚ß‚Ü‚¢‚ª‚µ‚½", "ñ", "‘Ì", "Œã•”•ª‚ÌŠZ",
@@ -2142,12 +2151,13 @@ int part;
                           "length", "posterior setae", "setae", "blood",
                           "skin", "prostomium", "stomach" },
 #else
-        *worm_parts[] = { "‘O‹æ", "Š´Œõ«×–E",
-                          "ŠÂ‘Ñ", "Šp", "Šp", "Œã‹æ",
-                          "ß", "ß‚É‚Â‚¯‚é", "‘O‹æ",
-                          "Œã•”", "L‚Ñ‚·‚¬‚½", "ŠÂ‘Ñ",
-                          "‘Ì", "Œã•”‚ÌŠp", "Šp", "ŒŒ",
-                          "”ç•†", "Œû‘O—t", "ˆİ" },
+        *worm_parts[] = {
+            "‘O‹æ", "Š´Œõ«×–E",
+            "ŠÂ‘Ñ", "Šp", "Šp", "Œã‹æ",
+            "ß", "ß‚É‚Â‚¯‚é", "‘O‹æ",
+            "Œã•”", "L‚Ñ‚·‚¬‚½", "ŠÂ‘Ñ",
+            "‘Ì", "Œã•”‚ÌŠp", "Šp", "ŒŒ",
+            "”ç•†", "Œû‘O—t", "ˆİ" },
 #endif
 #if 0 /*JP*/
         *fish_parts[] = { "fin", "eye", "premaxillary", "pelvic axillary",
@@ -2156,7 +2166,8 @@ int part;
                           "dorsal fin", "caudal fin", "scales", "blood",
                           "gill", "nostril", "stomach" };
 #else
-        *fish_parts[] = { "‚Ğ‚ê", "–Ú", "Šç", "‚Ğ‚ê‚Ìæ",
+        *fish_parts[] = {
+            "‚Ğ‚ê", "–Ú", "Šç", "‚Ğ‚ê‚Ìæ",
             "‚Ğ‚ê‚Ìæ", "”ö‚Ñ‚ê", "‹¹‚Ğ‚ê", "‚Ğ‚ê‚Å‚Â",
             "“ª", "”ö•¿", "‚ß‚Ü‚¢‚ª‚µ‚½", "‚¦‚ç",
             "”w‚Ñ‚ê", "”ö‚Ñ‚ê", "—Ø", "ŒŒ",
@@ -2426,10 +2437,10 @@ udeadinside()
                  : "empty";    /* golems plus vortices */
 #else
     return !nonliving(youmonst.data)
-             ? "€‚ñ‚¾"          /* living, including demons */
+             ? "€‚ñ‚¾"          /* ¶•¨‚Æˆ«–‚ */
              : !weirdnonliving(youmonst.data)
-                 ? "”j‰ó‚³‚ê‚½" /* undead plus manes */
-                 : "‚È‚­‚È‚Á‚½";    /* golems plus vortices */
+                 ? "”j‰ó‚³‚ê‚½"  /* ƒAƒ“ƒfƒbƒh‚Æ–S—ì */
+                 : "‚È‚­‚È‚Á‚½"; /* ƒS[ƒŒƒ€‚Æ‰Q */
 #endif
 }
 

@@ -629,9 +629,15 @@ struct entity *etmp;
     } else {
         if (crm->typ == DRAWBRIDGE_DOWN) {
             if (is_u(etmp)) {
+#if 0 /*JP*/
                 killer.format = NO_KILLER_PREFIX;
                 Strcpy(killer.name,
                        "crushed to death underneath a drawbridge");
+#else
+                killer.format = KILLED_BY;
+                Strcpy(killer.name,
+                       "’µ‚Ë‹´‚Ì‰º•~‚É‚È‚Á‚Ä");
+#endif
             }
 /*JP
             pline("%s crushed underneath the drawbridge.",

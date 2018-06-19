@@ -365,12 +365,21 @@ register struct obj *sobj;
 */
                    "あなたは将来の経済状況が心配になった．");
             else if (steedgold)
+#if 0 /*JP*/
                 Sprintf(buf, "You feel interested in %s financial situation.",
                         s_suffix(x_monnam(u.usteed,
                                           u.usteed->mtame ? ARTICLE_YOUR
                                                           : ARTICLE_THE,
                                           (char *) 0,
                                           SUPPRESS_SADDLE, FALSE)));
+#else
+                Sprintf(buf, "あなたは%sの経済状況に興味が出てきた．",
+                        x_monnam(u.usteed,
+                                          u.usteed->mtame ? ARTICLE_YOUR
+                                                          : ARTICLE_THE,
+                                          (char *) 0,
+                                          SUPPRESS_SADDLE, FALSE));
+#endif
             else
 /*JP
                 Strcpy(buf, "You feel materially poor.");
@@ -451,7 +460,10 @@ outgoldmap:
     You("どん欲になったような気がした，そして金貨の位置を感知した！");
     exercise(A_WIS, TRUE);
 
+/*JP
     browse_map(ter_typ, "gold");
+*/
+    browse_map(ter_typ, "金");
 
     reconstrain_map();
     docrt();
@@ -606,7 +618,10 @@ register struct obj *sobj;
             You("%sを感知した．", what);
         exercise(A_WIS, TRUE);
 
+/*JP
         browse_map(ter_typ, "food");
+*/
+        browse_map(ter_typ, "食料");
 
         reconstrain_map();
         docrt();
@@ -823,7 +838,10 @@ int class;            /* an object class, 0 for all */
     if (!ct)
         display_nhwindow(WIN_MAP, TRUE);
     else
+/*JP
         browse_map(ter_typ, "object");
+*/
+        browse_map(ter_typ, "物体");
 
     reconstrain_map();
     docrt(); /* this will correctly reset vision */
@@ -911,7 +929,10 @@ int mclass;                /* monster class, 0 for all */
             /* one-shot detection--allow player to move cursor around and
                get autodescribe feedback */
             EDetect_monsters |= I_SPECIAL;
+/*JP
             browse_map(TER_DETECT | TER_MON, "monster of interest");
+*/
+            browse_map(TER_DETECT | TER_MON, "関心のある怪物");
             EDetect_monsters &= ~I_SPECIAL;
         }
 
@@ -1109,7 +1130,10 @@ outtrapmap:
 */
     You("%s気持になった．", cursed_src ? "とてもどん欲な" : "だまされているような");
 
+/*JP
     browse_map(ter_typ, "trap of interest");
+*/
+    browse_map(ter_typ, "関心のある罠");
 
     reconstrain_map();
     docrt(); /* redraw the screen to remove unseen traps from the map */
@@ -1505,8 +1529,13 @@ do_mapping()
     if (!level.flags.hero_memory || unconstrained) {
         flush_screen(1);                 /* flush temp screen */
         /* browse_map() instead of display_nhwindow(WIN_MAP, TRUE) */
+#if 0 /*JP*/
         browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ,
                    "anything of interest");
+#else
+        browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ,
+                   "関心のあるもの");
+#endif
         docrt();
     }
     reconstrain_map();
@@ -1548,12 +1577,18 @@ struct obj *sobj; /* scroll--actually fake spellbook--object */
         /* the getpos() prompt from browse_map() is only shown when
            flags.verbose is set, but make this unconditional so that
            not-verbose users become aware of the prompting situation */
+/*JP
         You("sense your surroundings.");
+*/
+        You("まわりのものを感知した．");
         if (extended || glyph_is_monster(glyph_at(u.ux, u.uy)))
             ter_typ |= TER_MON;
         if (extended)
             EDetect_monsters |= I_SPECIAL;
+/*JP
         browse_map(ter_typ, "anything of interest");
+*/
+        browse_map(ter_typ, "関心のあるもの");
         EDetect_monsters &= ~I_SPECIAL;
         refresh = TRUE;
     }
@@ -1816,8 +1851,13 @@ boolean via_warning;
         if (mtmp->mundetected
             && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL))
             if (via_warning) {
+#if 0 /*JP*/
                 Your("warning senses cause you to take a second %s.",
                      Blind ? "to check nearby" : "look close by");
+#else
+                Your("警戒心が%sしばらくかかった．",
+                     Blind ? "まわりを調べるのに" : "近くを見るのに");
+#endif
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
         mtmp->mundetected = 0;

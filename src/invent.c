@@ -1904,8 +1904,8 @@ unsigned *resultflags;
  * of objects to be treated.  Return the number of objects treated.
  */
 /*JP CHECK: 3.6.0 での呼び出し元
-invent.c:1728:        int cnt = askchain(&invent, olets, allflag, fn, ckfn, mx, word);
-pickup.c:2882:        if (askchain(objlist, (one_by_one ? (char *) 0 : selection), allflag,
+invent.c:1886:        int cnt = askchain(&invent, olets, allflag, fn, ckfn, mx, word);
+pickup.c:3145:        if (askchain(objlist, (one_by_one ? (char *) 0 : selection), allflag,
   wordには動詞が英語で入る。
 */
 int
@@ -2520,11 +2520,21 @@ nextclass:
     }
     if (iflags.force_invmenu && lets && want_reply) {
         any = zeroany;
+#if 0 /*JP*/
         add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                  "Special", MENU_UNSELECTED);
+#else
+        add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                 "特殊", MENU_UNSELECTED);
+#endif
         any.a_char = '*';
+#if 0 /*JP*/
         add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
                  "(list everything)", MENU_UNSELECTED);
+#else
+        add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
+                 "(全ての一覧)", MENU_UNSELECTED);
+#endif
     }
     /* for permanent inventory where we intend to show everything but
        nothing has been listed (because there isn't anyhing to list;
@@ -4109,8 +4119,13 @@ doorganize() /* inventory organizer by Del Lamb */
                 pline1(Never_mind);
             return 0;
         } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
+#if 0 /*JP*/
             pline("Only gold coins may be moved into the '%c' slot.",
                   GOLD_SYM);
+#else
+            pline("'%c'にできるのは金貨だけ．",
+                  GOLD_SYM);
+#endif
             ever_mind = TRUE;
             goto noadjust;
         }

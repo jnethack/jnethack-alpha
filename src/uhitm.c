@@ -2379,9 +2379,15 @@ register struct attack *mattk;
            vampire form now instead of dealing with that when it dies */
         if (is_vampshifter(mdef)
             && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
+/*JP
             You("engulf it, then expel it.");
+*/
+            You("飲み込んで，吐き出した．");
             if (canspotmon(mdef))
+/*JP
                 pline("It turns into %s.", a_monnam(mdef));
+*/
+                pline("それは%sになった．", a_monnam(mdef));
             else
                 map_invisible(mdef->mx, mdef->my);
             return 1;

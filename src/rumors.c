@@ -492,7 +492,7 @@ boolean delphi;
 /*JP
                      : "The Oracle meditates for a moment and then intones:");
 */
-                     : "賢者はしばらく冥想し，歌うように話した：");
+                     : "賢者はしばらく瞑想し，歌うように話した：");
         else
 /*JP
             putstr(tmpwin, 0, "The message reads:");

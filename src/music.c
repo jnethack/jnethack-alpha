@@ -540,17 +540,35 @@ const char *
 generic_lvl_desc()
 {
     if (Is_astralevel(&u.uz))
+/*JP
         return "astral plane";
+*/
+        return "天上界";
     else if (In_endgame(&u.uz))
+/*JP
         return "plane";
+*/
+        return "精霊界";
     else if (Is_sanctum(&u.uz))
+/*JP
         return "sanctum";
+*/
+        return "聖域";
     else if (In_sokoban(&u.uz))
+/*JP
         return "puzzle";
+*/
+        return "倉庫";
     else if (In_V_tower(&u.uz))
+/*JP
         return "tower";
+*/
+        return "塔";
     else
+/*JP
         return "dungeon";
+*/
+        return "迷宮";
 }
 
 /*
@@ -611,10 +629,16 @@ struct obj *instr;
 */
         break;
     case PLAY_CONFUSED:
+/*JP
         You("produce a raucous noise.");
+*/
+        You("耳障りな音を出した．");
         break;
     case PLAY_HALLU:
+/*JP
         You("produce a kaleidoscopic display of floating butterfiles.");
+*/
+        You("空に浮かぶ蝶の万華鏡的な表現を創出した．");
         break;
     /* TODO? give some or all of these combinations their own feedback;
        hallucination ones should reference senses other than hearing... */

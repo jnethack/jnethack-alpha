@@ -267,8 +267,13 @@ int msgflg; /* positive => no message, zero => message, and */
                       abonflg ? "今のところ" : "既に", attrstr);
 #endif
             else /* current stayed the same but base value changed */
+#if 0 /*JP*/
                 Your("innate %s has %s.", attrname[ndx],
                      (incr > 0) ? "improved" : "declined");
+#else
+                Your("本質的な%sが%sした．", attrname[ndx],
+                     (incr > 0) ? "向上" : "低下");
+#endif
         }
         return FALSE;
     }
@@ -378,9 +383,15 @@ boolean exclaim; /* emphasis */
      * (dunce cap) is such that we don't need message fixups for them.
      */
     if (typ == A_STR && ACURR(A_STR) == STR19(25))
+/*JP
         msg_txt = "innately weaker";
+*/
+        msg_txt = "本質的に弱くなった";
     else if (typ == A_CON && ACURR(A_CON) == 25)
+/*JP
         msg_txt = "sick inside";
+*/
+        msg_txt = "内部に病をかかえた";
 
 /*JP
     (*func)("%s%c", msg_txt, exclaim ? '!' : '.');
@@ -1022,17 +1033,27 @@ int propidx; /* special cases can have negative values */
 */
                 Strcpy(buf, "生まれながらに");
             else if (innateness == FROM_INTR) /* [].intrinsic & FROMOUTSIDE */
+/*JP
                 Strcpy(buf, " intrinsically");
+*/
+                Strcpy(buf, "本質的に");
             else if (innateness == FROM_EXP)
 /*JP
                 Strcpy(buf, " because of your experience");
 */
                 Strcpy(buf, "経験によって");
             else if (innateness == FROM_LYCN)
+/*JP
                 Strcpy(buf, " due to your lycanthropy");
+*/
+                Strcpy(buf, "獣化病によって");
             else if (innateness == FROM_FORM)
+/*JP
                 Strcpy(buf, " from current creature form");
+*/
+                Strcpy(buf, "現在の姿によって");
             else if (propidx == FAST && Very_fast)
+#if 0 /*JP*/
                 Sprintf(buf, because_of,
                         ((HFast & TIMEOUT) != 0L) ? "a potion or spell"
                           : ((EFast & W_ARMF) != 0L && uarmf->dknown
@@ -1040,6 +1061,15 @@ int propidx; /* special cases can have negative values */
                               ? ysimple_name(uarmf) /* speed boots */
                                 : EFast ? "worn equipment"
                                   : something);
+#else
+                Sprintf(buf, because_of,
+                        ((HFast & TIMEOUT) != 0L) ? "薬や呪文"
+                          : ((EFast & W_ARMF) != 0L && uarmf->dknown
+                             && objects[uarmf->otyp].oc_name_known)
+                              ? ysimple_name(uarmf) /* speed boots */
+                                : EFast ? "装備"
+                                  : something);
+#endif
             else if (wizard
                      && (obj = what_gives(&u.uprops[propidx].extrinsic)) != 0)
                 Sprintf(buf, because_of, obj->oartifact

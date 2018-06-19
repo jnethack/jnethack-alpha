@@ -792,10 +792,13 @@ rejectcasting()
 /*JP
         You("are too impaired to cast a spell.");
 */
-        You("魔法を唱えられない．");
+        You("くらくらしていて魔法を使えない．");
         return TRUE;
     } else if (!can_chant(&youmonst)) {
+/*JP
         You("are unable to chant the incantation.");
+*/
+        You("呪文を唱えることができない．");
         return TRUE;
     } else if (!freehand()) {
         /* Note: !freehand() occurs when weapon and shield (or two-handed

@@ -1181,12 +1181,20 @@ struct monst *mtmp;
            the worm's segments, but we count it as such when presenting
            worm feedback to the player */
         if (!nsegs) {
+/*JP
             Strcat(info, ", single segment");
+*/
+            Strcat(info, ", ‘S‘Ì");
         } else {
             ++nsegs; /* include head in the segment count */
             segndx = wseg_at(mtmp, bhitpos.x, bhitpos.y);
+#if 0 /*JP*/
             Sprintf(eos(info), ", %d%s of %d segments",
                     segndx, ordin(segndx), nsegs);
+#else
+            Sprintf(eos(info), ", %dß‚Ì‚¤‚¿%d”Ô–Ú",
+                    nsegs, segndx);
+#endif
         }
     }
     if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])

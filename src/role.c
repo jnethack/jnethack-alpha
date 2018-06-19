@@ -2564,7 +2564,10 @@ role_init()
         urole.cgod = roles[flags.pantheon].cgod;
     }
     /* 0 or 1; no gods are neuter, nor is gender randomized */
+/*JP
     quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "goddess");
+*/
+    quest_status.godgend = !strcmpi(align_gtitle(alignmnt), "èóê_");
 
     /* Fix up infravision */
     if (mons[urace.malenum].mflags3 & M3_INFRAVISION) {

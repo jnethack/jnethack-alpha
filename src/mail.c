@@ -603,8 +603,13 @@ boolean adminmsg;
     struct flock fl = { 0 };
 #endif
     const char *msgfrom = adminmsg
+#if 0 /*JP*/
         ? "The voice of %s booms through the caverns:"
         : "This message is from '%s'.";
+#else
+        ? "%sの声が洞窟に響きわたった:"
+        : "これは'%s'からのメッセージだ．";
+#endif
 
     if (!mb)
         goto bail;
@@ -631,8 +636,13 @@ boolean adminmsg;
             fl.l_type = F_UNLCK;
             fcntl (fileno(mb), F_UNLCK, &fl);
 #endif
+#if 0 /*JP*/
             pline("There is a%s message on this scroll.",
                   seen_one_already ? "nother" : "");
+#else
+            pline("この巻物には%sメッセージがある．",
+                  seen_one_already ? "まだ" : "");
+#endif
         }
         msg = strchr(curline, ':');
 
@@ -647,7 +657,10 @@ boolean adminmsg;
         if (adminmsg)
             verbalize(msg);
         else
+/*JP
             pline("It reads: \"%s\".", msg);
+*/
+            pline("それを読んだ：「%s」", msg);
 
         seen_one_already = TRUE;
 #ifdef SIMPLE_MAIL
@@ -674,7 +687,10 @@ boolean adminmsg;
 bail:
     /* bail out _professionally_ */
     if (!adminmsg)
+/*JP
         pline("It appears to be all gibberish.");
+*/
+        pline("これはまったくちんぷんかんぷんだ．");
 }
 #endif /* SIMPLE_MAIL */
 

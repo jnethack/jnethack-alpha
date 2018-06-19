@@ -581,11 +581,19 @@ static struct Comp_Opt {
     { "soundcard", "使用しているサウンドカードの種類", 20, SET_IN_FILE },
 #endif
 #ifdef STATUS_HILITES
+#if 0 /*JP*/
     { "statushilites",
       "0=no status highlighting, N=show highlights for N turns",
+#else
+    { "statushilites",
+      "0=ステータスハイライトなし，Nターン毎にハイライト表示",
+#endif
       20, SET_IN_GAME },
 #else
+/*JP
     { "statushilites", "highlight control", 20, SET_IN_FILE },
+*/
+    { "statushilites", "ハイライトの制御", 20, SET_IN_FILE },
 #endif
 #if 0 /*JP*/
     { "symset", "load a set of display symbols from the symbols file", 70,
@@ -657,11 +665,22 @@ static struct Comp_Opt {
     { "videoshades", "表示にグレイスケールを用いる", 32,
       DISP_IN_GAME },
 #endif
+#if 0 /*JP*/
     { "whatis_coord", "show coordinates when auto-describing cursor position",
       1, SET_IN_GAME },
+#else
+    { "whatis_coord", "カーソル位置を自動説明するときに座標を表示する",
+      1, SET_IN_GAME },
+#endif
+#if 0 /*JP*/
     { "whatis_filter",
       "filter coordinate locations when targeting next or previous",
       1, SET_IN_GAME },
+#else
+    { "whatis_filter",
+      "次や手前をターゲットするときに座標位置をフィルタする",
+      1, SET_IN_GAME },
+#endif
 #if 0 /*JP*/
     { "windowcolors", "the foreground/background colors of windows", /*WC*/
       80, DISP_IN_GAME },
@@ -1305,8 +1324,13 @@ bad_negation(optname, with_parameter)
 const char *optname;
 boolean with_parameter;
 {
+#if 0 /*JP*/
     pline_The("%s option may not %sbe negated.", optname,
               with_parameter ? "both have a value and " : "");
+#else
+    pline_The("%sオプションは否定%sできない．", optname,
+              with_parameter ? "と値指定の両方は" : "");
+#endif
 }
 
 /*
@@ -1411,7 +1435,10 @@ const char *optn;
         return 0;
     if (fnv > get_current_feature_ver()) {
         if (!initial) {
+/*JP
             You_cant("disable new feature alerts for future versions.");
+*/
+            You_cant("将来のバージョンの機能警告を無効にすることはできない．");
         } else {
             config_error_add(
                         "%s=%s Invalid reference to a future version ignored",
@@ -1424,9 +1451,15 @@ const char *optn;
     if (!initial) {
         Sprintf(buf, "%lu.%lu.%lu", FEATURE_NOTICE_VER_MAJ,
                 FEATURE_NOTICE_VER_MIN, FEATURE_NOTICE_VER_PATCH);
+#if 0 /*JP*/
         pline(
           "Feature change alerts disabled for NetHack %s features and prior.",
               buf);
+#else
+        pline(
+          "NetHack %s 以前の機能に対する機能変更警告を無効にした．",
+              buf);
+#endif
     }
     return 1;
 }

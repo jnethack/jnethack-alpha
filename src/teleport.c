@@ -755,7 +755,7 @@ level_tele()
 /*JP
             if (ynq("Go to Nowhere.  Are you sure?") != 'y')
 */
-            if (ynq("どことも知れぬ場所に行きます？よろしいですか？") != 'y')
+            if (ynq("どことも知れぬ場所に行きます．よろしいですか？") != 'y')
                 return;
 #if 0 /*JP*/
             You("%s in agony as your body begins to warp...",

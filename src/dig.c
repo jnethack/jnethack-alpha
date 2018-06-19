@@ -738,7 +738,10 @@ int ttyp;
     if (ttyp == PIT) {
         if (madeby_u) {
             if (x != u.ux || y != u.uy)
+/*JP
                 You("dig an adjacent pit.");
+*/
+                You("—×‚Ì—‚µŒŠ‚ğŒ@‚Á‚½D");
             else
 /*JP
                 You("dig a pit in the %s.", surface_type);
@@ -2393,8 +2396,13 @@ int x, y;
     newsym(x, y);
 
     if (costly && loss) {
+#if 0 /*JP*/
         You("owe %s %ld %s for burying merchandise.", mon_nam(shkp), loss,
             currency(loss));
+#else
+        You("–„‚Ü‚Á‚½¤•i‚ÉŠÖ‚µ‚Ä%s‚É%ld%s‚Ì•‰Â‚ğ•‰‚Á‚½D", mon_nam(shkp), loss,
+            currency(loss));
+#endif
     }
 }
 

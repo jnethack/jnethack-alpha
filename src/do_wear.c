@@ -10,7 +10,9 @@
 
 #include "hack.h"
 
+#if 0 /*JP*//*未使用*/
 static NEARDATA const char see_yourself[] = "see yourself";
+#endif
 static NEARDATA const char unknown_type[] = "Unknown type of %s (%d)";
 #if 0 /*JP*/
 static NEARDATA const char c_armor[] = "armor", c_suit[] = "suit",
@@ -1604,18 +1606,30 @@ struct obj *obj;
                 Strcat(what, cloak_simple_name(uarmc));
             if ((obj == uarmu) && uarm) {
                 if (uarmc)
+#if 0 /*JP*/
                     Strcat(what, " and ");
+#else
+                    Strcat(what, "と");
+#endif
                 Strcat(what, suit_simple_name(uarm));
             }
+#if 0 /*JP*/
             Sprintf(why, " without taking off your %s first", what);
+#else
+            Sprintf(why, "先に%sをはずさないと", what);
+#endif
         } else {
+#if 0 /*JP*/
             Strcpy(why, "; it's embedded");
+#else
+            Strcpy(why, "くっついているので");
+#endif
         }
 #if 0 /*JP*/
         You_cant("take that off%s.", why);
 #else
         m = joffmsg(obj, &j);
-        You("それ%s%sことはできない．", j, m);
+        pline("%sそれ%s%sことはできない．", why, j, m);
 #endif
         return 0;
     }
@@ -1873,7 +1887,10 @@ boolean noisy;
        in case we get here via 'P' (doputon) */
     if (verysmall(youmonst.data) || nohands(youmonst.data)) {
         if (noisy)
+/*JP
             You("can't wear any armor in your current form.");
+*/
+            You("現在の姿では防具を身につけることはできない．");
         return 0;
     }
 

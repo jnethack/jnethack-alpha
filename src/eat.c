@@ -2006,7 +2006,10 @@ struct obj *otmp;
                       TRUE, SICK_VOMITABLE);
 #endif
 
+/*JP
             pline("(It must have died too long ago to be safe to eat.)");
+*/
+            pline("(この肉は安全に食べられる時間を過ぎてしまっていたようだ．)");
         }
         if (carried(otmp))
             useup(otmp);
@@ -2253,10 +2256,16 @@ struct obj *otmp;
         break;
     case LEMBAS_WAFER:
         if (maybe_polyd(is_orc(youmonst.data), Race_if(PM_ORC))) {
+/*JP
             pline("%s", "!#?&* elf kibble!");
+*/
+            pline("%s", "！＃？＆＊ エルクの食い物！");
             break;
         } else if (maybe_polyd(is_elf(youmonst.data), Race_if(PM_ELF))) {
+/*JP
             pline("A little goes a long way.");
+*/
+            pline("少しで十分だ．");
             break;
         }
         goto give_feedback;
@@ -2585,18 +2594,30 @@ eatspecial()
 #ifdef MAIL
         if (otmp->otyp == SCR_MAIL)
             /* no nutrition */
+/*JP
             pline("This junk mail is less than satisfying.");
+*/
+            pline("このゴミメールは満足にはほど遠い．");
         else
 #endif
         if (otmp->otyp == SCR_SCARE_MONSTER)
             /* to eat scroll, hero is currently polymorphed into a monster */
+/*JP
             pline("Yuck%c", otmp->blessed ? '!' : '.');
+*/
+            pline("おえっ%s", otmp->blessed ? "！" : "．");
         else if (otmp->oclass == SCROLL_CLASS
                  /* check description after checking for specific scrolls */
                  && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
+/*JP
             pline("Yum%c", otmp->blessed ? '!' : '.');
+*/
+            pline("うまい%s", otmp->blessed ? "！" : "．");
         else
+/*JP
             pline("Needs salt...");
+*/
+            pline("味がうすい．．．");
     }
     if (otmp->oclass == POTION_CLASS) {
         otmp->quan++; /* dopotion() does a useup() */
@@ -2823,7 +2844,9 @@ struct obj *otmp;
 #else
     Strcpy(foodsmell, xname(otmp));
 #endif
+#if 0 /*JP*/
     Strcpy(it_or_they, (otmp->quan == 1L) ? "it" : "they");
+#endif
 #if 0 /*JP*/
     Sprintf(eat_it_anyway, "Eat %s anyway?",
             (otmp->quan == 1L) ? "it" : "one");
@@ -3095,7 +3118,10 @@ doeat()
          */
         if (welded(otmp) || (otmp->cursed && (otmp->owornmask & W_RING))) {
             otmp->bknown = 1; /* for ring; welded() does this for weapon */
+/*JP
             You("spit out %s.", the(xname(otmp)));
+*/
+            You("%sを吐き出した．", xname(otmp));
         } else {
 #if 0 /*JP*/
             You("spit %s out onto the %s.", the(xname(otmp)),
@@ -3353,8 +3379,13 @@ struct obj *obj;
         if (obj->cursed && obj->bknown) {
             char qbuf[QBUFSZ];
 
+#if 0 /*JP*/
             if (ynq(safe_qbuf(qbuf, "Really wield ", "?",
                               obj, doname, thesimpleoname, "that")) != 'y')
+#else
+            if (ynq(safe_qbuf(qbuf, "本当に", "を装備する？",
+                              obj, doname, thesimpleoname, "それ")) != 'y')
+#endif
                 return 0;
         }
         if (!wield_tool(obj, "use"))

@@ -472,7 +472,10 @@ int trouble;
             set_itimeout(&HPasses_walls, (long) (d(4, 4) + 4)); /* 8..20 */
             /* how else could you move between packed rocks or among
                lattice forming "solid" rock? */
+/*JP
             You_feel("much slimmer.");
+*/
+            You_feel("Ç∆ÇƒÇ‡ÉXÉäÉÄÇ…Ç»Ç¡ÇΩãCÇ™ÇµÇΩÅD");
         }
         break;
     case TROUBLE_CURSED_LEVITATION:

@@ -66,7 +66,10 @@ struct monst *mon;
 
         if (uwep && uwep->oartifact == ART_DEMONBANE && is_demon(ptr)) {
             if (canseemon(mon))
+/*JP
                 pline("%s looks puzzled for a moment.", Monnam(mon));
+*/
+                pline("%s‚Í­‚µ¢˜f‚µ‚Ä‚¢‚é‚æ‚¤‚¾D", Monnam(mon));
             return 0;
         }
 

@@ -1916,9 +1916,15 @@ int cindex, ccount; /* index of this container (1..N), number of them (N) */
                   cobj->lknown ? "" : "むーん，");
 #endif
         else if (cobj->lknown)
+/*JP
             pline("%s is locked.", The(xname(cobj)));
+*/
+            pline("%sは鍵がかかっている．", xname(cobj));
         else
+/*JP
             pline("Hmmm, %s turns out to be locked.", the(xname(cobj)));
+*/
+            pline("むーん，%sは鍵がかかっている．", xname(cobj));
         cobj->lknown = 1;
         return 0;
     }
@@ -3320,8 +3326,13 @@ boolean outokay, inokay, alreadyused, more_containers;
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     if (more_containers) {
         any.a_int = 7; /* 'n' */
+#if 0 /*JP*/
         add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
                  "loot next container", MENU_SELECTED);
+#else
+        add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
+                 "次の箱を開ける", MENU_SELECTED);
+#endif
     }
     any.a_int = 8; /* 'q' */
 /*JP
@@ -3403,10 +3414,15 @@ dotip()
                     /* use 'i' for inventory unless there are so many
                        containers that it's already being used */
                     i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
+#if 0 /*JP*/
                     add_menu(win, NO_GLYPH, &any, i, 0, ATR_NONE,
                              "tip something being carried", MENU_SELECTED);
+#else
+                    add_menu(win, NO_GLYPH, &any, i, 0, ATR_NONE,
+                             "入れ物をひっくりかえす", MENU_SELECTED);
+#endif
                 }
-                end_menu(win, "Tip which container?");
+                end_menu(win, "どの入れ物をひっくりかえす？");
                 n = select_menu(win, PICK_ONE, &pick_list);
                 destroy_nhwindow(win);
                 /*

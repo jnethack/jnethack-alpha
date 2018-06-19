@@ -958,7 +958,10 @@ genericptr_t p2;
         if (u.uinvulnerable || nonliving(youmonst.data) || Breathless)
             return FALSE;
         if (!Blind) {
+/*JP
             Your("%s sting.", makeplural(body_part(EYE)));
+*/
+            Your("%sがチクチクした．", body_part(EYE));
             make_blinded(1L, FALSE);
         }
         if (!Poison_resistance) {
@@ -1114,10 +1117,16 @@ region_safety()
         safe_teleds(FALSE);
     } else if (r) {
         remove_region(r);
+/*JP
         pline_The("gas cloud enveloping you dissipates.");
+*/
+        pline("あなたを包んでいたガス雲は消えた．");
     } else {
         /* cloud dissipated on its own, so nothing needs to be done */
+/*JP
         pline_The("gas cloud has dissipated.");
+*/
+        pline("ガス雲は消えた．");
     }
     /* maybe cure blindness too */
     if ((Blinded & TIMEOUT) == 1L)

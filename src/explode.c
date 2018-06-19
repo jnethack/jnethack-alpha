@@ -46,8 +46,13 @@ int expltype;
     struct monst *mtmp, *mdef = 0;
     uchar adtyp;
     int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
+#if 0 /*JP*//*do_halluの処理はとりあえず外す*/
     boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
             do_hallu = FALSE, inside_engulfer, grabbed, grabbing;
+#else
+    boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
+            inside_engulfer, grabbed, grabbing;
+#endif
     coord grabxy;
     char hallu_buf[BUFSZ], killr_buf[BUFSZ];
     short exploding_wand_typ = 0;
@@ -118,6 +123,7 @@ int expltype;
      *  skip harm to gear of any extended targets when inflicting damage.
      */
 
+#if 0 /*JP*//*do_halluの処理はとりあえず外す*/
     if (olet == MON_EXPLODE) {
         /* when explode() is called recursively, killer.name might change so
            we need to retain a copy of the current value for this explosion */
@@ -127,6 +133,7 @@ int expltype;
                         || strstri(str, "s' explosion")));
         adtyp = AD_PHYS;
     } else
+#endif
         switch (abs(type) % 10) {
         case 0:
 /*JP
@@ -365,6 +372,7 @@ int expltype;
                     mtmp = u.usteed;
                 if (!mtmp)
                     continue;
+#if 0 /*JP*//*do_halluの処理はとりあえず外す*/
                 if (do_hallu) {
                     /* replace "gas spore" with a different description
                        for each target (we can't distinguish personal names
@@ -376,6 +384,7 @@ int expltype;
                     } while (*hallu_buf != lowc(*hallu_buf));
                     str = hallu_buf;
                 }
+#endif
                 if (u.uswallow && mtmp == u.ustuck) {
                     const char *adj = (char *) 0;
 
@@ -557,10 +566,17 @@ int expltype;
                          * would be "you killed <mdef>" so give our own.
                          */
                         if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
+#if 0 /*JP*/
                             pline("%s is %s!", Monnam(mtmp),
                                   xkflg ? "burned completely"
                                         : nonliving(mtmp->data) ? "destroyed"
                                                                 : "killed");
+#else
+                            pline("%sは%s！", Monnam(mtmp),
+                                  xkflg ? "燃えつきた"
+                                        : nonliving(mtmp->data) ? "倒された"
+                                                                : "殺された");
+#endif
                         xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT | xkflg);
                     } else {
                         if (xkflg)
@@ -578,6 +594,7 @@ int expltype;
         /* give message for any monster-induced explosion
            or player-induced one other than scroll of fire */
         if (flags.verbose && (type < 0 || olet != SCROLL_CLASS)) {
+#if 0 /*JP*//*do_halluの処理はとりあえず外す*/
             if (do_hallu) { /* (see explanation above) */
                 do {
                     Sprintf(hallu_buf, "%s explosion",
@@ -585,6 +602,7 @@ int expltype;
                 } while (*hallu_buf != lowc(*hallu_buf));
                 str = hallu_buf;
             }
+#endif
 /*JP
             You("are caught in the %s!", str);
 */
@@ -773,7 +791,10 @@ struct obj *obj; /* only scatter this obj        */
 */
                 pline("%sは一部分が砕けた．",xname(otmp));
                 else
+/*JP
                     You_hear("stone breaking.");
+*/
+                    You_hear("石が砕ける音を聞いた．");
                 fracture_rock(otmp);
                 place_object(otmp, sx, sy);
                 if ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -792,7 +813,10 @@ struct obj *obj; /* only scatter this obj        */
 */
                 pline("%sはこなごなになった．",xname(otmp));
                 else
+/*JP
                     You_hear("stone crumbling.");
+*/
+                    You_hear("石がこなごなになる音を聞いた．");
                 (void) break_statue(otmp);
 #ifndef FIX_BUG_C340_2
                 place_object(otmp, sx, sy); /* put fragments on floor */

@@ -150,25 +150,42 @@ picklock(VOID_ARGS)
         /* unfortunately we don't have a 'tknown' flag to record
            "known to be trapped" so declining to disarm and then
            retrying lock manipulation will find it all over again */
+/*JP
         if (yn("You find a trap!  Do you want to try to disarm it?") == 'y') {
+*/
+        if (yn("罠を見つけた！外しますか？") == 'y') {
             const char *what;
             boolean alreadyunlocked;
 
             /* disarming while using magic key always succeeds */
             if (xlock.door) {
                 xlock.door->doormask &= ~D_TRAPPED;
+/*JP
                 what = "door";
+*/
+                what = "扉";
                 alreadyunlocked = !(xlock.door->doormask & D_LOCKED);
             } else {
                 xlock.box->otrapped = 0;
+/*JP
                 what = (xlock.box->otyp == CHEST) ? "chest" : "box";
+*/
+                what = (xlock.box->otyp == CHEST) ? "宝箱" : "箱";
                 alreadyunlocked = !xlock.box->olocked;
             }
+#if 0 /*JP*/
             You("succeed in disarming the trap.  The %s is still %slocked.",
                 what, alreadyunlocked ? "un" : "");
+#else
+            You("罠を外した．%sは鍵が%sままだ．",
+                what, alreadyunlocked ? "開いた" : "かかった");
+#endif
             exercise(A_WIS, TRUE);
         } else {
+/*JP
             You("stop %s.", lock_action());
+*/
+            You("%sのをやめた．", lock_action());
             exercise(A_WIS, FALSE);
         }
         return ((xlock.usedtime = 0));
@@ -883,8 +900,12 @@ int x, y;
 */
             pline_The("跳ね橋はもう開いている．");
         else if (container_at(cc.x, cc.y, TRUE))
+#if 0 /*JP*/
             pline("%s like something lootable over there.",
                   Blind ? "Feels" : "Seems");
+#else
+            pline("ここには何か入れ物があるようだ．");
+#endif
         else
 /*JP
             You("%s no door there.", Blind ? "feel" : "see");

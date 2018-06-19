@@ -893,7 +893,10 @@ int mode;
                so we won't get here, hence don't need to worry about
                "there" being somewhere the player isn't sure of */
             if (mode == DO_MOVE)
+/*JP
                 pline("There is an obstacle there.");
+*/
+                pline("障害物がある．");
             return FALSE;
         } else if (tmpr->typ == IRONBARS) {
             if ((dmgtype(youmonst.data, AD_RUST)
@@ -962,7 +965,10 @@ int mode;
                     You("ドアの下からにじみ出た．");
             } else if (Underwater) {
                 if (mode == DO_MOVE)
+/*JP
                     pline("There is an obstacle there.");
+*/
+                    pline("障害物がある．");
                 return FALSE;
             } else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
                 /* Eat the door. */
@@ -1015,7 +1021,10 @@ int mode;
                     if (Blind)
                         feel_location(x, y);
                     if (Underwater || iflags.mention_walls)
+/*JP
                         You_cant("move diagonally into an intact doorway.");
+*/
+                        You_cant("壊れていない扉に斜めに移動することはできない．");
                 }
                 return FALSE;
             }
@@ -1081,7 +1090,10 @@ int mode;
         && (!doorless_door(ux, uy) || block_entry(x, y))) {
         /* Can't move at a diagonal out of a doorway with door. */
         if (mode == DO_MOVE && iflags.mention_walls)
+/*JP
             You_cant("move diagonally out of an intact doorway.");
+*/
+            You_cant("壊れていない扉から斜めに移動することはできない．");
         return FALSE;
     }
 
@@ -1089,7 +1101,10 @@ int mode;
         if (!(Blind || Hallucination) && (context.run >= 2)
             && mode != TEST_TRAV) {
             if (mode == DO_MOVE && iflags.mention_walls)
+/*JP
                 pline("A boulder blocks your path.");
+*/
+                pline("巨岩が道をふさいでいる．");
             return FALSE;
         }
         if (mode == DO_MOVE) {
@@ -1770,11 +1785,19 @@ domove()
                 if (iflags.mention_walls) {
                     if (trap && trap->tseen) {
                         int tt = what_trap(trap->ttyp);
+/*JP
                         You("stop in front of %s.",
+*/
+                        You("%sの手前で止まった．",
                             an(defsyms[trap_to_defsym(tt)].explanation));
                     } else if (is_pool_or_lava(x,y) && levl[x][y].seenv) {
+#if 0 /*JP*/
                         You("stop at the edge of the %s.",
                             hliquid(is_pool(x,y) ? "water" : "lava"));
+#else
+                        You("%sの端で止まった．.",
+                            hliquid(is_pool(x,y) ? "水" : "溶岩"));
+#endif
                     }
                 }
                 nomul(0);
@@ -3128,7 +3151,10 @@ lookaround()
     /* Grid bugs stop if trying to move diagonal, even if blind.  Maybe */
     /* they polymorphed while in the middle of a long move. */
     if (NODIAG(u.umonnum) && u.dx && u.dy) {
+/*JP
         You("cannot move diagonally.");
+*/
+        You("斜めに移動できない．");
         nomul(0);
         return;
     }
@@ -3150,7 +3176,10 @@ lookaround()
                     || (x == u.ux + u.dx && y == u.uy + u.dy
                         && !context.travel)) {
                     if (iflags.mention_walls)
+/*JP
                         pline("%s blocks your path.", upstart(a_monnam(mtmp)));
+*/
+                        pline("%sが道をふさいでいる．", a_monnam(mtmp));
                     goto stop;
                 }
             }
@@ -3168,7 +3197,10 @@ lookaround()
                     continue;
                 if (context.run != 1) {
                     if (iflags.mention_walls)
+/*JP
                         You("stop in front of the door.");
+*/
+                        You("扉の手前で止まった．");
                     goto stop;
                 }
                 goto bcorr;
@@ -3198,7 +3230,10 @@ lookaround()
                 if (x == u.ux + u.dx && y == u.uy + u.dy) {
                     if (iflags.mention_walls) {
                         int tt = what_trap(trap->ttyp);
+/*JP
                         You("stop in front of %s.",
+*/
+                        You("%sの手前で止まった．",
                             an(defsyms[trap_to_defsym(tt)].explanation));
                     }
                     goto stop;
@@ -3215,8 +3250,13 @@ lookaround()
                      * into a pool and seeing if the game allowed it
                      */
                     if (iflags.mention_walls)
+#if 0 /*JP*/
                         You("stop at the edge of the %s.",
                             hliquid(is_pool(x,y) ? "water" : "lava"));
+#else
+                        You("%sの端で止まった．",
+                            hliquid(is_pool(x,y) ? "水" : "溶岩"));
+#endif
                     goto stop;
                 }
                 continue;
@@ -3238,7 +3278,10 @@ lookaround()
 
     if (corrct > 1 && context.run == 2) {
         if (iflags.mention_walls)
+/*JP
             pline_The("corridor widens here.");
+*/
+            pline("通路はここで広くなっている．");
         goto stop;
     }
     if ((context.run == 1 || context.run == 3 || context.run == 8) && !noturn

@@ -183,7 +183,10 @@ register int otyp;
 */
         Strcat(buf, "魔法書");
         } else {
+/*JP
             Strcpy(buf, !nn ? "book" : "novel");
+*/
+            Strcpy(buf, !nn ? "本" : "小説");
             nn = 0;
         }
         break;
@@ -902,13 +905,22 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     case SPBOOK_CLASS:
         if (typ == SPE_NOVEL) { /* 3.6 tribute */
             if (!dknown)
+/*JP
                 Strcpy(buf, "book");
+*/
+                Strcpy(buf, "本");
             else if (nn)
                 Strcpy(buf, actualn);
             else if (un)
+/*JP
                 Sprintf(buf, "novel called %s", un);
+*/
+                Sprintf(buf, "%sという小説", un);
             else
+/*JP
                 Sprintf(buf, "%s book", dn);
+*/
+                Sprintf(buf, "%s本", dn);
             break;
             /* end of tribute */
         } else if (!dknown) {
@@ -1321,7 +1333,10 @@ unsigned doname_flags;
             Sprintf(prefix, "%ld%sの", obj->quan, numeral(obj));
 #endif
         else
+/*JP
             Strcpy(prefix, "some ");
+*/
+            Strcpy(prefix, "いくつかの");
     } else if (obj->otyp == CORPSE) {
         /* skip article prefix for corpses [else corpse_xname()
            would have to be taught how to strip it off again] */
@@ -1721,9 +1736,15 @@ unsigned doname_flags;
     if (!iflags.suppress_price && is_unpaid(obj)) {
         long quotedprice = unpaid_cost(obj, TRUE);
 
+#if 0 /*JP*/
         Sprintf(eos(bp), " (%s, %ld %s)",
                 obj->unpaid ? "unpaid" : "contents",
                 quotedprice, currency(quotedprice));
+#else
+        Sprintf(eos(bp), " (%s, %ld%s)",
+                obj->unpaid ? "未払い" : "中身",
+                quotedprice, currency(quotedprice));
+#endif
     } else if (with_price) {
         long price = get_cost_of_shop_item(obj);
 
@@ -2616,7 +2637,7 @@ sing:
         Strcasecpy(bspot + 1, "s");
     }
 
-#else
+#else /*新しいバッファは必要*/
     char *buf;
 
     buf = nextobuf();
@@ -2947,7 +2968,7 @@ const char *oldstr;
 bottom:
     if (excess)
         Strcat(str, excess);
-#else /*JP*/
+#else /*JP*//*新しいバッファは必要*/
     char *str = nextobuf();
     Strcpy(str, oldstr);
 #endif
@@ -3074,7 +3095,7 @@ bottom:
         Strcat(bp, excess);
 
     return bp;
-#else /*JP*/
+#else /*JP*//*新しいバッファは必要*/
     char *str = nextobuf();
     Strcpy(str, oldstr);
     return str;
@@ -4681,17 +4702,34 @@ struct obj *suit;
     const char *suitnm, *esuitp;
 
     if (Is_dragon_mail(suit))
+#if 0 /*JP*/
         return "dragon mail"; /* <color> dragon scale mail */
+#else
+        return "鱗鎧"; /* <color> dragon scale mail */
+#endif
     else if (Is_dragon_scales(suit))
+/*JP
         return "dragon scales";
+*/
+        return "鱗";
     suitnm = OBJ_NAME(objects[suit->otyp]);
     esuitp = eos((char *) suitnm);
+#if 0 /*JP*/
     if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail"))
         return "mail"; /* most suits fall into this category */
+#else
+    if (strlen(suitnm) > 2 && !strcmp(esuitp - 2, "鎧"))
+        return "鎧"; /* most suits fall into this category */
+#endif
+#if 0 /*JP*/
     else if (strlen(suitnm) > 7 && !strcmp(esuitp - 7, " jacket"))
         return "jacket"; /* leather jacket */
+#endif
     /* suit is lame but armor is ambiguous and body armor is absurd */
+/*JP
     return "suit";
+*/
+    return "服";
 }
 
 const char *

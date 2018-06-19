@@ -1224,7 +1224,11 @@ int old_range;
             *buf = '\0';
             if (iflags.last_msg == PLNMSG_OBJ_GLOWS)
                 /* we just saw "The <obj> glows <color>." from dipping */
+#if 0 /*JP*/
                 Strcpy(buf, (obj->quan == 1L) ? "It" : "They");
+#else
+                Strcpy(buf, "ÇªÇÍ");
+#endif
             else if (carried(obj) || cansee(ox, oy))
                 Strcpy(buf, Yname2(obj));
             if (*buf) {
@@ -1233,9 +1237,15 @@ int old_range;
                    when changing intensity, using "less brightly" is
                    straightforward for dimming, but we need "brighter"
                    rather than "more brightly" for brightening; ugh */
+#if 0 /*JP*/
                 pline("%s %s %s%s.", buf, otense(obj, "shine"),
                       (abs(delta) > 1) ? "much " : "",
                       (delta > 0) ? "brighter" : "less brightly");
+#else
+                pline("%sÇÃãPÇ´ÇÕ%s%sÅD", buf,
+                      (abs(delta) > 1) ? "Ç©Ç»ÇË" : "",
+                      (delta > 0) ? "ëùÇµÇΩ" : "å∏Ç¡ÇΩ");
+#endif
             }
         }
     }

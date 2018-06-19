@@ -244,7 +244,10 @@ boolean resuming;
                             u.uen = u.uenmax;
                         context.botl = 1;
                         if (u.uen == u.uenmax)
+/*JP
                             interrupt_multi("You feel full of energy.");
+*/
+                            interrupt_multi("エネルギーが回復した．");
                     }
 
                     if (!u.uinvulnerable) {
@@ -524,7 +527,10 @@ int wtcap;
     }
 
     if (reached_full)
+/*JP
         interrupt_multi("You are in full health.");
+*/
+        interrupt_multi("体力が回復した．");
 }
 
 void
@@ -664,7 +670,10 @@ boolean new_game; /* false => restoring an old game */
     /* skip "welcome back" if restoring a doomed character */
     if (!new_game && Upolyd && ugenocided()) {
         /* death via self-genocide is pending */
+/*JP
         pline("You're back, but you still feel %s inside.", udeadinside());
+*/
+        pline("あなたは帰ってきたが，魂が%sままだ．", udeadinside());
         return;
     }
 

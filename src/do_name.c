@@ -55,7 +55,13 @@ boolean FDECL((*gp_getvalidf), (int, int));
     getpos_getvalid = gp_getvalidf;
 }
 
+/*JP:
+  [0] "cannot see %s"
+  [1] "pick a %s"
+  [2] "use XXX to move the cursor to %s"
+  */
 const char *const gloc_descr[NUM_GLOCS][4] = {
+#if 0 /*JP*/
     { "any monsters", "monster", "next monster", "monsters" },
     { "any items", "item", "next object", "objects" },
     { "any doors", "door", "next door or doorway", "doors or doorways" },
@@ -63,12 +69,25 @@ const char *const gloc_descr[NUM_GLOCS][4] = {
       "unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting",
       "anything interesting" }
+#else
+    { "怪物", "怪物", "怪物の隣", "怪物" },
+    { "物", "物", "物の隣", "物" },
+    { "扉", "扉", "扉や出入り口の隣", "扉や出入り口" },
+    { "未探索部分", "未探索部分", "未探索の位置", "未探索の位置" },
+    { "関心のあるもの", "関心のあるもの", "関心のあるもの", "関心のあるもの" }
+#endif
 };
 
 const char *const gloc_filtertxt[NUM_GFILTER] = {
+#if 0 /*JP*/
     "",
     " in view",
     " in this area"
+#else
+    "",
+    "視界の中の",
+    "このエリアの"
+#endif
 };
 
 void
@@ -80,12 +99,21 @@ int gloc;
 {
     char sbuf[BUFSZ];
 
+#if 0 /*JP*/
     Sprintf(sbuf, "Use '%s' or '%s' to %s%s%s.",
             k1, k2,
             iflags.getloc_usemenu ? "get a menu of "
                                   : "move the cursor to ",
             gloc_descr[gloc][2 + iflags.getloc_usemenu],
             gloc_filtertxt[iflags.getloc_filter]);
+#else
+    Sprintf(sbuf, "'%s'か'%s'で%s%s%s．",
+            k1, k2,
+            gloc_filtertxt[iflags.getloc_filter],
+            gloc_descr[gloc][2 + iflags.getloc_usemenu],
+            iflags.getloc_usemenu ? "のメニューを出す"
+                                  : "にカーソルを動かす");
+#endif
     putstr(tmpwin, 0, sbuf);
 }
 
@@ -102,7 +130,7 @@ const char *goal;
     const char *const fastmovemode[2] = { "8 units at a time",
                                           "skipping same glyphs" };
 #else
-    const char *const fastmovemode[2] = { "一度に8歩",
+    const char *const fastmovemode[2] = { "一度に8マス",
                                           "同じ地形を飛ばして" };
 #endif
 
@@ -164,26 +192,49 @@ const char *goal;
                              visctrl(Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
+#if 0 /*JP*/
     Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
             visctrl(Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
             fastmovemode[!iflags.getloc_moveskip]);
+#else
+    Sprintf(sbuf, "'%s'で高速移動モードを%s移動にする．",
+            visctrl(Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
+            fastmovemode[!iflags.getloc_moveskip]);
+#endif
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) == 0) {
+#if 0 /*JP*/
         Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
                 visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
+#else
+        Sprintf(sbuf, "'%s'で可能なターゲットのメニュー表示を切り替える．",
+                visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
+#endif
         putstr(tmpwin, 0, sbuf);
+#if 0 /*JP*/
         Sprintf(sbuf,
                 "Use '%s' to change the mode of limiting possible targets.",
                 visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
+#else
+        Sprintf(sbuf,
+                "'%s'で制限された可能なターゲットのモードを切り替える．",
+                visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
+#endif
         putstr(tmpwin, 0, sbuf);
     }
     if (!iflags.terrainmode) {
         char kbuf[BUFSZ];
 
         if (getpos_getvalid) {
+#if 0 /*JP*/
             Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
                     visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
+#else
+            Sprintf(sbuf, "'%s'か'%s'で正当な位置に移動する．",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
+#endif
             putstr(tmpwin, 0, sbuf);
         }
         if (getpos_hilitefunc) {
@@ -205,21 +256,37 @@ const char *goal;
 #endif
         putstr(tmpwin, 0, sbuf);
         if (iflags.cmdassist) { /* assisting the '/' command, I suppose... */
+#if 0 /*JP*/
             Sprintf(sbuf,
                     (iflags.getpos_coords == GPCOORDS_NONE)
          ? "(Set 'whatis_coord' option to include coordinates with '%s' text.)"
          : "(Reset 'whatis_coord' option to omit coordinates from '%s' text.)",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
+#else
+            Sprintf(sbuf,
+                    (iflags.getpos_coords == GPCOORDS_NONE)
+         ? "('%s'に座標を含むには'whatis_coord'オプションをオンにする．)"
+         : "('%s'から座標を除くには'whatis_coord'オプションをオフにする．)",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
+#endif
         }
         /* disgusting hack; the alternate selection characters work for any
            getpos call, but only matter for dowhatis (and doquickwhatis) */
 	doing_what_is = (goal == what_is_an_unknown_object);
         if (doing_what_is) {
+#if 0 /*JP*/
             Sprintf(kbuf, "'%s' or '%s' or '%s' or '%s'",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_Q]),
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_O]),
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+#else
+            Sprintf(kbuf, "'%s'か'%s'か'%s'か'%s'",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_Q]),
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_O]),
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+#endif
         } else {
             Sprintf(kbuf, "'%s'", visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]));
         }
@@ -230,22 +297,47 @@ const char *goal;
 #endif
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
+#if 0 /*JP*/
             Sprintf(sbuf,
        "  '%s' describe current spot, show 'more info', move to another spot.",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+#else
+            Sprintf(sbuf,
+       "  '%s'は現在の位置を説明し、追加情報を表示し、次の位置に移動する．",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+#endif
             putstr(tmpwin, 0, sbuf);
+#if 0 /*JP*/
             Sprintf(sbuf,
                     "  '%s' describe current spot,%s move to another spot;",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
                     flags.help ? " prompt if 'more info'," : "");
+#else
+            Sprintf(sbuf,
+                    "  '%s'は現在の位置を説明し，%s次の位置に移動する;",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
+                    flags.help ? "追加情報があれば確認し，" : "");
+#endif
             putstr(tmpwin, 0, sbuf);
+#if 0 /*JP*/
             Sprintf(sbuf,
                     "  '%s' describe current spot, move to another spot;",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
+#else
+            Sprintf(sbuf,
+                    "  '%s'は現在の位置を説明し，次の位置に移動する;",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
+#endif
             putstr(tmpwin, 0, sbuf);
+#if 0 /*JP*/
             Sprintf(sbuf,
                     "  '%s' describe current spot, stop looking at things;",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_O]));
+#else
+            Sprintf(sbuf,
+                    "  '%s'は現在の位置を説明し，見るのをやめる;",
+                    visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_O]));
+#endif
             putstr(tmpwin, 0, sbuf);
         }
     }
@@ -506,16 +598,26 @@ boolean fulldir;
     int dst;
 
     if (!dx && !dy) {
+/*JP
         Sprintf(buf, "here");
+*/
+        Sprintf(buf, "ここ");
     } else if ((dst = xytod(dx, dy)) != -1) {
         /* explicit direction; 'one step' is implicit */
         Sprintf(buf, "%s", directionname(dst));
     } else {
         const char *dirnames[4][2] = {
+#if 0 /*JP*/
             { "n", "north" },
             { "s", "south" },
             { "w", "west" },
             { "e", "east" } };
+#else
+            { "n", "北" },
+            { "s", "南" },
+            { "w", "西" },
+            { "e", "東" } };
+#endif
         buf[0] = '\0';
         /* 9999: protect buf[] against overflow caused by invalid values */
         if (dy) {
@@ -584,12 +686,16 @@ int cx, cy;
     coord cc;
     int sym = 0;
     char tmpbuf[BUFSZ];
+/*JP
     const char *firstmatch = "unknown";
+*/
+    const char *firstmatch = "不明";
 
     cc.x = cx;
     cc.y = cy;
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
+#if 0 /*JP*/
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
@@ -597,6 +703,15 @@ int cx, cy;
                       ? " (illegal)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
+#else
+        custompline(SUPPRESS_HISTORY,
+                    "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
+                    (iflags.autodescribe
+                     && getpos_getvalid && !getpos_getvalid(cx, cy))
+                      ? " (不正)" : "",
+                    (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
+                      ? " (経路なし)" : "");
+#endif
         curs(WIN_MAP, cx, cy);
         flush_screen(0);
     }
@@ -619,9 +734,15 @@ int gloc;
 
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
+#if 0 /*JP*/
         You("cannot %s %s.",
             iflags.getloc_filter == GFILTER_VIEW ? "see" : "detect",
             gloc_descr[gloc][0]);
+#else
+        You("%sを%sことができない．",
+            gloc_descr[gloc][0],
+            iflags.getloc_filter == GFILTER_VIEW ? "見る" : "見つける");
+#endif
         return FALSE;
     }
 
@@ -633,7 +754,10 @@ int gloc;
     for (i = 1; i < gcount; i++) {
         char fullbuf[BUFSZ];
         coord tmpcc;
+/*JP
         const char *firstmatch = "unknown";
+*/
+        const char *firstmatch = "不明";
         int sym = 0;
         any.a_int = i + 1;
         tmpcc.x = garr[i].x;
@@ -648,10 +772,17 @@ int gloc;
         }
     }
 
+#if 0 /*JP*/
     Sprintf(tmpbuf, "Pick a target %s%s%s",
             gloc_descr[gloc][1],
             gloc_filtertxt[iflags.getloc_filter],
             iflags.getloc_travelmode ? " for travel" : "");
+#else
+    Sprintf(tmpbuf, "%s%sで目標とする%sを選択してください",
+            iflags.getloc_travelmode ? "移動のために" : "",
+            gloc_filtertxt[iflags.getloc_filter],
+            gloc_descr[gloc][1]);
+#endif
     end_menu(tmpwin, tmpbuf);
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
@@ -866,9 +997,15 @@ const char *goal;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
             const char *const view_filters[NUM_GFILTER] = {
+#if 0 /*JP*/
                 "Not limiting targets",
                 "Limiting targets to in sight",
                 "Limiting targets to in same area"
+#else
+                "ターゲットを制限しない",
+                "視界内にターゲットを制限する",
+                "同じエリアにターゲットを制限する"
+#endif
             };
             iflags.getloc_filter = (iflags.getloc_filter + 1) % NUM_GFILTER;
             for (i = 0; i < NUM_GLOCS; i++) {
@@ -878,13 +1015,21 @@ const char *goal;
                 }
                 gidx[i] = gcount[i] = 0;
             }
+/*JP
             pline("%s.", view_filters[iflags.getloc_filter]);
+*/
+            pline("%s．", view_filters[iflags.getloc_filter]);
             msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_MENU]) {
             iflags.getloc_usemenu = !iflags.getloc_usemenu;
+#if 0 /*JP*/
             pline("%s a menu to show possible targets.",
                   iflags.getloc_usemenu ? "Using" : "Not using");
+#else
+            pline("可能なターゲットを見るのにメニューを使%s．",
+                  iflags.getloc_usemenu ? "う" : "わない");
+#endif
             msg_given = TRUE;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_SELF]) {
@@ -897,8 +1042,13 @@ const char *goal;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
             iflags.getloc_moveskip = !iflags.getloc_moveskip;
+#if 0 /*JP*/
             pline("%skipping over similar terrain when fastmoving the cursor.",
                   iflags.getloc_moveskip ? "S" : "Not s");
+#else
+            pline("カーソルを高速移動させるときに似たような地形を飛ば%s．",
+                  iflags.getloc_moveskip ? "す" : "さない");
+#endif
         } else if ((cp = index(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
             /* nearest or farthest monster or object or door or unexplored */
             int gtmp = (int) (cp - mMoOdDxX), /* 0..7 */
@@ -1178,14 +1328,21 @@ char *monnambuf, *usrbuf;
         /* catch trying to name "the {priest,Angel} of Crom" as "Crom" */
         || ((p = strstri(monnambuf, " of ")) != 0
             && fuzzymatch(usrbuf, p + 4, " -_", TRUE))) {
+#if 0 /*JP*/
         pline("%s is already called %s.",
               upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
+#else
+        pline("%sは既に%sと呼ばれている．",
+              upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
+#endif
         return TRUE;
+#if 0 /*JP*//*日本語では使わない*/
     } else if (mtmp->data == &mons[PM_JUIBLEX]
                && strstri(monnambuf, "Juiblex")
                && !strcmpi(usrbuf, "Jubilex")) {
         pline("%s doesn't like being called %s.", upstart(monnambuf), usrbuf);
         return TRUE;
+#endif
     }
     return FALSE;
 }
@@ -1667,8 +1824,12 @@ namefloorobj()
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
+#if 0 /*JP*/
     Sprintf(buf, "object on map (or '.' for one %s you)",
             (u.uundetected && hides_under(youmonst.data)) ? "over" : "under");
+#else
+    Strcpy(buf, "地図上の物体(あるいは'.'であなたのいる場所");
+#endif
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
         return;
     if (cc.x == u.ux && cc.y == u.uy) {
@@ -2253,6 +2414,7 @@ roguename()
                 return i + 5;
             }
     }
+    /*JP:Rogueの開発者の名前*/
     return rn2(3) ? (rn2(2) ? "Michael Toy" : "Kenneth Arnold")
                   : "Glenn Wichman";
 }
@@ -2300,6 +2462,7 @@ rndcolor()
 }
 
 static NEARDATA const char *const hliquids[] = {
+#if 0 /*JP*/
     "yoghurt", "oobleck", "clotted blood", "diluted water", "purified water",
     "instant coffee", "tea", "herbal infusion", "liquid rainbow",
     "creamy foam", "mulled wine", "bouillon", "nectar", "grog", "flubber",
@@ -2307,6 +2470,15 @@ static NEARDATA const char *const hliquids[] = {
     "caramel sauce", "ink", "aqueous humour", "milk substitute", "fruit juice",
     "glowing lava", "gastric acid", "mineral water", "cough syrup", "quicksilver",
     "sweet vitriol", "grey goo", "pink slime",
+#else
+    "ヨーグルト", "ウーブレック", "血糊", "蒸留水", "精製水",
+    "インスタントコーヒー", "紅茶", "ハーブ液", "液体の虹",
+    "クリーミーフォーム", "ホットワイン", "ブイヨン", "果汁", "グロッグ", "フラバー",
+    "ケチャップ", "低速光", "油", "ビネグレットソース", "液体水晶", "蜂蜜",
+    "カラメルソース", "インク", "房水", "代用乳", "フルーツジュース",
+    "流れる溶岩", "胃酸", "ミネラルウォーター", "咳止めシロップ", "水銀",
+    "ジエチルエーテル", "グレイグー", "ピンクスライム",
+#endif
 };
 
 const char *

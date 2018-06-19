@@ -528,9 +528,15 @@ doread()
            maintained illiterate conduct so far, and this mail
            scroll didn't come from bones, ask for confirmation */
         if (!u.uconduct.literate) {
+#if 0 /*JP*/
             if (!scroll->spe && yn(
              "Reading mail will violate \"illiterate\" conduct.  Read anyway?"
                                    ) != 'y')
+#else
+            if (!scroll->spe && yn(
+             "メールを読むと「文字を読まない」挑戦に違反するけど，それでも読む？"
+                                   ) != 'y')
+#endif
                 return 0;
         }
     }
@@ -1249,7 +1255,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         known = TRUE;
         if (sobj->spe == 2)
             /* "stamped scroll" created via magic marker--without a stamp */
+/*JP
             pline("This scroll is marked \"postage due\".");
+*/
+            pline("この巻物には「料金不足」と書いてある．");
         else if (sobj->spe)
             /* scroll of mail obtained from bones file or from wishing;
              * note to the puzzled: the game Larn actually sends you junk
@@ -1491,7 +1500,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 /*JP
                 You_feel("confused.");
 */
-                You_feel("confused.");
+                You_feel("混乱した．");
             make_confused(HConfusion + rnd(100), FALSE);
         } else if (confused) {
             if (!sblessed) {
@@ -2065,11 +2074,20 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         } else {
             if (sblessed) {
                 if (!already_known)
+/*JP
                     pline("This is a scroll of fire!");
+*/
+                    pline("これは火の巻物だ！");
                 dam *= 5;
+/*JP
                 pline("Where do you want to center the explosion?");
+*/
+                pline("どこを爆発の中心にしますか？");
                 getpos_sethilite(display_stinking_cloud_positions, get_valid_stinking_cloud_pos);
+/*JP
                 (void) getpos(&cc, TRUE, "the desired position");
+*/
+                (void) getpos(&cc, TRUE, "狙いの場所");
                 if (!is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
                     /* try to reach too far, get burned */
                     cc.x = u.ux;

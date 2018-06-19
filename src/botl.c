@@ -214,14 +214,20 @@ do_statusline2()
      * unusual for more than one of them to apply at a time.]
      */
     if (Stoned)
+/*JP
         Strcpy(nb = eos(nb), " Stone");
+*/
+        Strcpy(nb = eos(nb), " êŒâª");
     if (Slimed)
 /*JP
         Strcpy(nb = eos(nb), " Slime");
 */
         Strcpy(nb = eos(nb), " Ç«ÇÎÇ«ÇÎ");
     if (Strangled)
+/*JP
         Strcpy(nb = eos(nb), " Strngl");
+*/
+        Strcpy(nb = eos(nb), " íÇëß");
     if (Sick) {
         if (u.usick_type & SICK_VOMITABLE)
 /*JP
@@ -244,7 +250,10 @@ do_statusline2()
 */
         Strcpy(nb = eos(nb), " ñ”ñ⁄");
     if (Deaf)
+/*JP
         Strcpy(nb = eos(nb), " Deaf");
+*/
+        Strcpy(nb = eos(nb), " é®òW");
     if (Stunned)
 /*JP
         Strcpy(nb = eos(nb), " Stun");
@@ -262,11 +271,20 @@ do_statusline2()
         Strcpy(nb = eos(nb), " å∂äo");
     /* levitation and flying are mutually exclusive; riding is not */
     if (Levitation)
+/*JP
         Strcpy(nb = eos(nb), " Lev");
+*/
+        Strcpy(nb = eos(nb), " ïÇóV");
     if (Flying)
+/*JP
         Strcpy(nb = eos(nb), " Fly");
+*/
+        Strcpy(nb = eos(nb), " îÚçs");
     if (u.usteed)
+/*JP
         Strcpy(nb = eos(nb), " Ride");
+*/
+        Strcpy(nb = eos(nb), " ãRèÊ");
     cln = strlen(cond);
 
     /*
@@ -628,7 +646,11 @@ bot_via_windowport()
     Strcpy(nb = buf, plname);
     nb[0] = highc(nb[0]);
     nb[10] = '\0';
+#if 0 /*JP*/
     Sprintf(nb = eos(nb), " the ");
+#else
+    Sprintf(nb = eos(nb), " ");
+#endif
     if (Upolyd) {
         for (i = 0, nb = strcpy(eos(nb), mons[u.umonnum].mname); nb[i]; i++)
             if (i == 0 || nb[i - 1] == ' ')
@@ -651,11 +673,19 @@ bot_via_windowport()
     blstats[idx][BL_CH].a.a_int = ACURR(A_CHA);
 
     /* Alignment */
+#if 0 /*JP*/
     Strcpy(blstats[idx][BL_ALIGN].val, (u.ualign.type == A_CHAOTIC)
                                           ? "Chaotic"
                                           : (u.ualign.type == A_NEUTRAL)
                                                ? "Neutral"
                                                : "Lawful");
+#else
+    Strcpy(blstats[idx][BL_ALIGN].val, (u.ualign.type == A_CHAOTIC)
+                                          ? "ç¨ì◊"
+                                          : (u.ualign.type == A_NEUTRAL)
+                                               ? "íÜóß"
+                                               : "íÅèò");
+#endif
 
     /* Score */
     blstats[idx][BL_SCORE].a.a_long =

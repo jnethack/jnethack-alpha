@@ -590,6 +590,7 @@ int how;
 }
 
 /* some special cases for overriding while-helpless reason */
+#if 0 /*JP*//*日本語では使わない*/
 static const struct {
     int why, unmulti;
     const char *exclude, *include;
@@ -626,6 +627,7 @@ int how;
             }
     }
 }
+#endif
 
 #if defined(WIN32) && !defined(SYSCF)
 #define NOTIFY_NETHACK_BUGS
@@ -1326,7 +1328,9 @@ int how;
     if (how == ESCAPED || how == PANICKED)
         killer.format = NO_KILLER_PREFIX;
 
+#if 0 /*JP*//*日本語では使わない*/
     fixup_death(how); /* actually, fixup multi_reason */
+#endif
 
     if (how != PANICKED) {
         /* these affect score and/or bones, but avoid them during panic */
@@ -1980,7 +1984,10 @@ set_vanq_order()
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, vanqorders[i],
                  (i == vanq_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
     }
+/*JP
     end_menu(tmpwin, "Sort order for vanquished monster counts");
+*/
+    end_menu(tmpwin, "倒した敵のソート順");
 
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
@@ -2129,10 +2136,14 @@ boolean ask;
 #endif
                 }
                 /* number of leading spaces to match 3 digit prefix */
+#if 0 /*JP*/
                 pfx = !strncmpi(buf, "the ", 3) ? 0
                       : !strncmpi(buf, "an ", 3) ? 1
                         : !strncmpi(buf, "a ", 2) ? 2
                           : !digit(buf[2]) ? 4 : 0;
+#else
+                pfx = !digit(buf[2]) ? 4 : 0;
+#endif
                 if (class_header)
                     ++pfx;
                 Sprintf(buftoo, "%*s%s", pfx, "", buf);
@@ -2421,6 +2432,7 @@ char **inp, *out;
     *inp = in;
 }
 
+/*JP: files.cで1ヶ所使われているがここは英語のままにしておく*/
 char *
 build_english_list(in)
 char *in;

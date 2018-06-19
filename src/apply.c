@@ -612,8 +612,13 @@ struct obj *obj;
         You("%sを通して泡を出した．", xname(obj));
     } else {
         if (Deaf)
+#if 0 /*JP*/
             You_feel("rushing air tickle your %s.",
                         body_part(NOSE));
+#else
+            You_feel("空気の流れが%sをくすぐった．",
+                        body_part(NOSE));
+#endif
         else
 /*JP
         You(whistle_str, obj->cursed ? "shrill" : "high");
@@ -792,12 +797,21 @@ struct obj *obj;
            it from the engulfer versus from some other creature
            (note: the two in-use cases can't actually occur; all
            leashes are released when the hero gets engulfed) */
+#if 0 /*JP*/
         You_cant((!obj->leashmon
                   ? "leash %s from inside."
                   : (obj->leashmon == (int) u.ustuck->m_id)
                     ? "unleash %s from inside."
                     : "unleash anything from inside %s."),
                  noit_mon_nam(u.ustuck));
+#else
+        You_cant((!obj->leashmon
+                  ? "内側から%sに結びつけることはできない．"
+                  : (obj->leashmon == (int) u.ustuck->m_id)
+                    ? "内側から%sを外すことはできない．"
+                    : "%sの内側から外すことはできない．"),
+                 noit_mon_nam(u.ustuck));
+#endif
         return 0;
     }
     if (!obj->leashmon && number_leashed() >= MAXLEASHED) {
@@ -843,7 +857,10 @@ struct obj *obj;
     if (!spotmon && !glyph_is_invisible(levl[cc.x][cc.y].glyph)) {
         /* for the unleash case, we don't verify whether this unseen
            monster is the creature attached to the current leash */
+/*JP
         You("fail to %sleash something.", obj->leashmon ? "un" : "");
+*/
+        You("%sのに失敗した．", obj->leashmon ? "外す" : "結びつける");
         /* trying again will work provided the monster is tame
            (and also that it doesn't change location by retry time) */
         map_invisible(cc.x, cc.y);
@@ -1158,8 +1175,13 @@ struct obj *obj;
     }
     if (u.uswallow) {
         if (useeit)
+#if 0 /*JP*/
             You("reflect %s %s.", s_suffix(mon_nam(u.ustuck)),
                 mbodypart(u.ustuck, STOMACH));
+#else
+            You("%sの%sを映した．", mon_nam(u.ustuck),
+                mbodypart(u.ustuck, STOMACH));
+#endif
         return 1;
     }
     if (Underwater) {
@@ -2125,14 +2147,20 @@ boolean showmsg;
             && (traj == jDiag
                 || ((traj & jHorz) != 0) == (lev->horizontal != 0))) {
             if (showmsg)
+/*JP
                 You_cant("jump diagonally out of a doorway.");
+*/
+                You_cant("出入り口から斜めに飛び出すことはできない．");
             return FALSE;
         }
         uc.x = u.ux, uc.y = u.uy;
         tc.x = x, tc.y = y; /* target */
         if (!walk_path(&uc, &tc, check_jump, (genericptr_t) &traj)) {
             if (showmsg)
+/*JP
                 There("is an obstacle preventing that jump.");
+*/
+                pline("飛ぶのを邪魔する何かがある．");
             return FALSE;
         }
     }

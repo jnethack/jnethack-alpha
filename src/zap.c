@@ -926,14 +926,27 @@ boolean by_hero;
             char buf[BUFSZ];
             unsigned pfx = CXN_PFX_THE;
 
+#if 1 /*JP*//* 死体名は先に */
+            Strcat(buf, corpse_xname(corpse, (const char *) 0, pfx));
+#endif
+#if 0 /*JP*/
             Strcpy(buf, one_of ? "one of " : "");
+#else /* 語順は変わっている */
+            if (one_of) {
+                Strcat(buf, "の一つ");
+            }
+#endif
+#if 0 /*JP*//* ここで「あなたの」は不自然 */
             if (carried(corpse) && !corpse->unpaid) {
                 Strcat(buf, "your ");
                 pfx = CXN_NO_PFX;
             }
+#endif
             if (one_of)
                 corpse->quan++; /* force plural */
+#if 0 /*JP*//* 既に設定済み */
             Strcat(buf, corpse_xname(corpse, (const char *) 0, pfx));
+#endif
             if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
                 corpse->quan--;
 /*JP
@@ -5552,7 +5565,10 @@ register int osym, dmgtyp;
                     boolean one = (cnt == 1L);
 
                     if (dmgtyp == AD_FIRE && osym == FOOD_CLASS)
+/*JP
                         how = "exploding glob of slime";
+*/
+                        how = "スライムのねばねばの爆発で";
                     if (physical_damage)
                         dmg = Maybe_Half_Phys(dmg);
                     losehp(dmg, one ? how : (const char *) makeplural(how),

@@ -980,7 +980,11 @@ boolean so;
 #endif /*JP*/
 
         if (t1->deathdnum == astral_level.dnum) {
+#if 0 /*JP*/
             const char *arg, *fmt = " on the Plane of %s";
+#else
+            const char *arg;
+#endif
 
             switch (t1->deathlev) {
             case -5:
@@ -1042,9 +1046,11 @@ boolean so;
                 Sprintf(eos(where), "[最大地下%d階]", t1->maxlvl);
         }
 
+#if 0 /*JP*//* 日本語では細工不要 */
         /* kludge for "quit while already on Charon's boat" */
         if (!strncmp(t1->death, "quit ", 5))
             Strcat(linebuf, t1->death + 4);
+#endif
     }
 #if 0 /*JP*/
     Strcat(linebuf, ".");
@@ -1068,7 +1074,7 @@ boolean so;
     /* beginning of hp column after padding (not actually padded yet) */
     hppos = COLNO - (sizeof("  Hp [max]") - 1); /* sizeof(str) includes \0 */
 #if 1 /*JP*/
-    while(lngr >= hppos ){
+    while (lngr >= hppos) {
 /*JP hpposより前の適当な位置で分割する．*/
         car[0] = '\0';
         cdr[0] = '\0';

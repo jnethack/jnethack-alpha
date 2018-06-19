@@ -2806,8 +2806,13 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
     boolean vis = canseemon(mon), res = TRUE;
 
     if (vis)
+#if 0 /*JP*/
         pline("%s starts turning %s.", Monnam(mon),
               green_mon(mon) ? "into ooze" : hcolor(NH_GREEN));
+#else
+        pline("%sは%sになりはじめた．", Monnam(mon),
+              green_mon(mon) ? "スライム" : hcolor(NH_GREEN));
+#endif
     /* -4 => sliming, causes quiet loss of enhanced speed */
     mon_adjust_speed(mon, -4, (struct obj *) 0);
 
@@ -2816,8 +2821,12 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
 
         if (mon->mx == trap->tx && mon->my == trap->ty) {
             if (vis)
+#if 0 /*JP*/
                 pline("%s triggers %s fire trap!", Mnam,
                       trap->tseen ? "the" : "a");
+#else
+                pline("%sは炎の罠を発動させた！", Mnam);
+#endif
         } else {
             remove_monster(mon->mx, mon->my);
             newsym(mon->mx, mon->my);
@@ -2826,10 +2835,14 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
                 worm_move(mon);
             newsym(mon->mx, mon->my);
             if (vis)
+#if 0 /*JP*/
                 pline("%s %s %s %s fire trap!", Mnam,
                       vtense(Mnam, locomotion(mon->data, "move")),
                       is_floater(mon->data) ? "over" : "onto",
                       trap->tseen ? "the" : "a");
+#else
+                pline("%sは炎の罠に飛び込んだ！", Mnam);
+#endif
         }
         /* hack to avoid mintrap()'s chance of avoiding known trap */
         mon->mtrapseen &= ~(1 << (FIRE_TRAP - 1));
@@ -2837,7 +2850,10 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
     } else if (otyp == STRANGE_OBJECT) {
         /* monster is using fire breath on self */
         if (vis)
+/*JP
             pline("%s breathes fire on %sself.", Monnam(mon), mhim(mon));
+*/
+            pline("%sは火をはいた．", Monnam(mon));
         if (!rn2(3))
             mon->mspec_used = rn1(10, 5);
         /* -21 => monster's fire breath; 1 => # of damage dice */
@@ -2846,7 +2862,10 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
         mreadmsg(mon, obj);
         if (mon->mconf) {
             if (cansee(mon->mx, mon->my))
+/*JP
                 pline("Oh, what a pretty fire!");
+*/
+                pline("あら、なんてかわいい火だ！");
             if (vis && !objects[otyp].oc_name_known
                 && !objects[otyp].oc_uname)
                 docall(obj);
@@ -2880,15 +2899,26 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
                    for pacifist conduct); xkilled()'s message would say
                    "You killed/destroyed <mon>" so give our own message */
                 if (vis)
+#if 0 /*JP*/
                     pline("%s is %s by the fire!", Monnam(mon),
                           nonliving(mon->data) ? "destroyed" : "killed");
+#else
+                    pline("%sは火で%sされた！", Monnam(mon),
+                          nonliving(mon->data) ? "倒" : "殺");
+#endif
                 xkilled(mon, XKILL_NOMSG | XKILL_NOCONDUCT);
             } else
+/*JP
                 monkilled(mon, "fire", AD_FIRE);
+*/
+                monkilled(mon, "火", AD_FIRE);
         } else {
             /* non-fatal damage occurred */
             if (vis)
+/*JP
                 pline("%s is burned%s", Monnam(mon), exclam(dmg));
+*/
+                pline("%sは燃えた%s", Monnam(mon), exclam(dmg));
         }
     }
     if (vis) {
@@ -2937,7 +2967,11 @@ struct monst *mon;
         return (ptr->mcolor == CLR_GREEN || ptr->mcolor == CLR_BRIGHT_GREEN);
 #endif
     /* approximation */
+#if 0 /*JP*/
     if (strstri(ptr->mname, "green"))
+#else
+    if (strstri(ptr->mname, "緑"))
+#endif
         return TRUE;
     switch (monsndx(ptr)) {
     case PM_FOREST_CENTAUR:

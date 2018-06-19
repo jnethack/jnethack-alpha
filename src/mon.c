@@ -2643,6 +2643,7 @@ struct monst *mtmp;
                                && closed_door(mtmp->mx, mtmp->my));
 
             /* construct a format string before transformation */
+#if 0 /*JP*/
             Sprintf(buf, "The lapidifying %s %s %s",
                     x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
                              (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
@@ -2651,6 +2652,16 @@ struct monst *mtmp;
                        : is_flyer(mtmp->data) ? "drops to the"
                           : "writhes on the",
                     surface(x,y));
+#else
+            Sprintf(buf, "石化しつつある%sが%s%s",
+                    x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
+                             (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
+                              | SUPPRESS_INVISIBLE | SUPPRESS_IT), FALSE),
+                    surface(x,y),
+                    amorphous(mtmp->data) ? "の上で融合した"
+                       : is_flyer(mtmp->data) ? "に落ちた"
+                          : "の上で身もだえた");
+#endif
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
             if (mtmp->mhpmax <= 0)
@@ -2667,7 +2678,10 @@ struct monst *mtmp;
                 }
             }
             if (canspotmon(mtmp)) {
+/*JP
                 pline("%s!", buf);
+*/
+                pline("%s！", buf);
                 display_nhwindow(WIN_MESSAGE, FALSE);
             }
             newcham(mtmp, &mons[mndx], FALSE, FALSE);
@@ -2676,8 +2690,13 @@ struct monst *mtmp;
             else
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
+#if 0 /*JP*/
                 pline("%s rises from the %s with renewed agility!",
                       Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
+#else
+                pline("%sは機敏さを取り戻して%sから復活した！",
+                      Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
+#endif
             }
             newsym(mtmp->mx, mtmp->my);
             return FALSE;   /* didn't petrify */
@@ -2856,7 +2875,10 @@ struct monst *mtmp;
 boolean via_attack;
 {
     if (via_attack && sengr_at("Elbereth", u.ux, u.uy, TRUE)) {
+/*JP
         You_feel("like a hypocrite.");
+*/
+        You_feel("偽善者のような気がした．");
         /* AIS: Yes, I know alignment penalties and bonuses aren't balanced
            at the moment. This is about correct relative to other "small"
            penalties; it should be fairly large, as attacking while standing
@@ -2867,7 +2889,10 @@ boolean via_attack;
         adjalign(-5);
 
         if (!Blind)
+/*JP
             pline("The engraving beneath you fades.");
+*/
+            pline("あなたの足元の文字が薄れた．");
         del_engr_at(u.ux, u.uy);
     }
 
@@ -2929,7 +2954,10 @@ boolean via_attack;
     /* make other peaceful monsters react */
     if (!context.mon_moving) {
         static const char *const Exclam[] = {
+/*JP
             "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
+*/
+            "ぐはっ！", "うわ．", "Oh my!", "なにっ？", "なんだ？",
         };
         struct monst *mon;
         int mndx = monsndx(mtmp->data);
@@ -2947,7 +2975,10 @@ boolean via_attack;
 
                 if (humanoid(mon->data) || mon->isshk || mon->ispriest) {
                     if (is_watch(mon->data)) {
+/*JP
                         verbalize("Halt!  You're under arrest!");
+*/
+                        verbalize("止まれ！逮捕する！");
                         (void) angry_guards(!!Deaf);
                     } else {
                         if (!rn2(5)) {
@@ -2970,7 +3001,10 @@ boolean via_attack;
                             mon->mpeaceful = 0;
                             adjalign(-1);
                             if (!exclaimed)
+/*JP
                                 pline("%s gets angry!", Monnam(mon));
+*/
+                                pline("%sは怒った！", Monnam(mon));
                         }
                     }
                 } else if (mon->data->mlet == mtmp->data->mlet
@@ -3723,8 +3757,13 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                     char msgtrail[BUFSZ];
 
                     if (is_vampshifter(mtmp)) {
+#if 0 /*JP*/
                         Sprintf(msgtrail, " which was a shapeshifted %s",
                                 noname_monnam(mtmp, ARTICLE_NONE));
+#else
+                        Sprintf(msgtrail, "(実際には形を変えた%s)",
+                                noname_monnam(mtmp, ARTICLE_NONE));
+#endif
                     } else if (is_animal(mdat)) {
 /*JP
                         Strcpy(msgtrail, "'s stomach");

@@ -128,11 +128,21 @@ char *outbuf;
     int x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my,
         glyph = (level.flags.hero_memory && !isyou) ? levl[x][y].glyph
                                                     : glyph_at(x, y);
+#if 1 /*JP*/
+    char suffixbuf[QBUFSZ];
+#endif
 
     *outbuf = '\0';
+#if 1 /*JP*/
+    suffixbuf[0] = '\0';
+#endif
     if (mon->m_ap_type == M_AP_FURNITURE
         || mon->m_ap_type == M_AP_OBJECT) {
+#if 0 /*JP*/
         Strcpy(outbuf, ", mimicking ");
+#else /*後で追加する*/
+        Strcpy(suffixbuf, "のふりをしている");
+#endif
         if (mon->m_ap_type == M_AP_FURNITURE) {
             Strcat(outbuf, an(defsyms[mon->mappearance].explanation));
         } else if (mon->m_ap_type == M_AP_OBJECT
@@ -149,27 +159,55 @@ char *outbuf;
         } else {
             Strcat(outbuf, something);
         }
+#if 1 /*JP*/
+        Strcat(outbuf, suffixbuf);
+#endif
     } else if (mon->m_ap_type == M_AP_MONSTER) {
         if (altmon)
+#if 0 /*JP*/
             Sprintf(outbuf, ", masquerading as %s",
                     an(mons[mon->mappearance].mname));
+#else
+            Sprintf(outbuf, "%sになりすましている",
+                    mons[mon->mappearance].mname);
+#endif
     } else if (isyou ? u.uundetected : mon->mundetected) {
+#if 0 /*JP*/
         Strcpy(outbuf, ", hiding");
+#else
+        Strcpy(suffixbuf, "に隠れている");
+#endif
         if (hides_under(mon->data)) {
+#if 0 /*JP*//*地形の場合「の下に」などは不自然なので、単に省略しておく*/
             Strcat(outbuf, " under ");
+#endif
             /* remembered glyph, not glyph_at() which is 'mon' */
             if (glyph_is_object(glyph))
                 goto objfrommap;
             Strcat(outbuf, something);
         } else if (is_hider(mon->data)) {
+#if 0 /*JP*/
             Sprintf(eos(outbuf), " on the %s",
                     (is_flyer(mon->data) || mon->data->mlet == S_PIERCER)
                        ? "ceiling"
                        : surface(x, y)); /* trapper */
+#else
+            Sprintf(eos(outbuf), "%s",
+                    (is_flyer(mon->data) || mon->data->mlet == S_PIERCER)
+                       ? "天井"
+                       : surface(x, y)); /* trapper */
+#endif
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
+#if 0 /*JP*/
                 Strcat(outbuf, " in murky water");
+#else
+                Strcat(outbuf, "にごった水の中");
+#endif
         }
+#if 1 /*JP*/
+        Strcat(outbuf, suffixbuf);
+#endif
     }
 }
 
@@ -246,7 +284,10 @@ int x, y, glyph;
         Strcpy(buf, something); /* sanity precaution */
 
     if (otmp && otmp->where == OBJ_BURIED)
+/*JP
         Strcat(buf, " (buried)");
+*/
+        Strcat(buf, " (埋まっている)");
     else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
 /*JP
         Strcat(buf, " embedded in stone");
@@ -314,8 +355,12 @@ int x, y;
 #endif
     if (u.ustuck == mtmp) {
         if (u.uswallow || iflags.save_uswallow) /* monster detection */
+#if 0 /*JP*/
             Strcat(buf, is_animal(mtmp->data)
                           ? ", swallowing you" : ", engulfing you");
+#else
+            Strcat(buf, ", あなたを飲み込んでいる");
+#endif
         else
             Strcat(buf, (Upolyd && sticks(youmonst.data))
 /*JP
@@ -418,11 +463,19 @@ int x, y;
                     unsigned long mW = (context.warntype.obj
                                         | context.warntype.polyd),
                                   m2 = mtmp->data->mflags2;
+#if 0 /*JP*/
                     const char *whom = ((mW & M2_HUMAN & m2) ? "human"
                                         : (mW & M2_ELF & m2) ? "elf"
                                           : (mW & M2_ORC & m2) ? "orc"
                                             : (mW & M2_DEMON & m2) ? "demon"
                                               : mtmp->data->mname);
+#else
+                    const char *whom = ((mW & M2_HUMAN & m2) ? "人間"
+                                        : (mW & M2_ELF & m2) ? "エルフ"
+                                          : (mW & M2_ORC & m2) ? "オーク"
+                                            : (mW & M2_DEMON & m2) ? "悪魔"
+                                              : mtmp->data->mname);
+#endif
 
 /*JP
                     Sprintf(eos(monbuf), "warned of %s", makeplural(whom));
@@ -534,9 +587,17 @@ char *buf, *monbuf;
          * chests so that they can have their own glyphs and tiles.
          */
         if (trapped_chest_at(tnum, x, y))
+#if 0 /*JP*/
             Strcpy(buf, "trapped chest"); /* might actually be a large box */
+#else
+            Strcpy(buf, "罠の仕掛けられた箱"); /* might actually be a large box */
+#endif
         else if (trapped_door_at(tnum, x, y))
+#if 0 /*JP*/
             Strcpy(buf, "trapped door"); /* not "trap door"... */
+#else
+            Strcpy(buf, "罠の仕掛けられた扉"); /* not "trap door"... */
+#endif
         else
             Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
     } else if (glyph_is_warning(glyph)) {
@@ -672,6 +733,7 @@ boolean user_typed_name, without_asking;
         dbase_str = strcpy(newstr, inp);
     (void) lcase(dbase_str);
 
+    /*JP:TODO:データベース検索は動いていないので要修正*/
     /*
      * TODO:
      * The switch from xname() to doname_vague_quan() in look_at_obj()
@@ -1071,7 +1133,11 @@ const char **firstmatch;
                 i = 0; /* undo loop increment */
             x_str = defsyms[i].explanation;
             if (submerged && !strcmp(x_str, defsyms[0].explanation))
+#if 0 /*JP*/
                 x_str = "land"; /* replace "dark part of a room" */
+#else
+                x_str = "地面"; /* replace "dark part of a room" */
+#endif
             /* alt_i is now 3 or more and no longer of interest */
         }
         if (sym == (looked ? showsyms[i] : defsyms[i].sym) && *x_str) {
@@ -1141,7 +1207,10 @@ const char **firstmatch;
             /* Kludge: warning trumps boulders on the display.
                Reveal the boulder too or player can get confused */
             if (looked && sobj_at(BOULDER, cc.x, cc.y))
+/*JP
                 Strcat(out_str, " co-located with a boulder");
+*/
+                Strcat(out_str, "(巨岩と同じ位置にある)");
             break; /* out of for loop*/
         }
     }
@@ -1181,7 +1250,10 @@ const char **firstmatch;
      */
 
     if (found > 4)
+/*JP
         Sprintf(out_str, "%s", "That can be many things");
+*/
+        Sprintf(out_str, "%s", "ここには多くのものがある");
 
  didlook:
     if (looked) {
@@ -1198,7 +1270,10 @@ const char **firstmatch;
                 found = 1; /* we have something to look up */
             }
             if (monbuf[0]) {
+/*JP
                 Sprintf(temp_buf, " [seen: %s]", monbuf);
+*/
+                Sprintf(temp_buf, " [視覚: %s]", monbuf);
                 (void) strncat(out_str, temp_buf,
                                BUFSZ - strlen(out_str) - 1);
             }
