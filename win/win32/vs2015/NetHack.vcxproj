@@ -83,13 +83,13 @@
     <ClCompile Include="$(SrcDir)mon.c" />
     <ClCompile Include="$(SrcDir)mondata.c" />
     <ClCompile Include="$(SrcDir)monmove.c" />
-    <ClCompile Include="$(SrcDir)monst.c" />
+    <ClCompile Include="$(SrcDir)monstj.c" />
     <ClCompile Include="$(SrcDir)monstr.c" />
     <ClCompile Include="$(SrcDir)mplayer.c" />
     <ClCompile Include="$(SrcDir)mthrowu.c" />
     <ClCompile Include="$(SrcDir)muse.c" />
     <ClCompile Include="$(SrcDir)music.c" />
-    <ClCompile Include="$(SrcDir)objects.c" />
+    <ClCompile Include="$(SrcDir)objectsj.c" />
     <ClCompile Include="$(SrcDir)objnam.c" />
     <ClCompile Include="$(SrcDir)options.c" />
     <ClCompile Include="$(SrcDir)o_init.c" />
@@ -213,6 +213,8 @@
     <ClInclude Include="$(IncDir)you.h" />
     <ClInclude Include="$(IncDir)youprop.h" />
     <ClInclude Include="$(WinWin32Dir)nhresource.h" />
+    <ClCompile Include="$(RootDir)japanese\jconj.c" />
+    <ClCompile Include="$(RootDir)japanese\jlib.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(WinWin32Dir)NetHack.rc" />
