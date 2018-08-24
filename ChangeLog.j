@@ -1,3 +1,5 @@
+	* 翻訳追加修正
+
 Thu Jun 21 2018  Kentaro Shirakata  <argrath@ub32.org>
 
 	* NetHack-3.6.1ベース JNetHackテストリリース(3.6.1-0.1)

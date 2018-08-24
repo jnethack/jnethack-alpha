@@ -50,41 +50,41 @@ Hello, World!
 BAD WOLF
 
 # Gang tag
-Arooo!  Werewolves of Yendor!
+ワオーン！イェンダーの狼だ！
 
 # Strategy and pun
-Dig for Victory here
+勝利のためにここを掘れ！
 
 # Pompeii
-Gaius Julius Primigenius was here.  Why are you late?
+ガイウス・ユリウス・プリミジニウス参上．どうして遅れたの？
 
 # Helpful guiding
-Don't go this way
-Go left --->
-<--- Go right
-X marks the spot
-X <--- You are here.
-Here be dragons
-Save now, and do your homework!
-There was a hole here.  It's gone now.
-The Vibrating Square
-This is a pit!
-This is not the dungeon you are looking for.
-Watch out, there's a gnome with a wand of death behind that door!
+こっちに来てはいけない
+左に行け --->
+<--- 右に行け
+X たからのばしょ
+X <--- あなたはここにいる．
+ここにドラゴンがいる
+今すぐ保存して，宿題しろ！
+ここに穴がありました．もうありません．
+振動している場所
+ここには落し穴がある！
+ここはあなたが探している迷宮ではありません．
+気をつけろ，あの扉の向こうに死の杖を持ったノームがいるぞ！
 
 # Misc fun
-This square deliberately left blank.
+このマスは意図的に空白にしています．
 
 # Viking graffiti
-Haermund Hardaxe carved these runes
+手斧のハームンドがこのルーンを彫った
 
 # Advertising
-Need a light?  Come visit the Minetown branch of Izchak's Lighting Store!
-Snakes on the Astral Plane - Soon in a dungeon near you
-You are the one millionth visitor to this place!  Please wait 200 turns for your wand of wishing.
+灯りが必要？Izchak の照明店洞窟街支店へどうぞ！
+天上界の蛇 - お近くの迷宮で間もなく
+あなたは百万人目の訪問者です！願いの杖を200ターンお待ちください．
 
 # DnD
-Warning, Exploding runes!
+警告，爆発ルーン！
 
 # "Whispers Underground" Ben Aaronovitch
-If you can read these words then you are not only a nerd but probably dead.
+これを読んでいるならあなたは単なるオタクではなくおそらく死んでいる．
