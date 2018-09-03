@@ -479,13 +479,23 @@ int ch2;
 {
     unsigned char buf[2];
     WORD attrs[2];
+    boolean inverse = FALSE;
 
     buf[0] = ch1;
     buf[1] = ch2;
 
+    /* xputc_core()Ç©ÇÁÇÃÉRÉsÅ[ */
+    inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
+    console.attr = (inverse) ?
+                    ttycolors_inv[console.current_nhcolor] :
+                    ttycolors[console.current_nhcolor];
+    if (console.current_nhattr[ATR_BOLD])
+            console.attr |= (inverse) ?
+                            BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
+
     attrs[0] = attrs[1] = console.attr;
 
-    WriteConsoleOutputAttribute(hConOut, (WORD *)(&attrs), 2,
+    WriteConsoleOutputAttribute(hConOut, attrs, 2,
                                 console.cursor, &acount);
     WriteConsoleOutputCharacter(hConOut, buf, 2,
                                 console.cursor, &ccount);
