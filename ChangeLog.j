@@ -1,3 +1,5 @@
+	* 次の問題を修正
+	  * #wizwhereコマンドでクラッシュする (#38569)
 	* 翻訳追加修正
 
 Thu Jun 21 2018  Kentaro Shirakata  <argrath@ub32.org>
