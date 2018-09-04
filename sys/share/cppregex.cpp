@@ -5,16 +5,37 @@
 
 #include <regex>
 #include <memory>
+#include <windows.h>
 
 /* nhregex interface documented in sys/share/posixregex.c */
 
+#if 1 /*JP*/
+static std::wstring s2w(const char *s) {
+  std::string src = std::string(s);
+  auto const dest_size = ::MultiByteToWideChar(CP_ACP, 0U, src.data(), -1, nullptr, 0U);
+  std::vector<wchar_t> dest(dest_size, L'\0');
+  if (::MultiByteToWideChar(CP_ACP, 0U, src.data(), -1, dest.data(), dest.size()) == 0) {
+    return std::wstring(L"");
+  }
+  dest.resize(std::char_traits<wchar_t>::length(dest.data()));
+  dest.shrink_to_fit();
+  return std::wstring(dest.begin(), dest.end());
+  }
+#endif
+
 extern "C" {
+#if 0 /*JP*/
   #include <hack.h>
+#endif
 
   extern const char regex_id[] = "cppregex";
 
   struct nhregex {
+#if 0 /*JP*/
     std::unique_ptr<std::regex> re;
+#else
+    std::unique_ptr<std::wregex> re;
+#endif
     std::unique_ptr<std::regex_error> err;
   };
 
@@ -26,9 +47,15 @@ extern "C" {
     if (!re)
       return FALSE;
     try {
+#if 0 /*JP*/
       re->re.reset(new std::regex(s, (std::regex::extended
                                     | std::regex::nosubs
                                     | std::regex::optimize)));
+#else
+      re->re.reset(new std::wregex(s2w(s), (std::regex::extended
+                                     | std::regex::nosubs
+                                     | std::regex::optimize)));
+#endif
       re->err.reset(nullptr);
       return TRUE;
     } catch (const std::regex_error& err) {
@@ -49,7 +76,11 @@ extern "C" {
     if (!re->re)
       return false;
     try {
+#if 0 /*JP*/
       return regex_search(s, *re->re, std::regex_constants::match_any);
+#else
+      return regex_search(s2w(s), *re->re, std::regex_constants::match_any);
+#endif
     } catch (const std::regex_error& err) {
       return false;
     }
