@@ -530,7 +530,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "—‚µ”à", C(CLR_BROWN) },              /* trap */
        { '^', "uŠÔˆÚ“®‚Ìã©", C(CLR_MAGENTA) },      /* trap */
        { '^', "•Ê‚ÌŠK‚Ö‚ÌuŠÔˆÚ“®‚Ìã©", C(CLR_MAGENTA) }, /* trap */
-       { '^', "–‚–@‚Ìã©", C(CLR_BRIGHT_MAGENTA) },   /* trap */
+       { '^', "–‚–@‚Ì“üŒû", C(CLR_BRIGHT_MAGENTA) }, /* trap */
        { '"', "‚­‚à‚Ì‘ƒ", C(CLR_GRAY) },             /* web */
 #endif
 #if 0 /*JP*/
