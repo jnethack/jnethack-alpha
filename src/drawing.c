@@ -554,10 +554,10 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "ïœâªÇÃ„©", C(CLR_BRIGHT_GREEN) },       /* trap */
        { '~', "êUìÆÇµÇƒÇ¢ÇÈèÍèä", C(CLR_MAGENTA) },    /* "trap" */
        /* zap colors are changed by mapglyph() to match type of beam */
-       { '|', "ï«", C(CLR_GRAY) },              /* vbeam */
-       { '-', "ï«", C(CLR_GRAY) },              /* hbeam */
-       { '\\', "ï«", C(CLR_GRAY) },             /* lslant */
-       { '/', "ï«", C(CLR_GRAY) },              /* rslant */
+       { '|', "", C(CLR_GRAY) },              /* vbeam */
+       { '-', "", C(CLR_GRAY) },              /* hbeam */
+       { '\\', "", C(CLR_GRAY) },             /* lslant */
+       { '/', "", C(CLR_GRAY) },              /* rslant */
        { '*', "", C(CLR_WHITE) },               /* dig beam */
        { '!', "", C(CLR_WHITE) },               /* camera flash beam */
        { ')', "", C(HI_WOOD) },                 /* boomerang open left */
