@@ -38,6 +38,9 @@
 
 static BOOL FDECL(CtrlHandler, (DWORD));
 static void FDECL(xputc_core, (char));
+#if 1 /*JP*/
+static void FDECL(xputc2_core, (unsigned int, unsigned int));
+#endif
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
 int FDECL(process_keystroke,
@@ -474,8 +477,8 @@ char ch;
 #if 1 /*JP*/
 void
 xputc2_core(ch1, ch2)
-int ch1;
-int ch2;
+unsigned int ch1;
+unsigned int ch2;
 {
     unsigned char buf[2];
     WORD attrs[2];
@@ -1120,7 +1123,7 @@ VA_DECL(const char *, fmt)
         {
             char *str = buf;
             while(*str){
-                jbuffer(*(str++), NULL, xputc_core, xputc2_core);
+                jbuffer(*(str++), NULL, (void (__cdecl *)(unsigned int))xputc_core, xputc2_core);
             }
         }
 #endif
