@@ -1364,21 +1364,18 @@ static int
 kanji2index(c1, c2)
 unsigned char c1, c2;
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmultichar"
-#if (('')==0x8181)
+    if (IC == SJIS) {
 	/* SJIS */
 	if (c1 >= 0xe0) c1 -= 0x40;
 	c1 -= 0x81;
 	if (c2 >= 0x80) c2--;
 	c2 -= 0x40;
 	return ((int)c1 * (0xfc - 0x40 + 1 - 1)) + (int)c2;
-#else
+    } else {
 	/* EUC */
-    	return (((int)c1 & 0x7f) - 0x21) * (0x7e - 0x21 + 1) +
+	return (((int)c1 & 0x7f) - 0x21) * (0x7e - 0x21 + 1) +
 	       (((int)c2 & 0x7f) - 0x21);
-#endif
-#pragma GCC diagnostic pop
+    }
 }
 
 int
