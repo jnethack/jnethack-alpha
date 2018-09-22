@@ -220,7 +220,9 @@ str2ic(s)
     }
 #endif
     else{
+#ifdef POSIX_ICONV
 noconvert:
+#endif
 	strcpy((char *)buf, s);
 	return (char *)buf;
     }
@@ -272,7 +274,9 @@ ic2str(s)
     }
 #endif
     else{
+#ifdef POSIX_ICONV
 noconvert:
+#endif
 	strcpy((char *)buf, s);
 	return (char *)buf;
     }
