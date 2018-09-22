@@ -1655,10 +1655,7 @@ dosacrifice()
     highaltar = ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))
                  && (levl[u.ux][u.uy].altarmask & AM_SHRINE));
 
-/*JP
     otmp = floorfood("sacrifice", 1);
-*/
-    otmp = floorfood("•ù‚°‚é", 1);
     if (!otmp)
         return 0;
     /*

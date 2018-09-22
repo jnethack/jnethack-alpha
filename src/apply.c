@@ -2474,10 +2474,7 @@ struct obj *obj;
         pline("ŠÊ‹l‚ğì‚é‚½‚ß‚ÌŠÊ‚ªØ‚ê‚½‚æ‚¤‚¾D");
         return;
     }
-/*JP
     if (!(corpse = floorfood("tin", 2)))
-*/
-    if (!(corpse = floorfood("ŠÊ‹l‚ß‚É‚·‚é", 2)))
         return;
     if (corpse->oeaten) {
 /*JP

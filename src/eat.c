@@ -3046,10 +3046,7 @@ doeat()
         pline("息もできないのに，どうやって食べたらいいんだい？");
         return 0;
     }
-/*JP
     if (!(otmp = floorfood("eat", 0)))
-*/
-    if (!(otmp = floorfood("食べる", 0)))
         return 0;
     if (check_capacity((char *) 0))
         return 0;
@@ -3806,10 +3803,11 @@ boolean incr;
 /* Returns an object representing food.
  * Object may be either on floor or in inventory.
  */
-/*JP CHECK: 3.4.3 での呼び出し元
-apply.c:1959:   if (!(corpse = floorfood("缶詰めにする", 2))) return;
-eat.c:2404:     if (!(otmp = floorfood("食べる", 0))) return 0;
-pray.c:1478:    if (!(otmp = floorfood("捧げる", 1))) return 0;
+/*JP CHECK: 3.6.1 での呼び出し元
+apply.c:2478:    if (!(corpse = floorfood("tin", 2)))
+eat.c:3050:    if (!(otmp = floorfood("eat", 0)))
+pray.c:1659:    otmp = floorfood("sacrifice", 1);
+  この関数は英語名のまま呼び出すこと。
 */
 struct obj *
 floorfood(verb, corpsecheck)
@@ -3819,13 +3817,8 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
     register struct obj *otmp;
     char qbuf[QBUFSZ];
     char c;
-#if 0 /*JP*/
     boolean feeding = !strcmp(verb, "eat"),    /* corpsecheck==0 */
         offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
-#else
-    boolean feeding = !strcmp(verb, "食べる"), /* corpsecheck==0 */
-        offering = !strcmp(verb, "捧げる");    /* corpsecheck==1 */
-#endif
 
 #if 1 /*JP*/
     const char *jverb = trans_verb(verb)->jp;
