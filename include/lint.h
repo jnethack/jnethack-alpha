@@ -76,4 +76,19 @@ extern unsigned nhUse_dummy;
 #define debugpline4(fmt, a1, a2, a3, a4) /*empty*/
 #endif                                   /*DEBUG*/
 
+#if 1 /*JP*/
+#ifdef __GNUC__
+#define PRAGMA_IGNORE_HELPER0(x) #x
+#define PRAGMA_IGNORE_HELPER1(x) PRAGMA_IGNORE_HELPER0(GCC diagnostic ignored x)
+#define PRAGMA_IGNORE_HELPER2(y) PRAGMA_IGNORE_HELPER1(#y)
+#define _pragma_ignore(opt) _Pragma("GCC diagnostic push") \
+    _Pragma(PRAGMA_IGNORE_HELPER2(opt))
+#define _pragma_pop _Pragma("GCC diagnostic pop")
+#else
+#define _pragma_push
+#define _pragma_ignore(opt)
+#define _pragma_pop
+#endif
+#endif
+
 #endif /* LINT_H */

@@ -508,11 +508,10 @@ boolean wr;
 #endif
         ) {
 #ifdef SECURE
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
+_pragma_ignore(-Wunused-result)
         (void) setgid(getgid());
         (void) setuid(getuid()); /* Ron Wessels */
-#pragma GCC diagnostic pop
+_pragma_pop
 #endif
     } else {
         /* non-default data files is a sign that scores may not be

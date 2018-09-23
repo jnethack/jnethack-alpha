@@ -981,10 +981,9 @@ void
 save_savefile_name(fd)
 int fd;
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
+_pragma_ignore(-Wunused-result)
     (void) write(fd, (genericptr_t) SAVEF, sizeof(SAVEF));
-#pragma GCC diagnostic pop
+_pragma_pop
 }
 #endif
 
@@ -1374,11 +1373,10 @@ boolean uncomp;
             redirect(filename, RDBMODE, stdin, uncomp);
             redirect(cfn, WRBMODE, stdout, uncomp);
         }
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
+_pragma_ignore(-Wunused-result)
         (void) setgid(getgid());
         (void) setuid(getuid());
-#pragma GCC diagnostic pop
+_pragma_pop
         (void) execv(args[0], (char *const *) args);
         perror((char *) 0);
         (void) fprintf(stderr, "Exec to %scompress %s failed.\n",
