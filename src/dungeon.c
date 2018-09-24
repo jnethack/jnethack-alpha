@@ -1656,7 +1656,9 @@ const char *nam;
     d_level dlev;
     const char *p;
     int idx, idxtoo;
+#if 0 /*JP*/
     char buf[BUFSZ];
+#endif
     mapseen *mseen;
 
     /* look at the player's custom level annotations first */

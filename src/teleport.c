@@ -1053,9 +1053,9 @@ level_tele_trap(trap, trflags)
 struct trap *trap;
 unsigned trflags;
 {
+#if 0 /*JP*/
     char verbbuf[BUFSZ];
 
-#if 0 /*JP*/
     if ((trflags & VIASITTING) != 0)
         Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
     else

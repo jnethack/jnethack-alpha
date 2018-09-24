@@ -3420,7 +3420,11 @@ struct obj *no_wish;
     int eroded, eroded2, erodeproof, locked, unlocked, broken;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
+#if 0 /*JP*/
     int tmp, tinv, tvariety;
+#else
+    int tvariety;
+#endif
     int wetness, gsize = 0;
     struct fruit *f;
     int ftype = context.current_fruit;

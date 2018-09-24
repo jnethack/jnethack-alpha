@@ -1822,12 +1822,12 @@ struct monst *mtmp, *victim;
             mondied(mtmp);
             return (struct permonst *) 0;
         } else if (canspotmon(mtmp)) {
+#if 0 /*JP*/
             char buf[BUFSZ];
 
             /* 3.6.1:
              * Temporary (?) hack to fix growing into opposite gender.
              */
-#if 0 /*JP*/
             Sprintf(buf, "%s%s",
                     /* deal with female gnome becoming a gnome lord */
                     (mtmp->female && !fem) ? "male "

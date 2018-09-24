@@ -119,8 +119,10 @@ boolean incl_helpless;
     };
 #if 0 /*JP*/
     unsigned l;
-#endif
     char c, *kname = killer.name;
+#else
+    char *kname = killer.name;
+#endif
 
     buf[0] = '\0'; /* lint suppression */
 #if 1 /*JP*//*æ‚É‘ÎÛ‚ğƒRƒs[*/

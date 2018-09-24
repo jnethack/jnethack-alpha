@@ -1670,10 +1670,6 @@ int
 dotakeoff()
 {
     struct obj *otmp = (struct obj *) 0;
-#if 1 /*JP*/
-    const char *j;
-    const char *m;
-#endif
 
     count_worn_stuff(&otmp, FALSE);
     if (!Narmorpieces && !Naccessories) {

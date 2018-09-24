@@ -54,7 +54,11 @@ int expltype;
             inside_engulfer, grabbed, grabbing;
 #endif
     coord grabxy;
+#if 0 /*JP*/
     char hallu_buf[BUFSZ], killr_buf[BUFSZ];
+#else
+    char hallu_buf[BUFSZ];
+#endif
     short exploding_wand_typ = 0;
 
     if (olet == WAND_CLASS) { /* retributive strike */
