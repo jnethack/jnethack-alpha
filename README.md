@@ -1,9 +1,14 @@
-# JNetHack 3.6.1 レポジトリ
+[![Linux](https://travis-ci.org/jnethack/jnethack-alpha.svg?branch=develop)](https://travis-ci.org/jnethack/jnethack-alpha.svg?branch=develop)[![Windows](https://ci.appveyor.com/api/projects/status/2no8rc2q162ssb2c/branch/develop?svg=true)](https://ci.appveyor.com/project/argrath/jnethack-alpha/branch/develop)
 
-JNetHack 3.6.1 の作業中ソースレポジトリです。
+# JNetHack レポジトリ
 
-## 現状
+JNetHack のレポジトリです。二つのレポジトリを使っています。開発中の状況についてはREADME36.jを参照してください。
 
-Windows(VS2015 Community)とUbuntuで時々ビルド確認しています。
+### メインレポジトリ https://osdn.net/projects/jnethack/scm/git/source/
 
-JNH 3.6.0のパッチを3.6.1にあてただけなので3.6.1独自の部分は基本未訳です。
+ある程度確認したソースコードが登録されます。原則としてrebaseはしません。
+
+### 開発レポジトリ https://github.com/jnethack/jnethack-alpha
+
+開発中のソースが登録されます。頻繁にrebaseされます。
+TravisCIとAppVeyorでビルドの確認をしています。

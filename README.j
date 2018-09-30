@@ -6,14 +6,14 @@
 
 			   COPYRIGHT NOTICE
 
-JNetHack is Japanization of Nethack-3.6.0. You must read
+JNetHack is Japanization of Nethack-3.6.1. You must read
 original license (dat/license) and obey it to redistribute and modify
 this program.  Japanization part of JNetHack obey original license
 completely.  Japanization part copyright belong to the authors(see
 below).
 
-JNetHackは NetHack-3.6.0に日本語化を施したものです．JNetHackを再配布する
-際はオリジナルのNetHack-3.6.0のライセンス (dat/license)をよく読んでくだ
+JNetHackは NetHack-3.6.1に日本語化を施したものです．JNetHackを再配布する
+際はオリジナルのNetHack-3.6.1のライセンス (dat/license)をよく読んでくだ
 さい．日本語化された NetHackは，オリジナルの配布規定に完全に従っています．
 日本語化された部分の Copyrightは作者らにあります(下記参考)．また，オリジ
 ナルのライセンスで言うところの NetHackとは JNetHack をも含むとします．
