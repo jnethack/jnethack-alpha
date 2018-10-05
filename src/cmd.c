@@ -1878,10 +1878,7 @@ int final;
                 tmpbuf, urace.adj, role_titl, rank_titl);
 #endif
     }
-/*JP
         you_are(buf, "");
-*/
-        you_are_ing(buf, "");
 
     /* report alignment (bypass you_are() in order to omit ending period);
        adverb is used to distinguish between temporary change (helm of opp.

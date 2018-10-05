@@ -189,7 +189,7 @@ boolean on;
         You_feel("that monsters%s have difficulty pinpointing your location.",
                  on ? "" : " no longer");
 #else
-        You_feel("怪物はあなたの位置がはっきりと分か%sなったようだ．",
+        pline("怪物はあなたの位置がはっきりと分か%sなったようだ．",
                  on ? "らなく" : "るように");
 #endif
     }

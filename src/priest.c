@@ -1140,8 +1140,10 @@ const char *suffix;
 
     Sprintf(buf, "%s", pio);
     if (suffix && (!showneg || u.ualign.record >= 0)) {
+#if 0 /*JP*/
         if (u.ualign.record != 3)
             Strcat(buf, " ");
+#endif
         Strcat(buf, suffix);
     }
     return buf;

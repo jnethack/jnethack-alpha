@@ -1300,7 +1300,10 @@ boolean val_optional;
 
     if (!colon || !*++colon) {
         if (!val_optional)
+/*JP
             config_error_add("Missing parameter for '%s'", opts);
+*/
+            config_error_add("'%s'の引数がありません", opts);
         return (char *) 0;
     }
     return colon;
@@ -1541,8 +1544,13 @@ int iscompound; /* 0 == boolean option, 1 == compound */
      * For now just return.
      */
 #else /* !MAC */
+#if 0 /*JP*/
     config_error_add("%s option specified multiple times: %s",
                      iscompound ? "compound" : "boolean", opts);
+#else
+    config_error_add("%sオプションが複数回指定されています：%s",
+                     iscompound ? "複合" : "真偽値", opts);
+#endif
 #endif /* ?MAC */
     return;
 }
@@ -1565,23 +1573,50 @@ STATIC_VAR const struct paranoia_opts {
        both require at least two letters during config processing and use
        case-senstivity for 'O's interactive menu */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
+/*JP
       "for \"yes\" confirmations, require \"no\" to reject" },
+*/
+      "\"yes\"を確認するときに，拒否するときには\"no\"が必要" },
     { PARANOID_QUIT, "quit", 1, "explore", 1,
+/*JP
       "yes vs y to quit or to enter explore mode" },
+*/
+      "終了または探検モードに入るときにyではなくyes" },
     { PARANOID_DIE, "die", 1, "death", 2,
+/*JP
       "yes vs y to die (explore mode or debug mode)" },
+*/
+      "(探検モードかデバッグモードで)死ぬときにyではなくyes" },
     { PARANOID_BONES, "bones", 1, 0, 0,
+/*JP
       "yes vs y to save bones data when dying in debug mode" },
+*/
+      "デバッグモードで死んで骨データを保存するときにyではなくyes" },
     { PARANOID_HIT, "attack", 1, "hit", 1,
+/*JP
       "yes vs y to attack a peaceful monster" },
+*/
+      "友好的怪物を攻撃するときにyではなくyes" },
     { PARANOID_BREAKWAND, "wand-break", 2, "break-wand", 2,
+/*JP
       "yes vs y to break a wand via (a)pply" },
+*/
+      "(a)pplyで杖を折るときにyではなくyes" },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
+/*JP
       "yes vs y to change form when lycanthropy is controllable" },
+*/
+      "獣化病が制御可能な場合に変化するときにyではなくyes" },
     { PARANOID_PRAY, "pray", 1, 0, 0,
+/*JP
       "y to pray (supersedes old \"prayconfirm\" option)" },
+*/
+      "祈るときにyが必要(古い\"prayconfirm\"オプションを上書きする)" },
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
+/*JP
       "always pick from inventory for Remove and Takeoff" },
+*/
+      "RemoveとTakeoffで常に持ち物一覧から選ぶ" },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
@@ -1770,12 +1805,24 @@ static const struct {
     xchar msgtyp;
     const char *descr;
 } msgtype_names[] = {
+/*JP
     { "show", MSGTYP_NORMAL, "Show message normally" },
+*/
+    { "show", MSGTYP_NORMAL, "通常通りメッセージを表示する" },
+/*JP
     { "hide", MSGTYP_NOSHOW, "Hide message" },
+*/
+    { "hide", MSGTYP_NOSHOW, "メッセージを表示しない" },
     { "noshow", MSGTYP_NOSHOW, NULL },
+/*JP
     { "stop", MSGTYP_STOP, "Prompt for more after the message" },
+*/
+    { "stop", MSGTYP_STOP, "moreプロンプトで待つ" },
     { "more", MSGTYP_STOP, NULL },
+/*JP
     { "norep", MSGTYP_NOREP, "Do not repeat the message" }
+*/
+    { "norep", MSGTYP_NOREP, "このメッセージは繰り返さない" }
 };
 
 STATIC_OVL const char *
@@ -1807,7 +1854,10 @@ query_msgtype()
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  msgtype_names[i].descr, MENU_UNSELECTED);
         }
+/*JP
     end_menu(tmpwin, "How to show the message");
+*/
+    end_menu(tmpwin, "メッセージの表示方法");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
@@ -4332,7 +4382,10 @@ boolean dolist;
 
 static char fmtstr_doset[] = "%s%-15s [%s]   ";
 static char fmtstr_doset_tab[] = "%s\t[%s]";
+/*JP
 static char n_currently_set[] = "(%d currently set)";
+*/
+static char n_currently_set[] = "(%d個設定中)";
 
 /* doset('O' command) menu entries for compound options */
 STATIC_OVL void
@@ -5204,18 +5257,27 @@ boolean setinitial, setfromfile;
 
     msgtypes_again:
         nmt = msgtype_count();
+/*JP
         opt_idx = handle_add_list_remove("message type", nmt);
+*/
+        opt_idx = handle_add_list_remove("メッセージ型", nmt);
         if (opt_idx == 3) { /* done */
             return TRUE;
         } else if (opt_idx == 0) { /* add new */
+/*JP
             getlin("What new message pattern?", mtbuf);
+*/
+            getlin("新しいメッセージパターン：", mtbuf);
             if (*mtbuf == '\033')
                 return TRUE;
             if (*mtbuf
                 && test_regex_pattern(mtbuf, (const char *)0)
                 && (mttyp = query_msgtype()) != -1
                 && !msgtype_add(mttyp, mtbuf)) {
+/*JP
                 pline("Error adding the message type.");
+*/
+                pline("メッセージ型追加エラー．");
                 wait_synch();
             }
             goto msgtypes_again;
@@ -5244,8 +5306,13 @@ boolean setinitial, setfromfile;
                          MENU_UNSELECTED);
                 tmp = tmp->next;
             }
+#if 0 /*JP*/
             Sprintf(mtbuf, "%s message types",
                     (opt_idx == 1) ? "List of" : "Remove which");
+#else
+            Strcpy(mtbuf, (opt_idx == 1) ?
+                    "メッセージ型一覧" : "削除するメッセージ型");
+#endif
             end_menu(tmpwin, mtbuf);
             pick_cnt = select_menu(tmpwin,
                                    (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -5266,11 +5333,17 @@ boolean setinitial, setfromfile;
 
     menucolors_again:
         nmc = count_menucolors();
+/*JP
         opt_idx = handle_add_list_remove("menucolor", nmc);
+*/
+        opt_idx = handle_add_list_remove("メニュー色", nmc);
         if (opt_idx == 3) { /* done */
             return TRUE;
         } else if (opt_idx == 0) { /* add new */
+/*JP
             getlin("What new menucolor pattern?", mcbuf);
+*/
+            getlin("新しいメニュー色パターン：", mcbuf);
             if (*mcbuf == '\033')
                 return TRUE;
             if (*mcbuf
@@ -5278,7 +5351,10 @@ boolean setinitial, setfromfile;
                 && (mcclr = query_color((char *) 0)) != -1
                 && (mcattr = query_attr((char *) 0)) != -1
                 && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
+/*JP
                 pline("Error adding the menu color.");
+*/
+                pline("メニュー色追加エラー．");
                 wait_synch();
             }
             goto menucolors_again;
@@ -5315,8 +5391,13 @@ boolean setinitial, setfromfile;
                          MENU_UNSELECTED);
                 tmp = tmp->next;
             }
+#if 0 /*JP*/
             Sprintf(mcbuf, "%s menu colors",
                     (opt_idx == 1) ? "List of" : "Remove which");
+#else
+            Strcpy(mcbuf, (opt_idx == 1) ?
+                    "メニュー色一覧" : "削除するメニュー色");
+#endif
             end_menu(tmpwin, mcbuf);
             pick_cnt = select_menu(tmpwin,
                                    (opt_idx == 1) ? PICK_NONE : PICK_ANY,
@@ -5338,7 +5419,10 @@ boolean setinitial, setfromfile;
 
     ape_again:
         totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
+/*JP
         opt_idx = handle_add_list_remove("autopickup exception", totalapes);
+*/
+        opt_idx = handle_add_list_remove("自動拾い例外", totalapes);
         if (opt_idx == 3) { /* done */
             return TRUE;
         } else if (opt_idx == 0) { /* add new */
@@ -5448,9 +5532,15 @@ boolean setinitial, setfromfile;
                 sl = sl->next;
             }
             if (!setcount) {
+#if 0 /*JP*/
                 pline("There are no appropriate %ssymbol sets available.",
                       (rogueflag) ? "rogue level "
                                   : (primaryflag) ? "primary " : "");
+#else
+                pline("適切な%sシンボル設定がありません．",
+                      (rogueflag) ? "rogueレベル"
+                                  : (primaryflag) ? "優先" : "");
+#endif
                 return TRUE;
             }
 
@@ -5483,8 +5573,13 @@ boolean setinitial, setfromfile;
                 }
                 sl = sl->next;
             }
+#if 0 /*JP*/
             Sprintf(buf, "Select %ssymbol set:",
                     rogueflag ? "rogue level " : "");
+#else
+            Sprintf(buf, "%sシンボル設定を選択してください：",
+                    rogueflag ? "rogueレベル" : "");
+#endif
             end_menu(tmpwin, buf);
             if (select_menu(tmpwin, PICK_ONE, &symset_pick) > 0) {
                 chosen = symset_pick->item.a_int - 2;
@@ -5523,11 +5618,17 @@ boolean setinitial, setfromfile;
                 nothing_to_do = TRUE;
         } else if (!res) {
             /* The symbols file could not be accessed */
+/*JP
             pline("Unable to access \"%s\" file.", SYMBOLS);
+*/
+            pline("\"%s\"ファイルにアクセスできません．", SYMBOLS);
             return TRUE;
         } else if (!symset_list) {
             /* The symbols file was empty */
+/*JP
             pline("There were no symbol sets found in \"%s\".", SYMBOLS);
+*/
+            pline("\"%s\"にシンボル設定がありません．", SYMBOLS);
             return TRUE;
         }
 
@@ -5657,7 +5758,11 @@ char *buf;
                                       : defopt);
 #endif
     else if (!strcmp(optname, "align"))
+#if 0 /*JP*/
         Sprintf(buf, "%s", rolestring(flags.initalign, aligns, adj));
+#else
+        Sprintf(buf, "%s", rolestring(flags.initalign, aligns, noun));
+#endif
 #ifdef WIN32
     else if (!strcmp(optname, "altkeyhandler"))
         Sprintf(buf, "%s",
