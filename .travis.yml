@@ -1,11 +1,24 @@
 language: c
 
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+
 addons:
   apt:
     packages:
     - nkf
+  homebrew:
+    packages:
+    - nkf
+    - gcc@5
+
+before_script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sh japanese/set_mac.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh japanese/set_lnx.sh ; fi
 
 script:
-- find . -type f |xargs nkf -e --overwrite
-- sh sys/unix/setup.sh sys/unix/hints/linux
-- make install
+  - make install

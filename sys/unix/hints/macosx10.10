@@ -56,7 +56,8 @@ GAMEGRP  = games
 # build to run in the source tree - primarily for development.  Build with "make all"
 #WANT_SOURCE_INSTALL=1
 
-CC=gcc
+CC=gcc-5
+CFLAGS+=-fexec-charset=cp932 -Wno-comment -Wno-unused-parameter -Wno-overlength-strings
 
 # At the moment this is just for debugging, but in the future it could be
 # useful for other things.  Requires SYSCF and an ANSI compiler.
@@ -91,7 +92,7 @@ ifdef WANT_WIN_TTY
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)
 WINLIB = $(WINTTYLIB)
-WINTTYLIB=-lncurses
+WINTTYLIB=-lncurses -liconv
 else	# !WANT_WIN_TTY
 CFLAGS += -DNOTTYGRAPHICS
 endif	# !WANT_WIN_TTY
@@ -160,7 +161,7 @@ ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
 # XXX it's nice we don't write over sysconf, but we've already erased it
 # make sure we have group GAMEUID and group GAMEGRP
 PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); . sys/unix/hints/macosx.sh group2 $(GAMEGRP); mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+POSTINSTALL+= sh sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 else ifdef WANT_SOURCE_INSTALL
 PREFIX=$(abspath $(NHSROOT))
@@ -172,7 +173,7 @@ CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf;
+POSTINSTALL+= sh sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf;
 # We can use "make all" to build the whole thing - but it misses some things:
 MOREALL=$(MAKE) install
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
@@ -189,7 +190,7 @@ ifdef WANT_WIN_X11
 # install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
 PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc
 endif	# WANT_WIN_X11
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+POSTINSTALL+= sh sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 endif	# !WANT_SOURCE_INSTALL
 
@@ -272,7 +273,7 @@ build_package_root:
 	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
 	install -p doc/Guidebook $(PKGROOT_UG)/doc
 	install -p dat/nhdat $(PKGROOT_UGLN)
-	sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(PKGROOT_UGLN)/sysconf
+	sh sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(PKGROOT_UGLN)/sysconf
 	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form
 	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile $(PKGROOT_UGLN)/xlogfile
