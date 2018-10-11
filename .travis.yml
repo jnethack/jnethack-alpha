@@ -1,7 +1,9 @@
 language: c
 
-install:
-- sudo apt-get update; sudo apt-get install nkf
+addons:
+  apt:
+    packages:
+    - nkf
 
 script:
 - find . -type f |xargs nkf -e --overwrite
