@@ -305,7 +305,7 @@ boolean foundyou;
                               ? " at your displaced image"
                               : " at you");
 #else
-        char *who = (canspotmon(mtmp) ? Monnam(mtmp) : "‰½Ò‚©");
+        const char *who = (canspotmon(mtmp) ? Monnam(mtmp) : "‰½Ò‚©");
         if(is_undirected_spell(mattk->adtyp, spellnum)){
             pline("%s‚Íô•¶‚ğ¥‚¦‚½I", who);
         } else {
@@ -836,8 +836,8 @@ int spellnum;
     case CLC_BLIND_YOU:
         /* note: resists_blnd() doesn't apply here */
         if (!Blinded) {
-            int num_eyes = eyecount(youmonst.data);
 #if 0 /*JP*/
+            int num_eyes = eyecount(youmonst.data);
             pline("Scales cover your %s!", (num_eyes == 1)
                                                ? body_part(EYE)
                                                : makeplural(body_part(EYE)));

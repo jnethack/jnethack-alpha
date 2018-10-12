@@ -357,7 +357,7 @@ VA_DECL(const char *, line)
 {
     char *tmp;
 #if 1 /*JP*/
-        char *adj;
+        const char *adj;
         char *p;
 #endif
 

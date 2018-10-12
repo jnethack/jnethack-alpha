@@ -680,7 +680,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcat(buf, " called ");
             Strcat(buf, un);
 #else
-            char *p;
+            const char *p;
             if (is_boots(obj))
                 p = "ŒC";
             else if (is_gloves(obj))

@@ -23,12 +23,12 @@ int xputc2(int, int);
 #define UTF8    2
 
 #ifdef POSIX_ICONV
-static char* ccode[]={
+static const char* ccode[]={
     "EUC-JP-MS",
     "CP932",
     "UTF-8"
 };
-static char* ccode_alt[]={
+static const char* ccode_alt[]={
     "EUC-JP",
     "ShiftJIS",
     "UTF-8"
