@@ -1112,10 +1112,14 @@ mpickgold(mtmp)
 register struct monst *mtmp;
 {
     register struct obj *gold;
+#if 0 /*JP*/
     int mat_idx;
+#endif
 
     if ((gold = g_at(mtmp->mx, mtmp->my)) != 0) {
+#if 0 /*JP*/
         mat_idx = objects[gold->otyp].oc_material;
+#endif
         obj_extract_self(gold);
         add_to_minv(mtmp, gold);
         if (cansee(mtmp->mx, mtmp->my)) {
@@ -1945,10 +1949,12 @@ register struct monst *mtmp;
             char buf[BUFSZ];
             boolean in_door = (amorphous(mtmp->data)
                                && closed_door(mtmp->mx, mtmp->my)),
+#if 0 /*JP*/
                 /* alternate message phrasing for some monster types */
                 spec_mon = (nonliving(mtmp->data)
                             || noncorporeal(mtmp->data)
                             || amorphous(mtmp->data)),
+#endif
                 spec_death = (disintegested /* disintegrated or digested */
                               || noncorporeal(mtmp->data)
                               || amorphous(mtmp->data));
@@ -2388,9 +2394,9 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
         u.uconduct.killer++;
 
     if (!nomsg) {
+#if 0 /*JP*/
         boolean namedpet = has_mname(mtmp) && !Hallucination;
 
-#if 0 /*JP*/
         You("%s %s!",
             nonliving(mtmp->data) ? "destroy" : "kill",
             !(wasinside || canspotmon(mtmp)) ? "it"

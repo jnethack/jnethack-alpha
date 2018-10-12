@@ -1593,7 +1593,9 @@ int incamt, final;
 char *outbuf;
 {
     const char *modif, *bonus;
+#if 0 /*JP*/
     boolean invrt;
+#endif
     int absamt;
 
     absamt = abs(incamt);
@@ -1638,8 +1640,6 @@ char *outbuf;
     /* "bonus <foo>" (to hit) vs "<bar> bonus" (damage, defense) */
 #if 0 /*JP*/
     invrt = strcmp(inctyp, "to hit") ? TRUE : FALSE;
-#else
-    invrt = strcmp(inctyp, "–½’†—¦") ? TRUE : FALSE;
 #endif
 
 #if 0 /*JP*/

@@ -211,7 +211,9 @@ dosounds()
                 continue;
             if ((is_undead(mtmp->data) || is_vampshifter(mtmp))
                 && mon_in_room(mtmp, MORGUE)) {
+#if 0 /*JP*/
                 const char *hair = body_part(HAIR); /* hair/fur/scales */
+#endif
 
                 switch (rn2(2) + hallu) {
                 case 0:

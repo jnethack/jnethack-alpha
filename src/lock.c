@@ -448,7 +448,9 @@ struct obj *pick;
     if (cc.x == u.ux && cc.y == u.uy) { /* pick lock on a container */
         const char *verb;
         char qsfx[QBUFSZ];
+#if 0 /*JP*/
         boolean it;
+#endif
         int count;
 
         if (u.dz < 0) {
@@ -486,7 +488,9 @@ struct obj *pick;
                     You("‚±‚±‚©‚ç%s‚É“Í‚©‚È‚¢D", the(xname(otmp)));
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
+#if 0 /*JP*/
                 it = 0;
+#endif
                 if (otmp->obroken)
 /*JP
                     verb = "fix";
@@ -496,12 +500,12 @@ struct obj *pick;
 /*JP
                     verb = "lock", it = 1;
 */
-                    verb = "Œ®‚ð‚©‚¯‚é", it = 1;
+                    verb = "Œ®‚ð‚©‚¯‚é";
                 else if (picktyp != LOCK_PICK)
 /*JP
                     verb = "unlock", it = 1;
 */
-                    verb = "Œ®‚ð‚Í‚¸‚·", it = 1;
+                    verb = "Œ®‚ð‚Í‚¸‚·";
                 else
 /*JP
                     verb = "pick";

@@ -298,7 +298,9 @@ doread()
         return 1;
     } else if (scroll->otyp == T_SHIRT || scroll->otyp == ALCHEMY_SMOCK) {
         char buf[BUFSZ], *mesg;
+#if 0 /*JP*/
         const char *endpunct;
+#endif
 
         if (Blind) {
 /*JP
@@ -323,13 +325,17 @@ doread()
         /* populate 'buf[]' */
         mesg = (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
                                          : apron_text(scroll, buf);
+#if 0 /*JP*/
         endpunct = "";
+#endif
         if (flags.verbose) {
+#if 0 /*JP*/
             int ln = (int) strlen(mesg);
 
             /* we will be displaying a sentence; need ending punctuation */
             if (ln > 0 && !index(".!?", mesg[ln - 1]))
                 endpunct = ".";
+#endif
 /*JP
             pline("It reads:");
 */

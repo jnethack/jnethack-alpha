@@ -4508,14 +4508,20 @@ boolean force;
     } else if (obj->oclass == POTION_CLASS) {
         if (obj->otyp == POT_ACID) {
             char *bufp;
+#if 0 /*JP*/
             boolean one = (obj->quan == 1L), update = carried(obj),
                     exploded = FALSE;
+#else
+            boolean update = carried(obj);
+#endif
 
             if (Blind && !carried(obj))
                 obj->dknown = 0;
+#if 0 /*JP*/
             if (acid_ctx.ctx_valid)
                 exploded = ((obj->dknown ? acid_ctx.dkn_boom
                                          : acid_ctx.unk_boom) > 0);
+#endif
             /* First message is
              * "a [potion|<color> potion|potion of acid] explodes"
              * depending on obj->dknown (potion has been seen) and
@@ -5470,9 +5476,15 @@ boolean force;
     struct trap *ttmp;
     struct monst *mtmp;
     const char *trapdescr;
+#if 0 /*JP*/
     boolean here, useplural, deal_with_floor_trap,
             confused = (Confusion || Hallucination),
             trap_skipped = FALSE;
+#else
+    boolean here, deal_with_floor_trap,
+            confused = (Confusion || Hallucination),
+            trap_skipped = FALSE;
+#endif
     int boxcnt = 0;
     char the_trap[BUFSZ], qbuf[QBUFSZ];
 
@@ -5520,7 +5532,9 @@ boolean force;
             Strcat(the_trap, (boxcnt == 1) ? "a container" : "containers");
 */
             Strcat(the_trap, "—eŠí");
+#if 0 /*JP*/
         useplural = ((ttmp && boxcnt > 0) || boxcnt > 1);
+#endif
         /* note: boxcnt and useplural will always be 0 for !here case */
         if (ttmp || boxcnt)
 #if 0 /*JP*/

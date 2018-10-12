@@ -510,9 +510,9 @@ dowieldquiver()
 */
             Strcpy(qbuf, "代わりにこれら全部を準備する？");
         } else {
+#if 0 /*JP*/
             boolean use_plural = (is_plural(uwep) || pair_of(uwep));
 
-#if 0 /*JP*/
             Sprintf(qbuf, "You are wielding %s.  Ready %s instead?",
                     !use_plural ? "that" : "those",
                     !use_plural ? "it" : "them");
@@ -568,9 +568,9 @@ dowieldquiver()
 */
             Strcpy(qbuf, "代わりにこれら全部を準備する？");
         } else {
+#if 0 /*JP*/
             boolean use_plural = (is_plural(uswapwep) || pair_of(uswapwep));
 
-#if 0 /*JP*/
             Sprintf(qbuf, "%s your %s weapon.  Ready %s instead?",
                     !use_plural ? "That is" : "Those are",
                     u.twoweap ? "second" : "alternate",
@@ -639,8 +639,8 @@ wield_tool(obj, verb)
 struct obj *obj;
 const char *verb; /* "rub",&c */
 {
-    const char *what;
 #if 0 /*JP*/
+    const char *what;
     boolean more_than_1;
 #endif
 
@@ -650,9 +650,7 @@ const char *verb; /* "rub",&c */
 #if 0 /*JP*/
     if (!verb)
         verb = "wield";
-#endif
     what = xname(obj);
-#if 0 /*JP*/
     more_than_1 = (obj->quan > 1L || strstri(what, "pair of ") != 0
                    || strstri(what, "s of ") != 0);
 #endif

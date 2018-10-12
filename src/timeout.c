@@ -1290,12 +1290,18 @@ anything *arg;
 long timeout;
 {
     struct obj *obj = arg->a_obj;
+#if 0 /*JP*/
     boolean canseeit, many, menorah, need_newsym, need_invupdate;
+#else
+    boolean canseeit, menorah, need_newsym, need_invupdate;
+#endif
     xchar x, y;
     char whose[BUFSZ];
 
     menorah = obj->otyp == CANDELABRUM_OF_INVOCATION;
+#if 0 /*JP*/
     many = menorah ? obj->spe > 1 : obj->quan > 1L;
+#endif
 
     /* timeout while away */
     if (timeout != monstermoves) {

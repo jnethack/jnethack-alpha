@@ -2873,8 +2873,10 @@ int amt;          /* pseudo-damage used to determine blindness duration */
         pline("‚¨‚íCŒõ‚ª’É‚¢%s", (dmg > 2 || u.mh <= 5) ? "I" : "D");
         /* [composing killer/reason is superfluous here; if fatal, cause
            of death will always be "killed while stuck in creature form"] */
+#if 0 /*JP*/
         if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS)
             ordinary = FALSE; /* say blasted rather than zapped */
+#endif
         how = (obj->oclass != SPBOOK_CLASS)
                   ? (const char *) ansimpleoname(obj)
 /*JP

@@ -181,7 +181,10 @@ str2ic(s)
 {
     static unsigned char buf[1024];
     const unsigned char *up;
-    unsigned char *p, *pp;
+    unsigned char *p;
+#ifndef POSIX_ICONV
+    unsigned char *pp;
+#endif
 
     if(!s)
       return s;
@@ -240,7 +243,10 @@ ic2str(s)
 {
     static unsigned char buf[1024];
     const unsigned char *up;
-    unsigned char *p, *pp;
+    unsigned char *p;
+#ifndef POSIX_ICONV
+    unsigned char *pp;
+#endif
 
     if(!s)
       return s;
@@ -348,8 +354,10 @@ jbuffer(
 {
     static unsigned int ibuf[2];
     unsigned int c1, c2;
+#ifndef POSIX_ICONV
     unsigned char uc[2];
     unsigned char *p;
+#endif
 
     if(!buf) buf = ibuf;
     if(!f1) f1 = tty_jputc;

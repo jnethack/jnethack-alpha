@@ -471,9 +471,11 @@ int spellnum;
             impossible("bad wizard cloning?");
         break;
     case MGC_SUMMON_MONS: {
+#if 0 /*JP*/
         int count;
 
         count = nasty(mtmp); /* summon something nasty */
+#endif
         if (mtmp->iswiz)
 /*JP
             verbalize("Destroy the thief, my pet%s!", plur(count));

@@ -243,8 +243,8 @@ its_dead(rx, ry, resp)
 int rx, ry, *resp;
 {
     char buf[BUFSZ];
-    boolean more_corpses;
 #if 0 /*JP*/
+    boolean more_corpses;
     struct permonst *mptr;
 #endif
     struct obj *corpse = sobj_at(CORPSE, rx, ry),
@@ -264,7 +264,9 @@ int rx, ry, *resp;
         else
             statue = 0; /* corpse precedes statue; ignore statue */
     }
+#if 0 /*JP*/
     more_corpses = (corpse && nxtobj(corpse, CORPSE, TRUE));
+#endif
 
     /* additional stethoscope messages from jyoung@apanix.apana.org.au */
     if (!corpse && !statue) {
@@ -316,8 +318,12 @@ int rx, ry, *resp;
         return TRUE;
 
     } else if (corpse) {
+#if 0 /*JP*/
         boolean here = (rx == u.ux && ry == u.uy),
                 one = (corpse->quan == 1L && !more_corpses), reviver = FALSE;
+#else
+        boolean here = (rx == u.ux && ry == u.uy), reviver = FALSE;
+#endif
         int visglyph, corpseglyph;
 
         visglyph = glyph_at(rx, ry);

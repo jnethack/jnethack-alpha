@@ -1404,6 +1404,7 @@ register const char *let, *word;
         }
         if (ilet == HANDS_SYM) { /* '-' */
             if (!allownone) {
+#if 0 /*JP*/
                 char *suf = (char *) 0;
 
                 strcpy(buf, word);
@@ -1417,7 +1418,6 @@ register const char *let, *word;
                     bp = (rn2(2) ? buf : (bp + 4));
                 } else
                     bp = buf;
-#if 0 /*JP*/
                 You("mime %s something%s%s.", ing_suffix(bp), suf ? " " : "",
                     suf ? suf : "");
 #else

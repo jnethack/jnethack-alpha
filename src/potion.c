@@ -2350,7 +2350,9 @@ dodip()
     char allowall[2];
     short mixture;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
+#if 0 /*JP*/
     const char *shortestname; /* last resort obj name for prompt */
+#endif
 
     allowall[0] = ALL_CLASSES;
     allowall[1] = '\0';
@@ -2362,10 +2364,8 @@ dodip()
     if (inaccessible_equipment(obj, "ÇêZÇ∑", FALSE))
         return 0;
 
-#if 0 /*JP:T*/
+#if 0 /*JP*/
     shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
-#else
-    shortestname = "ÇªÇÍ";
 #endif
     /*
      * Bypass safe_qbuf() since it doesn't handle varying suffix without

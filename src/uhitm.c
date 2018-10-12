@@ -711,10 +711,14 @@ int dieroll;
     int jousting = 0;
     int wtype;
     struct obj *monwep;
+#if 0 /*JP*/
     char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
+#endif
     char saved_oname[BUFSZ];
 
+#if 0 /*JP*/
     unconventional[0] = '\0';
+#endif
     saved_oname[0] = '\0';
 
     wakeup(mon, TRUE);

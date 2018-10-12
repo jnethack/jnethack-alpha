@@ -2591,9 +2591,6 @@ int x, y;
 char ch;
 {
     register struct WinDesc *cw = 0;
-#if 1 /*JP*/
-    static int prev_win;
-#endif
 
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr, window);
@@ -2623,9 +2620,6 @@ char ch;
         impossible("Can't putsym to window type %d", cw->type);
         break;
     }
-#if 1 /*JP*/
-    prev_win = cw->type;
-#endif
 }
 
 STATIC_OVL const char *

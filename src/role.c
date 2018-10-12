@@ -1791,7 +1791,9 @@ int buflen, rolenum, racenum, gendnum, alignnum;
     static char err_ret[] = " character's";
 */
     static char err_ret[] = "キャラクターの";
+#if 0 /*JP*/
     boolean donefirst = FALSE;
+#endif
 
     if (!suppliedbuf || buflen < 1)
         return err_ret;
@@ -1816,14 +1818,18 @@ int buflen, rolenum, racenum, gendnum, alignnum;
                 Strcat(buf, " ");
 #endif
             Strcat(buf, aligns[alignnum].adj);
+#if 0 /*JP*/
             donefirst = TRUE;
+#endif
         } else {
 #if 0 /*JP*/
             if (donefirst)
                 Strcat(buf, " ");
 #endif
             Strcat(buf, aligns[alignnum].adj);
+#if 0 /*JP*/
             donefirst = TRUE;
+#endif
         }
     } else {
         /* in case we got here by failing the ok_align() test */
@@ -1857,7 +1863,9 @@ int buflen, rolenum, racenum, gendnum, alignnum;
                     Strcat(buf, " ");
 #endif
                 Strcat(buf, genders[gendnum].adj);
+#if 0 /*JP*/
                 donefirst = TRUE;
+#endif
             }
         } else {
 #if 0 /*JP*/
@@ -1865,7 +1873,9 @@ int buflen, rolenum, racenum, gendnum, alignnum;
                 Strcat(buf, " ");
 #endif
             Strcat(buf, genders[gendnum].adj);
+#if 0 /*JP*/
             donefirst = TRUE;
+#endif
         }
     } else {
         /* if gender not specified, but role is specified
@@ -1888,14 +1898,18 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 #endif
             Strcat(buf, (rolenum == ROLE_NONE) ? races[racenum].noun
                                                : races[racenum].adj);
+#if 0 /*JP*/
             donefirst = TRUE;
+#endif
         } else if (!validrole(rolenum)) {
 #if 0 /*JP*/
             if (donefirst)
                 Strcat(buf, " ");
 #endif
             Strcat(buf, races[racenum].noun);
+#if 0 /*JP*/
             donefirst = TRUE;
+#endif
         } else {
             pa[BP_RACE] = 1;
             post_attribs++;
@@ -1924,7 +1938,9 @@ int buflen, rolenum, racenum, gendnum, alignnum;
             } else
                 Strcat(buf, roles[rolenum].name.m);
         }
+#if 0 /*JP*/
         donefirst = TRUE;
+#endif
     } else if (rolenum == ROLE_NONE) {
         pa[BP_ROLE] = 1;
         post_attribs++;
@@ -1940,7 +1956,9 @@ int buflen, rolenum, racenum, gendnum, alignnum;
         Strcat(buf, "character");
 */
         Strcat(buf, "キャラクター");
+#if 0 /*JP*/
         donefirst = TRUE;
+#endif
     }
     /* <your lawful female gnomish cavewoman> || <your lawful female gnome>
      *    || <your lawful female character>

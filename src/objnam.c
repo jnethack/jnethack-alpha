@@ -29,17 +29,14 @@ STATIC_DCL void FDECL(releaseobuf, (char *));
 STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 STATIC_DCL char *FDECL(doname_base, (struct obj *obj, unsigned));
+#if 0 /*JP*/
 STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
+#endif
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
+#if 0 /*JP*/
 STATIC_DCL boolean FDECL(badman, (const char *, BOOLEAN_P));
-#if 1 /*JP*/
-static char *FDECL(substitute, (char *,     char *,     char *));
-static char *FDECL(transpose, (char *buf,char *));
-static char *FDECL(delete, (char *, char *str));
-static int FDECL(digit_8, (int));
-static int FDECL(atoi_8, (const char *));
 #endif
 
 struct Jitem {
@@ -1860,8 +1857,12 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
 {
     char *nambuf = nextobuf();
     int omndx = otmp->corpsenm;
+#if 0 /*JP*/
     boolean ignore_quan = (cxn_flags & CXN_SINGULAR) != 0,
             /* suppress "the" from "the unique monster corpse" */
+#else
+    boolean
+#endif
         no_prefix = (cxn_flags & CXN_NO_PFX) != 0,
             /* include "the" for "the woodchuck corpse */
         the_prefix = (cxn_flags & CXN_PFX_THE) != 0,
@@ -2495,12 +2496,14 @@ struct obj *obj;
     return outbuf;
 }
 
+#if 0 /*JP*/
 static const char *wrp[] = {
     "wand",   "ring",      "potion",     "scroll", "gem",
     "amulet", "spellbook", "spell book",
     /* for non-specific wishes */
     "weapon", "armor",     "tool",       "food",   "comestible",
 };
+#endif
 static const char wrpsym[] = { WAND_CLASS,   RING_CLASS,   POTION_CLASS,
                                SCROLL_CLASS, GEM_CLASS,    AMULET_CLASS,
                                SPBOOK_CLASS, SPBOOK_CLASS, WEAPON_CLASS,
@@ -2646,6 +2649,7 @@ sing:
     return buf;
 }
 
+#if 0 /*JP*/
 struct sing_plur {
     const char *sing, *plur;
 };
@@ -2799,6 +2803,7 @@ char *str;
     /* wasn't recognized as a compound phrase */
     return 0;
 }
+#endif
 
 /* Plural routine; once upon a time it may have been chiefly used for
  * user-defined fruits, but it is now used extensively throughout the
@@ -3102,6 +3107,7 @@ bottom:
 #endif
 }
 
+#if 0 /*JP*/
 boolean
 badman(basestr, to_plural)
 const char *basestr;
@@ -3149,6 +3155,7 @@ boolean to_plural;            /* true => makeplural, false => makesingular */
     }
     return FALSE;
 }
+#endif
 
 /* compare user string against object name string using fuzzy matching */
 STATIC_OVL boolean

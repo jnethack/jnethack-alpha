@@ -2352,9 +2352,9 @@ heal_legs()
         }
 
         if (!u.usteed) {
+#if 0 /*JP*/
             const char *legs = body_part(LEG);
 
-#if 0 /*JP*/
             if ((EWounded_legs & BOTH_SIDES) == BOTH_SIDES)
                 legs = makeplural(legs);
             /* this used to say "somewhat better" but that was

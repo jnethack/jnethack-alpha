@@ -1457,9 +1457,6 @@ register struct obj *obj;
     char *bufp, buf[BUFSZ] = DUMMY, bufcpy[BUFSZ], qbuf[QBUFSZ];
     const char *aname;
     short objtyp;
-#if 1 /*JP*/
-    boolean is_japanese = FALSE;
-#endif
 
     /* Do this now because there's no point in even asking for a name */
     if (obj->otyp == SPE_NOVEL) {
@@ -1495,14 +1492,7 @@ register struct obj *obj;
 
     /* relax restrictions over proper capitalization for artifacts */
     if ((aname = artifact_name(buf, &objtyp)) != 0 && objtyp == obj->otyp)
-#if 0 /*JP*/
         Strcpy(buf, aname);
-#else
-        {
-            is_japanese = is_kanji(*buf);
-        Strcpy(buf, aname);
-        }
-#endif
 
     if (obj->oartifact) {
 /*JP
@@ -1818,7 +1808,11 @@ namefloorobj()
     int glyph;
     char buf[BUFSZ];
     struct obj *obj = 0;
+#if 0 /*JP*/
     boolean fakeobj = FALSE, use_plural;
+#else
+    boolean fakeobj = FALSE;
+#endif
 
     cc.x = u.ux, cc.y = u.uy;
     /* "dot for under/over you" only makes sense when the cursor hasn't
@@ -1859,7 +1853,9 @@ namefloorobj()
     Strcpy(buf, (obj->otyp != STRANGE_OBJECT)
                  ? simpleonames(obj)
                  : obj_descr[STRANGE_OBJECT].oc_name);
+#if 0 /*JP*/
     use_plural = (obj->quan > 1L);
+#endif
     if (Hallucination) {
         const char *unames[6];
         char tmpbuf[BUFSZ];
