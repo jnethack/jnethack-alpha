@@ -3888,12 +3888,12 @@ struct obj *no_wish;
 #else /*JP:êπêÖÇ∆ïsèÚÇ»êÖÇï Ç…îªíË*/
     if (!BSTRCMPI(bp, p - 4, "êπêÖ")) {
         typ = POT_WATER;
-	blessed = 1;
+        blessed = 1;
         goto typfnd;
     }
     if (!BSTRCMPI(bp, p - 4, "ïsèÚÇ»êÖ")) {
         typ = POT_WATER;
-	iscursed = 1;
+        iscursed = 1;
         goto typfnd;
     }
 #endif

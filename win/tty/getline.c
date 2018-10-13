@@ -97,8 +97,8 @@ getlin_hook_proc hook;
         Strcat(strcat(strcpy(toplines, query), " "), obufp);
         c = pgetchar();
 #if 1 /*JP*/
-	uc = (*((unsigned int *)&c));
-	uc &= 0377;
+        uc = (*((unsigned int *)&c));
+        uc &= 0377;
 #endif
         if (c == '\033' || c == EOF) {
             if (c == '\033' && obufp[0] != '\0') {
@@ -203,14 +203,14 @@ getlin_hook_proc hook;
 #if 0 /*JP*/
             putsyms(bufp);
 #else
-	    raw_putsyms(bufp);
+            raw_putsyms(bufp);
 #endif
             bufp++;
             if (hook && (*hook)(obufp)) {
 #if 0 /*JP*/
                 putsyms(bufp);
 #else
-		raw_putsyms(bufp);
+                raw_putsyms(bufp);
 #endif
 #ifndef NEWAUTOCOMP
                 bufp = eos(bufp);
@@ -374,7 +374,7 @@ tty_get_ext_cmd()
 /*JP
         pline("%s: unknown extended command.", buf);
 */
-	pline("%s:拡張コマンドエラー", buf);
+        pline("%s:拡張コマンドエラー", buf);
         i = -1;
     }
 

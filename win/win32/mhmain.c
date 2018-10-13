@@ -484,7 +484,7 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 /*JP
             switch (NHMessageBox(hWnd, TEXT("Save?"),
 */
-	    switch (NHMessageBox(hWnd, TEXT("保存して終了しますか？"),
+            switch (NHMessageBox(hWnd, TEXT("保存して終了しますか？"),
                                  MB_YESNOCANCEL | MB_ICONQUESTION)) {
             case IDYES:
 #ifdef SAFERHANGUP

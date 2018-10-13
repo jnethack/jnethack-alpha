@@ -3,9 +3,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
-**	Japanese version (by Issei Numata)
-**	For 3.4, Copyright (c) Kentaro Shirakata, 2002-2003
-**	JNetHack may be freely redistributed.  See license for details. 
+**      Japanese version (by Issei Numata)
+**      For 3.4, Copyright (c) Kentaro Shirakata, 2002-2003
+**      JNetHack may be freely redistributed.  See license for details. 
 */
 
 /*
@@ -1237,7 +1237,7 @@ tty_askname()
 /*JP
             tty_putstr(BASE_WINDOW, 0, "Enter a name for your character...");
 */
-	    tty_putstr(BASE_WINDOW, 0, "あなたのキャラクタの名前は？");
+            tty_putstr(BASE_WINDOW, 0, "あなたのキャラクタの名前は？");
             /* erase previous prompt (in case of ESC after partial response)
              */
             tty_curs(BASE_WINDOW, 1, wins[BASE_WINDOW]->cury), cl_end();
@@ -1262,7 +1262,7 @@ tty_askname()
             /* some people get confused when their erase char is not ^H */
             if (c == '\b' || c == '\177') {
 #if 1 /*JP*/
-	    moreback:
+            moreback:
 #endif
                 if (ct) {
                     ct--;
@@ -1284,8 +1284,8 @@ tty_askname()
 #endif
                 }
 #if 1 /*JP*/
-		if(is_kanji2(ptmpname, ct))
-		  goto moreback;
+                if(is_kanji2(ptmpname, ct))
+                  goto moreback;
 #endif
                 continue;
             }
@@ -1307,10 +1307,10 @@ tty_askname()
 #  if 0 /*JP*/
                     (void) putchar(c);
 #  else
-		    (void) cputchar(c);
+                    (void) cputchar(c);
 #   ifdef NO_TERMS
-		    ttyDisplay->curx++;
-		    wins[BASE_WINDOW]->curx++;
+                    ttyDisplay->curx++;
+                    wins[BASE_WINDOW]->curx++;
 #   endif
 #  endif /*JP*/
                 } else
@@ -1318,14 +1318,14 @@ tty_askname()
 /*JP
                     msmsg("%c", c);
 */
-		    (void) putchar(c);
+                    (void) putchar(c);
 #else
                 (void) putchar(c);
 #endif
 #if 0 /*JP*/
                 plname[ct++] = c;
 #else
-		ptmpname[ct++] = c;
+                ptmpname[ct++] = c;
 #endif
 #ifdef WIN32CON
                 ttyDisplay->curx++;
@@ -1335,7 +1335,7 @@ tty_askname()
 #if 0 /*JP*/
         plname[ct] = 0;
 #else
-	ptmpname[ct] = 0;
+        ptmpname[ct] = 0;
 #endif
     } while (ct == 0);
 
@@ -1361,7 +1361,7 @@ STATIC_OVL void
 getret()
 {
 #if 1 /*JP*/
-	jputchar('\0');
+        jputchar('\0');
 #endif
     xputs("\n");
     if (flags.standout)
@@ -1716,10 +1716,10 @@ const char *s; /* valid responses */
     {
       const char *p;
       p = prompt;
-	while(*p){
-	    jputchar(*(p++));
-	    ttyDisplay->curx++;
-	}
+        while(*p){
+            jputchar(*(p++));
+            ttyDisplay->curx++;
+        }
     }
 /*    jputs(prompt);*/
 #endif
@@ -1946,7 +1946,7 @@ struct WinDesc *cw;
 #if 0 /*JP*/
                     (void) putchar(' ');
 #else
-		    (void) jputchar(' ');
+                    (void) jputchar(' ');
 #endif
                     ++ttyDisplay->curx;
 
@@ -2038,7 +2038,7 @@ struct WinDesc *cw;
 #if 0 /*JP*/
                 Sprintf(cw->morestr, "(%d of %d)", curr_page + 1,
 #else
-		Sprintf(cw->morestr, "(%d/%d)", curr_page + 1,
+                Sprintf(cw->morestr, "(%d/%d)", curr_page + 1,
 #endif
                         (int) cw->npages);
             else if (msave)
@@ -2283,7 +2283,7 @@ struct WinDesc *cw;
 #if 0 /*JP*/
                 (void) putchar(' ');
 #else
-		(void) jputchar(' ');
+                (void) jputchar(' ');
 #endif
                 ++ttyDisplay->curx;
             }
@@ -2299,7 +2299,7 @@ struct WinDesc *cw;
 #if 0 /*JP*/
                 (void) putchar(*cp);
 #else
-		(void) jputchar(*cp);
+                (void) jputchar(*cp);
 #endif
             term_end_attr(attr);
         }
@@ -2570,7 +2570,7 @@ register int x, y; /* not xchar: perhaps xchar is unsigned and
 # if 0 /*JP*/
         (void) putchar('\r');
 # else
-	(void) cputchar('\r');
+        (void) cputchar('\r');
 # endif
         ttyDisplay->curx = 0;
         nocmov(x, y);
@@ -2608,11 +2608,11 @@ char ch;
 #if 0 /*JP*/
         (void) putchar(ch);
 #else
-	if(cw->type!=NHW_MAP)
-	  (void) jputchar(ch);
-	else {
-	  (void) cputchar(ch);
-	}
+        if(cw->type!=NHW_MAP)
+          (void) jputchar(ch);
+        else {
+          (void) cputchar(ch);
+        }
 #endif
         ttyDisplay->curx++;
         cw->curx++;
@@ -2670,14 +2670,14 @@ const char *str;
     register const char *nb;
     register long i, j, n0;
 #if 1 /*JP*/
-    int kchar2 = 0;		/* if 1, kanji 2nd byte */
+    int kchar2 = 0;             /* if 1, kanji 2nd byte */
 #endif
 
     /* Assume there's a real problem if the window is missing --
      * probably a panic message
      */
 #if 1 /*JP*/
-    jputchar('\0');	/* RESET */
+    jputchar('\0');     /* RESET */
 #endif
 
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0) {
@@ -2802,7 +2802,7 @@ const char *str;
 #if 0 /*JP*/
             (void) putchar(*str);
 #else
-	    (void) cputchar(*str);
+            (void) cputchar(*str);
 #endif
             str++;
             ttyDisplay->curx++;
@@ -2823,7 +2823,7 @@ const char *str;
 #if 0 /*JP*/
             (void) putchar(*str);
 #else
-	    (void) jputchar(*str);
+            (void) jputchar(*str);
 #endif
             str++;
             ttyDisplay->curx++;
@@ -2889,7 +2889,7 @@ const char *str;
         break;
     }
 #if 1 /*JP*/
-    jputchar('\0');	/* RESET */
+    jputchar('\0');     /* RESET */
 #endif
 }
 
@@ -3372,7 +3372,7 @@ int in_ch;
 #   if 0 /*JP*/
         (void) putchar(ch);
 #   else
-	(void) cputchar(ch);
+        (void) cputchar(ch);
 #   endif
     } else if (ch & 0x80) {
         if (!GFlag || HE_resets_AS) {
@@ -3382,7 +3382,7 @@ int in_ch;
 # if 0 /*JP*/
         (void) putchar((ch ^ 0x80)); /* Strip 8th bit */
 # else
-	(void) cputchar((ch ^ 0x80)); /* Strip 8th bit */
+        (void) cputchar((ch ^ 0x80)); /* Strip 8th bit */
 # endif
     } else {
         if (GFlag) {
@@ -3392,7 +3392,7 @@ int in_ch;
 # if 0 /*JP*/
         (void) putchar(ch);
 # else
-	(void) jputchar(ch);
+        (void) jputchar(ch);
 # endif
     }
 
@@ -3487,7 +3487,7 @@ int bkglyph UNUSED;
 # if 0 /*JP*/
         (void) putchar((char) ' ');
 # else
-	(void) cputchar((char) ' ');
+        (void) cputchar((char) ' ');
 # endif
         backsp();
     }
@@ -3793,7 +3793,7 @@ tty_status_init()
                     term_start_attr(ATR_BLINK);                               \
                 if ((m) & HL_DIM)                                             \
                     term_start_attr(ATR_DIM);                                 \
-	    }
+            }
 
 #define End_Attr(m) \
             if (m) {                                                          \
@@ -3807,7 +3807,7 @@ tty_status_init()
                     term_end_attr(ATR_INVERSE);                               \
                 if ((m) & HL_BOLD)                                            \
                     term_end_attr(ATR_BOLD);                                  \
-	    }
+            }
 
 #ifdef STATUS_HILITES
 
@@ -3820,13 +3820,13 @@ tty_status_init()
                     Begin_Attr(attrmask);                                     \
                     if ((coloridx = condcolor(bm, colormasks)) != NO_COLOR)   \
                         term_start_color(coloridx);                           \
-		}                                                             \
+                }                                                             \
                 putstr(WIN_STATUS, 0, txt);                                   \
                 if (iflags.hilite_delta) {                                    \
                     if (coloridx != NO_COLOR)                                 \
                         term_end_color();                                     \
                     End_Attr(attrmask);                                       \
-		}                                                             \
+                }                                                             \
             }
 #else
 #define MaybeDisplayCond(bm,txt) \
@@ -3835,11 +3835,11 @@ tty_status_init()
                 if (iflags.hilite_delta) {                                    \
                     attrmask = condattr(bm, colormasks);                      \
                     Begin_Attr(attrmask);                                     \
-		}                                                             \
+                }                                                             \
                 putstr(WIN_STATUS, 0, txt);                                   \
                 if (iflags.hilite_delta) {                                    \
                     End_Attr(attrmask);                                       \
-		}                                                             \
+                }                                                             \
             }
 #endif
 
@@ -3917,16 +3917,16 @@ unsigned long *colormasks;
                     Begin_Attr(attridx);
 #ifdef TEXTCOLOR
                     if (coloridx != NO_COLOR && coloridx != CLR_MAX)
-	                term_start_color(coloridx);
+                        term_start_color(coloridx);
 #endif
-	        }
+                }
 
                 putstr(WIN_STATUS, 0, text);
 
                 if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
                     if (coloridx != NO_COLOR)
-	                term_end_color();
+                        term_end_color();
 #endif
                     End_Attr(attridx);
                 }
@@ -3952,7 +3952,7 @@ unsigned long *colormasks;
                         savedch = *bar2;
                         *bar2 = '\0';
                     }
-		}
+                }
                 if (iflags.hilite_delta && iflags.wc2_hitpointbar) {
                     putstr(WIN_STATUS, 0, "[");
 #ifdef TEXTCOLOR
@@ -4001,7 +4001,7 @@ unsigned long *colormasks;
                     if (coloridx != NO_COLOR && coloridx != CLR_MAX)
                         term_start_color(coloridx);
 #endif
-		}
+                }
 
                 if (fldidx2 == BL_GOLD) {
                     /* putmixed() due to GOLD glyph */
@@ -4012,7 +4012,7 @@ unsigned long *colormasks;
 
                 if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
-       	            if (coloridx != NO_COLOR)
+                    if (coloridx != NO_COLOR)
                         term_end_color();
 #endif
                     End_Attr(attridx);
@@ -4031,7 +4031,7 @@ unsigned long *colormasks;
                 MaybeDisplayCond(BL_MASK_LEV, "Lev");
                 MaybeDisplayCond(BL_MASK_FLY, "Fly");
                 MaybeDisplayCond(BL_MASK_RIDE, "Ride");
-	    }
+            }
         }
     }
     cl_end();

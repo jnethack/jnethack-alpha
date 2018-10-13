@@ -620,7 +620,7 @@ attempt_restore:
 /*JP
         pline("Restoring save file...");
 */
-	pline("セーブファイルを復元中．．．");
+        pline("セーブファイルを復元中．．．");
         mark_synch(); /* flush output */
 
         if (dorecover(fd)) {
@@ -629,12 +629,12 @@ attempt_restore:
 /*JP
                 You("are in non-scoring discovery mode.");
 */
-	        pline("発見モードではスコアはのらないよ．");
+                pline("発見モードではスコアはのらないよ．");
             if (discover || wizard) {
 /*JP
                 if (yn("Do you want to keep the save file?") == 'n')
 */
-		if (yn("セーブファイルを残しておきますか？") == 'n')
+                if (yn("セーブファイルを残しておきますか？") == 'n')
                     (void) delete_savefile();
                 else {
                     nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
@@ -666,7 +666,7 @@ attempt_restore:
 /*JP
             You("are in non-scoring discovery mode.");
 */
-	    pline("発見モードではスコアはのらないよ．");
+            pline("発見モードではスコアはのらないよ．");
     }
 
 #ifndef NO_SIGNAL

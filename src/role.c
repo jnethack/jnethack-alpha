@@ -2026,28 +2026,28 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 /*
             Strcat(buf, "race");
 */
-	    Strcat(buf, "í‘°");
+            Strcat(buf, "í‘°");
         }
         if (pa[BP_ROLE]) {
             (void) promptsep(eos(buf), num_post_attribs);
 /*
             Strcat(buf, "role");
 */
-	    Strcat(buf, "E‹Æ");
+            Strcat(buf, "E‹Æ");
         }
         if (pa[BP_GEND]) {
             (void) promptsep(eos(buf), num_post_attribs);
 /*JP
             Strcat(buf, "gender");
 */
-	    Strcat(buf, "«•Ê");
+            Strcat(buf, "«•Ê");
         }
         if (pa[BP_ALIGN]) {
             (void) promptsep(eos(buf), num_post_attribs);
 /*JP
             Strcat(buf, "alignment");
 */
-	    Strcat(buf, "‘®«");
+            Strcat(buf, "‘®«");
         }
     }
 /*JP

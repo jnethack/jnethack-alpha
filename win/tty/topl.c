@@ -225,7 +225,7 @@ folding_japanese( str, pos )
      int pos;
 {
   char ss[1024],s1[1024],s2[1024];
-  static char newstr[1024];		/* may be enough */
+  static char newstr[1024];             /* may be enough */
 
   newstr[0] = '\0';
   Strcpy(ss, str);
@@ -374,6 +374,7 @@ const char *str;
         topl_putsym(*str++);
 }
 
+#if 1 /*JP*/
 /* JP
 ** do not translate kcode this function(see topl_putsym)
 */
@@ -385,36 +386,36 @@ raw_topl_putsym(c)
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if(cw == (struct WinDesc *) 0) panic("Putsym window MESSAGE nonexistant");
-	
+
     switch(c) {
     case '\b':
-	if(ttyDisplay->curx == 0 && ttyDisplay->cury > 0)
-	    tty_curs(BASE_WINDOW, CO, (int)ttyDisplay->cury-1);
-	backsp();
-	ttyDisplay->curx--;
-	cw->curx = ttyDisplay->curx;
-	return;
+        if(ttyDisplay->curx == 0 && ttyDisplay->cury > 0)
+            tty_curs(BASE_WINDOW, CO, (int)ttyDisplay->cury-1);
+        backsp();
+        ttyDisplay->curx--;
+        cw->curx = ttyDisplay->curx;
+        return;
     case '\n':
-	cl_end();
+        cl_end();
 #if 1 /*JP*/
-	(void) cputchar('\r'); /* raw mode で必要? */
-	(void) cputchar('\n');
+        (void) cputchar('\r'); /* raw mode で必要? */
+        (void) cputchar('\n');
 #endif
-	ttyDisplay->curx = 0;
-	ttyDisplay->cury++;
-	cw->cury = ttyDisplay->cury;
-	break;
+        ttyDisplay->curx = 0;
+        ttyDisplay->cury++;
+        cw->cury = ttyDisplay->cury;
+        break;
     default:
-	if(ttyDisplay->curx == CO-1)
-	    topl_putsym('\n'); /* 1 <= curx <= CO; avoid CO */
+        if(ttyDisplay->curx == CO-1)
+            topl_putsym('\n'); /* 1 <= curx <= CO; avoid CO */
 #if 0 /*JP*/
-	ttyDisplay->curx++;
+        ttyDisplay->curx++;
 #else
     cw->curx = ttyDisplay->curx;
     if(cw->curx == 0) cl_end();
-	(void) cputchar(c);
-	++cw->curx;
-	++ttyDisplay->curx;
+        (void) cputchar(c);
+        ++cw->curx;
+        ++ttyDisplay->curx;
 #endif
     }
 }
@@ -426,8 +427,9 @@ raw_putsyms(str)
     const char *str;
 {
     while(*str)
-	raw_topl_putsym(*str++);
+        raw_topl_putsym(*str++);
 }
+#endif
 
 STATIC_OVL void
 removetopl(n)

@@ -1228,8 +1228,8 @@ const char *build_date;
 #endif
 
     Sprintf(outbuf, "%s JNetHack%s Version %s-%d.%d.", PORT_ID,
-	    subbuf, version_string(versbuf, "."), JVERSION_MAJOR, JVERSION_MINOR);
-	return outbuf;
+            subbuf, version_string(versbuf, "."), JVERSION_MAJOR, JVERSION_MINOR);
+        return outbuf;
 }
 #endif
 
@@ -1401,7 +1401,7 @@ do_date()
             version_id_string(buf, cbuf));
 #if 1 /*JP*/
     Fprintf(ofp,"#define JVERSION_ID \\\n \"%s\"\n",
-	    jversion_id_string(buf, cbuf));
+            jversion_id_string(buf, cbuf));
 #endif
     Fprintf(ofp, "#define COPYRIGHT_BANNER_C \\\n \"%s\"\n",
             bannerc_string(buf, cbuf));

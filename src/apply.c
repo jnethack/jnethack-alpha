@@ -1821,7 +1821,7 @@ struct obj *obj;
 /*JP
             pline("%slamp is now off.", Shk_Your(buf, obj));
 */
-	    pline("%sランプの灯は消えた．", Shk_Your(buf, obj));
+            pline("%sランプの灯は消えた．", Shk_Your(buf, obj));
         else
 /*JP
             You("snuff out %s.", yname(obj));

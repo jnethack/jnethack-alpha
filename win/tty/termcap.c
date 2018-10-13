@@ -768,15 +768,15 @@ tty_delay_output()
 #if defined(MICRO)
     /* simulate the delay with "cursor here" */
 #if 1 /*JP*//*JPTB need?*/
-	{
-	register int i;
+    {
+        register int i;
 #endif
     for (i = 0; i < 3; i++) {
         cmov(ttyDisplay->curx, ttyDisplay->cury);
         (void) fflush(stdout);
     }
 #if 1 /*JP*/
-	}
+    }
 #endif
 #else /* MICRO */
     /* BUG: if the padding character is visible, as it is on the 5620

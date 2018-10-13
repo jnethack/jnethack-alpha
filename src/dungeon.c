@@ -2833,7 +2833,7 @@ const char *obj;
 /*JP
         return index(vowels, *obj) ? "an" : "a";
 */
-	return "";
+        return "";
     case 2:
 /*JP
         return "some";
@@ -3311,7 +3311,7 @@ boolean printdun;
                 dungeons[mptr->br->end2.dnum].dname);
 #else
         Sprintf(buf, "%s%s‚Ö‚Ì%s", PREFIX, dungeons[mptr->br->end2.dnum].dname,
-		br_string2(mptr->br));
+                br_string2(mptr->br));
 #endif
 
         /* Since mapseen objects are printed out in increasing order
