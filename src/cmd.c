@@ -2697,8 +2697,10 @@ attributes_enlightenment(unused_mode, final)
 int unused_mode UNUSED;
 int final;
 {
+#if 0 /*JP*/
     static NEARDATA const char if_surroundings_permitted[] =
         " if surroundings permitted";
+#endif
     int ltmp, armpro;
     char buf[BUFSZ];
 
@@ -3037,7 +3039,7 @@ int final;
             enl_msg(You_, "would levitate", "would have levitated",
                     if_surroundings_permitted, "");
 #else
-            you_are("•‚—Vó‘Ô", "");
+            you_are("ó‹µ‚ª‹–‚¹‚Î•‚—V‚·‚éó‘Ô", "");
 #endif
         BLevitation = save_BLev;
     }
@@ -3057,7 +3059,14 @@ int final;
                           : " if circumstances permitted",
                     "");
 #else
-            you_can("”ò‚Ô‚±‚Æ‚ª", "");
+            enl_msg(You_, "‚Å‚«‚é", "‚Å‚«‚½",
+                    "”ò‚Ô‚±‚Æ‚ª",
+                    Levitation
+                       ? "•‚—V‚µ‚Ä‚¢‚È‚¯‚ê‚Î"
+                       : (save_BFly == FROMOUTSIDE)
+                          ? "ó‹µ‚ª‹–‚¹‚Î"
+                          /* both surroundings and [latent] levitation */
+                          : "–î‚ª‹–‚¹‚Î");
 #endif
         BFlying = save_BFly;
     }

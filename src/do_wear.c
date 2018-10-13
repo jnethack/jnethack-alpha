@@ -2528,13 +2528,16 @@ glibr()
         if (otmp->quan > 1L)
             otherwep = makeplural(otherwep);
         hand = body_part(HAND);
+/*JP
         which = "left ";
+*/
+        which = "左";
 #if 0 /*JP*/
         Your("%s %s%s from your %s%s.", otherwep, xfl ? "also " : "",
              otense(otmp, "slip"), which, hand);
 #else
-        You("%s%s%sから滑り落とした．", otherwep, xfl ? "もまた" : "を",
-            body_part(HAND));
+        You("%s%s%s%sから滑り落とした．", otherwep, xfl ? "もまた" : "を",
+            which, body_part(HAND));
 #endif
         xfl++;
         wastwoweap = TRUE;
@@ -2566,17 +2569,21 @@ glibr()
         if (bimanual(otmp))
             hand = makeplural(hand);
         else if (wastwoweap)
+#if 0 /*JP*/
             which = "right "; /* preceding msg was about left */
+#else
+            which = "右"; /* preceding msg was about left */
+#endif
 #if 0 /*JP*/
         pline("%s %s%s %s%s from your %s%s.",
               !strncmp(thiswep, "corpse", 6) ? "The" : "Your",
               otherwep ? "other " : "", thiswep, xfl ? "also " : "",
               otense(otmp, "slip"), which, hand);
 #else
-        You("%s%s%s%sから滑り落とした．",
+        You("%s%s%s%s%sから滑り落とした．",
             otherwep ? "もうひとつの" : "", thiswep,
             xfl ? "もまた" : "を",
-            body_part(HAND));
+            which, body_part(HAND));
 #endif
         /* xfl++; */
         otmp->quan = savequan;
