@@ -112,20 +112,20 @@ setkcode(c)
     if (output_dsc)
         iconv_close(output_dsc);
     output_dsc = iconv_open(ccode[output_kcode], ccode[IC]);
-    if ((size_t)output_dsc == -1)
+    if (output_dsc == (iconv_t)-1)
         output_dsc = iconv_open(ccode_alt[output_kcode], ccode[IC]);
-    if ((size_t)output_dsc == -1)
+    if (output_dsc == (iconv_t)-1)
         output_dsc = iconv_open(ccode[output_kcode], ccode_alt[IC]);
-    if ((size_t)output_dsc == -1)
+    if (output_dsc == (iconv_t)-1)
         output_dsc = iconv_open(ccode_alt[output_kcode], ccode_alt[IC]);
     if(input_dsc)
         iconv_close(input_dsc);
     input_dsc = iconv_open(ccode[IC] ,ccode[input_kcode]);
-    if ((size_t)input_dsc == -1)
+    if (input_dsc == (iconv_t)-1)
         input_dsc = iconv_open(ccode_alt[IC] ,ccode[input_kcode]);
-    if ((size_t)input_dsc == -1)
+    if (input_dsc == (iconv_t)-1)
         input_dsc = iconv_open(ccode[IC] ,ccode_alt[input_kcode]);
-    if ((size_t)input_dsc == -1)
+    if (input_dsc == (iconv_t)-1)
         input_dsc = iconv_open(ccode_alt[IC] ,ccode_alt[input_kcode]);
 #endif
 }
