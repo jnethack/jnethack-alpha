@@ -2285,16 +2285,19 @@ long quan;       /* if non-0, print this quantity, not obj->quan */
      */
     if (cost != 0 || let == '*') {
         /* if dot is true, we're doing Iu, otherwise Ix */
-        Sprintf(li,
 #if 0 /*JP*/
+        Sprintf(li,
                 iflags.menu_tab_sep ? "%c - %s\t%6ld %s"
                                     : "%c - %-45s %6ld %s",
-#else
-                iflags.menu_tab_sep ? "%c - %s\t%6ld%s"
-                                    : "%c - %-45s %6ld%s",
-#endif
                 (dot && use_invlet ? obj->invlet : let),
                 (txt ? txt : doname(obj)), cost, currency(cost));
+#else
+        Sprintf(li,
+                iflags.menu_tab_sep ? "%c - %s\t%6ld%s"
+                                    : "%c - %-45s %6ld%s",
+                (dot && use_invlet ? obj->invlet : let),
+                (txt ? txt : doname(obj)), cost, currency(cost));
+#endif
     } else {
         /* ordinary inventory display or pickup message */
         Sprintf(li, "%c - %s%s", (use_invlet ? obj->invlet : let),

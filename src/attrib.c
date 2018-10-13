@@ -1104,19 +1104,21 @@ int propidx; /* special cases can have negative values */
                 break;
             case INVIS:
                 if (u.uprops[INVIS].blocked & W_ARMC)
-                    Sprintf(buf, because_of,
 #if 0 /*JP*/
+                    Sprintf(buf, because_of,
                             ysimple_name(uarmc)); /* mummy wrapping */
 #else
+                    Sprintf(buf, because_of,
                             simpleonames(uarmc)); /* mummy wrapping */
 #endif
                 break;
             case CLAIRVOYANT:
                 if (wizard && (u.uprops[CLAIRVOYANT].blocked & W_ARMH))
-                    Sprintf(buf, because_of,
 #if 0 /*JP*/
+                    Sprintf(buf, because_of,
                             ysimple_name(uarmh)); /* cornuthaum */
 #else
+                    Sprintf(buf, because_of,
                             simpleonames(uarmh)); /* cornuthaum */
 #endif
                 break;

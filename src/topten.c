@@ -631,11 +631,12 @@ time_t when;
                 char pbuf[BUFSZ];
 
                 topten_print("");
-                Sprintf(pbuf,
 #if 0 /*JP*/
+                Sprintf(pbuf,
              "Since you were in %s mode, the score list will not be checked.",
                         wizard ? "wizard" : "discover");
 #else
+                Sprintf(pbuf,
              "%sモードでプレイしたのでスコアリストには載らない．",
                         wizard ? "ウィザード" : "発見");
 #endif

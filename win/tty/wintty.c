@@ -2037,10 +2037,11 @@ struct WinDesc *cw;
             if (cw->npages > 1)
 #if 0 /*JP*/
                 Sprintf(cw->morestr, "(%d of %d)", curr_page + 1,
+                        (int) cw->npages);
 #else
                 Sprintf(cw->morestr, "(%d/%d)", curr_page + 1,
-#endif
                         (int) cw->npages);
+#endif
             else if (msave)
                 Strcpy(cw->morestr, msave);
             else

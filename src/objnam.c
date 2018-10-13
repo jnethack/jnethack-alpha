@@ -1204,28 +1204,27 @@ char *prefix;
         Strcat(prefix, is_corrodeable(obj) ? "ïÖêHÇµÇΩ" : "ïÖÇ¡ÇΩ");
     }
     if (rknown && obj->oerodeproof)
+#if 0 /*JP*/
         Strcat(prefix, iscrys
-/*JP
                           ? "fixed "
-*/
+                          : is_rustprone(obj)
+                             ? "rustproof "
+                             : is_corrodeable(obj)
+                                ? "ïÖêHÇµÇ»Ç¢" /* "stainless"? */
+                                : is_flammable(obj)
+                                   ? "fireproof "
+                                   : "");
+#else
+        Strcat(prefix, iscrys
                           ? "à¿íËÇµÇΩ"
                           : is_rustprone(obj)
-/*JP
-                             ? "rustproof "
-*/
                              ? "éKÇ—Ç»Ç¢"
                              : is_corrodeable(obj)
-#if 0 /*JP*/
-                                ? "corrodeproof " /* "stainless"? */
-#else
                                 ? "ïÖêHÇµÇ»Ç¢" /* "stainless"? */
-#endif
                                 : is_flammable(obj)
-/*JP
-                                   ? "fireproof "
-*/
                                    ? "îRÇ¶Ç»Ç¢"
                                    : "");
+#endif
 }
 
 /* used to prevent rust on items where rust makes no difference */

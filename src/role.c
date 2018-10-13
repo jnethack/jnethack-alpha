@@ -2236,13 +2236,17 @@ winid where;
     Sprintf(buf, "%12s ", "alignment:");
 */
     Sprintf(buf, "%12s ", "属性:");
+#if 0 /*JP:日本語では名詞が自然*/
     Strcat(buf, (which == RS_ALGNMNT) ? choosing : (a == ROLE_NONE)
                                                        ? not_yet
                                                        : (a == ROLE_RANDOM)
                                                              ? rand_choice
-#if 0 /*JP:日本語では名詞が自然*/
                                                              : aligns[a].adj);
 #else
+    Strcat(buf, (which == RS_ALGNMNT) ? choosing : (a == ROLE_NONE)
+                                                       ? not_yet
+                                                       : (a == ROLE_RANDOM)
+                                                             ? rand_choice
                                                              : aligns[a].noun);
 #endif
     putstr(where, 0, buf);

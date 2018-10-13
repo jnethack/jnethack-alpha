@@ -134,13 +134,15 @@ const char *goal;
                                           "同じ地形を飛ばして" };
 #endif
 
-    Sprintf(sbuf,
 #if 0 /*JP*/
+    Sprintf(sbuf,
             "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
-#else
-            "[%c%c%c%c]で%sへ移動できる．",
-#endif
             Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
+#else
+    Sprintf(sbuf,
+            "[%c%c%c%c]で%sへ移動できる．",
+            Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
+#endif
     putstr(tmpwin, 0, sbuf);
 #if 0 /*JP*/
     Sprintf(sbuf,
