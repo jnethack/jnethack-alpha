@@ -1268,16 +1268,16 @@ char **argv;
         playerct = --argc;
         players = (const char **) ++argv;
 #else
-        int i;
+        int j;
         playerct = --argc;
         ++argv;
         players = (const char **)alloc(sizeof(char *) * argc + 1);
-        for (i = 0; i < argc; i++) {
-            char *p = (char *)str2ic(argv[i]);
-            players[i] = (char *)alloc(strlen(p) + 1);
-            strcpy((void *)players[i], p);
+        for (j = 0; j < argc; j++) {
+            char *p = (char *)str2ic(argv[j]);
+            players[j] = (char *)alloc(strlen(p) + 1);
+            strcpy((void *)players[j], p);
         }
-        players[i] = NULL;
+        players[j] = NULL;
 #endif
     }
     raw_print("");
