@@ -200,7 +200,7 @@ str2ic(s)
 #ifdef POSIX_ICONV
     if (input_dsc) {
         size_t src_len, dst_len;
-        up = s;
+        up = (unsigned char *)s;
         src_len = strlen(s);
         dst_len = sizeof(buf);
         if (iconv(input_dsc, (char**)&up, &src_len,
@@ -210,7 +210,7 @@ str2ic(s)
 #else
     if( IC==EUC && input_kcode == SJIS ){
         while(*s){
-            up = s;
+            up = (unsigned char *)s;
             if(is_kanji(*up)){
                 pp = sj2e((unsigned char *)s);
                 *(p++) = pp[0];
@@ -257,7 +257,7 @@ ic2str(s)
 #ifdef POSIX_ICONV
     if(output_dsc){
         size_t src_len, dst_len;
-        up = s;
+        up = (unsigned char *)s;
         src_len = strlen(s);
         dst_len = sizeof(buf);
         if(iconv(output_dsc, (char**)&up, &src_len,
@@ -267,7 +267,7 @@ ic2str(s)
 #else
     if( IC==EUC && output_kcode == SJIS ){
         while(*s){
-            up = s;
+            up = (unsigned char *)s;
             if( *up & 0x80 ){
                 pp = e2sj((unsigned char *)s);
                 *(p++) = pp[0];
@@ -587,7 +587,7 @@ offset_in_kanji(s, pos)
             return c;
         }
     } else {
-        return is_kanji2(s, pos);
+        return is_kanji2((char *)s, pos);
     }
 }
 
@@ -730,7 +730,7 @@ jrndm_replace(c)
     unsigned char cc[3];
 
     if(IC==SJIS)
-      memcpy(cc, (char *)sj2e(c), 2);
+      memcpy(cc, (char *)sj2e((unsigned char *)c), 2);
     else
       memcpy(cc, c, 2);
 
@@ -1411,10 +1411,13 @@ jrubout(engr, nxt, use_rubout, select_rnd)
     if(!is_kanji1(engr, nxt)) return 0;
 
     j = kanji2index(engr[nxt], engr[nxt + 1]);
-    if (j >= 0x0000 && j <= 0x02B1) p = &ro0[j << 2];
-    else if (j >= 0x0582 && j <= 0x1116) p = &ro1[(j - 0x0582) << 2];
-    else if (j >= 0x1142 && j <= 0x1E7F) p = &ro2[(j - 0x1142) << 2];
-    else p = "H";
+    if (j >= 0x0000 && j <= 0x02B1)
+        p = (unsigned char *)&ro0[j << 2];
+    else if (j >= 0x0582 && j <= 0x1116)
+        p = (unsigned char *)&ro1[(j - 0x0582) << 2];
+    else if (j >= 0x1142 && j <= 0x1E7F)
+        p = (unsigned char *)&ro2[(j - 0x1142) << 2];
+    else p = (unsigned char *)"H";
     
     if (p[2] != ' ' || p[3] != ' ') p += select_rnd * 2;
     engr[nxt] = *p++;

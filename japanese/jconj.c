@@ -349,7 +349,7 @@ jcan(jverb)
      const char *jverb;
 {
     const char *ret;
-    static unsigned char tmp[1024];
+    static char tmp[1024];
 
     int len = strlen(jverb);
     if(!strcmp(jverb + len - 4, "‚·‚é")){
@@ -367,7 +367,7 @@ const char *
 jcannot(jverb)
      const char *jverb;
 {
-    static unsigned char tmp[1024];
+    static char tmp[1024];
 
     int len = strlen(jverb);
     if(!strcmp(jverb + len - 4, "‚·‚é")){

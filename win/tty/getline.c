@@ -173,7 +173,7 @@ getlin_hook_proc hook;
 #if 1 /*JP*/
             {
                 int n;
-                n = offset_in_kanji(tmp, bufp - tmp);
+                n = offset_in_kanji((unsigned char *)tmp, bufp - tmp);
                 if (n > 0) {
                     /* Œã‚Å1ƒoƒCƒgˆø‚©‚ê‚é‚Ì‚Å‚»‚Ì•ª‚Í‚±‚±‚Å‚Íˆø‚©‚È‚¢ */
                     bufp = bufp - (n - 1);
@@ -189,7 +189,7 @@ getlin_hook_proc hook;
 #if 0 /*JP*/
         } else if (' ' <= (unsigned char) c && c != '\177'
 #else
-        } else if (' ' <= uc && uc < '\377'
+        } else if (' ' <= uc && uc < 255
 #endif
                    /* avoid isprint() - some people don't have it
                       ' ' is not always a printing char */
