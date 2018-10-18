@@ -3525,7 +3525,7 @@ struct obj *no_wish;
 #if 0 /*JP*/
             if (!strncmpi(bp, "wet ", 4))
 #else
-            if (!strncmpi(bp, "îGÇÍÇΩ", 4))
+            if (!strncmpi(bp, "îGÇÍÇΩ", 6))
 #endif
                 wetness = rn2(3) + 3;
             else
@@ -3540,7 +3540,7 @@ struct obj *no_wish;
 #if 0 /*JP*/
         } else if (!strncmpi(bp, "uncursed ", l = 9)) {
 #else
-        } else if (!strncmpi(bp, "éÙÇÌÇÍÇƒÇ¢Ç»Ç¢", l = 9)) {
+        } else if (!strncmpi(bp, "éÙÇÌÇÍÇƒÇ¢Ç»Ç¢", l = 14)) {
 #endif
             uncursed = 1;
 #if 0 /*JP*/
@@ -3897,7 +3897,7 @@ struct obj *no_wish;
         blessed = 1;
         goto typfnd;
     }
-    if (!BSTRCMPI(bp, p - 4, "ïsèÚÇ»êÖ")) {
+    if (!BSTRCMPI(bp, p - 8, "ïsèÚÇ»êÖ")) {
         typ = POT_WATER;
         iscursed = 1;
         goto typfnd;
