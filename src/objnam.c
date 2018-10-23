@@ -3255,6 +3255,7 @@ struct o_range {
     int f_o_range, l_o_range;
 };
 
+#if 0 /*JP*//*部分的なジャンル指定での願い用。日本語ではとりあえずしない*/
 /* wishable subranges of objects */
 STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
     { "bag", TOOL_CLASS, SACK, BAG_OF_TRICKS },
@@ -3279,6 +3280,7 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
     { "gray stone", GEM_CLASS, LUCKSTONE, FLINT },
     { "grey stone", GEM_CLASS, LUCKSTONE, FLINT },
 };
+#endif
 
 
 #if 0 /*JP*//*not used*/
@@ -3500,6 +3502,18 @@ struct obj *no_wish;
             while (*bp == ' ')
                 bp++;
             l = 0;
+#if 1 /*JP*//* 後に数詞があるときは削除 */
+            if(!strncmp(bp, "冊の", l = 4) ||
+               !strncmp(bp, "本の", l = 4) ||
+               !strncmp(bp, "着の", l = 4) ||
+               !strncmp(bp, "個の", l = 4) ||
+               !strncmp(bp, "枚の", l = 4) ||
+               !strncmp(bp, "つの", l = 4) ||
+               !strncmp(bp, "の", l = 2))
+              ;
+            else
+              l = 0;
+#endif
         } else if (*bp == '+' || *bp == '-') {
             spesgn = (*bp++ == '+') ? 1 : -1;
             spe = atoi(bp);
@@ -3557,18 +3571,36 @@ struct obj *no_wish;
                    || !strncmpi(bp, "燃えない", l = 8)) {
 #endif
             erodeproof = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "lit ", l = 4)
                    || !strncmpi(bp, "burning ", l = 8)) {
+#else
+        } else if (!strncmpi(bp, "光っている", l = 10)
+                   || !strncmpi(bp, "燃えている", l = 10)) {
+#endif
             islit = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "unlit ", l = 6)
                    || !strncmpi(bp, "extinguished ", l = 13)) {
+#else
+        } else if (!strncmpi(bp, "消えている", l = 10)) {
+#endif
             islit = 0;
             /* "unlabeled" and "blank" are synonymous */
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "unlabeled ", l = 10)
                    || !strncmpi(bp, "unlabelled ", l = 11)
                    || !strncmpi(bp, "blank ", l = 6)) {
+#else
+        } else if (!strncmpi(bp, "ラベルのない", l = 12)
+                   || !strncmpi(bp, "真っ白な", l = 8)) {
+#endif
             unlabeled = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "poisoned ", l = 9)) {
+#else
+        } else if (!strncmpi(bp, "毒の塗られた", l = 12)) {
+#endif
             ispoisoned = 1;
             /* "trapped" recognized but not honored outside wizard mode */
         } else if (!strncmpi(bp, "trapped ", l = 8)) {
@@ -3578,45 +3610,108 @@ struct obj *no_wish;
         } else if (!strncmpi(bp, "untrapped ", l = 10)) {
             trapped = 2; /* not trapped */
         /* locked, unlocked, broken: box/chest lock states */
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "locked ", l = 7)) {
+#else
+        } else if (!strncmpi(bp, "鍵の掛かった", l = 12)) {
+#endif
             locked = 1, unlocked = broken = 0;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "unlocked ", l = 9)) {
+#else
+        } else if (!strncmpi(bp, "鍵の掛かっていない", l = 18)) {
+#endif
             unlocked = 1, locked = broken = 0;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "broken ", l = 7)) {
+#else
+        } else if (!strncmpi(bp, "鍵の壊れた", l = 10)) {
+#endif
             broken = 1, locked = unlocked = 0;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "greased ", l = 8)) {
+#else
+        } else if (!strncmpi(bp, "油の塗られた", l = 12)
+                   || !strncmpi(bp, "脂の塗られた", l = 12)) {
+#endif
             isgreased = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "very ", l = 5)) {
+#else
+        } else if (!strncmpi(bp, "とても", l = 6)) {
+#endif
             /* very rusted very heavy iron ball */
             very = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "thoroughly ", l = 11)) {
+#else
+        } else if (!strncmpi(bp, "かなり", l = 6)) {
+#endif
             very = 2;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "rusty ", l = 6)
                    || !strncmpi(bp, "rusted ", l = 7)
                    || !strncmpi(bp, "burnt ", l = 6)
                    || !strncmpi(bp, "burned ", l = 7)) {
+#else
+        } else if (!strncmpi(bp, "錆びた", l = 6)
+                   || !strncmpi(bp, "燃えた", l = 6)) {
+#endif
             eroded = 1 + very;
             very = 0;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "corroded ", l = 9)
                    || !strncmpi(bp, "rotted ", l = 7)) {
+#else
+        } else if (!strncmpi(bp, "腐食した", l = 8)
+                   || !strncmpi(bp, "腐った", l = 6)) {
+#endif
             eroded2 = 1 + very;
             very = 0;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "partly eaten ", l = 13)
                    || !strncmpi(bp, "partially eaten ", l = 16)) {
+#else
+        } else if (!strncmpi(bp, "食べかけの", l = 10)) {
+#endif
             halfeaten = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "historic ", l = 9)) {
+#else
+        } else if (!strncmpi(bp, "歴史的な", l = 8)) {
+#endif
             ishistoric = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "diluted ", l = 8)) {
+#else
+        } else if (!strncmpi(bp, "薄まった", l = 8)) {
+#endif
             isdiluted = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "empty ", l = 6)) {
+#else
+        } else if (!strncmpi(bp, "空っぽの", l = 8)) {
+#endif
             contents = EMPTY;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "small ", l = 6)) { /* glob sizes */
+#else
+        } else if (!strncmpi(bp, "小さい", l = 6)) { /* glob sizes */
+#endif
             gsize = 1;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "medium ", l = 7)) {
+#else
+        } else if (!strncmpi(bp, "中くらいの", l = 10)) {
+#endif
             /* xname() doesn't display "medium" but without this
                there'd be no way to ask for the intermediate size */
             gsize = 2;
+#if 0 /*JP*/
         } else if (!strncmpi(bp, "large ", l = 6)) {
+#else
+        } else if (!strncmpi(bp, "大きい", l = 6)) {
+#endif
             /* "very large " had "very " peeled off on previous iteration */
             gsize = (very != 1) ? 3 : 4;
         } else
@@ -3695,6 +3790,7 @@ struct obj *no_wish;
     if ((p = strstri(bp, " called ")) != 0) {
         *p = 0;
         un = p + 8;
+#if 0 /*JP*//*タイプ別はとりあえずしない*/
         /* "helmet called telepathy" is not "helmet" (a specific type)
          * "shield called reflection" is not "shield" (a general type)
          */
@@ -3703,6 +3799,7 @@ struct obj *no_wish;
                 oclass = o_ranges[i].oclass;
                 goto srch;
             }
+#endif
     }
     if ((p = strstri(bp, " labeled ")) != 0) {
         *p = 0;
@@ -3810,11 +3907,22 @@ struct obj *no_wish;
             }
         }
     }
-#else /*JP:「(怪物名)の(アイテム)」対応 */
+#else
     {
-        if ((mntmp = name_to_mon(bp)) >= LOW_PM) {
-            const char *mp = mons[mntmp].mname;
-            bp = strstri(bp, mp) + strlen(mp) + 2;
+        /*JP 「(怪物名)の塊」は個々にIDがあるので別扱い */
+        int l = strlen(bp);
+        if (l > 4 && strncmp(bp + l - 4, "の塊", 4) == 0) {
+            if ((mntmp = name_to_mon(bp)) >= PM_GRAY_OOZE
+                && mntmp <= PM_BLACK_PUDDING) {
+                mntmp = NON_PM; /* lie to ourselves */
+                cnt = 0;        /* force only one */
+            }
+        } else {
+            /*JP:「(怪物名)の(アイテム)」対応 */
+            if ((mntmp = name_to_mon(bp)) >= LOW_PM) {
+                const char *mp = mons[mntmp].mname;
+                bp = strstri(bp, mp) + strlen(mp) + 2;
+            }
         }
     }
 #endif
@@ -4036,14 +4144,19 @@ struct obj *no_wish;
         }
     }
 
+#if 0 /*JP*//* mail/armor関連でのみ使うラベル */
 retry:
+#endif
+#if 0 /*JP*//* タイプ別はとりあえずしない */
     /* "grey stone" check must be before general "stone" */
     for (i = 0; i < SIZE(o_ranges); i++)
         if (!strcmpi(bp, o_ranges[i].name)) {
             typ = rnd_class(o_ranges[i].f_o_range, o_ranges[i].l_o_range);
             goto typfnd;
         }
+#endif
 
+#if 0 /*JP*//* 石の特別処理は不要 */
     if (!BSTRCMPI(bp, p - 6, " stone") || !BSTRCMPI(bp, p - 4, " gem")) {
         p[!strcmpi(p - 4, " gem") ? -4 : -6] = '\0';
         oclass = GEM_CLASS;
@@ -4081,11 +4194,14 @@ retry:
             Strcpy(bp, tbuf);
         }
     }
+#endif
 
     actualn = bp;
     if (!dn)
         dn = actualn; /* ex. "skull cap" */
+#if 0 /*JP*/
 srch:
+#endif
     /* check real names of gems first */
     if (!oclass && actualn) {
         for (i = bases[GEM_CLASS]; i <= LAST_GEM; i++) {
@@ -4096,12 +4212,14 @@ srch:
                 goto typfnd;
             }
         }
+#if 0 /*JP*//* 日本語は"tin"を訳し分けているので不要 */
         /* "tin of foo" would be caught above, but plain "tin" has
            a random chance of yielding "tin wand" unless we do this */
         if (!strcmpi(actualn, "tin")) {
             typ = TIN;
             goto typfnd;
         }
+#endif
     }
 
     if (((typ = rnd_otyp_by_namedesc(actualn, oclass)) != STRANGE_OBJECT)
@@ -4122,6 +4240,7 @@ srch:
             j++;
         }
     }
+#if 0 /*JP*//* mail/armorの表記揺れチェックは不要 */
     /* if we've stripped off "armor" and failed to match anything
        in objects[], append "mail" and try again to catch misnamed
        requests like "plate armor" and "yellow dragon scale armor" */
@@ -4131,6 +4250,7 @@ srch:
         Strcat(bp, " mail");
         goto retry;
     }
+#endif
 #if 0 /*JP*/
     if (!strcmpi(bp, "spinach")) {
 #else
@@ -4340,6 +4460,7 @@ wiztrap:
         }
     }
 
+#if 0 /*JP*//* タイプ別はとりあえずしない */
     if (!oclass && !typ) {
         if (!strncmpi(bp, "polearm", 7)) {
             typ = rnd_otyp_by_wpnskill(P_POLEARMS);
@@ -4349,6 +4470,7 @@ wiztrap:
             goto typfnd;
         }
     }
+#endif
 
     if (!oclass)
         return ((struct obj *) 0);
