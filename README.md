@@ -1,4 +1,4 @@
-[![Linux](https://travis-ci.org/jnethack/jnethack-alpha.svg?branch=develop)](https://travis-ci.org/jnethack/jnethack-alpha.svg?branch=develop)[![Windows](https://ci.appveyor.com/api/projects/status/2no8rc2q162ssb2c/branch/develop?svg=true)](https://ci.appveyor.com/project/argrath/jnethack-alpha/branch/develop)
+[![Linux/Mac](https://travis-ci.org/jnethack/jnethack-alpha.svg?branch=develop)](https://travis-ci.org/jnethack/jnethack-alpha)[![Windows](https://ci.appveyor.com/api/projects/status/2no8rc2q162ssb2c/branch/develop?svg=true)](https://ci.appveyor.com/project/argrath/jnethack-alpha/branch/develop)
 
 # JNetHack ƒŒƒ|ƒWƒgƒŠ
 
