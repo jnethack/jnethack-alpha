@@ -2,18 +2,16 @@
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata 1994-1999                                      */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2018            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 /*
  * Misc. popup windows: player selection and extended commands.
  *
  *      + Global functions: player_selection() and get_ext_cmd().
  */
-
-/*
-**	Japanese version Copyright (C) Issei Numata, 1994-1999
-**	changing point is marked `JP' (94/6/7) or XI18N (96/7/19)
-**	For 3.4.0, Copyright (c) Kentaro Shirakata, 2002
-**	JNetHack may be freely redistributed.  See license for details. 
-*/
 
 #ifndef SYSV
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */

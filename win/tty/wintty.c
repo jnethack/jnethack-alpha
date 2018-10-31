@@ -2,11 +2,10 @@
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/*
-**      Japanese version (by Issei Numata)
-**      For 3.4, Copyright (c) Kentaro Shirakata, 2002-2003
-**      JNetHack may be freely redistributed.  See license for details. 
-*/
+/* JNetHack Copyright */
+/* (c) Issei Numata 1994-2000                                      */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2018            */
+/* JNetHack may be freely redistributed.  See license for details. */
 
 /*
  * Neither a standard out nor character-based control codes should be

@@ -1,10 +1,6 @@
-/*
-**
-**      $Id: jlib.c,v 1.14 2008-05-03 15:40:59 argrath Exp $
-**
-*/
-
-/* Copyright (c) Issei Numata 1994-2000 */
+/* JNetHack Copyright */
+/* (c) Issei Numata 1994-2000                                      */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2018            */
 /* JNetHack may be freely redistributed.  See license for details. */
 
 #include <stdio.h>

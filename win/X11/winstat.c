@@ -2,6 +2,11 @@
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
+/* JNetHack Copyright */
+/* (c) Issei Numata 1994-1999                                      */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2018            */
+/* JNetHack may be freely redistributed.  See license for details. */
+
 /*
  * Status window routines.  This file supports both the "traditional"
  * tty status display and a "fancy" status display.  A tty status is
@@ -9,13 +14,6 @@
  * made.  This code assumes that only one fancy status will ever be made.
  * Currently, only one status window (of any type) is _ever_ made.
  */
-
-/*
-**	Japanese version Copyright (C) Issei Numata, 1994-1999
-**	changing point is marked `JP' (94/6/7) or XI18N (96/7/19)
-**	For 3.4.0, Copyright (c) Kentaro Shirakata, 2002
-**	JNetHack may be freely redistributed.  See license for details. 
-*/
 
 #ifndef SYSV
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
