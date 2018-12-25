@@ -1,3 +1,12 @@
+Sun Dec 26 2018  Kentaro Shirakata  <argrath@ub32.org>
+
+	* JNetHack-3.6.1-0.3リリース
+	* MacOSでのビルドに対応
+	* 願いの処理を拡充
+	* ビルド方法の文書を追加(japanese/build.md)
+	* AppVeyorでのビルドに対応
+	* 翻訳追加修正
+
 Sun Oct  7 2018  Kentaro Shirakata  <argrath@ub32.org>
 
 	* JNetHack-3.6.1-0.2リリース
