@@ -1,5 +1,11 @@
 language: c
 
+env:
+  global:
+    # COVERITY_SCAN_TOKEN
+    # ** specific to your project **
+    - secure: "RzE-RDqKwMSA-raXmZy06w"
+
 os:
   - linux
   - osx
@@ -22,3 +28,29 @@ before_script:
 
 script:
   - make install
+
+addons:
+  coverity_scan:
+
+    # GitHub project metadata
+    # ** specific to your project **
+    project:
+      name: jnethack/jnethack-alpha
+      version: 1.0
+      description: My Project
+
+    # Where email notification of build analysis results will be sent
+    notification_email: argrath@ub32.org
+
+    # Commands to prepare for build_command
+    # ** likely specific to your build **
+    build_command_prepend: sh japanese/set_lnx.sh
+
+    # The command that will be added as an argument to "cov-build" to compile your project for analysis,
+    # ** likely specific to your build **
+    build_command: make install
+
+    # Pattern to match selecting branches that will run analysis. We recommend leaving this set to 'coverity_scan'.
+    # Take care in resource usage, and consider the build frequency allowances per
+    #   https://scan.coverity.com/faq#frequency
+    branch_pattern: coverity_scan
