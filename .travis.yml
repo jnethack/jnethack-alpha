@@ -4,7 +4,7 @@ env:
   global:
     # COVERITY_SCAN_TOKEN
     # ** specific to your project **
-    - secure: "RzE-RDqKwMSA-raXmZy06w"
+    - secure: "QK0KJACY0/zAg2V9AjFK9xEyT6+BrTPoiZyqPQjoTNmnqAKfJ5B5Z3QQTot06zNfavslp0O8Tfuza0czIZjKooesGg1RU4hZuYhcopZI4Cp1Tkrh8+YjIKYWEbHJwnqLQERGOYAiWKWgOKGIseHeP+crwRS+wQECfn1G8MdkHLHjQlQnhd60inO/W6GgzS3uh+M+ii/V0q5n4VgbKb4gdb/DDy9OqPUz0iFtGFNkIWxMdQUeZFG62hK2lVzLGbG+GC6XtnipwEzmLK8AgcdAWUp2F1b+HF6Qu1FvJaKmcdNlCPv++sr5KB0BvTpkrMmnlNUCK7keuUqHHCUV5jsFi6o3nqoY9MfLWfQ7XCIR9qTdomPek+EHkglPmxw5jxI2H6LlaCYiDT2OhWSPbZ4ToUS5M1zcAgZRtxF080y7ASVVhKsP+2pM8d1gCp2BqQovAl2iQAWtq75zOTTrHunPq1XyC7YRhw+sBTxpoGiph7LM5E/PQx4ao+IO5xvoMl3+vEyMDnC2fSxCG8GDkY8C99iA/jF8y4F1aISJZ9xDlzx6FhOTGJC1YRJZm3oKQVMCj4+/C9xa/FRC4/eOP/2A7gvvJ9L/VzbhuvU5nZlpbnjp7K0FlvLx76akym73zX2fKFoAy9Le/RfthZ2TLq2nrJwEmvvCijNGgJcwyO2upfY="
 
 os:
   - linux
