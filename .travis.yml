@@ -44,7 +44,9 @@ addons:
 
     # Commands to prepare for build_command
     # ** likely specific to your build **
-    build_command_prepend: sh japanese/set_lnx.sh
+    build_command_prepend:
+      - sudo apt-get install -y nkf
+      - sh japanese/set_lnx.sh
 
     # The command that will be added as an argument to "cov-build" to compile your project for analysis,
     # ** likely specific to your build **
