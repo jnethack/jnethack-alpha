@@ -21,23 +21,12 @@ addons:
     packages:
     - nkf
     - gcc@5
-
-before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sh japanese/set_mac.sh ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh japanese/set_lnx.sh ; fi
-
-script:
-  - make install
-
-addons:
   coverity_scan:
-
     # GitHub project metadata
     # ** specific to your project **
     project:
-      name: jnethack/jnethack-alpha
-      version: 1.0
-      description: My Project
+      name: "jnethack/jnethack-alpha"
+      description: "My Project"
 
     # Where email notification of build analysis results will be sent
     notification_email: argrath@ub32.org
@@ -56,3 +45,10 @@ addons:
     # Take care in resource usage, and consider the build frequency allowances per
     #   https://scan.coverity.com/faq#frequency
     branch_pattern: coverity_scan
+
+before_script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sh japanese/set_mac.sh ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh japanese/set_lnx.sh ; fi
+
+script:
+  - make install
