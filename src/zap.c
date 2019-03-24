@@ -927,7 +927,7 @@ boolean by_hero;
             unsigned pfx = CXN_PFX_THE;
 
 #if 1 /*JP*//* éÄëÃñºÇÕêÊÇ… */
-            Strcat(buf, corpse_xname(corpse, (const char *) 0, pfx));
+            Strcpy(buf, corpse_xname(corpse, (const char *) 0, pfx));
 #endif
 #if 0 /*JP*/
             Strcpy(buf, one_of ? "one of " : "");

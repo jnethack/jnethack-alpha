@@ -1,3 +1,6 @@
+	* 次の問題を修正
+	  * 死体に蘇生の杖を振るとクラッシュする (#39081)
+
 Sun Dec 26 2018  Kentaro Shirakata  <argrath@ub32.org>
 
 	* JNetHack-3.6.1-0.3リリース
