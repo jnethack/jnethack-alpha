@@ -421,7 +421,7 @@ burn_away_slime()
 /*JP
         make_slimed(0L, "The slime that covers you is burned away!");
 */
-        pline("あなたを覆っていたスライムは焼け落ちた！");
+        make_slimed(0L, "あなたを覆っていたスライムは焼け落ちた！");
     }
 }
 
