@@ -1900,10 +1900,13 @@ do_data()
         }
         if (*line > ' ') { /* got an entry name */
 #else
-            unsigned char uc;
-            uc = *((unsigned char *)line);
-            if (d_filter(line)) continue;
-            if (uc > ' ') { /* got an entry name */
+        unsigned char uc;
+        if (d_filter(line)) {
+            free(line);
+            continue;
+        }
+        uc = *((unsigned char *)line);
+        if (uc > ' ') { /* got an entry name */
 #endif
             /* first finish previous entry */
             if (line_cnt)
