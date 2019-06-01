@@ -4,7 +4,7 @@
 
 /* JNetHack Copyright */
 /* (c) Issei Numata 1994-1999                                      */
-/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2018            */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2019            */
 /* JNetHack may be freely redistributed.  See license for details. */
 
 /*
