@@ -64,6 +64,10 @@ char *argv[];
 
     sys_early_init();
 
+#if 1 /*JP*//* iconvの初期化のために一度は呼び出す必要がある */
+    setkcode('U');
+#endif
+
 #ifdef XI18N
     setlocale(LC_ALL, "");
 #endif

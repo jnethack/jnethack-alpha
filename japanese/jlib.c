@@ -38,19 +38,19 @@ static const char* ccode_alt[]={
 
 /* default input kcode */
 #ifndef INPUT_KCODE
-# ifdef MSDOS
+# if defined(MSDOS) || defined(WIN32)
 #  define INPUT_KCODE SJIS
 # else
-#  define INPUT_KCODE EUC
+#  define INPUT_KCODE UTF8
 # endif
 #endif
 
 /* default output kcode */
 #ifndef OUTPUT_KCODE
-# ifdef MSDOS
+# if defined(MSDOS) || defined(WIN32)
 #  define OUTPUT_KCODE SJIS
 # else
-#  define OUTPUT_KCODE EUC
+#  define OUTPUT_KCODE UTF8
 # endif
 #endif
 
