@@ -1973,10 +1973,11 @@ int final;
         Sprintf(buf, "actually %s", align_str(u.ualignbase[A_CURRENT]));
 */
         Sprintf(buf, "é¿ç€Ç…ÇÕ%s", align_str(u.ualignbase[A_CURRENT]));
-/*JP
+#if 0 /*JP*/
         you_are(buf, "");
-*/
+#else
         enl_msg(buf, "ÇƒÇ¢ÇÈ", "ÇƒÇ¢ÇΩ", "", "");
+#endif
         difalgn &= ~1; /* suppress helm from "started out <foo>" message */
     }
     if (difgend || difalgn) { /* sex change or perm align change or both */
