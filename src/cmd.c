@@ -3445,10 +3445,10 @@ int final;
             /* either trapped in the floor or inside solid rock
                (or both if chained to buried iron ball and have
                moved one step into solid rock somehow) */
+#if 0 /*JP*/
             boolean trapped = (save_BLev & I_SPECIAL) != 0L,
                     terrain = (save_BLev & FROMOUTSIDE) != 0L;
 
-#if 0 /*JP*/
             Sprintf(buf, "%s%s%s",
                     trapped ? " if not trapped" : "",
                     (trapped && terrain) ? " and" : "",
