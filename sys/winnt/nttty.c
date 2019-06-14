@@ -49,11 +49,20 @@ extern int redirect_stdout;
 typedef struct {
     WCHAR   character;
     WORD    attribute;
+#if 1 /*JP*/
+    int     iskanji;
+#endif
 } cell_t;
 
+#if 0 /*JP*/
 cell_t clear_cell = { CONSOLE_CLEAR_CHARACTER, CONSOLE_CLEAR_ATTRIBUTE };
 cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
                           CONSOLE_UNDEFINED_ATTRIBUTE };
+#else
+cell_t clear_cell = { CONSOLE_CLEAR_CHARACTER, CONSOLE_CLEAR_ATTRIBUTE, 0 };
+cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
+                          CONSOLE_UNDEFINED_ATTRIBUTE, 0 };
+#endif
 
 /*
  * The following WIN32 Console API routines are used in this file.
@@ -223,6 +232,35 @@ static void back_buffer_flip()
 
     for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
         for (pos.X = 0; pos.X < console.width; pos.X++) {
+#if 1 /*JP*/
+            if (back->iskanji == 1) {
+                cell_t * back2 = back + 1;
+                cell_t * front2 = front + 1;
+                if (back->attribute != front->attribute ||
+                    back2->attribute != front2->attribute) {
+                    WORD attrs[2];
+                    attrs[0] = attrs[1] = back->attribute;
+                    WriteConsoleOutputAttribute(console.hConOut, attrs,
+                                                2, pos, &unused);
+                    front->attribute = back->attribute;
+                    front2->attribute = back2->attribute;
+                }
+                if (back->character != front->character ||
+                    back2->character != front2->character) {
+                    unsigned char buf[2];
+                    buf[0] = (unsigned char)(back->character);
+                    buf[1] = (unsigned char)(back2->character);
+                    WriteConsoleOutputCharacter(console.hConOut, buf, 2, pos,
+                                                    &unused);
+                    front->character = back->character;
+                    front2->character = back2->character;
+                }
+                pos.X++;
+                back += 2;
+                front += 2;
+                continue;
+            }
+#endif
             if (back->attribute != front->attribute) {
                 WriteConsoleOutputAttribute(console.hConOut, &back->attribute,
                                             1, pos, &unused);
@@ -547,8 +585,60 @@ xputc2_core(ch1, ch2)
 unsigned int ch1;
 unsigned int ch2;
 {
-    xputc_core(ch1);
-    xputc_core(ch2);
+    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
+
+    boolean inverse = FALSE;
+    cell_t cell;
+
+    /* xputc_core()からのコピー */
+    inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
+    console.attr = (inverse) ?
+        ttycolors_inv[console.current_nhcolor] :
+    ttycolors[console.current_nhcolor];
+    if (console.current_nhattr[ATR_BOLD])
+        console.attr |= (inverse) ?
+          BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
+
+    cell.attribute = console.attr;
+
+    /* 右端に1バイト分しか空きがない場合 */
+    if (console.cursor.X == console.width - 2) {
+        /* 空白表示 */
+        cell.character = ' ';
+        cell.iskanji = 0;
+        buffer_write(console.back_buffer, &cell, console.cursor);
+        console.cursor.X++;
+        if (console.cursor.Y < console.height - 1) {
+            /* 次の行に */
+            console.cursor.X = 1;
+            console.cursor.Y++;
+        } else {
+            /* 既に下端の場合はなにもしない */
+            return;
+        }
+    }
+
+    cell.character = ch1;
+    cell.iskanji = 1;
+    buffer_write(console.back_buffer, &cell, console.cursor);
+    console.cursor.X++;
+
+    cell.character = ch2;
+    cell.iskanji = 2;
+    buffer_write(console.back_buffer, &cell, console.cursor);
+
+    if (console.cursor.X == console.width - 1) {
+        if (console.cursor.Y < console.height - 1) {
+            console.cursor.X = 1;
+            console.cursor.Y++;
+        }
+    } else {
+        console.cursor.X++;
+    }
+
+    nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
+    nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 }
 
 void
@@ -624,6 +714,9 @@ char ch;
 
         cell.attribute = console.attr;
         cell.character = (console.has_unicode ? console.cpMap[ch] : ch);
+#if 1 /*JP*//*常に1バイト文字*/
+        cell.iskanji = 0;
+#endif
 
         buffer_write(console.back_buffer, &cell, console.cursor);
 
@@ -666,6 +759,9 @@ int in_ch;
 
     cell.attribute = console.attr;
     cell.character = (console.has_unicode ? cp437[ch] : ch);
+#if 1 /*JP*//*常に1バイト文字*/
+    cell.iskanji = 0;
+#endif
 
     buffer_write(console.back_buffer, &cell, console.cursor);
 }
