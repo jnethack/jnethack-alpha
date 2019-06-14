@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1519662898 2018/02/26 16:34:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1549074257 2019/02/02 02:24:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -168,7 +168,7 @@ stuck_in_wall()
             y = u.uy + j;
             if (!isok(x, y)
                 || (IS_ROCK(levl[x][y].typ)
-                    && (levl[x][y].typ != SDOOR || levl[x][y].typ != SCORR))
+                    && (levl[x][y].typ != SDOOR && levl[x][y].typ != SCORR))
                 || (blocked_boulder(i, j) && !throws_rocks(youmonst.data)))
                 ++count;
         }
@@ -258,6 +258,11 @@ in_trouble()
         && (!u.uswallow
             || !attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
         return TROUBLE_BLIND;
+    /* deafness isn't it's own trouble; healing magic cures deafness
+       when it cures blindness, so do the same with trouble repair */
+    if ((HDeaf & TIMEOUT) > 1L)
+        return TROUBLE_BLIND;
+
     for (i = 0; i < A_MAX; i++)
         if (ABASE(i) < AMAX(i))
             return TROUBLE_POISONED;
@@ -386,7 +391,7 @@ int trouble;
         You("固い地面に戻った．");
         /* teleport should always succeed, but if not, just untrap them */
         if (!safe_teleds(FALSE))
-            u.utrap = 0;
+            reset_utrap(TRUE);
         break;
     case TROUBLE_STARVING:
         /* temporarily lost strength recovery now handled by init_uhunger() */
@@ -582,22 +587,39 @@ int trouble;
         }
         (void) encumber_msg();
         break;
-    case TROUBLE_BLIND: {
+    case TROUBLE_BLIND: { /* handles deafness as well as blindness */
+        char msgbuf[BUFSZ];
 #if 0 /*JP*/
         const char *eyes = body_part(EYE);
-
-        if (eyecount(youmonst.data) != 1)
-            eyes = makeplural(eyes);
-        Your("%s %s better.", eyes, vtense(eyes, "feel"));
-#else
-        pline("%sが回復したような気がした．", body_part(EYE));
 #endif
-        u.ucreamed = 0;
-        make_blinded(0L, FALSE);
+        boolean cure_deaf = (HDeaf & TIMEOUT) ? TRUE : FALSE;
+
+        msgbuf[0] = '\0';
+        if (Blinded) {
+#if 0 /*JP*/
+            if (eyecount(youmonst.data) != 1)
+                eyes = makeplural(eyes);
+#endif
+#if 0 /*JP*/
+            Sprintf(msgbuf, "Your %s %s better", eyes, vtense(eyes, "feel"));
+#else
+            Sprintf(msgbuf, "%sが回復したような気がした．", body_part(EYE));
+#endif
+            u.ucreamed = 0;
+            make_blinded(0L, FALSE);
+        }
+        if (cure_deaf) {
+            make_deaf(0L, FALSE);
+            if (!Deaf)
+                Sprintf(eos(msgbuf), "%s can hear again",
+                        !*msgbuf ? "You" : " and you");
+        }
+        if (*msgbuf)
+            pline("%s.", msgbuf);
         break;
     }
     case TROUBLE_WOUNDED_LEGS:
-        heal_legs();
+        heal_legs(0);
         break;
     case TROUBLE_STUNNED:
         make_stunned(0L, TRUE);
@@ -1143,7 +1165,7 @@ aligntyp g_align;
      *  - fix all of your problems;
      *  - do you a gratuitous favor.
      *
-     * If you make it to the the last category, you roll randomly again
+     * If you make it to the last category, you roll randomly again
      * to see what they do for you.
      *
      * If your luck is at least 0, then you are guaranteed rescued from
@@ -1344,7 +1366,11 @@ aligntyp g_align;
             u.uhp = u.uhpmax;
             if (Upolyd)
                 u.mh = u.mhmax;
-            ABASE(A_STR) = AMAX(A_STR);
+            if (ABASE(A_STR) < AMAX(A_STR)) {
+                ABASE(A_STR) = AMAX(A_STR);
+                context.botl = 1; /* before potential message */
+                (void) encumber_msg();
+            }
             if (u.uhunger < 900)
                 init_uhunger();
             /* luck couldn't have been negative at start of prayer because
@@ -1672,7 +1698,6 @@ dosacrifice()
     if (otmp->otyp == CORPSE) {
         register struct permonst *ptr = &mons[otmp->corpsenm];
         struct monst *mtmp;
-        extern const int monstr[];
 
         /* KMH, conduct */
         u.uconduct.gnostic++;
@@ -1685,7 +1710,7 @@ dosacrifice()
 
         if (otmp->corpsenm == PM_ACID_BLOB
             || (monstermoves <= peek_at_iced_corpse_age(otmp) + 50)) {
-            value = monstr[otmp->corpsenm] + 1;
+            value = mons[otmp->corpsenm].difficulty + 1;
             if (otmp->oeaten)
                 value = eaten_stat(value, otmp);
         }
@@ -2543,7 +2568,7 @@ doturn()
         pline("なぜか，%sはあなたを無視したようだ．", u_gname());
         aggravate();
         exercise(A_WIS, FALSE);
-        return 0;
+        return 1;
     }
     if (Inhell) {
 /*JP
@@ -2551,7 +2576,7 @@ doturn()
 */
         pline("ゲヘナに%sの力は届かない．", u_gname());
         aggravate();
-        return 0;
+        return 1;
     }
 /*JP
     pline("Calling upon %s, you chant an arcane formula.", u_gname());
@@ -2728,13 +2753,16 @@ aligntyp alignment;
     if (!Hallucination)
         return align_gname(alignment);
 
-    /* The priest may not have initialized god names. If this is the
-     * case, and we roll priest, we need to try again. */
+    /* Some roles (Priest) don't have a pantheon unless we're playing as
+       that role, so keep trying until we get a role which does have one.
+       [If playing a Priest, the current pantheon will be twice as likely
+       to get picked as any of the others.  That's not significant enough
+       to bother dealing with.] */
     do
-        which = randrole();
+        which = randrole(TRUE);
     while (!roles[which].lgod);
 
-    switch (rn2(9)) {
+    switch (rn2_on_display_rng(9)) {
     case 0:
     case 1:
         gnam = roles[which].lgod;
@@ -2749,7 +2777,7 @@ aligntyp alignment;
         break;
     case 6:
     case 7:
-        gnam = hallu_gods[rn2(sizeof hallu_gods / sizeof *hallu_gods)];
+        gnam = hallu_gods[rn2_on_display_rng(SIZE(hallu_gods))];
         break;
     case 8:
         gnam = Moloch;
@@ -2833,6 +2861,7 @@ blocked_boulder(dx, dy)
 int dx, dy;
 {
     register struct obj *otmp;
+    int nx, ny;
     long count = 0L;
 
     for (otmp = level.objects[u.ux + dx][u.uy + dy]; otmp;
@@ -2841,6 +2870,7 @@ int dx, dy;
             count += otmp->quan;
     }
 
+    nx = u.ux + 2 * dx, ny = u.uy + 2 * dy; /* next spot beyond boulder(s) */
     switch (count) {
     case 0:
         /* no boulders--not blocked */
@@ -2848,17 +2878,24 @@ int dx, dy;
     case 1:
         /* possibly blocked depending on if it's pushable */
         break;
+    case 2:
+        /* this is only approximate since multiple boulders might sink */
+        if (is_pool_or_lava(nx, ny)) /* does its own isok() check */
+            break; /* still need Sokoban check below */
+        /*FALLTHRU*/
     default:
         /* more than one boulder--blocked after they push the top one;
            don't force them to push it first to find out */
         return TRUE;
     }
 
-    if (!isok(u.ux + 2 * dx, u.uy + 2 * dy))
+    if (dx && dy && Sokoban) /* can't push boulder diagonally in Sokoban */
         return TRUE;
-    if (IS_ROCK(levl[u.ux + 2 * dx][u.uy + 2 * dy].typ))
+    if (!isok(nx, ny))
         return TRUE;
-    if (sobj_at(BOULDER, u.ux + 2 * dx, u.uy + 2 * dy))
+    if (IS_ROCK(levl[nx][ny].typ))
+        return TRUE;
+    if (sobj_at(BOULDER, nx, ny))
         return TRUE;
 
     return FALSE;

@@ -45,6 +45,7 @@
 #if !defined(NOTTYGRAPHICS)
 #define TTY_GRAPHICS /* good old tty based graphics */
 #endif
+/* #define CURSES_GRAPHICS *//* Curses interface - Karl Garrison*/
 /* #define X11_GRAPHICS */   /* X11 interface */
 /* #define QT_GRAPHICS */    /* Qt interface */
 /* #define GNOME_GRAPHICS */ /* Gnome interface */
@@ -116,6 +117,12 @@
 
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "tty"
+#endif
+
+#ifdef CURSES_GRAPHICS
+#ifndef DEFAULT_WINDOW_SYS
+#define DEFAULT_WINDOW_SYS "curses"
+#endif
 #endif
 
 #ifdef X11_GRAPHICS
@@ -499,7 +506,7 @@ typedef unsigned char uchar;
  * Only available with POSIX_TYPES or GNU C */
 /* #define MSGHANDLER */
 
-/* #define STATUS_HILITES         /* support hilites of status fields */
+#define STATUS_HILITES              /* support hilites of status fields */
 
 /* #define WINCHAIN */              /* stacked window systems */
 
@@ -514,6 +521,10 @@ typedef unsigned char uchar;
 /* FREE_ALL_MEMORY is neither experimental nor inadequately tested,
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
+
+/* EXTRA_SANITY_CHECKS adds extra impossible calls,
+ * probably not useful for normal play */
+/* #define EXTRA_SANITY_CHECKS */
 
 /* EDIT_GETLIN makes the string input in TTY, Qt4, and X11
    so some prompts will remember the previously input text
@@ -531,7 +542,7 @@ typedef unsigned char uchar;
 #define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
 /* DUMPLOG_FILE allows following placeholders:
    %% literal '%'
-   %v version (eg. "3.6.1-0")
+   %v version (eg. "3.6.2-0")
    %u game UID
    %t game start time, UNIX timestamp format
    %T current time, UNIX timestamp format
@@ -545,6 +556,7 @@ typedef unsigned char uchar;
 
 #endif
 
+#define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
 /* End of Section 4 */
 

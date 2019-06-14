@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1515144230 2018/01/05 09:23:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1555201699 2019/04/14 00:28:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -66,7 +66,7 @@ STATIC_DCL long FDECL(getprice, (struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(shk_names_obj, (struct monst *, struct obj *,
                                       const char *, long, const char *));
 STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
-STATIC_DCL boolean FDECL(inherits, (struct monst *, int, int));
+STATIC_DCL boolean FDECL(inherits, (struct monst *, int, int, BOOLEAN_P));
 STATIC_DCL void FDECL(set_repo_loc, (struct monst *));
 STATIC_DCL boolean NDECL(angry_shk_exists);
 STATIC_DCL void FDECL(rile_shk, (struct monst *));
@@ -472,13 +472,13 @@ boolean newlev;
         else
 #if 0 /*JP*/
             pline("%s %s that you need to pay before leaving%s",
-                Shknam(shkp),
-                NOTANGRY(shkp) ? "points out" : "makes it clear",
-                NOTANGRY(shkp) ? "." : "!");
+                  Shknam(shkp),
+                  NOTANGRY(shkp) ? "points out" : "makes it clear",
+                  NOTANGRY(shkp) ? "." : "!");
 #else
             pline("%sは，帰る前に支払いをする必要があることを%s",
-                Shknam(shkp),
-                NOTANGRY(shkp) ? "指摘した．" : "はっきりさせた！");
+                  Shknam(shkp),
+                  NOTANGRY(shkp) ? "指摘した．" : "はっきりさせた！");
 #endif
         return;
     }
@@ -569,8 +569,8 @@ deserted_shop(enterstring)
                 continue;
             if ((mtmp = m_at(x, y)) != 0) {
                 ++n;
-                if (sensemon(mtmp) || ((mtmp->m_ap_type == M_AP_NOTHING
-                                        || mtmp->m_ap_type == M_AP_MONSTER)
+                if (sensemon(mtmp) || ((M_AP_TYPE(mtmp) == M_AP_NOTHING
+                                        || M_AP_TYPE(mtmp) == M_AP_MONSTER)
                                        && canseemon(mtmp)))
                     ++m;
             }
@@ -639,18 +639,18 @@ char *enterstring;
 
     if (Invis) {
 /*JP
-        pline("%s senses your presence.", shkname(shkp));
+        pline("%s senses your presence.", Shknam(shkp));
 */
-        pline("%sはあなたの存在に気がついた．", shkname(shkp));
+        pline("%sはあなたの存在に気がついた．", Shknam(shkp));
         if (!Deaf && !muteshk(shkp))
 /*JP
         verbalize("Invisible customers are not welcome!");
 */
         verbalize("透明なお客さんとは感心しないな！");
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s stands firm as if %s knows you are there.",
-                  Shknam(shkp), mhe(shkp));
+                  Shknam(shkp), noit_mhe(shkp));
 #else
             pline("%sは，まるであなたがそこにいることを知っているかのように立ちはだかった．",
                   Shknam(shkp));
@@ -664,18 +664,16 @@ char *enterstring;
         if (!Deaf && !muteshk(shkp))
 #if 0 /*JP:T*/
             verbalize("So, %s, you dare return to %s %s?!", plname,
-                  s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
+                      s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
 #else
             verbalize("%s！わざわざ%sの%sに戻ってきたのか？！", plname,
-                  shkname(shkp), shtypes[rt - SHOPBASE].name);
+                      shkname(shkp), shtypes[rt - SHOPBASE].name);
 #endif
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s seems %s over your return to %s %s!",
-                  Shknam(shkp),
-                  angrytexts[rn2(SIZE(angrytexts))],
-                  mhis(shkp),
-                  shtypes[rt - SHOPBASE].name);
+                  Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
+                  noit_mhis(shkp), shtypes[rt - SHOPBASE].name);
 #else
             pline("あなたが%sに戻ってきたので%sは%sようだ！",
                   shtypes[rt - SHOPBASE].name,
@@ -684,22 +682,16 @@ char *enterstring;
 #endif
     } else if (eshkp->robbed) {
         if (!Deaf)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s mutters imprecations against shoplifters.",
-                  shkname(shkp));
+                  Shknam(shkp));
 #else
             pline("%sは泥棒をののしった．",
-                  shkname(shkp));
-#endif
-        else
-#if 0 /*JP*/
-            pline("%s is combing through %s inventory list.",
-                  Shknam(shkp),
-                  mhis(shkp));
-#else
-            pline("%sは自分の持ち物一覧を確認している．",
                   Shknam(shkp));
 #endif
+        else
+            pline("%s is combing through %s inventory list.",
+                  Shknam(shkp), noit_mhis(shkp));
     } else {
         if (!Deaf && !muteshk(shkp))
 #if 0 /*JP:T*/
@@ -712,7 +704,7 @@ char *enterstring;
                       eshkp->visitct++ ? "また来ましたね" : "ようこそ");
 #endif
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("enter %s %s%s!",
                 s_suffix(shkname(shkp)),
                 shtypes[rt - SHOPBASE].name,
@@ -774,16 +766,16 @@ char *enterstring;
                           tool);
 #endif
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s to let you in with your %s%s.",
-                        Shknam(shkp),
-                        NOTANGRY(shkp) ? "is hesitant" : "refuses",
-                        tool, plur(cnt));
+                      Shknam(shkp),
+                      NOTANGRY(shkp) ? "is hesitant" : "refuses",
+                      tool, plur(cnt));
 #else
                 pline("%sはあなたが%sを持って入るの%s．",
-                        Shknam(shkp),
-                        tool,
-                        NOTANGRY(shkp) ? "は気がすすまないようだ" : "を拒否した");
+                      Shknam(shkp),
+                      tool,
+                      NOTANGRY(shkp) ? "は気がすすまないようだ" : "を拒否した");
 #endif
             should_block = TRUE;
         } else if (u.usteed) {
@@ -791,23 +783,23 @@ char *enterstring;
 #if 0 /*JP:T*/
                 verbalize(NOTANGRY(shkp) ? "Will you please leave %s outside?"
                                      : "Leave %s outside.",
-                      y_monnam(u.usteed));
+                          y_monnam(u.usteed));
 #else
                 verbalize(NOTANGRY(shkp) ? "%sを外に置いてきていただけませんか？"
                                      : "%sを外へ置いてこい！",
-                      y_monnam(u.usteed));
+                          y_monnam(u.usteed));
 #endif
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s to let you in while you're riding %s.",
-                        Shknam(shkp),
-                        NOTANGRY(shkp) ? "doesn't want" : "refuses",
-                        y_monnam(u.usteed));
+                      Shknam(shkp),
+                      NOTANGRY(shkp) ? "doesn't want" : "refuses",
+                      y_monnam(u.usteed));
 #else
                 pline("%sはあなたが%sに乗ったままなの%s.",
-                        Shknam(shkp),
-                        y_monnam(u.usteed),
-                        NOTANGRY(shkp) ? "は望まないようだ" : "を拒否した");
+                      Shknam(shkp),
+                      y_monnam(u.usteed),
+                      NOTANGRY(shkp) ? "は望まないようだ" : "を拒否した");
 #endif
             should_block = TRUE;
         } else {
@@ -1090,6 +1082,8 @@ register struct obj *obj, *merge;
         book_disappears(obj);
     if (Has_contents(obj))
         delete_contents(obj);
+    if (Is_container(obj))
+        maybe_reset_pick(obj);
 
     shkp = 0;
     if (obj->unpaid) {
@@ -1099,7 +1093,7 @@ register struct obj *obj, *merge;
             if (onbill(obj, shkp, TRUE))
                 break;
     }
-    /* sanity check, more or less */
+    /* sanity check, in case obj is on bill but not marked 'unpaid' */
     if (!shkp)
         shkp = shop_keeper(*u.ushops);
     /*
@@ -1136,6 +1130,17 @@ register struct obj *obj, *merge;
             *bp = ESHK(shkp)->bill_p[ESHK(shkp)->billct];
 #endif
         }
+    } else {
+        /* not on bill; if the item is being merged away rather than
+           just deleted and has a higher price adjustment than the stack
+           being merged into, give the latter the former's obj->o_id so
+           that the merged stack takes on higher price; matters if hero
+           eventually buys them from a shop, but doesn't matter if hero
+           owns them and intends to sell (unless he subsequently buys
+           them back) or if no shopping activity ever involves them */
+        if (merge && (oid_price_adjustment(obj, obj->o_id)
+                      > oid_price_adjustment(merge, merge->o_id)))
+            merge->o_id = obj->o_id;
     }
     if (obj->owornmask) {
         impossible("obfree: deleting worn obj (%d: %ld)", obj->otyp,
@@ -1549,7 +1554,7 @@ dopay()
         debugpline0("dopay: null shkp.");
         return 0;
     }
-proceed:
+ proceed:
     eshkp = ESHK(shkp);
     ltmp = eshkp->robbed;
 
@@ -1587,16 +1592,16 @@ proceed:
                 pline("しかし，あなたにはちょっっとしたヘソクリがある．");
         } else {
             if (umoney > ltmp) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("give %s the %ld gold piece%s %s asked for.",
-                    shkname(shkp), ltmp, plur(ltmp), mhe(shkp));
+                    shkname(shkp), ltmp, plur(ltmp), noit_mhe(shkp));
 #else
                 You("%sに望み通り%ld枚の金貨を与えた．",
                     shkname(shkp), ltmp);
 #endif
                 pay(ltmp, shkp);
             } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("give %s all your%s gold.", shkname(shkp),
                     stashed_gold ? " openly kept" : "");
 #else
@@ -1612,9 +1617,10 @@ proceed:
             }
             if ((umoney < ltmp / 2L) || (umoney < ltmp && stashed_gold))
 /*JP
-                pline("Unfortunately, %s doesn't look satisfied.", mhe(shkp));
+                pline("Unfortunately, %s doesn't look satisfied.",
 */
-                pline("残念ながら，%sは満足してないようだ．", mhe(shkp));
+                pline("残念ながら，%sは満足してないようだ．",
+                      noit_mhe(shkp));
             else
                 make_happy_shk(shkp, FALSE);
         }
@@ -1646,17 +1652,18 @@ proceed:
 */
                     pline(no_money, stashed_gold ? "ようだ" : "");
                 else
-                    pline(not_enough_money, mhim(shkp));
+                    pline(not_enough_money, noit_mhim(shkp));
                 return 1;
             }
 /*JP
-            pline("But since %s shop has been robbed recently,", mhis(shkp));
+            pline("But since %s shop has been robbed recently,",
 */
-            pline("しかし，%s店は最近盗みにあったので，", mhis(shkp));
+            pline("しかし，%s店は最近盗みにあったので，",
+                  noit_mhis(shkp));
 #if 0 /*JP*/
             pline("you %scompensate %s for %s losses.",
                   (umoney < ltmp) ? "partially " : "", shkname(shkp),
-                  mhis(shkp));
+                  noit_mhis(shkp));
 #else
             pline("%sの損失%sを補填した．", mhis(shkp),
                   (umoney < ltmp) ? "の一部" : "");
@@ -1677,15 +1684,20 @@ proceed:
 */
                     pline(no_money, stashed_gold ? "ようだ" : "");
                 else
-                    pline(not_enough_money, mhim(shkp));
+                    pline(not_enough_money, noit_mhim(shkp));
                 return 1;
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("try to appease %s by giving %s 1000 gold pieces.",
-                x_monnam(shkp, ARTICLE_THE, "angry", 0, FALSE), mhim(shkp));
+                canspotmon(shkp)
+                    ? x_monnam(shkp, ARTICLE_THE, "angry", 0, FALSE)
+                    : shkname(shkp),
+                noit_mhim(shkp));
 #else
             You("金貨1000枚を%sに手渡してなだめようとした．",
-                x_monnam(shkp, ARTICLE_THE, "怒った", 0, FALSE));
+                canspotmon(shkp)
+                    ? x_monnam(shkp, ARTICLE_THE, "怒った", 0, FALSE)
+                    : shkname(shkp));
 #endif
             pay(1000L, shkp);
             if (strncmp(eshkp->customer, plname, PL_NSIZ) || rn2(3))
@@ -1876,29 +1888,30 @@ proceed:
                 }
             }
         }
-    thanks:
+ thanks:
         if (!itemize)
             update_inventory(); /* Done in dopayobj() if itemize. */
     }
     if (!ANGRY(shkp) && paid) {
         if (!Deaf && !muteshk(shkp))
-#if 0 /*JP*/
-            verbalize("Thank you for shopping in %s %s!", s_suffix(shkname(shkp)),
-                  shtypes[eshkp->shoptype - SHOPBASE].name);
+#if 0 /*JP:T*/
+            verbalize("Thank you for shopping in %s %s!",
+                      s_suffix(shkname(shkp)),
+                      shtypes[eshkp->shoptype - SHOPBASE].name);
 #else
-            verbalize("%sの%sへまたどうぞ！", shkname(shkp),
-                  shtypes[eshkp->shoptype - SHOPBASE].name);
+            verbalize("%sの%sへまたどうぞ！",
+                      shkname(shkp),
+                      shtypes[eshkp->shoptype - SHOPBASE].name);
 #endif
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s nods appreciatively at you for shopping in %s %s!",
-                    Shknam(shkp),
-                    mhis(shkp),
-                    shtypes[eshkp->shoptype - SHOPBASE].name);
+                  Shknam(shkp), noit_mhis(shkp),
+                  shtypes[eshkp->shoptype - SHOPBASE].name);
 #else
             pline("%sは%sでの買い物に感謝してうなづいた！",
-                    Shknam(shkp),
-                    shtypes[eshkp->shoptype - SHOPBASE].name);
+                  Shknam(shkp),
+                  shtypes[eshkp->shoptype - SHOPBASE].name);
 #endif
     }
     return 1;
@@ -2067,8 +2080,9 @@ static struct repo { /* repossession context */
 
 /* routine called after dying (or quitting) */
 boolean
-paybill(croaked)
+paybill(croaked, silently)
 int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
+boolean silently; /* maybe avoid messages */
 {
     struct monst *mtmp, *mtmp2, *firstshk, *resident, *creditor, *hostile,
         *localshk;
@@ -2133,7 +2147,7 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
                                              : localshk;
     if (firstshk) {
         numsk++;
-        taken = inherits(firstshk, numsk, croaked);
+        taken = inherits(firstshk, numsk, croaked, silently);
     }
 
     /* now handle the rest */
@@ -2144,7 +2158,7 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
         local = on_level(&eshkp->shoplevel, &u.uz);
         if (mtmp != firstshk) {
             numsk++;
-            taken |= inherits(mtmp, numsk, croaked);
+            taken |= inherits(mtmp, numsk, croaked, silently);
         }
         /* for bones: we don't want a shopless shk around */
         if (!local)
@@ -2154,10 +2168,11 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
 }
 
 STATIC_OVL boolean
-inherits(shkp, numsk, croaked)
+inherits(shkp, numsk, croaked, silently)
 struct monst *shkp;
 int numsk;
 int croaked;
+boolean silently;
 {
     long loss = 0L;
     long umoney;
@@ -2167,20 +2182,23 @@ int croaked;
     int roomno = *u.ushops;
     char takes[BUFSZ];
 
+    /* not strictly consistent; affects messages and prevents next player
+       (if bones are saved) from blundering into or being ambused by an
+       invisible shopkeeper */
     shkp->minvis = 0;
     /* The simplifying principle is that first-come
        already took everything you had. */
     if (numsk > 1) {
-        if (cansee(shkp->mx, shkp->my) && croaked) {
+        if (cansee(shkp->mx, shkp->my) && croaked && !silently) {
             takes[0] = '\0';
             if (has_head(shkp->data) && !rn2(2))
-#if 0 /*JP*/
-                Sprintf(takes, ", shakes %s %s,", mhis(shkp),
+#if 0 /*JP:T*/
+                Sprintf(takes, ", shakes %s %s,", noit_mhis(shkp),
                         mbodypart(shkp, HEAD));
 #else
                 Strcpy(takes, "首を振り，");
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %slooks at your corpse%s and %s.", Shknam(shkp),
                   (!shkp->mcanmove || shkp->msleeping) ? "wakes up, " : "",
                   takes, !inhishop(shkp) ? "disappears" : "sighs");
@@ -2201,12 +2219,12 @@ int croaked;
         && !eshkp->robbed && !eshkp->debit && NOTANGRY(shkp)
         && !eshkp->following && u.ugrave_arise < LOW_PM) {
         taken = (invent != 0);
-        if (taken)
+        if (taken && !silently)
 /*JP
             pline("%s gratefully inherits all your possessions.",
 */
             pline("%sはあなたの持ち物をありがたく受けとった．",
-                  shkname(shkp));
+                  Shknam(shkp));
         set_repo_loc(shkp);
         goto clear;
     }
@@ -2242,42 +2260,45 @@ int croaked;
             eshkp->robbed -= umoney;
             if (eshkp->robbed < 0L)
                 eshkp->robbed = 0L;
-            if (umoney > 0)
+            if (umoney > 0L) {
                 money2mon(shkp, umoney);
-            context.botl = 1;
+                context.botl = 1;
+            }
+            if (!silently)
 /*JP
-            pline("%s %s all your possessions.", shkname(shkp), takes);
+                pline("%s %s all your possessions.", Shknam(shkp), takes);
 */
-            pline("%sは%sあなたの持ち物すべてをもらった．", shkname(shkp), takes);
+                pline("%sは%sあなたの持ち物すべてをもらった．", Shknam(shkp), takes);
             taken = TRUE;
             /* where to put player's invent (after disclosure) */
             set_repo_loc(shkp);
         } else {
             money2mon(shkp, loss);
             context.botl = 1;
-#if 0 /*JP*/
-            pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
-                  takes, loss, currency(loss),
-                  strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "you ",
-                  mhim(shkp));
+            if (!silently)
+#if 0 /*JP:T*/
+                pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
+                      takes, loss, currency(loss),
+                      strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "you ",
+                      noit_mhim(shkp));
 #else
-            pline("%sは%s%s借りている%ld%sを受けとった．", Shknam(shkp),
-                  takes,
-                  strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "あなたが",
-                  loss, currency(loss));
+                pline("%sは%s%s借りている%ld%sを受けとった．", Shknam(shkp),
+                      takes,
+                      strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "あなたが",
+                      loss, currency(loss));
 #endif
             /* shopkeeper has now been paid in full */
             pacify_shk(shkp);
             eshkp->following = 0;
             eshkp->robbed = 0L;
         }
-    skip:
+ skip:
         /* in case we create bones */
         rouse_shk(shkp, FALSE); /* wake up */
         if (!inhishop(shkp))
             home_shk(shkp, FALSE);
     }
-clear:
+ clear:
     shkp->minvis = save_minvis;
     setpaid(shkp);
     return taken;
@@ -2311,7 +2332,8 @@ struct monst *shkp;
     repo.shopkeeper = shkp;
 }
 
-/* called at game exit, after inventory disclosure but before making bones */
+/* called at game exit, after inventory disclosure but before making bones;
+   shouldn't issue any messages */
 void
 finish_paybill()
 {
@@ -2386,30 +2408,55 @@ unsigned id;
     return (struct obj *) 0;
 }
 
-/* Returns the price of an arbitrary item in the shop.
-   Returns 0 if the item doesn't belong to a shopkeeper. */
+/* Returns the price of an arbitrary item in the shop,
+   0 if the item doesn't belong to a shopkeeper or hero is not in the shop. */
 long
-get_cost_of_shop_item(obj)
+get_cost_of_shop_item(obj, nochrg)
 register struct obj *obj;
-{
+int *nochrg; /* alternate return value: 1: no charge, 0: shop owned,        */
+{            /* -1: not in a shop (so should't be formatted as "no charge") */
     struct monst *shkp;
+    struct obj *top;
     xchar x, y;
+    boolean freespot;
     long cost = 0L;
 
-    if (*u.ushops
-        && obj->oclass != COIN_CLASS
+    *nochrg = -1; /* assume 'not applicable' */
+    if (*u.ushops && obj->oclass != COIN_CLASS
         && obj != uball && obj != uchain
-        && get_obj_location(obj, &x, &y, 0)
-        && (obj->unpaid
-            || (obj->where == OBJ_FLOOR
-                && !obj->no_charge && costly_spot(x, y)))
-        && (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0
-        && inhishop(shkp)) {
-        cost = obj->quan * get_cost(obj, shkp);
-        if (Has_contents(obj))
-            cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
+        && get_obj_location(obj, &x, &y, CONTAINED_TOO)
+        && *in_rooms(x, y, SHOPBASE) == *u.ushops
+        && (shkp = shop_keeper(inside_shop(x, y))) != 0 && inhishop(shkp)) {
+        for (top = obj; top->where == OBJ_CONTAINED; top = top->ocontainer)
+            continue;
+        freespot = (top->where == OBJ_FLOOR
+                    && x == ESHK(shkp)->shk.x && y == ESHK(shkp)->shk.y);
+        /* no_charge is only set for floor items inside shop proper;
+           items on freespot are implicitly 'no charge' */
+        *nochrg = (top->where == OBJ_FLOOR && (obj->no_charge || freespot));
+
+        if (carried(top) ? (int) obj->unpaid : !*nochrg)
+            cost = obj->quan * get_cost(obj, shkp);
+        if (Has_contents(obj) && !freespot)
+            cost += contained_cost(obj, shkp, 0L, FALSE, TRUE);
     }
     return cost;
+}
+
+/* decide whether to apply a surcharge (or hypothetically, a discount) to obj
+   if it had ID number 'oid'; returns 1: increase, 0: normal, -1: decrease */
+int
+oid_price_adjustment(obj, oid)
+struct obj *obj;
+unsigned oid;
+{
+    int res = 0, otyp = obj->otyp;
+
+    if (!(obj->dknown && objects[otyp].oc_name_known)
+        && (obj->oclass != GEM_CLASS || objects[otyp].oc_material != GLASS)) {
+        res = ((oid % 4) == 0); /* id%4 ==0 -> +1, ==1..3 -> 0 */
+    }
+    return res;
 }
 
 /* calculate the value that the shk will charge for [one of] an object */
@@ -2471,7 +2518,7 @@ register struct monst *shkp; /* if angry, impose a surcharge */
                 break;
             }
             tmp = (long) objects[i].oc_cost;
-        } else if (!(obj->o_id % 4)) {
+        } else if (oid_price_adjustment(obj, obj->o_id) > 0) {
             /* unid'd, arbitrarily impose surcharge: tmp *= 4/3 */
             multiplier *= 4L;
             divisor *= 3L;
@@ -2532,7 +2579,19 @@ long price;
 boolean usell;
 boolean unpaid_only;
 {
-    register struct obj *otmp;
+    register struct obj *otmp, *top;
+    xchar x, y;
+    boolean on_floor, freespot;
+
+    for (top = obj; top->where == OBJ_CONTAINED; top = top->ocontainer)
+        continue;
+    /* pick_obj() removes item from floor, adds it to shop bill, then
+       puts it in inventory; behave as if it is still on the floor
+       during the add-to-bill portion of that situation */
+    on_floor = (top->where == OBJ_FLOOR || top->where == OBJ_FREE);
+    if (top->where == OBJ_FREE || !get_obj_location(top, &x, &y, 0))
+        x = u.ux, y = u.uy;
+    freespot = (on_floor && x == ESHK(shkp)->shk.x && y == ESHK(shkp)->shk.y);
 
     /* price of contained objects; "top" container handled by caller */
     for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
@@ -2546,8 +2605,13 @@ boolean unpaid_only;
                 && !(Is_candle(otmp)
                      && otmp->age < 20L * (long) objects[otmp->otyp].oc_cost))
                 price += set_cost(otmp, shkp);
-        } else if (!otmp->no_charge && (otmp->unpaid || !unpaid_only)) {
-            price += get_cost(otmp, shkp) * otmp->quan;
+        } else {
+            /* no_charge is only set for floor items (including
+               contents of floor containers) inside shop proper;
+               items on freespot are implicitly 'no charge' */
+            if (on_floor ? (!otmp->no_charge && !freespot)
+                         : (otmp->unpaid || !unpaid_only))
+                price += get_cost(otmp, shkp) * otmp->quan;
         }
 
         if (Has_contents(otmp))
@@ -2662,15 +2726,14 @@ boolean quietly;
 */
                 verbalize("それは仕入れないよ．持っていきなさい！");
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s shakes %s %s in refusal.",
-                            Shknam(shkp),
-                            mhis(shkp),
-                            mbodypart(shkp, HEAD));
+                          Shknam(shkp), noit_mhis(shkp),
+                          mbodypart(shkp, HEAD));
 #else
                     pline("%sは%sを振って拒否した．",
-                            Shknam(shkp),
-                            mbodypart(shkp, HEAD));
+                          Shknam(shkp),
+                          mbodypart(shkp, HEAD));
 #endif
             }
         }
@@ -2725,6 +2788,45 @@ register struct monst *shkp;
 
     /* (no adjustment for angry shk here) */
     return tmp;
+}
+
+/* unlike alter_cost() which operates on a specific item, identifying or
+   forgetting a gem causes all unpaid gems of its type to change value */
+void
+gem_learned(oindx)
+int oindx;
+{
+    struct obj *obj;
+    struct monst *shkp;
+    struct bill_x *bp;
+    int ct;
+
+    /*
+     * Unfortunately, shop bill doesn't have object type included,
+     * just obj->oid for each unpaid stack, so we have to go through
+     * every bill and every item on that bill and match up against
+     * every unpaid stack on the level....
+     *
+     * Fortunately, there's no need to catch up when changing dungeon
+     * levels even if we ID'd or forget some gems while gone from a
+     * level.  There won't be any shop bills when arriving; they were
+     * either paid before leaving or got treated as robbery and it's
+     * too late to adjust pricing.
+     */
+    for (shkp = next_shkp(fmon, TRUE); shkp;
+         shkp = next_shkp(shkp->nmon, TRUE)) {
+        ct = ESHK(shkp)->billct;
+        bp = ESHK(shkp)->bill;
+        while (--ct >= 0) {
+            obj = find_oid(bp->bo_id);
+            if (!obj) /* shouldn't happen */
+                continue;
+            if ((oindx != STRANGE_OBJECT) ? (obj->otyp == oindx)
+                                          : (obj->oclass == GEM_CLASS))
+                bp->price = get_cost(obj, shkp);
+            ++bp;
+        }
+    }
 }
 
 /* called when an item's value has been enhanced; if it happens to be
@@ -2852,6 +2954,8 @@ register struct monst *shkp;
 {
     register struct obj *otmp;
 
+    if (SchroedingersBox(obj))
+        return;
     for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
         if (otmp->oclass == COIN_CLASS)
             continue;
@@ -3094,7 +3198,7 @@ char *buf;
 {
     /* (chooses among [0]..[3] normally; [1]..[4] after the
        Wizard has been killed or invocation ritual performed) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     static const char *const honored[] = { "good", "honored", "most gracious",
                                            "esteemed",
                                            "most renowned and sacred" };
@@ -3105,6 +3209,7 @@ char *buf;
         "やぁ，高名で神聖な"
         };
 #endif
+
     Strcat(buf, honored[rn2(SIZE(honored) - 1) + u.uevent.udemigod]);
 #if 0 /*JP*//*日本語ではそこまでしない*/
     if (is_vampire(youmonst.data))
@@ -3114,13 +3219,13 @@ char *buf;
     else
 #endif
 #if 0 /*JP*/
-        Strcat(buf, !is_human(youmonst.data) ? " creature" : (flags.female)
-                                                                 ? " lady"
-                                                                 : " sir");
+        Strcat(buf, !is_human(youmonst.data) ? " creature"
+                                             : (flags.female) ? " lady"
+                                                              : " sir");
 #else
-        Strcat(buf, !is_human(youmonst.data) ? "生物さん" : (flags.female)
-                                                          ? "お嬢さん"
-                                                          : "旦那さん");
+        Strcat(buf, !is_human(youmonst.data) ? "生物さん"
+                                             : (flags.female) ? "お嬢さん"
+                                                              : "旦那さん");
 #endif
 }
 
@@ -3276,15 +3381,26 @@ boolean peaceful, silent;
     char roomno = *in_rooms(x, y, SHOPBASE);
     struct bill_x *bp;
     struct monst *shkp = 0;
+    boolean was_unpaid;
+    long c_count = 0L, u_count = 0L;
+
+    /* gather information for message(s) prior to manipulating bill */
+    was_unpaid = obj->unpaid ? TRUE : FALSE;
+    if (Has_contents(obj)) {
+        c_count = count_contents(obj, TRUE, FALSE, TRUE);
+        u_count = count_contents(obj, TRUE, FALSE, FALSE);
+    }
 
     if (!billable(&shkp, obj, roomno, FALSE)) {
         /* things already on the bill yield a not-billable result, so
            we need to check bill before deciding that shk doesn't care */
-        if ((bp = onbill(obj, shkp, FALSE)) == 0)
+        if ((bp = onbill(obj, shkp, FALSE)) != 0) {
+            /* shk does care; take obj off bill to avoid double billing */
+            billamt = bp->bquan * bp->price;
+            sub_one_frombill(obj, shkp);
+        }
+        if (!bp && !u_count)
             return 0L;
-        /* shk does care; take obj off bill to avoid double billing */
-        billamt = bp->bquan * bp->price;
-        sub_one_frombill(obj, shkp);
     }
 
     if (obj->oclass == COIN_CLASS) {
@@ -3312,6 +3428,7 @@ boolean peaceful, silent;
 
     if (peaceful) {
         boolean credit_use = !!ESHK(shkp)->credit;
+
         value = check_credit(value, shkp);
         /* 'peaceful' affects general treatment, but doesn't affect
          * the fact that other code expects that all charges after the
@@ -3322,6 +3439,7 @@ boolean peaceful, silent;
             ESHK(shkp)->debit += value;
 
         if (!silent) {
+            char buf[BUFSZ];
             const char *still = "";
 
             if (credit_use) {
@@ -3346,21 +3464,25 @@ boolean peaceful, silent;
 */
                 still = "さらに";
             }
-            if (obj->oclass == COIN_CLASS)
-#if 0 /*JP*/
-                You("%sowe %s %ld %s!", still, shkname(shkp), value,
-                    currency(value));
+#if 0 /*JP:T*/
+            Sprintf(buf, "%sowe %s %ld %s", still, shkname(shkp),
+                    value, currency(value));
 #else
-                You("%s%sに%ld%sの借りをつくった！", still, shkname(shkp), value,
-                    currency(value));
+            Sprintf(buf, "%s%sに%ld%sの借りをつくった", still, shkname(shkp),
+                    value, currency(value));
 #endif
-            else
+            if (u_count) /* u_count > 0 implies Has_contents(obj) */
+                Sprintf(eos(buf), " for %s%sits contents",
+                        was_unpaid ? "it and " : "",
+                        (c_count > u_count) ? "some of " : "");
+            else if (obj->oclass != COIN_CLASS)
+                Sprintf(eos(buf), " for %s",
+                        (obj->quan > 1L) ? "them" : "it");
+
 #if 0 /*JP*/
-                You("%sowe %s %ld %s for %s!", still, shkname(shkp),
-                    value, currency(value), (obj->quan > 1L) ? "them" : "it");
+            You("%s!", buf); /* "You owe <shk> N zorkmids for it!" */
 #else
-                You("%s%sに%ld%sの借りをつくった！", still, mon_nam(shkp), value,
-                    currency(value));
+            You("%s！", buf); /* "You owe <shk> N zorkmids for it!" */
 #endif
         }
     } else {
@@ -3373,7 +3495,7 @@ boolean peaceful, silent;
                       Shknam(shkp), plname);
 #else
                 Norep("%sは叫んだ：「%s，待て！このどろぼうめ！」",
-                      Shknam(shkp),  plname);
+                      Shknam(shkp), plname);
 #endif
             } else
 /*JP
@@ -3595,9 +3717,9 @@ xchar x, y;
             c = sell_response = 'y';
         } else if (sell_response != 'n') {
 /*JP
-            pline("%s cannot pay you at present.", shkname(shkp));
+            pline("%s cannot pay you at present.", Shknam(shkp));
 */
-            pline("%sは今のところは支払えない．", Monnam(shkp));
+            pline("%sは今のところは支払えない．", Shknam(shkp));
 #if 0 /*JP*/
             Sprintf(qbuf, "Will you accept %ld %s in credit for ", tmpcr,
                     currency(tmpcr));
@@ -3687,7 +3809,7 @@ xchar x, y;
              */
 #if 0 /*JP*/
             Sprintf(qbuf, "%s offers%s %ld gold piece%s for %s%s ",
-                    shkname(shkp), short_funds ? " only" : "", offer,
+                    Shknam(shkp), short_funds ? " only" : "", offer,
                     plur(offer),
                     (cltmp && !ltmp)
                         ? ((yourc == 1L) ? "your item in " : "your items in ")
@@ -3849,7 +3971,7 @@ int mode; /* 0: deliver count 1: paged */
     putstr(datawin, 0, "");
     putstr(datawin, 0, buf_p);
     display_nhwindow(datawin, FALSE);
-quit:
+ quit:
     destroy_nhwindow(datawin);
     return 0;
 }
@@ -3912,7 +4034,7 @@ register xchar x, y;
         && dist2(shkp->mx, shkp->my, x, y) < 3
         /* if it is the shk's pos, you hit and anger him */
         && (shkp->mx != x || shkp->my != y)) {
-        if (mnearto(shkp, x, y, TRUE) && !Deaf && !muteshk(shkp))
+        if (mnearto(shkp, x, y, TRUE) == 2 && !Deaf && !muteshk(shkp))
 /*JP
             verbalize("Out of my way, scum!");
 */
@@ -3952,8 +4074,8 @@ long cost;
 
         /* Don't schedule for repair unless it's a real shop entrance */
         for (shops = in_rooms(x, y, SHOPBASE); *shops; shops++)
-            if ((mtmp = shop_keeper(*shops)) != 0 && x == ESHK(mtmp)->shd.x
-                && y == ESHK(mtmp)->shd.y)
+            if ((mtmp = shop_keeper(*shops)) != 0
+                && x == ESHK(mtmp)->shd.x && y == ESHK(mtmp)->shd.y)
                 break;
         if (!*shops)
             return;
@@ -3961,10 +4083,11 @@ long cost;
     for (tmp_dam = level.damagelist; tmp_dam; tmp_dam = tmp_dam->next)
         if (tmp_dam->place.x == x && tmp_dam->place.y == y) {
             tmp_dam->cost += cost;
+            tmp_dam->when = monstermoves; /* needed by pay_for_damage() */
             return;
         }
-    tmp_dam = (struct damage *) alloc((unsigned) sizeof(struct damage));
-    (void) memset((genericptr_t)tmp_dam, 0, sizeof(struct damage));
+    tmp_dam = (struct damage *) alloc((unsigned) sizeof *tmp_dam);
+    (void) memset((genericptr_t) tmp_dam, 0, sizeof *tmp_dam);
     tmp_dam->when = monstermoves;
     tmp_dam->place.x = x;
     tmp_dam->place.y = y;
@@ -3992,11 +4115,13 @@ struct monst *shkp;
 boolean croaked;
 {
     struct damage *tmp_dam, *tmp2_dam;
+    struct obj *shk_inv = shkp->minvent;
     boolean did_repair = FALSE, saw_door = FALSE, saw_floor = FALSE,
-            stop_picking = FALSE, doorway_trap = FALSE;
-    int saw_walls = 0, saw_untrap = 0;
+            stop_picking = FALSE, doorway_trap = FALSE, skip_msg = FALSE;
+    int saw_walls = 0, saw_untrap = 0, feedback;
     char trapmsg[BUFSZ];
 
+    feedback = !croaked; /* 1 => give feedback, 0 => don't or already did */
     tmp_dam = level.damagelist;
     tmp2_dam = 0;
     while (tmp_dam) {
@@ -4011,15 +4136,15 @@ boolean croaked;
             if (IS_DOOR(levl[x][y].typ))
                 old_doormask = levl[x][y].doormask;
 
-            if (croaked)
+            if (croaked) {
                 disposition = (shops[1]) ? 0 : 1;
-            else if (stop_picking)
-                disposition = repair_damage(shkp, tmp_dam, FALSE);
-            else {
+            } else if (stop_picking) {
+                disposition = repair_damage(shkp, tmp_dam, &feedback, FALSE);
+            } else {
                 /* Defer the stop_occupation() until after repair msgs */
                 if (closed_door(x, y))
                     stop_picking = picking_at(x, y);
-                disposition = repair_damage(shkp, tmp_dam, FALSE);
+                disposition = repair_damage(shkp, tmp_dam, &feedback, FALSE);
                 if (!disposition)
                     stop_picking = FALSE;
             }
@@ -4062,7 +4187,16 @@ boolean croaked;
     if (!did_repair)
         return;
 
-    if (saw_untrap) {
+    trapmsg[0] = '\0'; /* not just lint suppression... */
+    shk_inv = (shkp->minvent != shk_inv) ? shkp->minvent : 0;
+    if (saw_untrap == 1 && shk_inv
+        && (shk_inv->otyp == BEARTRAP || shk_inv->otyp == LAND_MINE)
+        && canseemon(shkp)) {
+        pline("%s untraps %s.", Shknam(shkp), ansimpleoname(shk_inv));
+        /* we've already reported this trap (and know it's the only one) */
+        saw_untrap = 0;
+        skip_msg = !(saw_walls || saw_door || saw_floor);
+    } else if (saw_untrap) {
 #if 0 /*JP*/
         Sprintf(trapmsg, "%s trap%s",
                 (saw_untrap > 3) ? "several" : (saw_untrap > 1) ? "some"
@@ -4077,10 +4211,11 @@ boolean croaked;
                                                                    : "",
                 (doorway_trap && saw_untrap == 1) ? "扉" : "床");
 #endif
-    } else
-        trapmsg[0] = '\0'; /* not just lint suppression... */
+    }
 
-    if (saw_walls) {
+    if (skip_msg) {
+        ; /* already gave an untrap message which covered the only repair */
+    } else if (saw_walls) {
 #if 0 /*JP*/
         char wallbuf[BUFSZ];
 
@@ -4110,7 +4245,7 @@ boolean croaked;
             pline("%sた！", trapmsg);
     } else {
         if (saw_door || saw_floor || saw_untrap)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("Suddenly, %s%s%s%s%s!",
                   saw_door ? "the shop door reappears" : "",
                   (saw_door && saw_floor) ? " and " : "",
@@ -4125,6 +4260,10 @@ boolean croaked;
                   ((saw_door || saw_floor) && *trapmsg) ? "，" : "",
                   trapmsg);
 #endif
+        /* FIXME:
+         *  these messages aren't right if the unseen repairs were only
+         *  for trap removal (except for hole and possibly trap door).
+         */
         else if (inside_shop(u.ux, u.uy) == ESHK(shkp)->shoproom)
 /*JP
             You_feel("more claustrophobic than before.");
@@ -4145,16 +4284,18 @@ boolean croaked;
  * 3: untrap
  */
 int
-repair_damage(shkp, tmp_dam, catchup)
-register struct monst *shkp;
-register struct damage *tmp_dam;
+repair_damage(shkp, tmp_dam, once, catchup)
+struct monst *shkp;
+struct damage *tmp_dam;
+int *once;
 boolean catchup; /* restoring a level */
 {
-    register xchar x, y, i;
+    xchar x, y;
     xchar litter[9];
-    register struct monst *mtmp;
-    register struct obj *otmp;
-    register struct trap *ttmp;
+    struct monst *mtmp;
+    struct obj *otmp;
+    struct trap *ttmp;
+    int i, k, ix, iy, disposition = 1;
 
     if ((monstermoves - tmp_dam->when) < REPAIR_DELAY)
         return 0;
@@ -4163,19 +4304,32 @@ boolean catchup; /* restoring a level */
     x = tmp_dam->place.x;
     y = tmp_dam->place.y;
     if (!IS_ROOM(tmp_dam->typ)) {
-        if (x == u.ux && y == u.uy)
-            if (!Passes_walls)
-                return 0;
-        if (x == shkp->mx && y == shkp->my)
-            return 0;
-        if ((mtmp = m_at(x, y)) && (!passes_walls(mtmp->data)))
+        if ((x == u.ux && y == u.uy && !Passes_walls)
+            || (x == shkp->mx && y == shkp->my)
+            || ((mtmp = m_at(x, y)) != 0 && !passes_walls(mtmp->data)))
             return 0;
     }
-    if ((ttmp = t_at(x, y)) != 0) {
-        if (x == u.ux && y == u.uy)
-            if (!Passes_walls)
-                return 0;
-        if (ttmp->ttyp == LANDMINE || ttmp->ttyp == BEAR_TRAP) {
+    ttmp = t_at(x, y);
+    if (ttmp && x == u.ux && y == u.uy && !Passes_walls)
+        return 0;
+
+    if (once && *once) {
+        boolean shk_closeby = (distu(shkp->mx, shkp->my)
+                               <= (BOLT_LIM / 2) * (BOLT_LIM / 2));
+
+        /* this is suboptimal if we eventually give a "shk untraps"
+           message for the only repair, but perhaps the shop repair
+           incantation means that shk's untrap attempt will never fail */
+        if (canseemon(shkp))
+            pline("%s whispers %s.", Shknam(shkp),
+                  shk_closeby ? "an incantation" : "something");
+        else if (!Deaf && shk_closeby)
+            You_hear("someone muttering an incantation.");
+        *once = 0;
+    }
+    if (ttmp) {
+        if ((ttmp->ttyp == LANDMINE || ttmp->ttyp == BEAR_TRAP)
+            && dist2(x, y, shkp->mx, shkp->my) <= 2) {
             /* convert to an object */
             otmp = mksobj((ttmp->ttyp == LANDMINE) ? LAND_MINE : BEARTRAP,
                           TRUE, FALSE);
@@ -4184,48 +4338,60 @@ boolean catchup; /* restoring a level */
             (void) mpickobj(shkp, otmp);
         }
         deltrap(ttmp);
-        if (IS_DOOR(tmp_dam->typ) && !(levl[x][y].doormask & D_ISOPEN)) {
-            levl[x][y].doormask = D_CLOSED;
-            block_point(x, y);
-        } else if (IS_WALL(tmp_dam->typ)) {
-            levl[x][y].typ = tmp_dam->typ;
-            block_point(x, y);
-        }
-        newsym(x, y);
-        return 3;
+        if (cansee(x, y))
+            newsym(x, y);
+        if (!catchup)
+            disposition = 3;
     }
-    if (IS_ROOM(tmp_dam->typ)) {
-        /* No messages, because player already filled trap door */
-        return 1;
-    }
-    if ((tmp_dam->typ == levl[x][y].typ)
-        && (!IS_DOOR(tmp_dam->typ) || (levl[x][y].doormask > D_BROKEN)))
-        /* No messages if player already replaced shop door */
-        return 1;
+    if (IS_ROOM(tmp_dam->typ)
+        || (tmp_dam->typ == levl[x][y].typ
+            && (!IS_DOOR(tmp_dam->typ) || levl[x][y].doormask > D_BROKEN)))
+        /* no terrain fix necessary (trap removal or manually repaired) */
+        return disposition;
+
+    /* door or wall repair; trap, if any, is now gone;
+       restore original terrain type and move any items away */
     levl[x][y].typ = tmp_dam->typ;
-    (void) memset((genericptr_t) litter, 0, sizeof(litter));
-    if ((otmp = level.objects[x][y]) != 0) {
-/* Scatter objects haphazardly into the shop */
+    if (IS_DOOR(tmp_dam->typ))
+        levl[x][y].doormask = D_CLOSED; /* arbitrary */
+
+    (void) memset((genericptr_t) litter, 0, sizeof litter);
 #define NEED_UPDATE 1
 #define OPEN 2
 #define INSHOP 4
 #define horiz(i) ((i % 3) - 1)
 #define vert(i) ((i / 3) - 1)
+    k = 0; /* number of adjacent shop spots */
+    if (level.objects[x][y] && !IS_ROOM(levl[x][y].typ)) {
         for (i = 0; i < 9; i++) {
-            if ((i == 4) || (!ZAP_POS(levl[x + horiz(i)][y + vert(i)].typ)))
+            ix = x + horiz(i);
+            iy = y + vert(i);
+            if (i == 4 || !isok(ix, iy) || !ZAP_POS(levl[ix][iy].typ))
                 continue;
             litter[i] = OPEN;
-            if (inside_shop(x + horiz(i), y + vert(i))
-                == ESHK(shkp)->shoproom)
+            if (inside_shop(ix, iy) == ESHK(shkp)->shoproom) {
                 litter[i] |= INSHOP;
+                ++k;
+            }
         }
+    }
+    /* placement below assumes there is always at least one adjacent
+       spot; the 'k' check guards against getting stuck in an infinite
+       loop if some irregularly shaped room breaks that assumption */
+    if (k > 0) {
+        /* Scatter objects haphazardly into the shop */
         if (Punished && !u.uswallow
             && ((uchain->ox == x && uchain->oy == y)
                 || (uball->ox == x && uball->oy == y))) {
             /*
              * Either the ball or chain is in the repair location.
-             *
              * Take the easy way out and put ball&chain under hero.
+             *
+             * FIXME: message should be reworded; this might be the
+             * shop's doorway rather than a wall, there might be some
+             * other stuff here which isn't junk, and "your junk" has
+             * a slang connotation which could be applicable if hero
+             * has Passes_walls ability.
              */
             if (!Deaf && !muteshk(shkp))
 /*JP
@@ -4237,40 +4403,48 @@ boolean catchup; /* restoring a level */
         }
         while ((otmp = level.objects[x][y]) != 0)
             /* Don't mess w/ boulders -- just merge into wall */
-            if ((otmp->otyp == BOULDER) || (otmp->otyp == ROCK)) {
+            if (otmp->otyp == BOULDER || otmp->otyp == ROCK) {
                 obj_extract_self(otmp);
                 obfree(otmp, (struct obj *) 0);
             } else {
-                while (!(litter[i = rn2(9)] & INSHOP))
-                    ;
+                int trylimit = 50;
+
+                /* otmp must be moved otherwise level.objects[x][y] will
+                   never become Null and while-loop won't terminate */
+                do {
+                    i = rn2(9);
+                } while (--trylimit && !(litter[i] & INSHOP));
+                if ((litter[i] & (OPEN | INSHOP)) != 0) {
+                    ix = x + horiz(i);
+                    iy = y + vert(i);
+                } else {
+                    /* we know shk isn't at <x,y> because repair
+                       is deferred in that situation */
+                    ix = shkp->mx;
+                    iy = shkp->my;
+                }
                 remove_object(otmp);
-                place_object(otmp, x + horiz(i), y + vert(i));
+                place_object(otmp, ix, iy);
                 litter[i] |= NEED_UPDATE;
             }
     }
     if (catchup)
-        return 1; /* repair occurred while off level */
+        return 1; /* repair occurred while off level so no messages */
 
     block_point(x, y);
-    if (IS_DOOR(tmp_dam->typ)) {
-        levl[x][y].doormask = D_CLOSED; /* arbitrary */
-        newsym(x, y);
-    } else {
-        /* don't set doormask  - it is (hopefully) the same as it was
-           if not, perhaps save it with the damage array... */
-
-        if (IS_WALL(tmp_dam->typ) && cansee(x, y)) {
-            /* Player sees actual repair process, so they KNOW it's a wall */
+    if (cansee(x, y)) {
+        if (IS_WALL(tmp_dam->typ))
+            /* player sees actual repair process, so KNOWS it's a wall */
             levl[x][y].seenv = SVALL;
-            newsym(x, y);
-        }
-        /* Mark this wall as "repaired".  There currently is no code
-           to do anything about repaired walls, so don't do it. */
+        newsym(x, y);
     }
     for (i = 0; i < 9; i++)
         if (litter[i] & NEED_UPDATE)
             newsym(x + horiz(i), y + vert(i));
-    return 2;
+
+    if (disposition < 3)
+        disposition = 2;
+    return disposition;
 #undef NEED_UPDATE
 #undef OPEN
 #undef INSHOP
@@ -4283,12 +4457,12 @@ boolean catchup; /* restoring a level */
  */
 int
 shk_move(shkp)
-register struct monst *shkp;
+struct monst *shkp;
 {
-    register xchar gx, gy, omx, omy;
-    register int udist;
-    register schar appr;
-    register struct eshk *eshkp = ESHK(shkp);
+    xchar gx, gy, omx, omy;
+    int udist;
+    schar appr;
+    struct eshk *eshkp = ESHK(shkp);
     int z;
     boolean uondoor = FALSE, satdoor, avoid = FALSE, badinv;
 
@@ -4332,10 +4506,9 @@ register struct monst *shkp;
                               Hello(shkp));
 #endif
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s holds out %s upturned %s.",
-                          Shknam(shkp),
-                          mhis(shkp),
+                          Shknam(shkp), noit_mhis(shkp),
                           mbodypart(shkp, HAND));
 #else
                     pline("%sは%sを上に向けて差し出した．",
@@ -4344,7 +4517,7 @@ register struct monst *shkp;
 #endif
                 followmsg = moves;
                 if (!rn2(9)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s doesn't like customers who don't pay.",
                           Shknam(shkp));
 #else
@@ -4522,7 +4695,7 @@ register int fall;
              */
             if (lang == 2)
                 pline("%s curses %s inability to grab your backpack!",
-                      shkname(shkp), mhim(shkp));
+                      Shknam(shkp), noit_mhim(shkp));
             rile_shk(shkp);
             return;
 #endif
@@ -4537,24 +4710,24 @@ register int fall;
                     pline("%s curses you in anger and frustration!",
 */
                     pline("怒りで不満のたまっている%sはあなたを呪った！",
-                          shkname(shkp));
+                          Shknam(shkp));
                 else if (lang == 1)
                     growl(shkp);
                 rile_shk(shkp);
                 return;
             } else
-#if 0 /*JP*/
-                pline("%s %s, and %s your backpack!", shkname(shkp),
+#if 0 /*JP:T*/
+                pline("%s %s, and %s your backpack!", Shknam(shkp),
                       makeplural(locomotion(shkp->data, "leap")), grabs);
 #else
-                pline("%sは飛びついて，あなたの背負い袋を%s！", shkname(shkp),
+                pline("%sは飛びついて，あなたの背負い袋を%s！", Shknam(shkp),
                       grabs);
 #endif
         } else
 /*JP
-            pline("%s %s your backpack!", shkname(shkp), grabs);
+            pline("%s %s your backpack!", Shknam(shkp), grabs);
 */
-            pline("%sはあなたの背負い袋を%s！", shkname(shkp), grabs);
+            pline("%sはあなたの背負い袋を%s！", Shknam(shkp), grabs);
 
         for (obj = invent; obj; obj = obj2) {
             obj2 = obj->nobj;
@@ -4605,9 +4778,9 @@ boolean cant_mollify;
 {
     register struct monst *shkp = (struct monst *) 0;
     char shops_affected[5];
-    register boolean uinshp = (*u.ushops != '\0');
+    boolean uinshp = (*u.ushops != '\0');
     char qbuf[80];
-    register xchar x, y;
+    xchar x, y;
 #if 0 /*JP*/
     boolean dugwall = (!strcmp(dmgstr, "dig into")    /* wand */
                        || !strcmp(dmgstr, "damage")); /* pick-axe */
@@ -4617,17 +4790,15 @@ boolean cant_mollify;
 #endif
     boolean animal, pursue;
     struct damage *tmp_dam, *appear_here = 0;
-    /* any number >= (80*80)+(24*24) would do, actually */
     long cost_of_damage = 0L;
-    unsigned int nearest_shk = 7000, nearest_damage = 7000;
+    unsigned int nearest_shk = (ROWNO * ROWNO) + (COLNO * COLNO),
+                 nearest_damage = nearest_shk;
     int picks = 0;
 
-    for (tmp_dam = level.damagelist;
-         (tmp_dam && (tmp_dam->when == monstermoves));
-         tmp_dam = tmp_dam->next) {
+    for (tmp_dam = level.damagelist; tmp_dam; tmp_dam = tmp_dam->next) {
         char *shp;
 
-        if (!tmp_dam->cost)
+        if (tmp_dam->when != monstermoves || !tmp_dam->cost)
             continue;
         cost_of_damage += tmp_dam->cost;
         Strcpy(shops_affected,
@@ -4694,9 +4865,9 @@ boolean cant_mollify;
         if (um_dist(shkp->mx, shkp->my, 1)
             && !um_dist(shkp->mx, shkp->my, 3)) {
 /*JP
-            pline("%s leaps towards you!", shkname(shkp));
+            pline("%s leaps towards you!", Shknam(shkp));
 */
-            pline("%sはあなたに飛びかかった！", shkname(shkp));
+            pline("%sはあなたに飛びかかった！", Shknam(shkp));
             mnexto(shkp);
         }
         pursue = um_dist(shkp->mx, shkp->my, 1);
@@ -4738,7 +4909,7 @@ boolean cant_mollify;
     if ((um_dist(x, y, 1) && !uinshp) || cant_mollify
         || (money_cnt(invent) + ESHK(shkp)->credit) < cost_of_damage
         || !rn2(50)) {
-    getcad:
+ getcad:
         if (muteshk(shkp)) {
             if (animal && shkp->mcanmove && !shkp->msleeping)
                 yelp(shkp);
@@ -4754,10 +4925,10 @@ boolean cant_mollify;
                           jpast(dmgstr));
 #endif
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s is %s that you decided to %s %s %s!",
                       Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
-                      dmgstr, mhis(shkp), dugwall ? "shop" : "door");
+                      dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
 #else
                 pline("%sはあなたが%sを%sことに対して%s！",
                       Shknam(shkp),
@@ -4767,9 +4938,9 @@ boolean cant_mollify;
         } else {
             if (!Deaf) {
 /*JP
-            pline("%s shouts:", shkname(shkp));
+                pline("%s shouts:", Shknam(shkp));
 */
-            pline("%sはさけんだ：", shkname(shkp));
+                pline("%sはさけんだ：", Shknam(shkp));
 #if 0 /*JP*/
                 verbalize("Who dared %s my %s?", dmgstr,
                           dugwall ? "shop" : "door");
@@ -4780,10 +4951,10 @@ boolean cant_mollify;
                           jpast(dmgstr));
 #endif
             } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s is %s that someone decided to %s %s %s!",
                       Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
-                      dmgstr, mhis(shkp), dugwall ? "shop" : "door");
+                      dmgstr, noit_mhis(shkp), dugwall ? "shop" : "door");
 #else
                 pline("%sは誰かが%sを%sことに対して%s！",
                       Shknam(shkp),
@@ -4811,8 +4982,10 @@ boolean cant_mollify;
 #endif
     if (yn(qbuf) != 'n') {
         cost_of_damage = check_credit(cost_of_damage, shkp);
-        money2mon(shkp, cost_of_damage);
-        context.botl = 1;
+        if (cost_of_damage > 0L) {
+            money2mon(shkp, cost_of_damage);
+            context.botl = 1;
+        }
 /*JP
         pline("Mollified, %s accepts your restitution.", shkname(shkp));
 */
@@ -4830,15 +5003,13 @@ boolean cant_mollify;
             else
 #if 0 /*JP*/
                 pline("%s lunges %s %s toward your %s!",
-                    Shknam(shkp),
-                    mhis(shkp),
-                    mbodypart(shkp, HAND),
-                    body_part(NECK));
+                      Shknam(shkp), noit_mhis(shkp),
+                      mbodypart(shkp, HAND), body_part(NECK));
 #else
                 pline("%sは%sをあなたの%sに突き出した！",
-                    Shknam(shkp),
-                    mbodypart(shkp, HAND),
-                    body_part(NECK));
+                      Shknam(shkp),
+                      mbodypart(shkp, HAND),
+                      body_part(NECK));
 #endif
         } else
             growl(shkp);
@@ -4909,9 +5080,8 @@ register struct obj *first_obj;
     for (otmp = first_obj; otmp; otmp = otmp->nexthere) {
         if (otmp->oclass == COIN_CLASS)
             continue;
-        cost = (otmp->no_charge || otmp == uball || otmp == uchain)
-                   ? 0L
-                   : get_cost(otmp, (struct monst *) 0);
+        cost = (otmp->no_charge || otmp == uball || otmp == uchain) ? 0L
+                 : get_cost(otmp, shkp);
         contentsonly = !cost;
         if (Has_contents(otmp))
             cost += contained_cost(otmp, shkp, 0L, FALSE, FALSE);
@@ -5108,21 +5278,21 @@ struct monst *shkp;
 
     eshk = ESHK(shkp);
     if (ANGRY(shkp)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s how much %s dislikes %s customers.",
-              shkname(shkp),
+              Shknam(shkp),
               (!Deaf && !muteshk(shkp)) ? "mentions" : "indicates",
-              mhe(shkp), eshk->robbed ? "non-paying" : "rude");
+              noit_mhe(shkp), eshk->robbed ? "non-paying" : "rude");
 #else
         pline("%sは%s客は大嫌いだと%s．",
-              shkname(shkp),
+              Shknam(shkp),
               eshk->robbed ? "金を支払わない" : "無礼な",
               (!Deaf && !muteshk(shkp)) ? "言った" : "示した");
 #endif
     } else if (eshk->following) {
         if (strncmp(eshk->customer, plname, PL_NSIZ)) {
             if (!Deaf && !muteshk(shkp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 verbalize("%s %s!  I was looking for %s.",
                       Hello(shkp), plname, eshk->customer);
 #else
@@ -5132,7 +5302,7 @@ struct monst *shkp;
             eshk->following = 0;
         } else {
             if (!Deaf && !muteshk(shkp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 verbalize("%s %s!  Didn't you forget to pay?",
                           Hello(shkp), plname);
 #else
@@ -5151,36 +5321,37 @@ struct monst *shkp;
     } else if (eshk->billct) {
         register long total = addupbill(shkp) + eshk->debit;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s that your bill comes to %ld %s.",
-              shkname(shkp),
+              Shknam(shkp),
               (!Deaf && !muteshk(shkp)) ? "says" : "indicates",
               total, currency(total));
 #else
         pline("%sは勘定が%ld%sになると%s．",
-              shkname(shkp), total, currency(total),
+              Shknam(shkp),
+              total, currency(total),
               (!Deaf && !muteshk(shkp)) ? "言った" : "示した");
 #endif
     } else if (eshk->debit) {
 #if 0 /*JP*/
         pline("%s %s that you owe %s %ld %s.",
-              shkname(shkp),
+              Shknam(shkp),
               (!Deaf && !muteshk(shkp)) ? "reminds you" : "indicates",
-              mhim(shkp), eshk->debit, currency(eshk->debit));
+              noit_mhim(shkp), eshk->debit, currency(eshk->debit));
 #else
         pline("あなたは%sに%ld%sの借りがあることを思いだした．",
-              shkname(shkp), eshk->debit, currency(eshk->debit));
+              Shknam(shkp), eshk->debit, currency(eshk->debit));
 #endif
     } else if (eshk->credit) {
 #if 0 /*JP:T*/
         pline("%s encourages you to use your %ld %s of credit.",
-              shkname(shkp), eshk->credit, currency(eshk->credit));
+              Shknam(shkp), eshk->credit, currency(eshk->credit));
 #else
         pline("%sは%ld%sの預け金を使うよう勧めた．",
-              shkname(shkp), eshk->credit, currency(eshk->credit));
+              Shknam(shkp), eshk->credit, currency(eshk->credit));
 #endif
     } else if (eshk->robbed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s about a recent robbery.",
               Shknam(shkp),
               (!Deaf && !muteshk(shkp)) ? "complains" : "indicates concern");
@@ -5192,21 +5363,21 @@ struct monst *shkp;
     } else if ((shkmoney = money_cnt(shkp->minvent)) < 50L) {
 #if 0 /*JP*/
         pline("%s %s that business is bad.",
-              shkname(shkp),
+              Shknam(shkp),
               (!Deaf && !muteshk(shkp)) ? "complains" : "indicates");
 #else
         pline("%sは商売が旨くいってないと%s．",
-              shkname(shkp),
+              Shknam(shkp),
               (!Deaf && !muteshk(shkp)) ? "愚痴をこぼした" : "示した");
 #endif
     } else if (shkmoney > 4000) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s that business is good.",
-              shkname(shkp),
+              Shknam(shkp),
               (!Deaf && !muteshk(shkp)) ? "says" : "indicates");
 #else
         pline("%sは商売が旨くいっていると%s．",
-              shkname(shkp),
+              Shknam(shkp),
               (!Deaf && !muteshk(shkp)) ? "言った" : "示した");
 #endif
     } else if (is_izchak(shkp, FALSE)) {
@@ -5215,9 +5386,9 @@ struct monst *shkp;
     } else {
         if (!Deaf && !muteshk(shkp))
 /*JP
-        pline("%s talks about the problem of shoplifters.", shkname(shkp));
+            pline("%s talks about the problem of shoplifters.", Shknam(shkp));
 */
-        pline("%sは万引の問題について話した．", shkname(shkp));
+            pline("%sは万引の問題について話した．", Shknam(shkp));
     }
 }
 
@@ -5469,10 +5640,10 @@ register xchar x, y;
         && shkp->mcanmove && !shkp->msleeping
         && (ESHK(shkp)->debit || ESHK(shkp)->billct || ESHK(shkp)->robbed)) {
 #if 0 /*JP*/
-        pline("%s%s blocks your way!", shkname(shkp),
+        pline("%s%s blocks your way!", Shknam(shkp),
               Invis ? " senses your motion and" : "");
 #else
-        pline("%sは%sあなたの前に立ちふさがった！", shkname(shkp),
+        pline("%sは%sあなたの前に立ちふさがった！", Shknam(shkp),
               Invis ? "動きを感じとり，" : "");
 #endif
         return TRUE;
@@ -5510,11 +5681,11 @@ register xchar x, y;
         && (x == sx - 1 || x == sx + 1 || y == sy - 1 || y == sy + 1)
         && (Invis || carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)
             || u.usteed)) {
-#if 0 /*JP*/
-        pline("%s%s blocks your way!", shkname(shkp),
+#if 0 /*JP:T*/
+        pline("%s%s blocks your way!", Shknam(shkp),
               Invis ? " senses your motion and" : "");
 #else
-        pline("%s%sあなたの前に立ちふさがった！", shkname(shkp),
+        pline("%s%sあなたの前に立ちふさがった！", Shknam(shkp),
               Invis ? "動きを感じとり，" : "");
 #endif
         return TRUE;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	sit.c	$NHDT-Date: 1458341129 2016/03/18 22:45:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	sit.c	$NHDT-Date: 1544442714 2018/12/10 11:51:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -187,7 +187,8 @@ dosit()
             You("座った．");
             dotrap(trap, VIASITTING);
         }
-    } else if (Underwater || Is_waterlevel(&u.uz)) {
+    } else if ((Underwater || Is_waterlevel(&u.uz))
+                && !eggs_in_water(youmonst.data)) {
         if (Is_waterlevel(&u.uz))
 /*JP
             There("are no cushions floating nearby.");
@@ -198,7 +199,7 @@ dosit()
             You("sit down on the muddy bottom.");
 */
             You("どろどろした底に座った．");
-    } else if (is_pool(u.ux, u.uy)) {
+    } else if (is_pool(u.ux, u.uy) && !eggs_in_water(youmonst.data)) {
     in_water:
 /*JP
         You("sit in the %s.", hliquid("water"));
@@ -315,7 +316,7 @@ dosit()
                 u.ucreamed = 0;
                 make_blinded(0L, TRUE);
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-                heal_legs();
+                heal_legs(0);
                 context.botl = 1;
                 break;
             case 5:
@@ -460,7 +461,7 @@ dosit()
 
         if (!rn2(3) && IS_THRONE(levl[u.ux][u.uy].typ)) {
             /* may have teleported */
-            levl[u.ux][u.uy].typ = ROOM;
+            levl[u.ux][u.uy].typ = ROOM, levl[u.ux][u.uy].flags = 0;
 /*JP
             pline_The("throne vanishes in a puff of logic.");
 */
@@ -489,8 +490,18 @@ dosit()
 */
             You("卵を産むだけのエネルギーがない．");
             return 0;
+        } else if (eggs_in_water(youmonst.data)) {
+            if (!(Underwater || Is_waterlevel(&u.uz))) {
+                pline("A splash tetra you are not.");
+                return 0;
+            }
+            if (Upolyd &&
+                (youmonst.data == &mons[PM_GIANT_EEL]
+                 || youmonst.data == &mons[PM_ELECTRIC_EEL])) {
+                You("yearn for the Sargasso Sea.");
+                return 0;
+            }
         }
-
         uegg = mksobj(EGG, FALSE, FALSE);
         uegg->spe = 1;
         uegg->quan = 1L;
@@ -498,10 +509,11 @@ dosit()
         /* this sets hatch timers if appropriate */
         set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
         uegg->known = uegg->dknown = 1;
-/*JP
-        You("lay an egg.");
-*/
+#if 0 /*JP*/
+        You("%s an egg.", eggs_in_water(youmonst.data) ? "spawn" : "lay");
+#else
         You("卵を産んだ．");
+#endif
         dropy(uegg);
         stackobj(uegg);
         morehungry((int) objects[EGG].oc_nutrition);

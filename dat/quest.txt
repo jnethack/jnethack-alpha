@@ -1687,7 +1687,7 @@
   どもを追い返せるのだ．
 
 「さあ，%dの加護のもと，行くのだ，%pよ．」
-%E [%nC invaded %H and captured %o.  Defeat %ni and retrive %oh.]
+%E [%nC invaded %H and captured %o.  Defeat %ni and retrieve %oh.]
 %Cp Pri 00025
 「%dを信ずれば，そなたは勝てる．」
 %E
@@ -1817,7 +1817,7 @@
 それをもって，イェンダーの魔除けを取り戻すのだ．
 
 「行くがよい．そなたの行く手に%dの加護のあらんことを．」
-%E [Congraulations, %p.  Keep %o; go and recover the Amulet.]
+%E [Congratulations, %p.  Keep %o; go and recover the Amulet.]
 %Cc Pri 00082
 %lは%oがあなたのものであると繰り返した。
 
@@ -2988,7 +2988,7 @@
 氷と雪が谷底に道を作っていた．あなたは目の前に，溶岩に囲まれた大きな
 丸い丘を見た．これは%iへの入口である．戦うことなしに内部に
 入ることは無理なようだ．
-%E [This is the entrace to %i.]
+%E [This is the entrance to %i.]
 %Cp Val 00036
 もう一度，あなたは%iの入口の前にやってきた．
 %E

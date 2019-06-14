@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintext.c	$NHDT-Date: 1450453309 2015/12/18 15:41:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	wintext.c	$NHDT-Date: 1552422654 2019/03/12 20:30:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -205,8 +205,7 @@ boolean blocking;
      */
 /*JP*/
 #ifndef XI18N
-    nlines =
-        (XtScreen(wp->w)->height - text_info->extra_height) / font_height;
+    nlines = (XtScreen(wp->w)->height - text_info->extra_height) / font_height;
 #else
     nlines =
         (XtScreen(wp->w)->height - text_info->extra_height) / extent->max_logical_extent.height;
@@ -237,13 +236,16 @@ boolean blocking;
 #ifdef GRAPHIC_TOMBSTONE
     if (text_info->is_rip) {
         Widget rip = create_ripout_widget(XtParent(wp->w));
-        XtSetArg(args[num_args], XtNfromVert, rip);
-        num_args++;
+
+        if (rip) {
+            XtSetArg(args[num_args], nhStr(XtNfromVert), rip);
+            num_args++;
+        } else
+            text_info->is_rip = FALSE;
     }
 #endif
 
-    if (width
-        > (Dimension) XtScreen(wp->w)->width) { /* too wide for screen */
+    if (width > (Dimension) XtScreen(wp->w)->width) { /* too wide for screen */
         /* Back off some amount - we really need to back off the scrollbar */
         /* width plus some extra.					   */
         width = XtScreen(wp->w)->width - 20;
@@ -314,11 +316,9 @@ struct xwindow *wp;
 #endif
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNallowShellResize, True);
-    num_args++;
+    XtSetArg(args[num_args], XtNallowShellResize, True), num_args++;
     XtSetArg(args[num_args], XtNtranslations,
-             XtParseTranslationTable(text_translations));
-    num_args++;
+             XtParseTranslationTable(text_translations)), num_args++;
 
 #ifdef TRANSIENT_TEXT
     wp->popup = XtCreatePopupShell("text", transientShellWidgetClass,
@@ -332,8 +332,9 @@ struct xwindow *wp;
         XtParseTranslationTable("<Message>WM_PROTOCOLS: delete_text()"));
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNallowShellResize, True);
-    num_args++;
+    XtSetArg(args[num_args], XtNallowShellResize, True), num_args++;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(text_translations)), num_args++;
     form = XtCreateManagedWidget("form", formWidgetClass, wp->popup, args,
                                  num_args);
 
@@ -467,8 +468,7 @@ boolean concat;
     if (str) {
         (void) memcpy((tb->text + tb->text_last), str, length + 1);
         if (length) {
-            /* Remove all newlines. Otherwise we have a confused line count.
-             */
+            /* Remove all newlines. Otherwise we have a confused line count. */
             copy = (tb->text + tb->text_last);
             while ((copy = index(copy, '\n')) != (char *) 0)
                 *copy = ' ';
@@ -611,7 +611,7 @@ calculate_rip_text(int how, time_t when)
 static void
 rip_exposed(w, client_data, widget_data)
 Widget w;
-XtPointer client_data; /* unused */
+XtPointer client_data UNUSED;
 XtPointer widget_data; /* expose event from Window widget */
 {
     XExposeEvent *event = (XExposeEvent *) widget_data;
@@ -656,10 +656,12 @@ XtPointer widget_data; /* expose event from Window widget */
 #ifndef XI18N
         XFontStruct *font = WindowFontStruct(w);
         int width = XTextWidth(font, rip_line[i], len);
+
         XDrawString(dpy, XtWindow(w), gc, x - width / 2, y, rip_line[i], len);
 #else
         XFontSet fontset = WindowFontSet(w);
         int width = XmbTextEscapement(fontset, rip_line[i], len);
+
         XmbDrawString(dpy, XtWindow(w), fontset, gc, x - width / 2, y, rip_line[i], len);
 #endif
         x += appResources.tombtext_dx;
@@ -694,14 +696,16 @@ create_ripout_widget(Widget parent)
         attributes.colormap = cmap;
 #endif
         attributes.closeness = 65535; /* Try anything */
-        errorcode =
-            XpmReadFileToImage(XtDisplay(parent), appResources.tombstone,
-                               &rip_image, 0, &attributes);
+        errorcode = XpmReadFileToImage(XtDisplay(parent),
+                                       appResources.tombstone,
+                                       &rip_image, 0, &attributes);
         if (errorcode != XpmSuccess) {
             char buf[BUFSZ];
+
             Sprintf(buf, "Failed to load %s: %s", appResources.tombstone,
                     XpmGetErrorString(errorcode));
             X11_raw_print(buf);
+            return (Widget) 0;
         }
         rip_width = rip_image->width;
         rip_height = rip_image->height;

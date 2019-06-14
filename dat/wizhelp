@@ -11,7 +11,6 @@
 
 #levelchange    == set hero's experience level
 #lightsources   == show mobile light sources
-#monpolycontrol == control monster polymorphs
 #panic          == panic test (warning: current game will be terminated)
 #polyself       == polymorph self
 #seenv          == show seen vectors
@@ -26,3 +25,8 @@
 #wizsmell       == smell a monster
 #wizwhere       == show dungeon placement of all special levels
 #wmode          == show wall modes
+
+Options:
+monpolycontrol  == prompt for new form whenever any monster changes shape
+sanity_check    == evaluate monsters, objects, and map prior to each turn
+wizweight       == augment object descriptions with their objects' weight

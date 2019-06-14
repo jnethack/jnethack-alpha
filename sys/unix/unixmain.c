@@ -122,10 +122,15 @@ char *argv[];
         dir = nh_getenv("HACKDIR");
 
     if (argc > 1) {
-        if (argcheck(argc, argv, ARG_VERSION))
+        if (argcheck(argc, argv, ARG_VERSION) == 2)
             exit(EXIT_SUCCESS);
 
-        if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
+        if (argcheck(argc, argv, ARG_DEBUG) == 1) {
+            argc--;
+            argv++;
+	}
+
+        if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
              */
@@ -190,13 +195,6 @@ char *argv[];
 #endif
 #ifdef __linux__
     check_linux_console();
-#endif
-#if 1 /*JP*/
-    /* Line like "OPTIONS=name:foo-@" may exist in config file.
-     * In this case, need to select random class,
-     * so must call setrandom() before initoptions().
-     */
-    setrandom();
 #endif
     initoptions();
 #ifdef PANICTRACE
@@ -811,5 +809,37 @@ error:
     raw_printf(errfmt,strerror(errno));
 }
 #endif
+
+unsigned long
+sys_random_seed()
+{
+    unsigned long seed = 0L;
+    unsigned long pid = (unsigned long) getpid();
+    boolean no_seed = TRUE;
+#ifdef DEV_RANDOM
+    FILE *fptr;
+
+    fptr = fopen(DEV_RANDOM, "r");
+    if (fptr) {
+        fread(&seed, sizeof (long), 1, fptr);
+        has_strong_rngseed = TRUE;  /* decl.c */
+        no_seed = FALSE;
+        (void) fclose(fptr);
+    } else {
+        /* leaves clue, doesn't exit */
+        paniclog("sys_random_seed", "falling back to weak seed");
+    }
+#endif
+    if (no_seed) {
+        seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+        /* Quick dirty band-aid to prevent PRNG prediction */
+        if (pid) {
+            if (!(pid & 3L))
+                pid -= 1L;
+            seed *= pid;
+        }
+    }
+    return seed;
+}
 
 /*unixmain.c*/

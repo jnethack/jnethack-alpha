@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1509836679 2017/11/04 23:04:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1553363416 2019/03/23 17:50:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -35,6 +35,7 @@ STATIC_DCL boolean FDECL(Mb_hit, (struct monst * magr, struct monst *mdef,
                                 struct obj *, int *, int, BOOLEAN_P, char *));
 STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
 STATIC_DCL uchar FDECL(abil_to_adtyp, (long *));
+STATIC_DCL int FDECL(glow_strength, (int));
 STATIC_DCL boolean FDECL(untouchable, (struct obj *, BOOLEAN_P));
 STATIC_DCL int FDECL(count_surround_traps, (int, int));
 
@@ -1076,26 +1077,26 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
                 if (youmonst.data != old_uasmon)
                     *dmgptr = 0; /* rehumanized, so no more damage */
                 if (u.uenmax > 0) {
+                    u.uenmax--;
+                    if (u.uen > 0)
+                        u.uen--;
+                    context.botl = TRUE;
 /*JP
                     You("lose magical energy!");
 */
                     You("魔法のエネルギーを失った！");
-                    u.uenmax--;
-                    if (u.uen > 0)
-                        u.uen--;
-                    context.botl = 1;
                 }
             } else {
                 if (mdef->data == &mons[PM_CLAY_GOLEM])
                     mdef->mhp = 1; /* cancelled clay golems will die */
                 if (youattack && attacktype(mdef->data, AT_MAGC)) {
+                    u.uenmax++;
+                    u.uen++;
+                    context.botl = TRUE;
 /*JP
                     You("absorb magical energy!");
 */
                     You("魔法のエネルギーを吸いとった！");
-                    u.uenmax++;
-                    u.uen++;
-                    context.botl = 1;
                 }
             }
         }
@@ -1308,6 +1309,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             pline("巨大なハンマーは%sに命中した%s", hittee,
                       !spec_dbon_applies ? "．" : "！電撃が襲った！");
 #endif
+        if (spec_dbon_applies)
+            wake_nearto(mdef->mx, mdef->my, 4 * 4);
         if (!rn2(5))
             (void) destroy_mitem(mdef, RING_CLASS, AD_ELEC);
         if (!rn2(5))
@@ -1662,22 +1665,23 @@ struct obj *obj;
                 make_slimed(0L, (char *) 0);
             if (Blinded > creamed)
                 make_blinded(creamed, FALSE);
-            context.botl = 1;
+            context.botl = TRUE;
             break;
         }
         case ENERGY_BOOST: {
             int epboost = (u.uenmax + 1 - u.uen) / 2;
+
             if (epboost > 120)
                 epboost = 120; /* arbitrary */
             else if (epboost < 12)
                 epboost = u.uenmax - u.uen;
             if (epboost) {
+                u.uen += epboost;
+                context.botl = TRUE;
 /*JP
                 You_feel("re-energized.");
 */
                 You("エネルギーで満たされた．");
-                u.uen += epboost;
-                context.botl = 1;
             } else
                 goto nothing_special;
             break;
@@ -1806,6 +1810,7 @@ struct obj *obj;
             otmp = hold_another_object(otmp, "突然%sが落ちた．",
                                        xname(otmp), 0);
 #endif
+            nhUse(otmp);
             break;
         }
         }
@@ -1833,7 +1838,7 @@ struct obj *obj;
         }
 
         if ((eprop & ~W_ARTI) || iprop) {
-        nothing_special:
+ nothing_special:
             /* you had the property from some other source too */
             if (carried(obj))
 /*JP
@@ -2131,6 +2136,42 @@ int arti_indx;
     return hcolor(colorstr);
 }
 
+/* glow verb; [0] holds the value used when blind */
+static const char *glow_verbs[] = {
+/*JP
+    "quiver", "flicker", "glimmer", "gleam"
+*/
+    "震える", "またたく", "光る", "輝く"
+};
+
+/* relative strength that Sting is glowing (0..3), to select verb */
+STATIC_OVL int
+glow_strength(count)
+int count;
+{
+    /* glow strength should also be proportional to proximity and
+       probably difficulty, but we don't have that information and
+       gathering it is more trouble than this would be worth */
+    return (count > 12) ? 3 : (count > 4) ? 2 : (count > 0);
+}
+
+const char *
+glow_verb(count, ingsfx)
+int count; /* 0 means blind rather than no applicable creatures */
+boolean ingsfx;
+{
+    static char resbuf[20];
+
+    Strcpy(resbuf, glow_verbs[glow_strength(count)]);
+    /* ing_suffix() will double the last consonant for all the words
+       we're using and none of them should have that, so bypass it */
+#if 0 /*JP*//*日本語では使わない*/
+    if (ingsfx)
+        Strcat(resbuf, "ing");
+#endif
+    return resbuf;
+}
+
 /* use for warning "glow" for Sting, Orcrist, and Grimtooth */
 void
 Sting_effects(orc_count)
@@ -2140,39 +2181,48 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
         && (uwep->oartifact == ART_STING
             || uwep->oartifact == ART_ORCRIST
             || uwep->oartifact == ART_GRIMTOOTH)) {
+        int oldstr = glow_strength(warn_obj_cnt),
+            newstr = glow_strength(orc_count);
+
         if (orc_count == -1 && warn_obj_cnt > 0) {
             /* -1 means that blindness has just been toggled; give a
                'continue' message that eventual 'stop' message will match */
 #if 0 /*JP*/
             pline("%s is %s.", bare_artifactname(uwep),
-                  !Blind ? "glowing" : "quivering");
+                  glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
 #else
-            pline("%sは%sている．", bare_artifactname(uwep),
-                  !Blind ? "輝い" : "震え");
+            pline("%sは%sいる．", bare_artifactname(uwep),
+                  jconj(glow_verb(Blind ? 0 : warn_obj_cnt, TRUE), "て"));
 #endif
-        } else if (orc_count > 0 && warn_obj_cnt == 0) {
+        } else if (newstr > 0 && newstr != oldstr) {
             /* 'start' message */
             if (!Blind)
 #if 0 /*JP*/
-                pline("%s %s %s!", bare_artifactname(uwep),
-                      otense(uwep, "glow"), glow_color(uwep->oartifact));
+                pline("%s %s %s%c", bare_artifactname(uwep),
+                      otense(uwep, glow_verb(orc_count, FALSE)),
+                      glow_color(uwep->oartifact),
+                      (newstr > oldstr) ? '!' : '.');
 #else
-                pline("%sは%s輝いた！", bare_artifactname(uwep),
-                      glow_color(uwep->oartifact));
+                pline("%sは%s%s%s", bare_artifactname(uwep),
+                      jconj_adj(glow_color(uwep->oartifact)),
+                      jconj(glow_verb(orc_count, FALSE), "た"),
+                      (newstr > oldstr) ? "！" : "．");
 #endif
-            else
-/*JP
-                pline("%s quivers slightly.", bare_artifactname(uwep));
-*/
+            else if (oldstr == 0) /* quivers */
+#if 0 /*JP*/
+                pline("%s %s slightly.", bare_artifactname(uwep),
+                      otense(uwep, glow_verb(0, FALSE)));
+#else
                 pline("%sは少し震えた．", bare_artifactname(uwep));
+#endif
         } else if (orc_count == 0 && warn_obj_cnt > 0) {
             /* 'stop' message */
 #if 0 /*JP*/
             pline("%s stops %s.", bare_artifactname(uwep),
-                  !Blind ? "glowing" : "quivering");
+                  glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
 #else
-            pline("%sの%sは止まった．", bare_artifactname(uwep),
-                  !Blind ? "輝き" : "震え");
+            pline("%sは%sのをやめた．", bare_artifactname(uwep),
+                  glow_verb(Blind ? 0 : warn_obj_cnt, TRUE));
 #endif
         }
     }
@@ -2242,7 +2292,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
     if (loseit && obj) {
         if (Levitation) {
             freeinv(obj);
-            hitfloor(obj);
+            hitfloor(obj, TRUE);
         } else {
             /* dropx gives a message iff item lands on an altar */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))

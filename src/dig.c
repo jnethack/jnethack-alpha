@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1517913682 2018/02/06 10:41:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1547421446 2019/01/13 23:17:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -86,7 +86,7 @@ boolean waslit, rockit;
     lev->horizontal = FALSE;
     /* short-circuit vision recalc */
     viz_array[y][x] = (dist < 3) ? (IN_SIGHT | COULD_SEE) : COULD_SEE;
-    lev->typ = (rockit ? STONE : ROOM);
+    lev->typ = (rockit ? STONE : ROOM); /* flags set via doormask above */
     if (dist >= 3)
         impossible("mkcavepos called with dist %d", dist);
     feel_newsym(x, y);
@@ -142,7 +142,7 @@ register boolean rockit;
     }
 
     if (!rockit && levl[u.ux][u.uy].typ == CORR) {
-        levl[u.ux][u.uy].typ = ROOM;
+        levl[u.ux][u.uy].typ = ROOM; /* flags for CORR already 0 */
         if (waslit)
             levl[u.ux][u.uy].waslit = TRUE;
         newsym(u.ux, u.uy); /* in case player is invisible */
@@ -382,8 +382,7 @@ dig(VOID_ARGS)
         }
 
         if (context.digging.effort <= 50
-            || (ttmp && (ttmp->ttyp == TRAPDOOR || ttmp->ttyp == PIT
-                         || ttmp->ttyp == SPIKED_PIT))) {
+            || (ttmp && (ttmp->ttyp == TRAPDOOR || is_pit(ttmp->ttyp)))) {
             return 1;
         } else if (ttmp && (ttmp->ttyp == LANDMINE
                             || (ttmp->ttyp == BEAR_TRAP && !u.utrap))) {
@@ -411,7 +410,8 @@ dig(VOID_ARGS)
                 Sprintf(kbuf, "chopping off %s own %s", uhis(),
                         body_part(FOOT));
 #else
-                Sprintf(kbuf, "自分の%sを切り落として", body_part(FOOT));
+                Sprintf(kbuf, "自分の%sを切り落として",
+                        body_part(FOOT));
 #endif
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
@@ -421,8 +421,8 @@ dig(VOID_ARGS)
 #else
                 You("%sで熊の罠を壊した．", xname(uwep));
 #endif
-                u.utrap = 0; /* release from trap */
                 deltrap(ttmp);
+                reset_utrap(TRUE); /* release from trap, maybe Lev or Fly */
             }
             /* we haven't made any progress toward a pit yet */
             context.digging.effort = 0;
@@ -443,9 +443,9 @@ dig(VOID_ARGS)
     }
 
     if (context.digging.effort > 100) {
-        register const char *digtxt, *dmgtxt = (const char *) 0;
-        register struct obj *obj;
-        register boolean shopedge = *in_rooms(dpx, dpy, SHOPBASE);
+        const char *digtxt, *dmgtxt = (const char *) 0;
+        struct obj *obj;
+        boolean shopedge = *in_rooms(dpx, dpy, SHOPBASE);
 
         if ((obj = sobj_at(STATUE, dpx, dpy)) != 0) {
             if (break_statue(obj))
@@ -488,7 +488,7 @@ dig(VOID_ARGS)
                 digtxt = "You cut down the tree.";
 */
                 digtxt = "木を切り倒した．";
-                lev->typ = ROOM;
+                lev->typ = ROOM, lev->flags = 0;
                 if (!rn2(5))
                     (void) rnd_treefruit_at(dpx, dpy);
             } else {
@@ -496,7 +496,7 @@ dig(VOID_ARGS)
                 digtxt = "You succeed in cutting away some rock.";
 */
                 digtxt = "岩を少し切りとった．";
-                lev->typ = CORR;
+                lev->typ = CORR, lev->flags = 0;
             }
         } else if (IS_WALL(lev->typ)) {
             if (shopedge) {
@@ -507,12 +507,11 @@ dig(VOID_ARGS)
                 dmgtxt = "傷つける";
             }
             if (level.flags.is_maze_lev) {
-                lev->typ = ROOM;
+                lev->typ = ROOM, lev->flags = 0;
             } else if (level.flags.is_cavernous_lev && !in_town(dpx, dpy)) {
-                lev->typ = CORR;
+                lev->typ = CORR, lev->flags = 0;
             } else {
-                lev->typ = DOOR;
-                lev->doormask = D_NODOOR;
+                lev->typ = DOOR, lev->doormask = D_NODOOR;
             }
 /*JP
             digtxt = "You make an opening in the wall.";
@@ -685,7 +684,7 @@ int ttyp;
         if (u.utraptype == TT_BURIEDBALL)
             buried_ball_to_punishment();
         else if (u.utraptype == TT_INFLOOR)
-            u.utrap = 0;
+            reset_utrap(FALSE);
     }
 
     /* these furniture checks were in dighole(), but wand
@@ -701,6 +700,7 @@ int ttyp;
     } else if (lev->typ == DRAWBRIDGE_DOWN
                || (is_drawbridge_wall(x, y) >= 0)) {
         int bx = x, by = y;
+
         /* if under the portcullis, the bridge is adjacent */
         (void) find_drawbridge(&bx, &by);
         destroy_drawbridge(bx, by);
@@ -752,24 +752,29 @@ int ttyp;
                 pay_for_damage("ruin", FALSE);
 */
                 pay_for_damage("壊す", FALSE);
-        } else if (!madeby_obj && canseemon(madeby))
+        } else if (!madeby_obj && canseemon(madeby)) {
 /*JP
             pline("%s digs a pit in the %s.", Monnam(madeby), surface_type);
 */
             pline("%sは%sに落し穴を掘った．", Monnam(madeby), surface_type);
-        else if (cansee(x, y) && flags.verbose)
+        } else if (cansee(x, y) && flags.verbose) {
 /*JP
             pline("A pit appears in the %s.", surface_type);
 */
             pline("落し穴が%sに現われた．", surface_type);
+        }
+        /* in case we're digging down while encased in solid rock
+           which is blocking levitation or flight */
+        switch_terrain();
+        if (Levitation || Flying)
+            wont_fall = TRUE;
 
         if (at_u) {
             if (!wont_fall) {
-                u.utrap = rn1(4, 2);
-                u.utraptype = TT_PIT;
+                set_utrap(rn1(4, 2), TT_PIT);
                 vision_full_recalc = 1; /* vision limits change */
             } else
-                u.utrap = 0;
+                reset_utrap(TRUE);
             if (oldobjs != newobjs) /* something unearthed */
                 (void) pickup(1);   /* detects pit */
         } else if (mtmp) {
@@ -807,6 +812,13 @@ int ttyp;
             pline("%sに穴が現われた．", surface_type);
 
         if (at_u) {
+            /* in case we're digging down while encased in solid rock
+               which is blocking levitation or flight */
+            switch_terrain();
+            if (Levitation || Flying)
+                wont_fall = TRUE;
+
+            /* check for leashed pet that can't fall right now */
             if (!u.ustuck && !wont_fall && !next_to_u()) {
 /*JP
                 You("are jerked back by your pet!");
@@ -997,7 +1009,7 @@ coord *cc;
         }
 
     } else if ((boulder_here = sobj_at(BOULDER, dig_x, dig_y)) != 0) {
-        if (ttmp && (ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT)
+        if (ttmp && is_pit(ttmp->ttyp)
             && rn2(2)) {
 #if 0 /*JP*/
             pline_The("boulder settles into the %spit.",
@@ -1013,7 +1025,7 @@ coord *cc;
              * fills it.  Final outcome:  no hole, no boulder.
              */
 /*JP
-            pline("KADOOM! The boulder falls in!");
+            pline("KADOOM!  The boulder falls in!");
 */
             pline("どどーん！岩は落ちた！");
             (void) delfloortrap(ttmp);
@@ -1072,6 +1084,7 @@ coord *cc;
     } else {
         typ = fillholetyp(dig_x, dig_y, FALSE);
 
+        lev->flags = 0;
         if (typ != ROOM) {
             lev->typ = typ;
 #if 0 /*JP*/
@@ -1186,7 +1199,7 @@ coord *cc;
         pline("この墓は未使用のようだ．奇妙だ．．．");
         break;
     }
-    levl[dig_x][dig_y].typ = ROOM;
+    levl[dig_x][dig_y].typ = ROOM, levl[dig_x][dig_y].flags = 0;
     del_engr_at(dig_x, dig_y);
     newsym(dig_x, dig_y);
     return;
@@ -1398,7 +1411,7 @@ struct obj *obj;
                            KILLED_BY);
             } else if (u.utrap && u.utraptype == TT_PIT && trap
                        && (trap_with_u = t_at(u.ux, u.uy))
-                       && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)
+                       && is_pit(trap->ttyp)
                        && !conjoined_pits(trap, trap_with_u, FALSE)) {
                 int idx;
 
@@ -1418,7 +1431,7 @@ struct obj *obj;
                     pline("あなたは落し穴の間からごみを取りのぞいた．");
                 }
             } else if (u.utrap && u.utraptype == TT_PIT
-                       && (trap_with_u = t_at(u.ux, u.uy))) {
+                       && (trap_with_u = t_at(u.ux, u.uy)) != 0) {
 #if 0 /*JP*/
                 You("swing %s, but the rubble has no place to go.",
                     yobjnam(obj, (char *) 0));
@@ -1659,7 +1672,7 @@ register struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
         return FALSE;
     } else if (here->typ == SCORR) {
-        here->typ = CORR;
+        here->typ = CORR, here->flags = 0;
         unblock_point(mtmp->mx, mtmp->my);
         newsym(mtmp->mx, mtmp->my);
         draft_message(FALSE); /* "You feel a draft." */
@@ -1687,20 +1700,19 @@ register struct monst *mtmp;
         if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
             add_damage(mtmp->mx, mtmp->my, 0L);
         if (level.flags.is_maze_lev) {
-            here->typ = ROOM;
+            here->typ = ROOM, here->flags = 0;
         } else if (level.flags.is_cavernous_lev
                    && !in_town(mtmp->mx, mtmp->my)) {
-            here->typ = CORR;
+            here->typ = CORR, here->flags = 0;
         } else {
-            here->typ = DOOR;
-            here->doormask = D_NODOOR;
+            here->typ = DOOR, here->doormask = D_NODOOR;
         }
     } else if (IS_TREE(here->typ)) {
-        here->typ = ROOM;
+        here->typ = ROOM, here->flags = 0;
         if (pile && pile < 5)
             (void) rnd_treefruit_at(mtmp->mx, mtmp->my);
     } else {
-        here->typ = CORR;
+        here->typ = CORR, here->flags = 0;
         if (pile && pile < 5)
             (void) mksobj_at((pile == 1) ? BOULDER : ROCK, mtmp->mx, mtmp->my,
                              TRUE, FALSE);
@@ -1886,8 +1898,7 @@ zap_dig()
             struct trap *adjpit = t_at(zx, zy);
             if ((diridx < 8) && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
                 digdepth = 0; /* limited to the adjacent location only */
-                if (!(adjpit && (adjpit->ttyp == PIT
-                                 || adjpit->ttyp == SPIKED_PIT))) {
+                if (!(adjpit && is_pit(adjpit->ttyp))) {
                     char buf[BUFSZ];
                     cc.x = zx;
                     cc.y = zy;
@@ -1901,7 +1912,7 @@ zap_dig()
                     }
                 }
                 if (adjpit
-                    && (adjpit->ttyp == PIT || adjpit->ttyp == SPIKED_PIT)) {
+                    && is_pit(adjpit->ttyp)) {
                     int adjidx = (diridx + 4) % 8;
                     trap_with_u->conjoined |= (1 << diridx);
                     adjpit->conjoined |= (1 << adjidx);
@@ -1922,7 +1933,7 @@ zap_dig()
                 shopdoor = TRUE;
             }
             if (room->typ == SDOOR)
-                room->typ = DOOR;
+                room->typ = DOOR; /* doormask set below */
             else if (cansee(zx, zy))
 /*JP
                 pline_The("door is razed!");
@@ -1941,7 +1952,7 @@ zap_dig()
                         add_damage(zx, zy, SHOP_WALL_COST);
                         shopwall = TRUE;
                     }
-                    room->typ = ROOM;
+                    room->typ = ROOM, room->flags = 0;
                     unblock_point(zx, zy); /* vision */
                 } else if (!Blind)
 /*JP
@@ -1951,7 +1962,7 @@ zap_dig()
                 break;
             } else if (IS_TREE(room->typ)) { /* check trees before stone */
                 if (!(room->wall_info & W_NONDIGGABLE)) {
-                    room->typ = ROOM;
+                    room->typ = ROOM, room->flags = 0;
                     unblock_point(zx, zy); /* vision */
                 } else if (!Blind)
 /*JP
@@ -1961,7 +1972,7 @@ zap_dig()
                 break;
             } else if (room->typ == STONE || room->typ == SCORR) {
                 if (!(room->wall_info & W_NONDIGGABLE)) {
-                    room->typ = CORR;
+                    room->typ = CORR, room->flags = 0;
                     unblock_point(zx, zy); /* vision */
                 } else if (!Blind)
 /*JP
@@ -1980,17 +1991,16 @@ zap_dig()
                 }
                 watch_dig((struct monst *) 0, zx, zy, TRUE);
                 if (level.flags.is_cavernous_lev && !in_town(zx, zy)) {
-                    room->typ = CORR;
+                    room->typ = CORR, room->flags = 0;
                 } else {
-                    room->typ = DOOR;
-                    room->doormask = D_NODOOR;
+                    room->typ = DOOR, room->doormask = D_NODOOR;
                 }
                 digdepth -= 2;
             } else if (IS_TREE(room->typ)) {
-                room->typ = ROOM;
+                room->typ = ROOM, room->flags = 0;
                 digdepth -= 2;
             } else { /* IS_ROCK but not IS_WALL or SDOOR */
-                room->typ = CORR;
+                room->typ = CORR, room->flags = 0;
                 digdepth--;
             }
             unblock_point(zx, zy); /* vision */
@@ -2002,8 +2012,10 @@ zap_dig()
 
     if (pitflow && isok(flow_x, flow_y)) {
         struct trap *ttmp = t_at(flow_x, flow_y);
-        if (ttmp && (ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT)) {
+
+        if (ttmp && is_pit(ttmp->ttyp)) {
             schar filltyp = fillholetyp(ttmp->tx, ttmp->ty, TRUE);
+
             if (filltyp != ROOM)
                 pit_flow(ttmp, filltyp);
         }
@@ -2042,7 +2054,7 @@ char *msg;
         return FALSE;
     *msg = '\0';
     room = &levl[cc->x][cc->y];
-    ltyp = room->typ;
+    ltyp = room->typ, room->flags = 0;
 
     if (is_pool(cc->x, cc->y) || is_lava(cc->x, cc->y)) {
         /* this is handled by the caller after we return FALSE */
@@ -2161,15 +2173,14 @@ pit_flow(trap, filltyp)
 struct trap *trap;
 schar filltyp;
 {
-    if (trap && (filltyp != ROOM)
-        && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)) {
+    if (trap && filltyp != ROOM && is_pit(trap->ttyp)) {
         struct trap t;
         int idx;
 
         t = *trap;
-        levl[trap->tx][trap->ty].typ = filltyp;
-        liquid_flow(trap->tx, trap->ty, filltyp, trap,
-                    (trap->tx == u.ux && trap->ty == u.uy)
+        levl[t.tx][t.ty].typ = filltyp, levl[t.tx][t.ty].flags = 0;
+        liquid_flow(t.tx, t.ty, filltyp, trap,
+                    (t.tx == u.ux && t.ty == u.uy)
 /*JP
                         ? "Suddenly %s flows in from the adjacent pit!"
 */
@@ -2261,8 +2272,7 @@ buried_ball_to_punishment()
             (void) stop_timer(RUST_METAL, obj_to_any(ball));
 #endif
         punish(ball); /* use ball as flag for unearthed buried ball */
-        u.utrap = 0;
-        u.utraptype = 0;
+        reset_utrap(FALSE);
         del_engr_at(cc.x, cc.y);
         newsym(cc.x, cc.y);
     }
@@ -2286,8 +2296,7 @@ buried_ball_to_freedom()
 #endif
         place_object(ball, cc.x, cc.y);
         stackobj(ball);
-        u.utrap = 0;
-        u.utraptype = 0;
+        reset_utrap(TRUE);
         del_engr_at(cc.x, cc.y);
         newsym(cc.x, cc.y);
     }
@@ -2595,7 +2604,7 @@ escape_tomb()
         You("attempt a teleport spell.");
 */
         You("瞬間移動を試みた．");
-        (void) dotele();        /* calls unearth_you() */
+        (void) dotele(FALSE);        /* calls unearth_you() */
     } else if (u.uburied) { /* still buried after 'port attempt */
         boolean good;
 

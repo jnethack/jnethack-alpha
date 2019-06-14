@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1514152830 2017/12/24 22:00:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1542765360 2018/11/21 01:56:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -168,7 +168,7 @@ int x, y;
 
     if (create && !((mtmp = m_at(x, y)) != 0 && mtmp->mtrapped
                     && (t = t_at(x, y)) != 0
-                    && (t->ttyp == PIT || t->ttyp == SPIKED_PIT))) {
+                    && is_pit(t->ttyp))) {
         int objgone = 0;
 
         if (down_gate(x, y) != -1)
@@ -343,7 +343,7 @@ struct obj *otmp, *mwep;
            if mtmp gets killed (shot kills adjacent gas spore and
            triggers explosion, perhaps), inventory will be dropped
            and otmp might go away via merging into another stack */
-        if (mtmp->mhp <= 0 && m_shot.i < m_shot.n)
+        if (DEADMONSTER(mtmp) && m_shot.i < m_shot.n)
             /* cancel pending shots (perhaps ought to give a message here
                since we gave one above about throwing/shooting N missiles) */
             break; /* endmultishot(FALSE); */
@@ -371,7 +371,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
     struct obj *mon_launcher = archer ? MON_WEP(archer) : NULL;
 
     notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
-    ismimic = mtmp->m_ap_type && mtmp->m_ap_type != M_AP_MONSTER;
+    ismimic = M_AP_TYPE(mtmp) && M_AP_TYPE(mtmp) != M_AP_MONSTER;
     vis = cansee(bhitpos.x, bhitpos.y);
 
     tmp = 5 + find_mac(mtmp) + omon_adj(mtmp, otmp, FALSE);
@@ -417,8 +417,8 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         mtmp->msleeping = 0;
         if (vis) {
             if (otmp->otyp == EGG)
-#if 0 /*JP*/
-                pline("Splat! %s is hit with %s egg!", Monnam(mtmp),
+#if 0 /*JP:T*/
+                pline("Splat!  %s is hit with %s egg!", Monnam(mtmp),
                       otmp->known ? an(mons[otmp->corpsenm].mname) : "an");
 #else
                 pline("ビチャッ！%sは%s卵に当たった！", Monnam(mtmp),
@@ -428,7 +428,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                 hit(distant_name(otmp, mshot_xname), mtmp, exclam(damage));
         } else if (verbose && !target)
 #if 0 /*JP:T*/
-            pline("%s%s is hit%s", (otmp->otyp == EGG) ? "Splat! " : "",
+            pline("%s%s is hit%s", (otmp->otyp == EGG) ? "Splat!  " : "",
                   Monnam(mtmp), exclam(damage));
 #else
             pline("%s%sに命中した%s", (otmp->otyp == EGG) ? "ビチャッ！" : "",
@@ -496,9 +496,9 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                 damage = 0;
         }
 
-        if (mtmp->mhp > 0) { /* might already be dead (if petrified) */
+        if (!DEADMONSTER(mtmp)) { /* might already be dead (if petrified) */
             mtmp->mhp -= damage;
-            if (mtmp->mhp < 1) {
+            if (DEADMONSTER(mtmp)) {
                 if (vis || (verbose && !target))
 #if 0 /*JP:T*/
                     pline("%s is %s!", Monnam(mtmp),
@@ -520,7 +520,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
 
         /* blinding venom and cream pie do 0 damage, but verify
            that the target is still alive anyway */
-        if (mtmp->mhp > 0
+        if (!DEADMONSTER(mtmp)
             && can_blnd((struct monst *) 0, mtmp,
                         (uchar) ((otmp->otyp == BLINDING_VENOM) ? AT_SPIT
                                                                 : AT_WEAP),
@@ -641,7 +641,7 @@ struct obj *obj;         /* missile (or stack providing it) */
      * be careful not to use either one after it's been freed.
      */
     if (sym)
-        tmp_at(DISP_FLASH, obj_to_glyph(singleobj));
+        tmp_at(DISP_FLASH, obj_to_glyph(singleobj, rn2_on_display_rng));
     while (range-- > 0) { /* Actually the loop is always exited by break */
         bhitpos.x += dx;
         bhitpos.y += dy;
@@ -966,7 +966,7 @@ struct attack  *mattk;
                     pline("%s breathes %s!", Monnam(mtmp), breathwep[typ - 1]);
 */
                     pline("%sは%sをはいた！", Monnam(mtmp), breathwep[typ - 1]);
-                dobuzz((int) (-20 - (typ - 1)), (int)mattk->damn,
+                dobuzz((int) (-20 - (typ - 1)), (int) mattk->damn,
                        mtmp->mx, mtmp->my, sgn(tbx), sgn(tby), FALSE);
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some
@@ -1258,8 +1258,8 @@ register struct monst *mtmp;
 
     /* hero concealment usually trumps monst awareness of being lined up */
     if (Upolyd && rn2(25)
-        && (u.uundetected || (youmonst.m_ap_type != M_AP_NOTHING
-                              && youmonst.m_ap_type != M_AP_MONSTER)))
+        && (u.uundetected || (U_AP_TYPE != M_AP_NOTHING
+                              && U_AP_TYPE != M_AP_MONSTER)))
         return FALSE;
 
     ignore_boulders = (throws_rocks(mtmp->data)

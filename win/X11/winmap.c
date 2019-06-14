@@ -1130,6 +1130,9 @@ Cardinal *num_params;
 
     switch (event->type) {
     case ButtonPress:
+        if (!iflags.wc_mouse_support)
+            return;
+
         button = (XButtonEvent *) event;
 #ifdef VERBOSE_INPUT
         printf("button press\n");

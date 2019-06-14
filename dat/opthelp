@@ -17,7 +17,8 @@ cmdassist      方向やその他のコマンドでエラー時にヘルプを表示する      [TRUE]
 confirm        ペットや友好的な怪物を攻撃する前に確認する              [TRUE]
 dark_room      show floor not in sight in different color              [TRUE]
 eight_bit_tty  8-bitキャラクタを端末にそのまま送信する                 [FALSE]
-extmenu        拡張コマンド (#) を選択するときにメニューを使用する     [FALSE]
+extmenu        tty, curses: 拡張コマンド (#) の選択にメニューを使う    [FALSE]
+               X11: menu has all commands (T) or traditional subset (F)
 fixinv         できるだけ，同じ物は同じ文字に当てる                    [TRUE]
 force_invmenu  commands asking for inventory item show a menu          [FALSE]
 goldX          when filtering objects by bless/curse state,            [FALSE]
@@ -108,7 +109,7 @@ preload_tiles  ゲーム開始時にタイルを予め RAM に読み込むかを制御する． [TRUE]
                より多くのメモリを使う．
 
 Boolean option if TTY_TILES_ESCCODES was set at compile time (tty only):
-vt_tiledata    insert extra data escae code markers into output        [FALSE]
+vt_tiledata    insert extra data escape code markers into output       [FALSE]
 
 任意の真偽オプションは'!'や'no'をつけることにより否定できる．
 

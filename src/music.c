@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1517877381 2018/02/06 00:36:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1544442713 2018/12/10 11:51:53 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.57 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -272,19 +272,15 @@ int force;
     unsigned tu_pit = 0;
 
     if (trap_at_u)
-        tu_pit = (trap_at_u->ttyp == PIT || trap_at_u->ttyp == SPIKED_PIT);
+        tu_pit = is_pit(trap_at_u->ttyp);
     start_x = u.ux - (force * 2);
     start_y = u.uy - (force * 2);
     end_x = u.ux + (force * 2);
     end_y = u.uy + (force * 2);
-    if (start_x < 1)
-        start_x = 1;
-    if (start_y < 1)
-        start_y = 1;
-    if (end_x >= COLNO)
-        end_x = COLNO - 1;
-    if (end_y >= ROWNO)
-        end_y = ROWNO - 1;
+    start_x = max(start_x, 1);
+    start_y = max(start_y, 0);
+    end_x = min(end_x, COLNO - 1);
+    end_y = min(end_y, ROWNO - 1);
     for (x = start_x; x <= end_x; x++)
         for (y = start_y; y <= end_y; y++) {
             if ((mtmp = m_at(x, y)) != 0) {
@@ -358,6 +354,11 @@ int force;
                         break; /* no pit if portal at that location */
                     chasm->tseen = 1;
 
+                    /* TODO:
+                     * This ought to be split into a separate routine to
+                     * reduce indentation and the consequent line-wraps.
+                     */
+
                     levl[x][y].doormask = 0;
                     /*
                      * Let liquid flow into the newly created chasm.
@@ -366,7 +367,7 @@ int force;
                      */
                     filltype = fillholetyp(x, y, FALSE);
                     if (filltype != ROOM) {
-                        levl[x][y].typ = filltype;
+                        levl[x][y].typ = filltype; /* flags set via doormask */
                         liquid_flow(x, y, filltype, chasm, (char *) 0);
                     }
 
@@ -374,14 +375,14 @@ int force;
 
                     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
                         if (cansee(x, y))
-#if 0 /*JP*/
-                            pline("KADOOM! The boulder falls into a chasm%s!",
-                                  ((x == u.ux) && (y == u.uy)) ? " below you"
-                                                               : "");
+#if 0 /*JP:T*/
+                            pline("KADOOM!  The boulder falls into a chasm%s!",
+                                  (x == u.ux && y == u.uy) ? " below you"
+                                                           : "");
 #else
                             pline("ドドーン！岩は%s地割れに落ちた！",
-                                  ((x == u.ux) && (y == u.uy)) ? "あなたの下の"
-                                                               : "");
+                                  (x == u.ux && y == u.uy) ? "あなたの下の"
+                                                           : "");
 #endif
                         if (mtmp)
                             mtmp->mtrapped = 0;
@@ -396,6 +397,7 @@ int force;
                         if (!is_flyer(mtmp->data)
                             && !is_clinger(mtmp->data)) {
                             boolean m_already_trapped = mtmp->mtrapped;
+
                             mtmp->mtrapped = 1;
                             if (!m_already_trapped) { /* suppress messages */
                                 if (cansee(x, y))
@@ -416,9 +418,9 @@ int force;
                             mselftouch(mtmp, "Falling, ", TRUE);
 */
                             mselftouch(mtmp, "落下中，", TRUE);
-                            if (mtmp->mhp > 0) {
+                            if (!DEADMONSTER(mtmp)) {
                                 mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
-                                if (mtmp->mhp <= 0) {
+                                if (DEADMONSTER(mtmp)) {
                                     if (!cansee(x, y)) {
 /*JP
                                         pline("It is destroyed!");
@@ -447,6 +449,16 @@ int force;
                             }
                         }
                     } else if (x == u.ux && y == u.uy) {
+                        if (u.utrap && u.utraptype == TT_BURIEDBALL) {
+                            /* Note:  the chain should break if a pit gets
+                               created at the buried ball's location, which
+                               is not necessarily here.  But if we don't do
+                               things this way, entering the new pit below
+                               will override current trap anyway, but too
+                               late to get Lev and Fly handling. */
+                            Your("chain breaks!");
+                            reset_utrap(TRUE);
+                        }
                         if (Levitation || Flying
                             || is_clinger(youmonst.data)) {
                             if (!tu_pit) { /* no pit here previously */
@@ -462,14 +474,13 @@ int force;
                         } else if (!tu_pit || !u.utrap
                                    || (u.utrap && u.utraptype != TT_PIT)) {
                             /* no pit here previously, or you were
-                               not in it even it there was */
+                               not in it even if there was */
 /*JP
                             You("fall into a chasm!");
 */
                             You("地割れに落ちた！");
-                            u.utrap = rn1(6, 2);
-                            u.utraptype = TT_PIT;
-#if 0 /*JP*/
+                            set_utrap(rn1(6, 2), TT_PIT);
+#if 0 /*JP:T*/
                             losehp(Maybe_Half_Phys(rnd(6)),
                                    "fell into a chasm", NO_KILLER_PREFIX);
 #else
@@ -485,13 +496,13 @@ int force;
                                 ((Fumbling && !rn2(5))
                                  || (!rnl(Role_if(PM_ARCHEOLOGIST) ? 3 : 9))
                                  || ((ACURR(A_DEX) > 7) && rn2(5)));
+
 /*JP
                             You("are jostled around violently!");
 */
                             You("乱暴に押しのけられた！");
-                            u.utrap = rn1(6, 2);
-                            u.utraptype = TT_PIT; /* superfluous */
-#if 0 /*JP*/
+                            set_utrap(rn1(6, 2), TT_PIT);
+#if 0 /*JP:T*/
                             losehp(Maybe_Half_Phys(rnd(keepfooting ? 2 : 4)),
                                    "hurt in a chasm", NO_KILLER_PREFIX);
 #else
@@ -571,6 +582,11 @@ generic_lvl_desc()
         return "迷宮";
 }
 
+const char *beats[] = {
+    "stepper", "one drop", "slow two", "triple stroke roll",
+    "double shuffle", "half-time shuffle", "second line", "train"
+};
+
 /*
  * The player is trying to extract something from his/her instrument.
  */
@@ -580,6 +596,7 @@ struct obj *instr;
 {
     int damage, mode, do_spec = !(Stunned || Confusion);
     struct obj itmp;
+    boolean mundane = FALSE;
 
     itmp = *instr;
     itmp.oextra = (struct oextra *) 0; /* ok on this copy as instr maintains
@@ -588,8 +605,10 @@ struct obj *instr;
 
     /* if won't yield special effect, make sound of mundane counterpart */
     if (!do_spec || instr->spe <= 0)
-        while (objects[itmp.otyp].oc_magic)
+        while (objects[itmp.otyp].oc_magic) {
             itmp.otyp -= 1;
+            mundane = TRUE;
+        }
 #ifdef MAC
     mac_speaker(&itmp, "C");
 #endif
@@ -745,6 +764,10 @@ struct obj *instr;
         exercise(A_DEX, TRUE);
         break;
     case DRUM_OF_EARTHQUAKE: /* create several pits */
+        /* a drum of earthquake does not cause deafness
+           while still magically functional, nor afterwards
+           when it invokes the LEATHER_DRUM case instead and
+           mundane is flagged */
         consume_obj_charge(instr, TRUE);
 
 /*JP
@@ -761,13 +784,18 @@ struct obj *instr;
         makeknown(DRUM_OF_EARTHQUAKE);
         break;
     case LEATHER_DRUM: /* Awaken monsters */
+        if (!mundane) {
 /*JP
         You("beat a deafening row!");
 */
         You("耳が聞こえなくなるくらい叩いた！");
-        awaken_monsters(u.ulevel * 40);
-        incr_itimeout(&HDeaf, rn1(20, 30));
-        exercise(A_WIS, FALSE);
+            incr_itimeout(&HDeaf, rn1(20, 30));
+            exercise(A_WIS, FALSE);
+        } else
+            You("%s %s.",
+                rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
+                an(beats[rn2(SIZE(beats))]));
+        awaken_monsters(u.ulevel * (mundane ? 5 : 40));
         context.botl = TRUE;
         break;
     default:
