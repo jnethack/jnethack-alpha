@@ -348,9 +348,13 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
                 cached_font * fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
 
+#if 0 /*JP*/
                 BOOL useUnicode = fnt->supportsUnicode;
+#endif
 
+#if 0 /*JP*//* wchar‚É•ÏŠ·‚µ‚È‚¢ */
                 winos_ascii_to_wide_str(str, wbuf, SIZE(wbuf));
+#endif
 
                 nFg = (clr == NO_COLOR ? status_fg_color
                     : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
@@ -406,10 +410,10 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     }
 #else
                     /* get bounding rectangle */
-                    GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+                    GetTextExtentPoint32(hdc, str, vlen, &sz);
 
                     /* first draw title normally */
-                    DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    DrawText(hdc, str, vlen, &rt, DT_LEFT);
 #endif
                     int bar_percent = status_string->bar_percent;
                     if (bar_percent > 0) {
@@ -433,7 +437,7 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                         else
                             DrawTextA(hdc, str, vlen, &barrect, DT_LEFT);
 #else
-                        DrawText(hdc, wbuf, vlen, &barrect, DT_LEFT);
+                        DrawText(hdc, str, vlen, &barrect, DT_LEFT);
 #endif
                     }
                     DeleteObject(back_brush);
@@ -468,10 +472,10 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     }
 #else
                     /* get bounding rectangle */
-                    GetTextExtentPoint32(hdc, wbuf, vlen, &sz);
+                    GetTextExtentPoint32(hdc, str, vlen, &sz);
 
                     /* draw */
-                    DrawText(hdc, wbuf, vlen, &rt, DT_LEFT);
+                    DrawText(hdc, str, vlen, &rt, DT_LEFT);
 #endif
                 }
                 assert(sz.cy >= 0);
