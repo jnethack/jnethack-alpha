@@ -2025,6 +2025,7 @@ void nethack_enter_nttty()
     HKL keyboard_layout = GetKeyboardLayout(0);
     DWORD primary_language = (UINT_PTR) keyboard_layout & 0x3f;
 
+#if 0 /*JP*//* “ú–{Œê‚Å‚Ínhdefkey‚µ‚©g‚í‚È‚¢ */
     if (primary_language == LANG_ENGLISH) {
         if (!load_keyboard_handler("nhdefkey"))
             error("Unable to load nhdefkey.dll");
@@ -2032,6 +2033,10 @@ void nethack_enter_nttty()
         if (!load_keyboard_handler("nhraykey"))
             error("Unable to load nhraykey.dll");
     }
+#else
+    if (!load_keyboard_handler("nhdefkey"))
+        error("nhdefkey.dll‚ğ“Ç‚İ‚ß‚Ü‚¹‚ñ");
+#endif
 }
 #endif /* TTY_GRAPHICS */
 
