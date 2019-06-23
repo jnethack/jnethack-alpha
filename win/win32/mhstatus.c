@@ -273,7 +273,9 @@ static LRESULT
 onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     SIZE sz;
+#if 0 /*JP*/
     WCHAR wbuf[BUFSZ];
+#endif
     RECT rt;
     PAINTSTRUCT ps;
     PNHStatusWindow data;

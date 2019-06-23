@@ -7,7 +7,9 @@
 
 #include "win32api.h"
 
+#if 0 /*JP*/
 extern const WCHAR cp437[256];
+#endif
 
 WCHAR *
 winos_ascii_to_wide_str(const unsigned char * src, WCHAR * dst, size_t dstLength);
@@ -15,6 +17,8 @@ winos_ascii_to_wide_str(const unsigned char * src, WCHAR * dst, size_t dstLength
 WCHAR
 winos_ascii_to_wide(const unsigned char c);
 
+#if 0 /*JP*/
 BOOL winos_font_support_cp437(HFONT hFont);
+#endif
 
 #endif // WINOS_H

@@ -49,7 +49,9 @@ typedef struct mswin_nethack_map_window {
     POINT map_orig;             /* map origin point */
 
     HFONT hMapFont;             /* font for ASCII mode */
+#if 0 /*JP*/
     boolean bUnicodeFont;       /* font supports unicode page 437 */
+#endif
 
     int tileWidth;              /* width of tile in pixels at 96 dpi */
     int tileHeight;             /* height of tile in pixels at 96 dpi */
@@ -249,7 +251,9 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 
         data->hMapFont = font;
 
+#if 0 /*JP*/
         data->bUnicodeFont = winos_font_support_cp437(data->hMapFont);
+#endif
 
         // set tile size to match font metrics
 
@@ -922,6 +926,7 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
             OldFg = SetTextColor(data->backBufferDC, nhcolor_to_RGB(color));
         }
     #endif
+#if 0 /*JP*/
         if (data->bUnicodeFont) {
             wch = winos_ascii_to_wide(ch);
             if (wch == 0x2591 || wch == 0x2592) {
@@ -941,6 +946,9 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
                     | DT_SINGLELINE);
             }
         } else {
+#else
+        {
+#endif
             DrawTextA(data->backBufferDC, &ch, 1, rect,
                         DT_CENTER | DT_VCENTER | DT_NOPREFIX
                             | DT_SINGLELINE);
