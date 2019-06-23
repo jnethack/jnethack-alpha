@@ -192,7 +192,10 @@ int ef_flags;
         *const msg[] = { "burnt", "rusted", "rotten", "corroded" },
 */
         *const msg[] =  { "焦げた", "錆びた", "腐った", "腐食した" },
+/*JP
         *const bythe[] = { "heat", "oxidation", "decay", "corrosion" };
+*/
+        *const bythe[] = { "熱", "酸化", "腐敗", "腐食" };
     boolean vulnerable = FALSE, is_primary = TRUE,
             check_grease = (ef_flags & EF_GREASE) ? TRUE : FALSE,
             print = (ef_flags & EF_VERBOSE) ? TRUE : FALSE,
@@ -1088,7 +1091,10 @@ boolean msg;
         if (!was_Lev && Levitation)
             float_up();
         if (!was_Fly && Flying)
+/*JP
             You("can fly.");
+*/
+            You("飛べるようになった．");
     }
 }
 
@@ -1564,8 +1570,13 @@ unsigned trflags;
 */
                 You("隣の落し穴に移動した．");
             } else if (adj_pit) {
+#if 0 /*JP:T*/
                 You("stumble over debris%s.",
                     !rn2(5) ? " between the pits" : "");
+#else
+                You("は%sがらくたでつまづいた．",
+                    !rn2(5) ? "落し穴の" : "");
+#endif
             } else {
 #if 0 /*JP*/
                 Strcpy(verbbuf,
@@ -1912,14 +1923,18 @@ unsigned trflags;
 
         seetrap(trap);
         if (viasitting)
+#if 0 /*JP*/
             Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
+#else
+            Strcpy(verbbuf, "を引き起こした"); /* follows "You sit down." */
+#endif
         else if (u.usteed)
 #if 0 /*JP*/
             Sprintf(verbbuf, "lead %s onto",
                     x_monnam(u.usteed, steed_article, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
 #else
-            Sprintf(verbbuf, "%sとともに飛び込んだ",
+            Sprintf(verbbuf, "に%sとともに飛び込んだ",
                     x_monnam(u.usteed, steed_article, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
 #endif
@@ -1929,14 +1944,14 @@ unsigned trflags;
                     Levitation ? (const char *) "float"
                                : locomotion(youmonst.data, "step"));
 #else
-            Sprintf(verbbuf,"%s",
+            Sprintf(verbbuf,"に%s",
                     jpast(Levitation ? (const char *)"浮きながら飛びこむ"
                           : locomotion(youmonst.data, "踏み込む")));
 #endif
 /*JP
         You("%s a polymorph trap!", verbbuf);
 */
-        You("変化の罠に%s！", verbbuf);
+        You("変化の罠%s！", verbbuf);
         if (Antimagic || Unchanging) {
             shieldeff(u.ux, u.uy);
 /*JP
@@ -3639,11 +3654,20 @@ float_up()
             (void) buried_ball(&cc);
             /* being chained to the floor blocks levitation from floating
                above that floor but not from enhancing carrying capacity */
+#if 0 /*JP*/
             You("feel lighter, but your %s is still chained to the %s.",
                 body_part(LEG),
                 IS_ROOM(levl[cc.x][cc.y].typ) ? "floor" : "ground");
+#else
+            You("すこし軽くなったが，あなたの%sはまだ%sにつながっている．",
+                body_part(LEG),
+                IS_ROOM(levl[cc.x][cc.y].typ) ? "床" : "地面");
+#endif
         } else if (u.utraptype == WEB) {
+/*JP
             You("float up slightly, but you are still stuck in the web.");
+*/
+            You("すこし浮き上がったが，まだくもの巣につかまっている．");
         } else { /* bear trap */
 /*JP
             You("float up slightly, but your %s is still stuck.",
@@ -3754,12 +3778,21 @@ long hmask, emask; /* might cancel timeout */
 
         float_vs_flight();
         if (trapped && u.utrap) /* u.utrap => paranoia */
+#if 0 /*JP*/
             You("are no longer trying to float up from the %s.",
                 (u.utraptype == TT_BEARTRAP) ? "trap's jaws"
                   : (u.utraptype == TT_WEB) ? "web"
                       : (u.utraptype == TT_BURIEDBALL) ? "chain"
                           : (u.utraptype == TT_LAVA) ? "lava"
                               : "ground"); /* TT_INFLOOR */
+#else
+            You("もはや%sから浮き上がろうとしなくなった．",
+                (u.utraptype == TT_BEARTRAP) ? "罠の歯"
+                  : (u.utraptype == TT_WEB) ? "くもの巣"
+                      : (u.utraptype == TT_BURIEDBALL) ? "鎖"
+                          : (u.utraptype == TT_LAVA) ? "溶岩"
+                              : "地面"); /* TT_INFLOOR */
+#endif
         (void) encumber_msg(); /* carrying capacity might have changed */
         return 0;
     }
@@ -4138,7 +4171,10 @@ domagictrap()
             context.botl = TRUE;
         } else {
             /* magic vibrations still hit you */
+/*JP
             You_feel("rankled.");
+*/
+            You_feel("いらいらした．");
             incr_itimeout(&HDeaf, rn1(5, 15));
             context.botl = TRUE;
         }
@@ -5947,14 +5983,23 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         which = "";
         switch (u.utraptype) {
         case TT_LAVA:
+/*JP
             trapdescr = "molten lava";
+*/
+            trapdescr = "どろどろの溶岩";
             break;
         case TT_INFLOOR:
             /* solidified lava, so not "floor" even if within a room */
+/*JP
             trapdescr = "ground";
+*/
+            trapdescr = "地面";
             break;
         case TT_BURIEDBALL:
+/*JP
             trapdescr = "your anchor";
+*/
+            trapdescr = "くさび";
             break;
         case TT_BEARTRAP:
         case TT_PIT:
@@ -5964,7 +6009,10 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         default:
             /* lint suppression in case 't' is unexpectedly Null
                or u.utraptype has new value we don't know about yet */
+/*JP
             trapdescr = "trap";
+*/
+            trapdescr = "罠";
             break;
         }
     } else {
@@ -6677,7 +6725,7 @@ unconscious()
                               || !strncmp(nomovemsg, "You regain con", 14)
                               || !strncmp(nomovemsg, "You are consci", 14))));
 #else
-/*JP 3.6.0 での出現位置/回数
+/*JP 3.6.2 での出現位置/回数
  "You awake"      : potion.c(1)
   "You regain con": eat.c(1)
   "You are consci": eat.c(1)

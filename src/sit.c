@@ -492,13 +492,19 @@ dosit()
             return 0;
         } else if (eggs_in_water(youmonst.data)) {
             if (!(Underwater || Is_waterlevel(&u.uz))) {
+/*JP
                 pline("A splash tetra you are not.");
+*/
+                pline("あなたはコペラ・アーノルディではなかった．");
                 return 0;
             }
             if (Upolyd &&
                 (youmonst.data == &mons[PM_GIANT_EEL]
                  || youmonst.data == &mons[PM_ELECTRIC_EEL])) {
+/*JP
                 You("yearn for the Sargasso Sea.");
+*/
+                You("サルガッソー海にあこがれた．");
                 return 0;
             }
         }

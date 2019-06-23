@@ -543,7 +543,7 @@ int wtcap;
 /*JP
         interrupt_multi("You are in full health.");
 */
-        interrupt_multi("‘Ì—Í‚ª‰ñ•œ‚µ‚½D");
+        interrupt_multi("‘Ì—Í‚ªŠ®‘S‰ñ•œ‚µ‚½D");
 }
 
 void

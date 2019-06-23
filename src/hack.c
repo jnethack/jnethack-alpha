@@ -1796,7 +1796,10 @@ domove_core()
                    doing so while encumbered is feasible; if in an aquatic
                    form, stressed or less is allowed; otherwise (magical
                    breathing), only burdened is allowed */
+/*JP
                 You("are carrying too much to climb out of the water.");
+*/
+                You("…‚©‚çã‚ª‚é‚É‚Í‰×•¨‚ğ‚¿‚·‚¬‚Ä‚¢‚éD");
                 nomul(0);
                 return;
             }

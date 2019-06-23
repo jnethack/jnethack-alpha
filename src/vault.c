@@ -263,7 +263,10 @@ struct monst *grd;
         && um_dist(grd->mx, grd->my, 1)) {
         if (grd->mpeaceful) {
             if (canspotmon(grd)) /* see or sense via telepathy */
+/*JP
                 pline("%s becomes irate.", Monnam(grd));
+*/
+                pline("%s‚ÍŒƒ“{‚µ‚½D", Monnam(grd));
             grd->mpeaceful = 0; /* bypass setmangry() */
         }
         /* if arriving outside guard's temporary corridor, give the
@@ -1192,7 +1195,10 @@ register struct monst *grd;
         /* We're stuck, so try to find a new destination. */
         if (!find_guard_dest(grd, &egrd->gdx, &egrd->gdy)
             || (egrd->gdx == gx && egrd->gdy == gy)) {
+/*JP
             pline("%s, confused, disappears.", Monnam(grd));
+*/
+            pline("%s‚Í¬—‚µCÁ‚¦‚½D", Monnam(grd));
             disappear_msg_seen = TRUE;
             goto cleanup;
         } else

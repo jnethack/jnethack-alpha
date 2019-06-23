@@ -422,10 +422,15 @@ doextlist(VOID_ARGS)
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "", MENU_UNSELECTED);
 
+#if 0 /*JP*/
         Strcpy(buf, menumode ? "Show" : "Hide");
         Strcat(buf, " commands that don't autocomplete");
         if (!menumode)
             Strcat(buf, " (those not marked with [A])");
+#else
+        Strcpy(buf, "自動補完されないコマンドを");
+        Strcat(buf, menumode ? "表示する" : "表示しない (これらは[A]マークがつかない)");
+#endif
         any.a_int = 1;
         add_menu(menuwin, NO_GLYPH, &any, 'a', 0, ATR_NONE, buf,
                  MENU_UNSELECTED);
@@ -437,10 +442,19 @@ doextlist(VOID_ARGS)
                actual list of extended commands shown via separator lines;
                having ':' as an explicit selector overrides the default
                menu behavior for it; we retain 's' as a group accelerator */
+#if 0 /*JP*/
             add_menu(menuwin, NO_GLYPH, &any, ':', 's', ATR_NONE,
                      "Search extended commands", MENU_UNSELECTED);
+#else
+            add_menu(menuwin, NO_GLYPH, &any, ':', 's', ATR_NONE,
+                     "拡張コマンドを検索する", MENU_UNSELECTED);
+#endif
         } else {
+#if 0 /*JP*/
             Strcpy(buf, "Show all, clear search");
+#else
+            Strcpy(buf, "全て表示; 検索をクリア");
+#endif
             if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ)
                 Sprintf(eos(buf), " (\"%s\")", searchbuf);
             any.a_int = 3;
@@ -454,10 +468,17 @@ doextlist(VOID_ARGS)
         }
         if (wizard) {
             any.a_int = 4;
+#if 0 /*JP*/
             add_menu(menuwin, NO_GLYPH, &any, 'z', 0, ATR_NONE,
                      onelist ? "Show debugging commands in separate section"
                      : "Show all alphabetically, including debugging commands",
                      MENU_UNSELECTED);
+#else
+            add_menu(menuwin, NO_GLYPH, &any, 'z', 0, ATR_NONE,
+                     onelist ? "デバッグコマンドは別の節に表示する"
+                     : "デバッグコマンドを含む全てのコマンドをアルファベット順に表示する",
+                     MENU_UNSELECTED);
+#endif
         }
         any = zeroany;
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -519,8 +540,13 @@ doextlist(VOID_ARGS)
                          "", MENU_UNSELECTED);
         }
         if (*searchbuf && !n)
+#if 0 /*JP*/
             add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "no matches", MENU_UNSELECTED);
+#else
+            add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     "一致なし", MENU_UNSELECTED);
+#endif
 
         end_menu(menuwin, (char *) 0);
         n = select_menu(menuwin, PICK_ONE, &selected);
@@ -551,8 +577,12 @@ doextlist(VOID_ARGS)
             searchbuf[0] = '\0';
         }
         if (search) {
+#if 0 /*JP*/
             Strcpy(promptbuf, "Extended command list search phrase");
             Strcat(promptbuf, "?");
+#else
+            Strcpy(promptbuf, "拡張コマンドの検索文字列は?");
+#endif
             getlin(promptbuf, searchbuf);
             (void) mungspaces(searchbuf);
             if (searchbuf[0] == '\033')
@@ -2229,8 +2259,12 @@ int final;
         int egdepth = observable_depth(&u.uz);
 
         (void) endgamelevelname(tmpbuf, egdepth);
+#if 0 /*JP*/
         Sprintf(buf, "in the endgame, on the %s%s",
                 !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
+#else
+        Sprintf(buf, "最終試練の%s", tmpbuf);
+#endif
     } else if (Is_knox(&u.uz)) {
         /* this gives away the fact that the knox branch is only 1 level */
 /*JP
@@ -2260,9 +2294,15 @@ int final;
         /* TODO? maybe extend this bit to include various other automatic
            annotations from the dungeon overview code */
         if (Is_rogue_level(&u.uz))
+/*JP
             Strcat(tmpbuf, ", a primitive area");
+*/
+            Strcat(tmpbuf, ", 単純な世界");
         else if (Is_bigroom(&u.uz) && !Blind)
+/*JP
             Strcat(tmpbuf, ", a very big room");
+*/
+            Strcat(tmpbuf, ", とても大きな部屋");
 #if 0 /*JP*/
         Sprintf(buf, "in %s, on %s", dgnbuf, tmpbuf);
 #else
@@ -2305,9 +2345,14 @@ int final;
                 long nxtlvl = newuexp(ulvl);
                 /* long oldlvl = (ulvl > 1) ? newuexp(ulvl - 1) : 0; */
 
+#if 0 /*JP*/
                 Sprintf(eos(buf), ", %ld %s%sneeded to attain level %d",
                         (nxtlvl - u.uexp), (u.uexp > 0) ? "more " : "",
                         !final ? "" : "were ", (ulvl + 1));
+#else
+                Sprintf(eos(buf), "(レベル%dまで%ldポイント)",
+                        (ulvl + 1), (nxtlvl - u.uexp));
+#endif
             }
         }
         you_have(buf, "");
@@ -2433,15 +2478,32 @@ int final;
     if (flags.pickup) {
         char ocl[MAXOCLASSES + 1];
 
+#if 0 /*JP*//*後に回す*/
         Strcpy(buf, "on");
+#endif
         oc_to_str(flags.pickup_types, ocl);
+#if 0 /*JP*/
         Sprintf(eos(buf), " for %s%s%s",
                 *ocl ? "'" : "", *ocl ? ocl : "all types", *ocl ? "'" : "");
+#else
+        Sprintf(buf, "%s%s%s",
+                *ocl ? "'" : "", *ocl ? ocl : "全ての種類", *ocl ? "'" : "");
+#endif
         if (flags.pickup_thrown && *ocl) /* *ocl: don't show if 'all types' */
+/*JP
             Strcat(buf, " plus thrown");
+*/
+            Strcat(buf, "に加えて投げるもの");
         if (iflags.autopickup_exceptions[AP_GRAB]
             || iflags.autopickup_exceptions[AP_LEAVE])
+/*JP
             Strcat(buf, ", with exceptions");
+*/
+            Strcat(buf, "(例外あり)");
+#if 1 /*JP*/
+        Strcpy(buf, "に対してオン");
+#endif
+        
     } else
 /*JP
         Strcpy(buf, "off");
@@ -3228,7 +3290,11 @@ int final;
 
     /*** Vision and senses ***/
     if (!Blind && (Blinded || !haseyes(youmonst.data)))
+#if 0 /*JP*/
         you_can("see", from_what(-BLINDED)); /* Eyes of the Overworld */
+#else /*「超世界の目によって見ることができる」*/
+        you_can("見ることが", from_what(-BLINDED)); /* Eyes of the Overworld */
+#endif
     if (See_invisible) {
         if (!Blind)
 /*JP
@@ -4386,6 +4452,7 @@ int final;
              *  N wishes (1 for an artifact)
              *  N wishes (M for artifacts)
              */
+#if 0 /*JP*/
             if (u.uconduct.wisharti == u.uconduct.wishes)
                 Sprintf(eos(buf), " (%s",
                         (u.uconduct.wisharti > 2L) ? "all "
@@ -4396,6 +4463,9 @@ int final;
             Sprintf(eos(buf), "for %s)",
                     (u.uconduct.wisharti == 1L) ? "an artifact"
                                                 : "artifacts");
+#else
+            Sprintf(eos(buf), " (聖器は%ld回)", u.uconduct.wisharti);
+#endif
         }
         you_have_X(buf);
 
@@ -6435,9 +6505,15 @@ const char *msg;
         }
     }
 
+#if 0 /*JP*/
     Sprintf(buf, "Valid direction keys%s%s%s are:",
             prefixhandling ? " to " : "", prefixhandling ? dothat : "",
             NODIAG(u.umonnum) ? " in your current form" : "");
+#else
+    Sprintf(buf, "%s%s%sでの有効な方向指定は:",
+            prefixhandling ? " to " : "", prefixhandling ? dothat : "",
+            NODIAG(u.umonnum) ? " in your current form" : "");
+#endif
     putstr(win, 0, buf);
     show_direction_keys(win, !prefixhandling ? '.' : ' ', NODIAG(u.umonnum));
 

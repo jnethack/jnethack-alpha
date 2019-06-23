@@ -1523,7 +1523,10 @@ dopay()
         }
         mtmp = m_at(cx, cy);
         if (!cansee(cx, cy) && (!mtmp || !canspotmon(mtmp))) {
+/*JP
             You("can't %s anyone there.", !Blind ? "see" : "sense");
+*/
+            You("ここには誰も%sない．", !Blind ? "見え" : "感じられ");
             return 0;
         }
         if (!mtmp) {
@@ -1732,7 +1735,7 @@ dopay()
 /*JP
                 Strcat(sbuf, "you picked up in the store.");
 */
-                        Strcpy(sbuf, "店の中で拾ったものに対して，");
+                Strcpy(sbuf, "店の中で拾ったものに対して，");
             else
 #if 0 /*JP*/
                 Strcat(sbuf,
@@ -3464,13 +3467,9 @@ boolean peaceful, silent;
 */
                 still = "さらに";
             }
-#if 0 /*JP:T*/
+#if 0 /*JP*/
             Sprintf(buf, "%sowe %s %ld %s", still, shkname(shkp),
                     value, currency(value));
-#else
-            Sprintf(buf, "%s%sに%ld%sの借りをつくった", still, shkname(shkp),
-                    value, currency(value));
-#endif
             if (u_count) /* u_count > 0 implies Has_contents(obj) */
                 Sprintf(eos(buf), " for %s%sits contents",
                         was_unpaid ? "it and " : "",
@@ -3478,6 +3477,10 @@ boolean peaceful, silent;
             else if (obj->oclass != COIN_CLASS)
                 Sprintf(eos(buf), " for %s",
                         (obj->quan > 1L) ? "them" : "it");
+#else
+            Sprintf(buf, "%s%sに%ld%sの借りをつくった", still, shkname(shkp),
+                    value, currency(value));
+#endif
 
 #if 0 /*JP*/
             You("%s!", buf); /* "You owe <shk> N zorkmids for it!" */
@@ -4038,7 +4041,7 @@ register xchar x, y;
 /*JP
             verbalize("Out of my way, scum!");
 */
-                    verbalize("どけ，クソったれ！");
+            verbalize("どけ，クソったれ！");
         if (cansee(x, y)) {
 #if 0 /*JP:T*/
             pline("%s nimbly%s catches %s.", Shknam(shkp),
@@ -4321,10 +4324,18 @@ boolean catchup; /* restoring a level */
            message for the only repair, but perhaps the shop repair
            incantation means that shk's untrap attempt will never fail */
         if (canseemon(shkp))
+#if 0 /*JP*/
             pline("%s whispers %s.", Shknam(shkp),
                   shk_closeby ? "an incantation" : "something");
+#else
+            pline("%sは%sをささやいた．", Shknam(shkp),
+                  shk_closeby ? "呪文" : "何か");
+#endif
         else if (!Deaf && shk_closeby)
+/*JP
             You_hear("someone muttering an incantation.");
+*/
+            You_hear("誰かが呪文をつぶやいているのを聞いた．");
         *once = 0;
     }
     if (ttmp) {

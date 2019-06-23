@@ -763,9 +763,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         break;
     case ROCK_CLASS:
         if (typ == STATUE && omndx != NON_PM) {
+#if 0 /*JP*/
             char anbuf[10];
 
-#if 0 /*JP*/
             Sprintf(buf, "%s%s of %s%s",
                     (Role_if(PM_ARCHEOLOGIST) && (obj->spe & STATUE_HISTORIC))
                        ? "historic "
@@ -3504,7 +3504,11 @@ struct obj *no_wish;
     int wetness, gsize = 0;
     struct fruit *f;
     int ftype = context.current_fruit;
+#if 0 /*JP*/
     char fruitbuf[BUFSZ], globbuf[BUFSZ];
+#else
+    char fruitbuf[BUFSZ];
+#endif
     /* Fruits may not mess up the ability to wish for real objects (since
      * you can leave a fruit in a bones file and it will be added to
      * another person's game), so they must be checked for last, after

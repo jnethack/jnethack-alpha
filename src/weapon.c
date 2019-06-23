@@ -476,7 +476,9 @@ struct monst *magr UNUSED;
 struct monst *mdef;
 long silverhit;
 {
+#if 0 /*JP*/
     char rings[20]; /* plenty of room for "rings" */
+#endif
     int ltyp = ((uleft && (silverhit & W_RINGL) != 0L)
                 ? uleft->otyp : STRANGE_OBJECT),
         rtyp = ((uright && (silverhit & W_RINGR) != 0L)
@@ -494,6 +496,7 @@ long silverhit;
            silver [see hmonas(uhitm.c) for explanation of 'multi_claw'] */
         both = ((ltyp == rtyp && uleft->dknown == uright->dknown)
                 || (l_ag && r_ag));
+#if 0 /*JP*/
         Sprintf(rings, "ring%s", both ? "s" : "");
         Your("%s%s %s %s!",
              (l_ag || r_ag) ? "silver "
@@ -501,6 +504,14 @@ long silverhit;
                : ((silverhit & W_RINGL) != 0L) ? "left "
                  : "right ",
              rings, vtense(rings, "sear"), mon_nam(mdef));
+#else
+        Your("%séwó÷Ç™%sÇèƒÇ¢ÇΩÅI",
+             (l_ag || r_ag) ? "ã‚ÇÃ"
+             : both ? ""
+               : ((silverhit & W_RINGL) != 0L) ? "ç∂ÇÃ"
+                 : "âEÇÃ",
+             mon_nam(mdef));
+#endif
     }
 }
 

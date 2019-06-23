@@ -2245,9 +2245,9 @@ unsigned *resultflags;
  * If allflag then no questions are asked.  Mx gives the max number
  * of objects to be treated.  Return the number of objects treated.
  */
-/*JP CHECK: 3.6.0 での呼び出し元
-invent.c:1886:        int cnt = askchain(&invent, olets, allflag, fn, ckfn, mx, word);
-pickup.c:3145:        if (askchain(objlist, (one_by_one ? (char *) 0 : selection), allflag,
+/*JP CHECK: 3.6.2 での呼び出し元
+invent.c:2228:        int cnt = askchain(&invent, olets, allflag, fn, ckfn, mx, word);
+pickup.c:3208:        if (askchain(objlist, (one_by_one ? (char *) 0 : selection), allflag,
   wordには動詞が英語で入る。
 */
 int
@@ -3253,7 +3253,10 @@ dounpaid()
                     char contbuf[BUFSZ];
 
                     /* Shopkeeper knows what to charge for contents */
+/*JP
                     Sprintf(contbuf, "%s contents", s_suffix(xname(otmp)));
+*/
+                    Sprintf(contbuf, "%sの中身", xname(otmp));
                     putstr(win, 0,
                            xprname((struct obj *) 0, contbuf, CONTAINED_SYM,
                                    TRUE, contcost, 0L));

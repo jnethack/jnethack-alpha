@@ -223,7 +223,10 @@ struct obj *wep;
 
             wep->owornmask |= W_WEP;
             if (wep->otyp == AKLYS && (wep->owornmask & W_WEP) != 0)
+/*JP
                 You("secure the tether.");
+*/
+                You("ひもをしっかりと固定した．");
             prinv((char *) 0, wep, 0L);
             wep->owornmask = dummy;
         }
@@ -922,12 +925,20 @@ register int amount;
 
         if (amount >= 0 && uwep && will_weld(uwep)) { /* cursed tin opener */
             if (!Blind) {
+#if 0 /*JP*/
                 Sprintf(buf, "%s with %s aura.",
                         Yobjnam2(uwep, "glow"), an(hcolor(NH_AMBER)));
+#else
+                Sprintf(buf, "%sは%sオーラにつつまれた．",
+                        xname(uwep), hcolor(NH_AMBER));
+#endif
                 uwep->bknown = !Hallucination;
             } else {
                 /* cursed tin opener is wielded in right hand */
+/*JP
                 Sprintf(buf, "Your right %s tingles.", body_part(HAND));
+*/
+                Sprintf(buf, "あなたの右%sはちくちくした．", body_part(HAND));
             }
             uncurse(uwep);
             update_inventory();

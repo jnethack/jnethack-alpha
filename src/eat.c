@@ -3843,10 +3843,10 @@ boolean incr;
 /* Returns an object representing food.
  * Object may be either on floor or in inventory.
  */
-/*JP CHECK: 3.6.1 での呼び出し元
-apply.c:2478:    if (!(corpse = floorfood("tin", 2)))
-eat.c:3050:    if (!(otmp = floorfood("eat", 0)))
-pray.c:1659:    otmp = floorfood("sacrifice", 1);
+/*JP CHECK: 3.6.2 での呼び出し元
+apply.c:2500:    if (!(corpse = floorfood("tin", 2)))
+eat.c:3089:    if (!(otmp = floorfood("eat", 0)))
+pray.c:1684:    otmp = floorfood("sacrifice", 1);
   この関数は英語名のまま呼び出すこと。
 */
 struct obj *
@@ -3994,7 +3994,10 @@ vomit() /* A good idea from David Neves */
            vomiting_dialog() gives a vomit message when its countdown
            reaches 0, but only if u.uhs < FAINTING (and !cantvomit()) */
         if (u.uhs >= FAINTING)
+/*JP
             Your("%s heaves convulsively!", body_part(STOMACH));
+*/
+            Your("%sは激しい吐き気をもよおした！", body_part(STOMACH));
     }
 
     /* nomul()/You_can_move_again used to be unconditional, which was

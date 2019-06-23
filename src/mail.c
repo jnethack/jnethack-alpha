@@ -499,7 +499,7 @@ struct obj *otmp UNUSED;
 /*JP
         "Please disregard previous letter.", "Welcome to NetHack.",
 */
-        "前のメールは忘れてください．", "NetHackへようこそ！",
+        "前のメールは忘れてください．", "JNetHackへようこそ！",
 #ifdef AMIGA
         "Only Amiga makes it possible.", "CATS have all the answers.",
 #endif

@@ -501,9 +501,15 @@ struct kinfo *kptr;
        player may have genocided green slimes after being infected */
     if ((mvitals[PM_GREEN_SLIME].mvflags & G_GENOD) != 0) {
         killer.format = KILLED_BY;
+/*JP
         Strcpy(killer.name, "slimicide");
+*/
+        Strcpy(killer.name, "スライム虐殺");
         /* immediately follows "OK, so you don't die." */
+/*JP
         pline("Yes, you do.  Green slime has been genocided...");
+*/
+        pline("はい，そうです．緑スライムは虐殺されました．．．");
         done(GENOCIDED);
         /* could be life-saved again (only in explore or wizard mode)
            but green slimes are gone; just stay in current form */
@@ -769,7 +775,10 @@ nh_timeout()
                 /* timed Flying is via #wizintrinsic only */
                 if (was_flying && !Flying) {
                     context.botl = 1;
+/*JP
                     You("land.");
+*/
+                    You("着地した．");
                     spoteffects(TRUE);
                 }
                 break;
@@ -778,8 +787,13 @@ nh_timeout()
                 if (!Warn_of_mon) {
                     context.warntype.speciesidx = NON_PM;
                     if (context.warntype.species) {
+#if 0 /*JP*/
                         You("are no longer warned about %s.",
                             makeplural(context.warntype.species->mname));
+#else
+                        You("もはや%sを警告しなくなった．",
+                            makeplural(context.warntype.species->mname));
+#endif
                         context.warntype.species = (struct permonst *) 0;
                     }
                 }

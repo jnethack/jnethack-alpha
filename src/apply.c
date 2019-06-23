@@ -528,7 +528,10 @@ register struct obj *obj;
             mtmp->mundetected = 0;
             newsym(mtmp->mx, mtmp->my);
         } else if (mtmp->mappearance) {
+/*JP
             const char *what = "thing";
+*/
+            const char *what = "•¨‘Ì";
 
             switch (M_AP_TYPE(mtmp)) {
             case M_AP_OBJECT:
@@ -1324,9 +1327,15 @@ struct obj *obj;
 
         if (mtmp->mfrozen) {
             if (vis)
+/*JP
                 You("discern no obvious reaction from %s.", mon_nam(mtmp));
+*/
+                You("%s‚©‚ç‚Ì–¾‚ç‚©‚È”½‰‚Í¯•Ê‚Å‚«‚È‚©‚Á‚½D", mon_nam(mtmp));
             else
+/*JP
                 You_feel("a bit silly gesturing the mirror in that direction.");
+*/
+                You_feel("‹¾‚ğ‚»‚Ì•ûŒü‚ÉŒü‚¯‚é‚Ì‚Í‚¿‚å‚Á‚Æ‚¨‚©‚µ‚Ès“®‚¾‚ÆŠ´‚¶‚½D");
             do_react = FALSE;
         }
         if (do_react) {

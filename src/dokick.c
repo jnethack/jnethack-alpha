@@ -1249,7 +1249,7 @@ dokick()
 /*JP
         You("splash some %s around.", hliquid("water"));
 */
-        You("%s‚ğ‰ñ‚è‚É‚Ü‚«‚¿‚ç‚µ‚½D", hliquid("water"));
+        You("%s‚ğ‰ñ‚è‚É‚Ü‚«‚¿‚ç‚µ‚½D", hliquid("…"));
         return 1;
     }
 

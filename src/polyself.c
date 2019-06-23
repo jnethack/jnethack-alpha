@@ -1288,7 +1288,10 @@ rehumanize()
 #endif
             done(DIED);
         } else if (uamul && uamul->otyp == AMULET_OF_UNCHANGING) {
+/*JP
             Your("%s %s!", simpleonames(uamul), otense(uamul, "fail"));
+*/
+            Your("%sÇ…é∏îsÇµÇΩÅI", simpleonames(uamul));
             uamul->dknown = 1;
             makeknown(AMULET_OF_UNCHANGING);
         }
@@ -1321,8 +1324,13 @@ rehumanize()
     vision_full_recalc = 1;
     (void) encumber_msg();
     if (was_flying && !Flying && u.usteed)
+#if 0 /*JP*/
         You("and %s return gently to the %s.",
             mon_nam(u.usteed), surface(u.ux, u.uy));
+#else
+        You("Ç∆%sÇÕ%sÇ…íÖínÇµÇΩÅD",
+            mon_nam(u.usteed), surface(u.ux, u.uy));
+#endif
     retouch_equipment(2);
     if (!uarmg)
         selftouch(no_longer_petrify_resistant);
@@ -2013,7 +2021,7 @@ struct monst *mon;
 int part;
 {
     static NEARDATA const char
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *humanoid_parts[] = { "arm",       "eye",  "face",         "finger",
                               "fingertip", "foot", "hand",         "handed",
                               "head",      "leg",  "light headed", "neck",
@@ -2027,7 +2035,7 @@ int part;
             "îwçú", "í‹êÊ", "îØ",  "åå",
             "îx", "ï@", "à›"},
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *jelly_parts[] = { "pseudopod", "dark spot", "front",
                            "pseudopod extension", "pseudopod extremity",
                            "pseudopod root", "grasp", "grasped",
@@ -2045,7 +2053,7 @@ int part;
             "îgñ‰", "ëÃât", "ï\ñ ", "ä¥äoäÌ",
             "à›"},
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *animal_parts[] = { "forelimb",  "eye",           "face",
                             "foreclaw",  "claw tip",      "rear claw",
                             "foreclaw",  "clawed",        "head",
@@ -2063,7 +2071,7 @@ int part;
             "åå", "îx", "ï@",
             "à›"},
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *bird_parts[] = { "wing",     "eye",  "face",         "wing",
                           "wing tip", "foot", "wing",         "winged",
                           "head",     "leg",  "light headed", "neck",
@@ -2077,7 +2085,7 @@ int part;
             "îwçú", "í‹êÊ", "âHñ—", "åå",
             "îx", "Ç≠ÇøÇŒÇµ", "à›" },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *horse_parts[] = { "foreleg",  "eye",           "face",
                            "forehoof", "hoof tip",      "rear hoof",
                            "forehoof", "hooved",        "head",
@@ -2095,7 +2103,7 @@ int part;
             "åå", "îx", "ï@",
             "à›" },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *sphere_parts[] = { "appendage", "optic nerve", "body", "tentacle",
                             "tentacle tip", "lower appendage", "tentacle",
                             "tentacled", "body", "lower tentacle",
@@ -2111,7 +2119,7 @@ int part;
             "â∫ÇÃêGéËÇÃêÊ", "ë@ñ—", "ê∂ñΩóÕ",
             "ñ‘ñå", "ökäoíÜêï", "ì‡ïî" },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *fungus_parts[] = { "mycelium", "visual area", "front",
                             "hypha",    "hypha",       "root",
                             "strand",   "stranded",    "cap area",
@@ -2129,7 +2137,7 @@ int part;
             "ëÃât", "Ç¶ÇÁ", "Ç¶ÇÁ",
             "ì‡ïî"},
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *vortex_parts[] = { "region",        "eye",           "front",
                             "minor current", "minor current", "lower current",
                             "swirl",         "swirled",       "central core",
@@ -2147,7 +2155,7 @@ int part;
             "ê∂ñΩóÕ", "íÜêS", "ëOâè",
             "ì‡ïî" },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *snake_parts[] = { "vestigial limb", "eye", "face", "large scale",
                            "large scale tip", "rear region", "scale gap",
                            "scale gapped", "head", "rear region",
@@ -2163,7 +2171,7 @@ int part;
             "óÿ", "åå", "îx", "ê„",
             "à›" },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *worm_parts[] = { "anterior segment", "light sensitive cell",
                           "clitellum", "setae", "setae", "posterior segment",
                           "segment", "segmented", "anterior segment",
@@ -2179,7 +2187,7 @@ int part;
             "ëÃ", "å„ïîÇÃäp", "äp", "åå",
             "îÁïÜ", "å˚ëOót", "à›" },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         *fish_parts[] = { "fin", "eye", "premaxillary", "pelvic axillary",
                           "pelvic fin", "anal fin", "pectoral fin", "finned",
                           "head", "peduncle", "played out", "gills",

@@ -316,7 +316,10 @@ boolean force;      /* Quietly force this animal */
            attempting to mount a tail segment when hero was not adjacent
            to worm's head could trigger an impossible() in worm_cross()
            called from test_move(), so handle not-on-head before that */
+/*JP
         You("couldn't ride %s, let alone its tail.", a_monnam(mtmp));
+*/
+        You("%sには乗れない，もちろん尻尾にも乗れない．", a_monnam(mtmp));
         return FALSE;
     }
     if (u.uswallow || u.ustuck || u.utrap || Punished
@@ -474,7 +477,10 @@ boolean force;      /* Quietly force this animal */
 */
         You("%sに乗った．", mon_nam(mtmp));
         if (Flying)
+/*JP
             You("and %s take flight together.", mon_nam(mtmp));
+*/
+            You("と%sは一緒に空を飛んだ．", mon_nam(mtmp));
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))

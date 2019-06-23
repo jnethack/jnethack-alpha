@@ -197,8 +197,13 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
             struct obj *obj;
 
             if (!Blind && Hallucination)
+#if 0 /*JP*/
                 pline("A %s %s appeared!",
                       mtmp->mtame ? "tame" : "wild", l_monnam(mtmp));
+#else
+                pline("%s%s‚ªŒ»‚ê‚½I",
+                      mtmp->mtame ? "è‚È‚Ã‚¯‚ç‚ê‚½" : "–ì¶‚Ì", l_monnam(mtmp));
+#endif
             else if (Blind || (is_pool(mtmp->mx, mtmp->my) && !Underwater))
 /*JP
                 pline("Wait!  There's a hidden monster there!");
@@ -480,7 +485,10 @@ register struct monst *mtmp;
         && (m_move(mtmp, 0) == 2 /* it died */
             || mtmp->mx != u.ux + u.dx
             || mtmp->my != u.uy + u.dy)) { /* it moved */
+/*JP
         You("miss wildly and stumble forwards.");
+*/
+        You("‘å‚«‚­ŠO‚µ‚Ä‘O‚É‚Â‚Ü‚Ã‚¢‚½D");
         return FALSE;
     }
 
@@ -1484,20 +1492,37 @@ int dieroll;
 
         if (canspotmon(mon)) {
             if (saved_oname[0]) {
+#if 0 /*JP*/
                 Sprintf(emitlightobjbuf,
                         "%s radiance penetrates deep into",
                         s_suffix(saved_oname));
                 Strcat(emitlightobjbuf, " %s!");
+#else
+                Sprintf(emitlightobjbuf,
+                        "%sŒõ‚ª%%s‚É[‚­ŠÑ’Ê‚µ‚½I",
+                        s_suffix(saved_oname));
+#endif
                 fmt = emitlightobjbuf;
             } else
+/*JP
                 fmt = "The light sears %s!";
+*/
+                fmt = "Œõ‚Í%s‚ğÄ‚¢‚½I";
         } else {
+#if 0 /*JP*/
             *whom = highc(*whom); /* "it" -> "It" */
+#endif
+/*JP
             fmt = "%s is seared!";
+*/
+            fmt = "%s‚ÍÄ‚©‚ê‚½I";
         }
         /* note: s_suffix returns a modifiable buffer */
         if (!noncorporeal(mdat) && !amorphous(mdat))
+/*JP
             whom = strcat(s_suffix(whom), " flesh");
+*/
+            whom = strcat(s_suffix(whom), "“÷");
         pline(fmt, whom);
     }
     /* if a "no longer poisoned" message is coming, it will be last;
@@ -1907,9 +1932,15 @@ int specialdmg; /* blessed and/or silver bonus against various things */
 */
                 pline("%s‚ÍŠ®‘S‚É”R‚¦s‚«‚½I", Monnam(mdef));
             else
+#if 0 /*JP*/
                 You("smell burning%s.",
                     (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
                       : (pd == &mons[PM_STRAW_GOLEM]) ? " straw" : "");
+#else
+                You("%s‚ª”R‚¦‚é‚É‚¨‚¢‚ª‚µ‚½D",
+                    (pd == &mons[PM_PAPER_GOLEM]) ? "†"
+                      : (pd == &mons[PM_STRAW_GOLEM]) ? "‚í‚ç" : "‰½‚©");
+#endif
             xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
             tmp = 0;
             break;
@@ -2881,7 +2912,9 @@ register struct monst *mon;
             if (dhit) {
                 int compat, specialdmg;
                 long silverhit = 0L;
+#if 0 /*JP*//* ‚·‚×‚ÄuUŒ‚‚µ‚½v‚É‚·‚é */
                 const char *verb = 0; /* verb or body part */
+#endif
 
                 if (!u.uswallow
                     && (compat = could_seduce(&youmonst, mon, mattk)) != 0) {
@@ -2909,7 +2942,9 @@ register struct monst *mon;
                 case AT_CLAW:
                 case AT_TUCH:
                     /* verb=="claws" may be overridden below */
+#if 0 /*JP*/
                     verb = (mattk->aatyp == AT_TUCH) ? "touch" : "claws";
+#endif
                     /* decide if silver-hater will be hit by silver ring(s);
                        for 'multi_claw' where attacks alternate right/left,
                        assume 'even' claw or touch attacks use right hand
@@ -2930,35 +2965,49 @@ register struct monst *mon;
                 case AT_TENT:
                     /* assumes mind flayer's tentacles-on-head rather
                        than sea monster's tentacle-as-arm */
+#if 0 /*JP*/
                     verb = "tentacles";
+#endif
                     break;
                 case AT_KICK:
+#if 0 /*JP*/
                     verb = "kick";
+#endif
                     specialdmg = special_dmgval(&youmonst, mon, W_ARMF,
                                                 &silverhit);
                     break;
                 case AT_BUTT:
+#if 0 /*JP*/
                     verb = "head butt"; /* mbodypart(mon,HEAD)=="head" */
                     /* hypothetical; if any form with a head-butt attack
                        could wear a helmet, it would hit shades when
                        wearing a blessed (or silver) one */
+#endif
                     specialdmg = special_dmgval(&youmonst, mon, W_ARMH,
                                                 &silverhit);
                     break;
                 case AT_BITE:
+#if 0 /*JP*/
                     verb = "bite";
+#endif
                     break;
                 case AT_STNG:
+#if 0 /*JP*/
                     verb = "sting";
+#endif
                     break;
                 default:
+#if 0 /*JP*/
                     verb = "hit";
+#endif
                     break;
                 }
                 if (mon->data == &mons[PM_SHADE] && !specialdmg) {
+#if 0 /*JP*/
                     if (!strcmp(verb, "hit")
                         || (mattk->aatyp == AT_CLAW && humanoid(mon->data)))
                         verb = "attack";
+#endif
 #if 0 /*JP*/
                     Your("%s %s harmlessly through %s.",
                          verb, vtense(verb, "pass"), mon_nam(mon));
@@ -2973,9 +3022,15 @@ register struct monst *mon;
 */
                     Your("Gè‚ª%s‚Ì‘Ì‰t‚ğ‹z‚¢‚Æ‚Á‚½D", mon_nam(mon));
                     } else {
+#if 0 /*JP*/
                         if (mattk->aatyp == AT_CLAW)
                             verb = "hit"; /* not "claws" */
+#endif
+#if 0 /*JP*/
                         You("%s %s.", verb, mon_nam(mon));
+#else
+                        You("%s‚ğUŒ‚‚µ‚½D", mon_nam(mon));
+#endif
                         if (silverhit && flags.verbose)
                             silver_sears(&youmonst, mon, silverhit);
                     }
@@ -3033,13 +3088,19 @@ register struct monst *mon;
                     unconcerned = FALSE;
             }
             if (mon->data == &mons[PM_SHADE]) {
+#if 0 /*JP*/
                 const char *verb = byhand ? "grasp" : "hug";
+#endif
 
                 /* hugging a shade; successful if blessed outermost armor
                    for normal hug, or blessed gloves or silver ring(s) for
                    choking hug; deals damage but never grabs hold */
                 if (specialdmg) {
+#if 0 /*JP*/
                     You("%s %s%s", verb, mon_nam(mon), exclam(specialdmg));
+#else
+                    You("%s‚ğ‚Â‚©‚ñ‚¾%s", mon_nam(mon), exclam(specialdmg));
+#endif
                     if (silverhit && flags.verbose)
                         silver_sears(&youmonst, mon, silverhit);
                     sum[i] = damageum(mon, mattk, specialdmg);
@@ -3308,7 +3369,7 @@ boolean wep_was_destroyed;
 /*JP
             pline("A hail of magic missiles narrowly misses you!");
 */
-            pline("–‚–@‚Ì–î‚Ì‰J‚ğ‚È‚ñ‚Æ‚©‚©‚í‚µ‚½I");
+            pline("–‚–@‚Ì–î‚Ì‰J‚ª‚©‚·‚ß‚Ä‚¢‚Á‚½I");
         } else {
 /*JP
             You("are hit by magic missiles appearing from thin air!");

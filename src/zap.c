@@ -2123,11 +2123,19 @@ struct obj *obj, *otmp;
                     /* we don't want to force alive vs dead
                        determination for Schroedinger's Cat here,
                        so just make probing be inconclusive for it */
+#if 0 /*JP*/
                     You("aren't sure whether %s has %s or its corpse inside.",
                         the(xname(obj)),
                         /* unfortunately, we can't tell whether rndmonnam()
                            picks a form which can't leave a corpse */
                         an(Hallucination ? rndmonnam((char *) 0) : "cat"));
+#else
+                    pline("%sに%sが入っているのかその死体が入っているのかわからない．",
+                        xname(obj),
+                        /* unfortunately, we can't tell whether rndmonnam()
+                           picks a form which can't leave a corpse */
+                        Hallucination ? rndmonnam((char *) 0) : "猫");
+#endif
                     obj->cknown = 0;
                 } else {
                     struct obj *o;
@@ -2227,8 +2235,13 @@ struct obj *obj, *otmp;
                 } else {
                     if (cansee(ox, oy)) {
                         if (canspotmon(mtmp)) {
+#if 0 /*JP*/
                             pline("%s is resurrected!",
                                   upstart(noname_monnam(mtmp, ARTICLE_THE)));
+#else
+                            pline("%sは生き返った！",
+                                  upstart(noname_monnam(mtmp, ARTICLE_THE)));
+#endif
                             learn_it = TRUE;
                         } else {
                             /* saw corpse but don't see monster: maybe
@@ -2236,7 +2249,10 @@ struct obj *obj, *otmp;
                                a different spot than <ox,oy> */
                             if (!type_is_pname(&mons[corpsenm]))
                                 corpsname = The(corpsname);
+/*JP
                             pline("%s disappears.", corpsname);
+*/
+                            pline("%sは消えた．", corpsname);
                         }
                     } else {
                         /* couldn't see corpse's location */
@@ -2245,7 +2261,10 @@ struct obj *obj, *otmp;
                             if (!type_is_pname(&mons[corpsenm]))
                                 corpsname = an(corpsname);
                             if (!Hallucination)
+/*JP
                                 You_hear("%s reviving.", corpsname);
+*/
+                                You_hear("%sが生き返る音を聞いた．", corpsname);
                             else
 /*JP
                                 You_hear("a defibrillator.");
@@ -3093,7 +3112,11 @@ boolean youattack, allow_cancel_kill, self_cancel;
                 if (!Blind)
                     pline(writing_vanishes, your);
                 else /* note: "dark" rather than "heavy" is intentional... */
+#if 0 /*JP*/
                     You_feel("%s headed.", Hallucination ? "dark" : "light");
+#else /*いい訳語を思いつかないので幻覚でメッセージを変えない */
+                    You_feel("軽はずみだった気がした．");
+#endif
                 u.mh = 0; /* fatal; death handled by rehumanize() */
             }
             if (Unchanging && u.mh > 0)
@@ -5626,9 +5649,11 @@ int osym, dmgtyp;
         pline("%s %s %s!", mult, xname(obj),
               destroy_strings[dindx][(cnt > 1L)]);
 #else
-        mult = (cnt == quan)
-                ? ""
-                : (cnt == 1L) ? "のひとつ" : "のいくつか";
+        mult = (cnt == 1L)
+                ? ((quan == 1L) ? ""                             /* 1 of 1 */
+                                : "のひとつ")                    /* 1 of N */
+                : ((cnt < quan) ? "のいくつか"                   /* n of N */
+                                : "の全て");                     /* N of N */
         pline("あなたの%s%sは%s！", xname(obj), mult, 
               destroy_strings[dindx][(cnt > 1L)]);
 #endif

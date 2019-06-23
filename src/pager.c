@@ -1684,6 +1684,7 @@ boolean do_mons; /* True => monsters, False => objects */
 }
 
 static const char *suptext1[] = {
+#if 0 /*JP:T*/
     "%s is a member of a marauding horde of orcs",
     "rumored to have brutally attacked and plundered",
     "the ordinarily sheltered town that is located ",
@@ -1693,9 +1694,19 @@ static const char *suptext1[] = {
     "defiantly acclaim their allegiance to their",
     "leader %s in their names.",
     (char *) 0,
+#else
+    "%sは，ノームの鉱山の奥に位置している",
+    "通常通り防御していた街を容赦なく攻撃して",
+    "略奪したと噂される，オークの襲撃集団の一員である．",
+    "",
+    "その悪質な集団のメンバーは，そのリーダーである%sの名の下に",
+    "誇らしげかつ挑戦的にその忠誠を称賛している．",
+    (char *) 0,
+#endif
 };
 
 static const char *suptext2[] = {
+#if 0 /*JP:T*/
     "\"%s\" is the common dungeon name of",
     "a nefarious orc who is known to acquire property",
     "from thieves and sell it off for profit.",
@@ -1703,6 +1714,15 @@ static const char *suptext2[] = {
     "The perpetrator was last seen hanging around the",
     "stairs leading to the Gnomish Mines.",
     (char *) 0,
+#else
+    "\"%s\" は，盗賊から物品を入手して",
+    "利益を得るために売りさばくことで知られている",
+    "無法なオークの一般的な迷宮名である．",
+    "",
+    "犯人が最後に目撃されたのは",
+    "ノームの炭鉱へ続く階段の近くである．",
+    (char *) 0,
+#endif
 };
 
 void
@@ -1803,7 +1823,10 @@ doidtrap()
         boolean chesttrap = trapped_chest_at(tt, x, y);
 
         if (chesttrap || trapped_door_at(tt, x, y)) {
+/*JP
             pline("That is a trapped %s.", chesttrap ? "chest" : "door");
+*/
+            pline("それは罠が仕掛けられた%sだ．", chesttrap ? "箱" : "扉");
             return 0; /* trap ID'd, but no time elapses */
         }
     }
@@ -2132,11 +2155,19 @@ dowhatdoes()
     char q, *reslt;
 
     if (!once) {
+#if 0 /*JP*/
         pline("Ask about '&' or '?' to get more info.%s",
 #ifdef ALTMETA
               iflags.altmeta ? "  (For ESC, type it twice.)" :
 #endif
               "");
+#else
+        pline("さらなる情報については '&' か '?' についてたずねます．%s",
+#ifdef ALTMETA
+              iflags.altmeta ? "  (ESCについては，2回タイプします．)" :
+#endif
+              "");
+#endif
         once = TRUE;
     }
 #if defined(UNIX) || defined(VMS)

@@ -2190,7 +2190,10 @@ char *outbuf;
 
     if (turnsleft < 1L) {
         /* spell has expired; hero can't successfully cast it anymore */
+/*JP
         Strcpy(outbuf, "(gone)");
+*/
+        Strcpy(outbuf, "(–Y‹p)");
     } else if (turnsleft >= (long) KEEN) {
         /* full retention, first turn or immediately after reading book */
         Strcpy(outbuf, "100%");

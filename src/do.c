@@ -229,10 +229,17 @@ const char *verb;
                         mtmp->mhp -= damage;
                         if (DEADMONSTER(mtmp)) {
                             if (canspotmon(mtmp))
+#if 0 /*JP*/
                                 pline("%s is %s!", Monnam(mtmp),
                                       (nonliving(mtmp->data)
                                        || is_vampshifter(mtmp))
                                       ? "destroyed" : "killed");
+#else
+                                pline("%sは%s！", Monnam(mtmp),
+                                      (nonliving(mtmp->data)
+                                       || is_vampshifter(mtmp))
+                                      ? "倒された" : "殺された");
+#endif
                             mondied(mtmp);
                         }
                     } else {
@@ -1331,20 +1338,41 @@ dodown()
 
     if (trap) {
         const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
+#if 0 /*JP*/
         const char *actn = Flying ? "fly" : locomotion(youmonst.data, "jump");
+#else
+        const char *actn = "";
+#endif
 
         if (youmonst.data->msize >= MZ_HUGE) {
             char qbuf[QBUFSZ];
 
+#if 0 /*JP*/
             You("don't fit %s easily.", down_or_thru);
             Sprintf(qbuf, "Try to squeeze %s?", down_or_thru);
+#else
+            pline("ここは狭くて簡単には通り抜けられない．");
+            Sprintf(qbuf, "体を押し込みますか?");
+#endif
             if (yn(qbuf) == 'y') {
                 if (!rn2(3)) {
+#if 0 /*JP*/
                     actn = "manage to squeeze";
+#else
+                    actn = "なんとか";
+#endif
+#if 0 /*JP*/
                     losehp(Maybe_Half_Phys(rnd(4)),
                            "contusion from a small passage", KILLED_BY);
+#else
+                    losehp(Maybe_Half_Phys(rnd(4)),
+                           "狭い道での打ち身で", KILLED_BY);
+#endif
                 } else {
+/*JP
                     You("were unable to fit %s.", down_or_thru);
+*/
+                    You("通り抜けられない．");
                     return 0;
                 }
             } else {
@@ -1355,7 +1383,7 @@ dodown()
         You("%s %s the %s.", actn, down_or_thru,
             trap->ttyp == HOLE ? "hole" : "trap door");
 #else
-        You("%s．",
+        You("%s%s．", actn,
             trap->ttyp == HOLE ? "穴を降りた" : "落し扉を通り抜けた");
 #endif
     }

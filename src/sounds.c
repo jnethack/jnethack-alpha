@@ -183,21 +183,21 @@ dosounds()
 /*JP
                     You_hear("a low buzzing.");
 */
-                        You_hear("ぶーんという音を聞いた．");
+                    You_hear("ぶーんという音を聞いた．");
                     break;
                 case 1:
 /*JP
                     You_hear("an angry drone.");
 */
-                        You_hear("興奮した雄バチの音を聞いた．");
+                    You_hear("興奮した雄バチの音を聞いた．");
                     break;
                 case 2:
 #if 0 /*JP*/
                     You_hear("bees in your %sbonnet!",
                              uarmh ? "" : "(nonexistent) ");
 #else
-                        You_hear("ハチがあなたの帽子%sの中にいる音を聞いた！",
-                            uarmh ? "" : "(被ってないけど)");
+                    You_hear("ハチがあなたの帽子%sの中にいる音を聞いた！",
+                             uarmh ? "" : "(被ってないけど)");
 #endif
                     break;
                 }

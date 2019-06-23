@@ -852,10 +852,16 @@ int x, y;
             (void) drown();
             return FALSE;
         } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
+/*JP
             Norep("You move over %s.", an(is_moat(x, y) ? "moat" : "pool"));
+*/
+            Norep("‚ ‚È‚½‚Í%s‚Ìã‚ğˆÚ“®‚µ‚½D", is_moat(x, y) ? "–x" : "…‚½‚Ü‚è");
        }
     } else if (is_lava(x, y) && !stopping_short) {
+/*JP
         Norep("You move over some lava.");
+*/
+        Norep("‚ ‚È‚½‚Í—nŠâ‚Ìã‚ğˆÚ“®‚µ‚½D");
     }
 
     /* FIXME:
@@ -1513,7 +1519,10 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
     } else if (u.uswallow) {
         if (tethered_weapon) {
             tmp_at(DISP_END, 0);
+/*JP
             pline("%s returns to your hand!", The(xname(thrownobj)));
+*/
+            pline("%s‚Í‚ ‚È‚½‚Ìè‚É–ß‚Á‚Ä‚«‚½I", The(xname(thrownobj)));
             thrownobj = addinv(thrownobj);
             (void) encumber_msg();
             /* in case addinv() autoquivered */
