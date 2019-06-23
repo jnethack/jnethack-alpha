@@ -608,6 +608,7 @@ winos_ascii_to_wide(const unsigned char c)
     return cp437[c];
 }
 
+#if 0 /*JP*/
 BOOL winos_font_support_cp437(HFONT hFont)
 {
     BOOL allFound = FALSE;
@@ -643,6 +644,7 @@ BOOL winos_font_support_cp437(HFONT hFont)
 
     return allFound;
 }
+#endif
 
 int
 windows_early_options(window_opt)

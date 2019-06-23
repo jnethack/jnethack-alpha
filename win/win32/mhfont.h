@@ -15,12 +15,16 @@
 typedef struct cached_font {
     int code;
     HFONT hFont;
+#if 0 /*JP*/
     BOOL supportsUnicode;
+#endif
     int width;
     int height;
 } cached_font;
 
+#if 0 /*JP*/
 BOOL mswin_font_supports_unicode(HFONT hFont);
+#endif
 cached_font * mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace);
 HFONT mswin_create_splashfont(HWND hWnd);
 UINT mswin_charset(void);

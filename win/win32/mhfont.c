@@ -45,6 +45,7 @@ mswin_create_splashfont(HWND hWnd)
     return font;
 }
 
+#if 0 /*JP*/
 BOOL 
 mswin_font_supports_unicode(HFONT hFont)
 {
@@ -54,6 +55,7 @@ mswin_font_supports_unicode(HFONT hFont)
 
     return FALSE;
 }
+#endif
 
 /* create font based on window type, charater attributes and
    window device context */
@@ -203,7 +205,9 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 
     font_table[font_index].code = NHFONT_CODE(win_type, attr);
     font_table[font_index].hFont = fnt;
+#if 0 /*JP*/
     font_table[font_index].supportsUnicode = winos_font_support_cp437(fnt);
+#endif
 
     HGDIOBJ savedFont = SelectObject(hdc, fnt);
     SIZE size;

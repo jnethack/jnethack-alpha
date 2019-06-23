@@ -92,7 +92,9 @@ int FDECL(process_keystroke,
 static void NDECL(init_ttycolor);
 static void NDECL(really_move_cursor);
 static void NDECL(check_and_set_font);
+#if 0 /*JP*/
 static boolean NDECL(check_font_widths);
+#endif
 static void NDECL(set_known_good_console_font);
 static void NDECL(restore_original_console_font);
 extern void NDECL(safe_routines);
@@ -713,7 +715,11 @@ char ch;
                                 BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
 
         cell.attribute = console.attr;
+#if 0 /*JP*/
         cell.character = (console.has_unicode ? console.cpMap[ch] : ch);
+#else
+        cell.character = ch;
+#endif
 #if 1 /*JP*//*常に1バイト文字*/
         cell.iskanji = 0;
 #endif
@@ -758,7 +764,11 @@ int in_ch;
     cell_t cell;
 
     cell.attribute = console.attr;
+#if 0 /*JP*/
     cell.character = (console.has_unicode ? cp437[ch] : ch);
+#else
+    cell.character = ch;
+#endif
 #if 1 /*JP*//*常に1バイト文字*/
     cell.iskanji = 0;
 #endif
@@ -1660,6 +1670,7 @@ check_and_set_font()
 #endif
 }
 
+#if 0 /*JP*/
 /* check_font_widths returns TRUE if all glyphs in current console font
  * fit within the width of a single console cell.
  */
@@ -1759,6 +1770,7 @@ clean_up:
 
     return all_glyphs_fit;
 }
+#endif
 
 /* set_known_good_console_font sets the code page and font used by the console
  * to settings know to work well with NetHack.  It also saves the original
@@ -1810,6 +1822,7 @@ restore_original_console_font()
     }
 }
 
+#if 0 /*JP*/
 /* set_cp_map() creates a mapping of every possible character of a code
  * page to its corresponding WCHAR.  This is necessary due to the high
  * cost of making calls to MultiByteToWideChar() for every character we
@@ -1840,6 +1853,7 @@ void set_cp_map()
 
     }
 }
+#endif
 
 #if 0
 /* early_raw_print() is used during early game intialization prior to the
@@ -2002,7 +2016,9 @@ void nethack_enter_nttty()
 
     /* check the font before we capture the code page map */
     check_and_set_font();
+#if 0 /*JP*/
     set_cp_map();
+#endif
 
     /* Set console mode */
     DWORD cmode, mask;
