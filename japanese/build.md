@@ -6,7 +6,7 @@ NetHack‚ÉJNetHack‚Ìƒpƒbƒ`‚ğ“–‚Ä‚½ó‘ÔA‚ ‚é‚¢‚ÍgitƒŒƒ|ƒWƒgƒŠ‚©‚çclone‚µ‚½ó‘Ô‚©‚
 
 ## Windows
 
-VisualStudio 2015‚É‘Î‰‚µ‚Ä‚¢‚Ü‚·BuŠJ”­ÒƒRƒ}ƒ“ƒh ƒvƒƒ“ƒvƒg for VS2015v‚©‚çÀs‚µ‚Ü‚·B
+VisualStudio 2017‚É‘Î‰‚µ‚Ä‚¢‚Ü‚·BuŠJ”­ÒƒRƒ}ƒ“ƒh ƒvƒƒ“ƒvƒg for VS2017v‚©‚çÀs‚µ‚Ü‚·B
 
 ```
 sys/winnt/setup.bat
@@ -27,7 +27,7 @@ make install
 
 NetHack‚Ìƒrƒ‹ƒhŠÂ‹«‚É‰Á‚¦‚Ä `GCC@5ˆÈã`, `nkf` ‚ª•K—v‚Å‚·BXCode‚ÉŠÜ‚Ü‚ê‚Ä‚¢‚é`gcc`‚Å‚Íƒrƒ‹ƒh‚Å‚«‚Ü‚¹‚ñ‚Ì‚ÅAhomebrew‚ÅƒCƒ“ƒXƒg[ƒ‹‚µ‚Ä‚­‚¾‚³‚¢B
 
-İ’èƒtƒ@ƒCƒ‹‚ÍGCC@5‚ğ‘O’ñ‚Æ‚µ‚Ä‘‚©‚ê‚Ä‚¢‚Ü‚·B6ˆÈã‚Å‚àƒrƒ‹ƒh‚Å‚«‚Ü‚·‚ªA`sys/unix/hints` ‚Æ `japanese/set_mac.sh` ‚ÌC³‚ª•K—v‚Å‚·B
+İ’èƒtƒ@ƒCƒ‹‚ÍGCC@8‚ğ‘O’ñ‚Æ‚µ‚Ä‘‚©‚ê‚Ä‚¢‚Ü‚·B‚»‚êˆÈŠO‚Ìƒo[ƒWƒ‡ƒ“‚Ìê‡‚Í`sys/unix/hints` ‚Æ `japanese/set_mac.sh` ‚ÌC³‚ª•K—v‚Å‚·B
 
 ```
 sh japanese/set_mac.sh
