@@ -1456,14 +1456,15 @@ int dieroll;
                 Sprintf(silverobjbuf, "Your %s%s %s",
                         strstri(saved_oname, "silver") ? "" : "silver ",
                         saved_oname, vtense(saved_oname, "sear"));
+                (void) strNsubst(silverobjbuf, "%", "%%", 0);
+                Strcat(silverobjbuf, " %s!");
 #else
                 Sprintf(silverobjbuf, "%%sÇÕ%s%sÇ≈èƒÇ©ÇÍÇΩÅI",
                         strstri(saved_oname, "ã‚") ?
                         "" : "ã‚ÇÃ",
                         saved_oname);
+                (void) strNsubst(silverobjbuf, "%%", "%", 0);
 #endif
-                (void) strNsubst(silverobjbuf, "%", "%%", 0);
-                Strcat(silverobjbuf, " %s!");
                 fmt = silverobjbuf;
             } else
 /*JP
