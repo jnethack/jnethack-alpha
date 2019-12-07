@@ -795,9 +795,9 @@ struct obj *obj; /* only scatter this obj        */
             if (otmp->otyp == BOULDER) {
                 if (cansee(sx, sy))
 /*JP
-                pline("%s apart.", Tobjnam(otmp, "break"));
+                    pline("%s apart.", Tobjnam(otmp, "break"));
 */
-                pline("%sは一部分が砕けた．",xname(otmp));
+                    pline("%sは一部分が砕けた．",xname(otmp));
                 else
 /*JP
                     You_hear("stone breaking.");
@@ -817,9 +817,9 @@ struct obj *obj; /* only scatter this obj        */
                     deltrap(trap);
                 if (cansee(sx, sy))
 /*JP
-                pline("%s.", Tobjnam(otmp, "crumble"));
+                    pline("%s.", Tobjnam(otmp, "crumble"));
 */
-                pline("%sはこなごなになった．",xname(otmp));
+                    pline("%sはこなごなになった．",xname(otmp));
                 else
 /*JP
                     You_hear("stone crumbling.");

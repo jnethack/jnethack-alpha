@@ -644,9 +644,9 @@ char *enterstring;
         pline("%sはあなたの存在に気がついた．", Shknam(shkp));
         if (!Deaf && !muteshk(shkp))
 /*JP
-        verbalize("Invisible customers are not welcome!");
+            verbalize("Invisible customers are not welcome!");
 */
-        verbalize("透明なお客さんとは感心しないな！");
+            verbalize("透明なお客さんとは感心しないな！");
         else
 #if 0 /*JP:T*/
             pline("%s stands firm as if %s knows you are there.",
@@ -2705,9 +2705,9 @@ boolean quietly;
 #endif
                 } else {
 /*JP
-                verbalize("No thanks, I'd hang onto that if I were you.");
+                    verbalize("No thanks, I'd hang onto that if I were you.");
 */
-                verbalize("いや，いらない．私ならそれを手放さないね．");
+                    verbalize("いや，いらない．私ならそれを手放さないね．");
                     if (obj->spe < 7)
 #if 0 /*JP:T*/
                         verbalize(
@@ -2725,9 +2725,9 @@ boolean quietly;
             } else {
                 if (!Deaf && !muteshk(shkp))
 /*JP
-                verbalize("I won't stock that.  Take it out of here!");
+                    verbalize("I won't stock that.  Take it out of here!");
 */
-                verbalize("それは仕入れないよ．持っていきなさい！");
+                    verbalize("それは仕入れないよ．持っていきなさい！");
                 else
 #if 0 /*JP:T*/
                     pline("%s shakes %s %s in refusal.",
@@ -4895,13 +4895,13 @@ boolean cant_mollify;
             if (!animal) {
                 if (!Deaf && !muteshk(shkp)) {
 /*JP
-                You_hear("an angry voice:");
+                    You_hear("an angry voice:");
 */
-                You("怒りの声を聞いた：");
+                    You("怒りの声を聞いた：");
 /*JP
-                verbalize("Out of my way, scum!");
+                    verbalize("Out of my way, scum!");
 */
-                verbalize("どけ！クソったれ！");
+                    verbalize("どけ！クソったれ！");
                 }
                 wait_synch();
 #if defined(UNIX) || defined(VMS)
@@ -5008,9 +5008,9 @@ boolean cant_mollify;
         if (!animal) {
             if (!Deaf && !muteshk(shkp))
 /*JP
-            verbalize("Oh, yes!  You'll pay!");
+                verbalize("Oh, yes!  You'll pay!");
 */
-            verbalize("さあ，払うんだ！");
+                verbalize("さあ，払うんだ！");
             else
 #if 0 /*JP*/
                 pline("%s lunges %s %s toward your %s!",

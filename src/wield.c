@@ -727,9 +727,9 @@ const char *verb; /* "rub",&c */
             (void) ready_weapon(obj);
         } else {
 /*JP
-        You("now wield %s.", doname(obj));
+            You("now wield %s.", doname(obj));
 */
-        You("%s‚ğ‘•”õ‚µ‚½D", doname(obj));
+            You("%s‚ğ‘•”õ‚µ‚½D", doname(obj));
             setuwep(obj);
         }
         if (flags.pushweapon && oldwep && uwep != oldwep)

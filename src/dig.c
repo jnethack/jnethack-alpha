@@ -2044,9 +2044,9 @@ char *msg;
     struct rm *room;
     const char *foundation_msg =
 /*JP
-        "The foundation is too hard to dig through from this angle.";
+                 "The foundation is too hard to dig through from this angle.";
 */
-        "Šî‘b‚Í‚±‚ÌŠp“x‚©‚çŒ@‚é‚É‚ÍŒÅ‚·‚¬‚éD";
+                 "Šî‘b‚Í‚±‚ÌŠp“x‚©‚çŒ@‚é‚É‚ÍŒÅ‚·‚¬‚éD";
 
     if (!cc)
         return FALSE;

@@ -4006,9 +4006,9 @@ vomit() /* A good idea from David Neves */
     if (multi >= -2) {
         nomul(-2);
 /*JP
-    multi_reason = "vomiting";
+        multi_reason = "vomiting";
 */
-    multi_reason = "šq“f‚µ‚Ä‚¢‚éÅ’†‚É";
+        multi_reason = "šq“f‚µ‚Ä‚¢‚éÅ’†‚É";
         nomovemsg = You_can_move_again;
     }
 }

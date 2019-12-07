@@ -708,12 +708,17 @@ boolean break_the_rules; /* True: wizard mode ^T */
             castit = (sp_no < MAXSPELL && !Confusion);
             if (!castit && !break_the_rules) {
 #if 0 /*JP*/
+                You("%s.",
+                    !Teleportation ? ((sp_no < MAXSPELL)
+                                        ? "can't cast that spell"
+                                        : "don't know that spell")
+                                   : "are not able to teleport at will");
+#else
                 You("%sD",
                     !Teleportation ? ((sp_no < MAXSPELL)
                                         ? "‚»‚Ì–‚–@‚Í¥‚¦‚ç‚ê‚È‚¢"
                                         : "‚»‚ñ‚È–‚–@‚Í’m‚ç‚È‚¢")
                                    : "Ž©•ª‚ÌˆÓŽv‚ÅuŠÔˆÚ“®‚Å‚«‚È‚¢");
-#else
 #endif
                 return 0;
             }
@@ -1564,9 +1569,9 @@ int in_sight;
                 if (nlev == depth(&u.uz)) {
                     if (in_sight)
 /*JP
-                    pline("%s shudders for a moment.", Monnam(mtmp));
+                        pline("%s shudders for a moment.", Monnam(mtmp));
 */
-                    pline("%s‚Íˆêuk‚¦‚½D", Monnam(mtmp));
+                        pline("%s‚Íˆêuk‚¦‚½D", Monnam(mtmp));
                     return 0;
                 }
                 get_level(&tolevel, nlev);

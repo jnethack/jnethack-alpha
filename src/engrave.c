@@ -1160,9 +1160,9 @@ doengrave()
         make_engr_at(u.ux, u.uy, buf, moves, type);
         if (!Blind)
 /*JP
-        pline_The("engraving now reads: \"%s\".", buf);
+            pline_The("engraving now reads: \"%s\".", buf);
 */
-        pline("刻まれた文字を読んだ：「%s」．", buf);
+            pline("刻まれた文字を読んだ：「%s」．", buf);
         ptext = FALSE;
     }
     if (zapwand && (otmp->spe < 0)) {

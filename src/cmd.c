@@ -2321,9 +2321,9 @@ int final;
     } else {
         /* 'turns' grates on the nerves in this context... */
 /*JP
-    Sprintf(buf, "the dungeon %ld turn%s ago", moves, plur(moves));
+        Sprintf(buf, "the dungeon %ld turn%s ago", moves, plur(moves));
 */
-    Sprintf(buf, "%ldターン前に迷宮に入った", moves);
+        Sprintf(buf, "%ldターン前に迷宮に入った", moves);
         /* same phrasing for current and final: "entered" is unconditional */
 #if 0 /*JP*/
         enlght_line(You_, "entered ", buf, "");
@@ -6326,9 +6326,9 @@ retry:
                                     NHKF_ESC,
                                     help_requested ? (const char *) 0
 /*JP
-                                            : "Invalid direction key!");
+                                                  : "Invalid direction key!");
 */
-                                            : "無効な方向指定です！");
+                                                  : "無効な方向指定です！");
                 if (help_requested)
                     goto retry;
             }
@@ -7256,13 +7256,13 @@ dotravel(VOID_ARGS)
         iflags.getloc_filter = gf;
     } else {
 /*JP
-    pline("Where do you want to travel to?");
+        pline("Where do you want to travel to?");
 */
-    pline("どこに移動する？");
+        pline("どこに移動する？");
 /*JP
-    if (getpos(&cc, TRUE, "the desired destination") < 0) {
+        if (getpos(&cc, TRUE, "the desired destination") < 0) {
 */
-    if (getpos(&cc, TRUE, "移動先") < 0) {
+        if (getpos(&cc, TRUE, "移動先") < 0) {
             /* user pressed ESC */
             iflags.getloc_travelmode = FALSE;
             return 0;

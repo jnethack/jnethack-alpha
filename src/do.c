@@ -633,9 +633,9 @@ register struct obj *obj;
         /* give message even if blind; we know we're not levitating,
            so can feel the outcome even if we can't directly see it */
 /*JP
-            pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
+        pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
 */
-            pline_The("—¬‚µ‘ä‚Í%sÁ‚¦‚½D", nosink ? "" : "ˆêu");
+        pline_The("—¬‚µ‘ä‚Í%sÁ‚¦‚½D", nosink ? "" : "ˆêu");
         ideed = FALSE;
         break;
     case RIN_POLYMORPH:
@@ -737,9 +737,9 @@ register struct obj *obj;
         case RIN_POLYMORPH_CONTROL:
             pline_The(
 /*JP
-                "sink momentarily looks like a regularly erupting geyser.");
+                  "sink momentarily looks like a regularly erupting geyser.");
 */
-                "—¬‚µ‘ä‚Íˆêu‹K‘¥³‚µ‚­•¬o‚·‚éŠÔŒ‡ò‚Ì‚æ‚¤‚ÉŒ©‚¦‚½D");
+                  "—¬‚µ‘ä‚Íˆêu‹K‘¥³‚µ‚­•¬o‚·‚éŠÔŒ‡ò‚Ì‚æ‚¤‚ÉŒ©‚¦‚½D");
             break;
         default:
             break;

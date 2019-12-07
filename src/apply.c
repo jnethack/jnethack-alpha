@@ -627,9 +627,9 @@ struct obj *obj;
 #endif
         else
 /*JP
-        You(whistle_str, obj->cursed ? "shrill" : "high");
+            You(whistle_str, obj->cursed ? "shrill" : "high");
 */
-        You(whistle_str, obj->cursed ? "•s‹C–¡‚È" : "‚©‚ñ‚‚¢");
+            You(whistle_str, obj->cursed ? "•s‹C–¡‚È" : "‚©‚ñ‚‚¢");
         wake_nearby();
         if (obj->cursed)
             vault_summon_gd();
@@ -912,9 +912,9 @@ struct obj *obj;
         /* applying a leash which is currently in use */
         if (obj->leashmon != (int) mtmp->m_id) {
 /*JP
-        pline("This leash is not attached to that creature.");
+            pline("This leash is not attached to that creature.");
 */
-        pline("‚±‚Ì•R‚Í‚»‚ê‚É‚ÍŒ‹‚Î‚ê‚Ä‚¢‚È‚¢D");
+            pline("‚±‚Ì•R‚Í‚»‚ê‚É‚ÍŒ‹‚Î‚ê‚Ä‚¢‚È‚¢D");
         } else if (obj->cursed) {
 /*JP
             pline_The("leash would not come off!");
@@ -1341,9 +1341,9 @@ struct obj *obj;
         if (do_react) {
             if (vis)
 /*JP
-            pline("%s is frightened by its reflection.", Monnam(mtmp));
+                pline("%s is frightened by its reflection.", Monnam(mtmp));
 */
-            pline("%s‚Í©•ª‚Ìp‚ğŒ©‚Ä•|‚ª‚Á‚½D", Monnam(mtmp));
+                pline("%s‚Í©•ª‚Ìp‚ğŒ©‚Ä•|‚ª‚Á‚½D", Monnam(mtmp));
             monflee(mtmp, d(2, 4), FALSE, FALSE);
         }
     } else if (!Blind) {

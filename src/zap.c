@@ -5674,18 +5674,18 @@ int osym, dmgtyp;
         if (dmg) {
             if (xresist) {
 /*JP
-                    You("aren't hurt!");
+                You("aren't hurt!");
 */
-                    You("傷つかない！");
+                You("傷つかない！");
             } else {
                 const char *how = destroy_strings[dindx][2];
                 boolean one = (cnt == 1L);
 
                 if (dmgtyp == AD_FIRE && osym == FOOD_CLASS)
 /*JP
-                        how = "exploding glob of slime";
+                    how = "exploding glob of slime";
 */
-                        how = "スライムのねばねばの爆発で";
+                    how = "スライムのねばねばの爆発で";
                 if (physical_damage)
                     dmg = Maybe_Half_Phys(dmg);
                 losehp(dmg, one ? how : (const char *) makeplural(how),

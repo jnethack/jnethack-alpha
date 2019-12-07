@@ -463,9 +463,9 @@ int trouble;
         /* no control, but works on no-teleport levels */
         if (safe_teleds(FALSE)) {
 /*JP
-        Your("surroundings change.");
+            Your("surroundings change.");
 */
-        Your("ŠÂ‹«‚ª•Ï‰»‚µ‚½D");
+            Your("ŠÂ‹«‚ª•Ï‰»‚µ‚½D");
         } else {
             /* safe_teleds() couldn't find a safe place; perhaps the
                level is completely full.  As a last resort, confer

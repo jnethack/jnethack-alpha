@@ -5423,9 +5423,9 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "reversed",
                      MENU_UNSELECTED);
 /*JP
-        end_menu(tmpwin, "Select message history display type:");
+            end_menu(tmpwin, "Select message history display type:");
 */
-        end_menu(tmpwin, "メッセージ履歴の表示方法を選択してください：");
+            end_menu(tmpwin, "メッセージ履歴の表示方法を選択してください：");
             if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
                 iflags.prevmsg_window = window_pick->item.a_char;
                 free((genericptr_t) window_pick);

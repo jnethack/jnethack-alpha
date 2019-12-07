@@ -1938,9 +1938,9 @@ boolean via_warning;
         if (!canspotmon(mtmp)) {
             map_invisible(x, y);
 /*JP
-                                    You_feel("an unseen monster!");
+            You_feel("an unseen monster!");
 */
-                                    You("見えない怪物の気配を感じた！");
+            You("見えない怪物の気配を感じた！");
         } else if (!sensemon(mtmp)) {
 #if 0 /*JP:T*/
             You("find %s.", mtmp->mtame ? y_monnam(mtmp) : a_monnam(mtmp));

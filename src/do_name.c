@@ -1435,23 +1435,23 @@ do_mname()
     if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest) {
         if (!alreadynamed(mtmp, monnambuf, buf))
 /*JP
-        pline("%s doesn't like being called names!", upstart(monnambuf));
+            pline("%s doesn't like being called names!", upstart(monnambuf));
 */
-        pline("%sはあだ名で呼ばれるのが嫌いなようだ！", Monnam(mtmp));
+            pline("%sはあだ名で呼ばれるのが嫌いなようだ！", Monnam(mtmp));
     } else if (mtmp->isshk
                && !(Deaf || mtmp->msleeping || !mtmp->mcanmove
                     || mtmp->data->msound <= MS_ANIMAL)) {
         if (!alreadynamed(mtmp, monnambuf, buf))
 /*JP
-        verbalize("I'm %s, not %s.", shkname(mtmp), buf);
+            verbalize("I'm %s, not %s.", shkname(mtmp), buf);
 */
-        verbalize("私は%sだ，%sではない．", shkname(mtmp), buf);
+            verbalize("私は%sだ，%sではない．", shkname(mtmp), buf);
     } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk) {
         if (!alreadynamed(mtmp, monnambuf, buf))
 /*JP
-        pline("%s will not accept the name %s.", upstart(monnambuf), buf);
+            pline("%s will not accept the name %s.", upstart(monnambuf), buf);
 */
-        pline("%sは%sという名前を受けいれなかった．", monnambuf, buf);
+            pline("%sは%sという名前を受けいれなかった．", monnambuf, buf);
     } else
         (void) christen_monst(mtmp, buf);
 }

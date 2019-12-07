@@ -1548,9 +1548,9 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 
                 if (!impaired && rn2(100)) {
 /*JP
-                pline("%s to your hand!", Tobjnam(obj, "return"));
+                    pline("%s to your hand!", Tobjnam(obj, "return"));
 */
-                pline("%s‚Í‚ ‚È‚½‚Ìè‚É–ß‚Á‚Ä‚«‚½I", xname(obj));
+                    pline("%s‚Í‚ ‚È‚½‚Ìè‚É–ß‚Á‚Ä‚«‚½I", xname(obj));
                     obj = addinv(obj);
                     (void) encumber_msg();
                     /* addinv autoquivers an aklys if quiver is empty;

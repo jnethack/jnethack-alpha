@@ -682,9 +682,9 @@ struct obj *instr;
         consume_obj_charge(instr, TRUE);
 
 /*JP
-            You("produce %s music.", Hallucination ? "piped" : "soft");
+        You("produce %s music.", Hallucination ? "piped" : "soft");
 */
-            You("%s‚ğ‘t‚Å‚½D", Hallucination ? "‚a‚f‚l" : "“î‚ç‚©‚¢‹È");
+        You("%s‚ğ‘t‚Å‚½D", Hallucination ? "‚a‚f‚l" : "“î‚ç‚©‚¢‹È");
         put_monsters_to_sleep(u.ulevel * 5);
         exercise(A_DEX, TRUE);
         break;
@@ -704,18 +704,18 @@ struct obj *instr;
 
         if (!getdir((char *) 0)) {
 /*JP
-                pline("%s.", Tobjnam(instr, "vibrate"));
+            pline("%s.", Tobjnam(instr, "vibrate"));
 */
-                pline("%s‚Ík‚¦‚½D", xname(instr));
+            pline("%s‚Ík‚¦‚½D", xname(instr));
             break;
         } else if (!u.dx && !u.dy && !u.dz) {
             if ((damage = zapyourself(instr, TRUE)) != 0) {
                 char buf[BUFSZ];
 
 /*JP
-                    Sprintf(buf, "using a magical horn on %sself", uhim());
+                Sprintf(buf, "using a magical horn on %sself", uhim());
 */
-                    Strcpy(buf, "©•ª©g‚Ì–‚–@‚Ìƒzƒ‹ƒ“‚Ì—Í‚ğ—‚Ñ‚Ä");
+                Strcpy(buf, "©•ª©g‚Ì–‚–@‚Ìƒzƒ‹ƒ“‚Ì—Í‚ğ—‚Ñ‚Ä");
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
         } else {
@@ -744,9 +744,9 @@ struct obj *instr;
         consume_obj_charge(instr, TRUE);
 
 /*JP
-            pline("%s very attractive music.", Tobjnam(instr, "produce"));
+        pline("%s very attractive music.", Tobjnam(instr, "produce"));
 */
-            pline("%s‚Í‚Æ‚Ä‚à–£—Í“I‚È‰¹Šy‚ğ‘t‚Å‚½D", xname(instr));
+        pline("%s‚Í‚Æ‚Ä‚à–£—Í“I‚È‰¹Šy‚ğ‘t‚Å‚½D", xname(instr));
         charm_monsters((u.ulevel - 1) / 3 + 1);
         exercise(A_DEX, TRUE);
         break;
@@ -771,9 +771,9 @@ struct obj *instr;
         consume_obj_charge(instr, TRUE);
 
 /*JP
-            You("produce a heavy, thunderous rolling!");
+        You("produce a heavy, thunderous rolling!");
 */
-            You("dŒú‚È—‹‚Ì‚æ‚¤‚È‰¹‚ğ‘t‚Å‚½I");
+        You("dŒú‚È—‹‚Ì‚æ‚¤‚È‰¹‚ğ‘t‚Å‚½I");
 /*JP
         pline_The("entire %s is shaking around you!", generic_lvl_desc());
 */
@@ -786,9 +786,9 @@ struct obj *instr;
     case LEATHER_DRUM: /* Awaken monsters */
         if (!mundane) {
 /*JP
-        You("beat a deafening row!");
+            You("beat a deafening row!");
 */
-        You("¨‚ª•·‚±‚¦‚È‚­‚È‚é‚­‚ç‚¢’@‚¢‚½I");
+            You("¨‚ª•·‚±‚¦‚È‚­‚È‚é‚­‚ç‚¢’@‚¢‚½I");
             incr_itimeout(&HDeaf, rn1(20, 30));
             exercise(A_WIS, FALSE);
         } else

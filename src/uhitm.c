@@ -2032,14 +2032,14 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             if (merge_choice(invent, mongold) || inv_cnt(FALSE) < 52) {
                 addinv(mongold);
 /*JP
-                    Your("purse feels heavier.");
+                Your("purse feels heavier.");
 */
-                    You("財布が重くなったような気がした．");
+                You("財布が重くなったような気がした．");
             } else {
 /*JP
-                    You("grab %s's gold, but find no room in your knapsack.",
+                You("grab %s's gold, but find no room in your knapsack.",
 */
-                    You("%sのお金をつかんだが，持ち物袋に入らなかった．",
+                You("%sのお金をつかんだが，持ち物袋に入らなかった．",
                     mon_nam(mdef));
                 dropy(mongold);
             }
@@ -3019,9 +3019,9 @@ register struct monst *mon;
                 } else {
                     if (mattk->aatyp == AT_TENT) {
 /*JP
-                    Your("tentacles suck %s.", mon_nam(mon));
+                        Your("tentacles suck %s.", mon_nam(mon));
 */
-                    Your("触手が%sの体液を吸いとった．", mon_nam(mon));
+                        Your("触手が%sの体液を吸いとった．", mon_nam(mon));
                     } else {
 #if 0 /*JP*/
                         if (mattk->aatyp == AT_CLAW)
@@ -3139,9 +3139,9 @@ register struct monst *mon;
                 if (u.ustuck && u.ustuck != mon)
                     uunstick();
 /*JP
-                    You("grab %s!", mon_nam(mon));
+                You("grab %s!", mon_nam(mon));
 */
-                    You("%sをつかまえた！", mon_nam(mon));
+                You("%sをつかまえた！", mon_nam(mon));
                 u.ustuck = mon;
                 if (silverhit && flags.verbose)
                     silver_sears(&youmonst, mon, silverhit);

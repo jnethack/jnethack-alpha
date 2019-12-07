@@ -412,9 +412,9 @@ int dmg;
     if (mtmp->mhp < mtmp->mhpmax) {
         if (canseemon(mtmp))
 /*JP
-                pline("%s looks better.", Monnam(mtmp));
+            pline("%s looks better.", Monnam(mtmp));
 */
-                pline("%sは気分がよくなったようだ．", Monnam(mtmp));
+            pline("%sは気分がよくなったようだ．", Monnam(mtmp));
         /* note: player healing does 6d4; this used to do 1d8 */
         if ((mtmp->mhp += d(3, 6)) > mtmp->mhpmax)
             mtmp->mhp = mtmp->mhpmax;

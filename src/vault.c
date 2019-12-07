@@ -469,9 +469,9 @@ invault()
                 pline("%sは不機嫌になって，去っていった．", noit_Monnam(guard));
             else
 /*JP
-            verbalize("I'll be back when you're ready to speak to me!");
+                verbalize("I'll be back when you're ready to speak to me!");
 */
-            verbalize("話せるようになったら戻ってきてやる！");
+                verbalize("話せるようになったら戻ってきてやる！");
             mongone(guard);
             return;
         }
@@ -522,9 +522,9 @@ invault()
                 } else {
                     verbalize(
 /*JP
-                    "Oh, yes, of course.  Sorry to have disturbed you.");
+                         "Oh, yes, of course.  Sorry to have disturbed you.");
 */
-                    "いや，こりゃ，えーと，お騒がせしました．");
+                         "いや，こりゃ，えーと，お騒がせしました．");
                 }
                 mongone(guard);
             } else {
@@ -564,9 +564,9 @@ invault()
 #endif
         else
 /*JP
-        verbalize("I don't know you.");
+            verbalize("I don't know you.");
 */
-        verbalize("知らんな．");
+            verbalize("知らんな．");
         umoney = money_cnt(invent);
         if (!umoney && !hidden_gold()) {
             if (Deaf)
@@ -579,9 +579,9 @@ invault()
 #endif
             else
 /*JP
-            verbalize("Please follow me.");
+                verbalize("Please follow me.");
 */
-            verbalize("私の後についてきなさい．");
+                verbalize("私の後についてきなさい．");
         } else {
             if (!umoney) {
                 if (Deaf) {
@@ -595,9 +595,9 @@ invault()
 #endif
                 } else {
 /*JP
-                verbalize("You have hidden gold.");
+                   verbalize("You have hidden gold.");
 */
-                verbalize("まだ金貨を隠してるな．");
+                   verbalize("まだ金貨を隠してるな．");
                 }
             }
             if (Deaf) {
@@ -615,13 +615,13 @@ invault()
             } else {
                 verbalize(
 /*JP
-                "Most likely all your gold was stolen from this vault.");
+                    "Most likely all your gold was stolen from this vault.");
 */
-                "倉庫から盗んだ金貨があるだろう．");
+                    "倉庫から盗んだ金貨があるだろう．");
 /*JP
-            verbalize("Please drop that gold and follow me.");
+                verbalize("Please drop that gold and follow me.");
 */
-            verbalize("それをそっくり戻してから，私の後についてきなさい．");
+                verbalize("それをそっくり戻してから，私の後についてきなさい．");
             }
         }
         EGD(guard)->gdx = gx;
@@ -761,9 +761,9 @@ int nx, ny;
     if (MON_AT(nx, ny) && !(nx == grd->mx && ny == grd->my)) {
         if (!Deaf)
 /*JP
-                    verbalize("Out of my way, scum!");
+            verbalize("Out of my way, scum!");
 */
-                    verbalize("目の前から消えろ，クソったれ！");
+            verbalize("目の前から消えろ，クソったれ！");
         if (!rloc(m_at(nx, ny), FALSE) || MON_AT(nx, ny))
             m_into_limbo(m_at(nx, ny));
     }
@@ -1287,9 +1287,9 @@ boolean silently;
         mnexto(grd);
         if (!silently)
 /*JP
-        pline("%s remits your gold to the vault.", Monnam(grd));
+            pline("%s remits your gold to the vault.", Monnam(grd));
 */
-        pline("%sはあなたの金貨を倉庫に送った．", Monnam(grd));
+            pline("%sはあなたの金貨を倉庫に送った．", Monnam(grd));
         gx = rooms[EGD(grd)->vroom].lx + rn2(2);
         gy = rooms[EGD(grd)->vroom].ly + rn2(2);
 #if 0 /*JP*/

@@ -627,9 +627,9 @@ register struct monst *mtmp;
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (context.mon_moving)
 /*JP
-                pline("%s drowns.", Monnam(mtmp));
+                    pline("%s drowns.", Monnam(mtmp));
 */
-                pline("%sは溺れた．", Monnam(mtmp));
+                    pline("%sは溺れた．", Monnam(mtmp));
                 else
                     /* hero used fire to melt ice that monster was on */
                     You("drown %s.", mon_nam(mtmp));
@@ -1107,9 +1107,9 @@ struct monst *mtmp;
             } else {
                 if (flags.verbose)
 /*JP
-                You_hear("a slurping sound.");
+                    You_hear("a slurping sound.");
 */
-                You_hear("ごくんと飲み込む音を聞いた．");
+                    You_hear("ごくんと飲み込む音を聞いた．");
             }
             /* Heal up to the object's weight in hp */
             if (mtmp->mhp < mtmp->mhpmax) {
@@ -3943,9 +3943,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                 pline("%s appears!", upstart(newname));
             else
 /*JP
-            pline("%s turns into %s!", oldname, newname);
+                pline("%s turns into %s!", oldname, newname);
 */
-            pline("%sは%sになった！", oldname, newname);
+                pline("%sは%sになった！", oldname, newname);
         }
     }
 

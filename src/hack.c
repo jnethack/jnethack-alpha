@@ -716,9 +716,9 @@ dosinkfall()
 */
         You((innate_lev || blockd_lev) ? "ちょっとふらついた．"
 /*JP
-                       : "gain control of your flight.");
+                                       : "gain control of your flight.");
 */
-                       : "飛行中の制御を取りもどした．");
+                                       : "飛行中の制御を取りもどした．");
     } else {
         long save_ELev = ELevitation, save_HLev = HLevitation;
 
@@ -3541,9 +3541,9 @@ maybe_wail()
 */
             pline((powercnt >= 4) ? "%s，あなたの全ての力は失われつつある．．．"
 /*JP
-                                : "%s, your life force is running out.",
+                                  : "%s, your life force is running out.",
 */
-                                : "%s，あなたの生命力は尽きようとしている．．．",
+                                  : "%s，あなたの生命力は尽きようとしている．．．",
                   who);
         }
     } else {

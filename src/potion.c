@@ -1348,9 +1348,9 @@ register struct obj *otmp;
                     ceiling(u.ux,u.uy));
 #endif
 /*JP
-                    losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
+                losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
 */
-                    losehp(Maybe_Half_Phys(dmg), "“Vˆä‚É“ª‚ð‚Ô‚Â‚¯‚Ä",
+                losehp(Maybe_Half_Phys(dmg), "“Vˆä‚É“ª‚ð‚Ô‚Â‚¯‚Ä",
                        KILLED_BY);
                 nothing = 0; /* not nothing after all */
             }

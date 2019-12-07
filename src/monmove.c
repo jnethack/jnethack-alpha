@@ -90,14 +90,14 @@ const char *shout;
     } else {
         if (canspotmon(mon))
 /*JP
-        pline("%s yells:", Amonnam(mon));
+            pline("%s yells:", Amonnam(mon));
 */
-        pline("%sは叫んだ：", Amonnam(mon));
+            pline("%sは叫んだ：", Amonnam(mon));
         else
 /*JP
-        You_hear("someone yell:");
+            You_hear("someone yell:");
 */
-        pline("何者かは叫んだ：");
+            pline("何者かは叫んだ：");
         verbalize1(shout);
     }
 }

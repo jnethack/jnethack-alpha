@@ -177,9 +177,9 @@ register int otyp;
     case SPBOOK_CLASS:
         if (otyp != SPE_NOVEL) {
 /*JP
-        Strcpy(buf, "spellbook");
+            Strcpy(buf, "spellbook");
 */
-        Strcat(buf, "魔法書");
+            Strcat(buf, "魔法書");
         } else {
 /*JP
             Strcpy(buf, !nn ? "book" : "novel");
@@ -1216,7 +1216,7 @@ char *prefix;
                           : is_rustprone(obj)
                              ? "rustproof "
                              : is_corrodeable(obj)
-                                ? "腐食しない" /* "stainless"? */
+                                ? "corrodeproof " /* "stainless"? */
                                 : is_flammable(obj)
                                    ? "fireproof "
                                    : "");
@@ -1477,9 +1477,9 @@ unsigned doname_flags;
                        : doffing(obj) ? " (being doffed)"
                          : donning(obj) ? " (being donned)"
 /*JP
-                                      : " (being worn)");
+                           : " (being worn)");
 */
-                                      : "(身につけている)");
+                           : "(身につけている)");
         /*FALLTHRU*/
     case WEAPON_CLASS:
         if (ispoisoned)
@@ -4947,9 +4947,9 @@ struct obj *suit;
 #endif
         else if (Is_dragon_scales(suit))
 /*JP
-        return "dragon scales";
+            return "dragon scales";
 */
-        return "鱗";
+            return "鱗";
         suitnm = OBJ_NAME(objects[suit->otyp]);
         esuitp = eos((char *) suitnm);
 #if 0 /*JP*/

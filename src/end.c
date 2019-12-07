@@ -1658,15 +1658,15 @@ int how;
         viz_array[0][0] |= IN_SIGHT; /* need visibility for naming */
         mtmp = mydogs;
 /*JP
-            Strcpy(pbuf, "You");
+        Strcpy(pbuf, "You");
 */
-            Strcpy(pbuf, "‚ ‚È‚½");
+        Strcpy(pbuf, "‚ ‚È‚½");
         if (mtmp || Schroedingers_cat) {
             while (mtmp) {
 /*JP
-                    Sprintf(eos(pbuf), " and %s", mon_nam(mtmp));
+                Sprintf(eos(pbuf), " and %s", mon_nam(mtmp));
 */
-                    Sprintf(eos(pbuf), "‚Æ%s", mon_nam(mtmp));
+                Sprintf(eos(pbuf), "‚Æ%s", mon_nam(mtmp));
                 if (mtmp->mtame)
                     nowrap_add(u.urexp, mtmp->mhp);
                 mtmp = mtmp->nmon;
@@ -1691,9 +1691,9 @@ int how;
             pbuf[0] = '\0';
         } else {
 /*JP
-                Strcat(pbuf, " ");
+            Strcat(pbuf, " ");
 */
-                Strcat(pbuf, "‚Í");
+            Strcat(pbuf, "‚Í");
         }
 #if 0 /*JP*/
         Sprintf(eos(pbuf), "%s with %ld point%s,",

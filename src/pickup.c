@@ -2679,9 +2679,9 @@ register struct obj *obj;
 */
                         ? "を運ぶのは少々困難だ．"
 /*JP
-                                        : "You have much trouble removing")
+                        : "You have much trouble removing")
 */
-                                        : "を運ぶのはかなり困難だ．")
+                        : "を運ぶのはかなり困難だ．")
                   : (char *) 0,
           otmp, count);
 
@@ -2968,9 +2968,9 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         && (loss = boh_loss(current_container, held)) != 0) {
         used = 1;
 /*JP
-            You("owe %ld %s for lost merchandise.", loss, currency(loss));
+        You("owe %ld %s for lost merchandise.", loss, currency(loss));
 */
-            You("失った商品のために%ld%sの負債を負った．", loss, currency(loss));
+        You("失った商品のために%ld%sの負債を負った．", loss, currency(loss));
         current_container->owt = weight(current_container);
     }
     inokay = (invent != 0
@@ -3488,6 +3488,9 @@ dotip()
                              "入れ物をひっくりかえす", MENU_SELECTED);
 #endif
                 }
+/*JP
+                end_menu(win, "Tip which container?");
+*/
                 end_menu(win, "どの入れ物をひっくりかえす？");
                 n = select_menu(win, PICK_ONE, &pick_list);
                 destroy_nhwindow(win);

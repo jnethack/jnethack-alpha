@@ -386,9 +386,9 @@ int x, y;
         else
             Strcat(buf, (Upolyd && sticks(youmonst.data))
 /*JP
-                     ? ", being held" : ", holding you");
+                          ? ", being held" : ", holding you");
 */
-                     ? "，あなたが掴まえている" : "，あなたを掴まえている");
+                          ? "，あなたが掴まえている" : "，あなたを掴まえている");
     }
     if (mtmp->mleashed)
 /*JP
@@ -966,9 +966,9 @@ char *supplemental_name;
                 if (user_typed_name || without_asking || yes_to_moreinfo) {
                     if (dlb_fseek(fp, fseekoffset, SEEK_SET) < 0) {
 /*JP
-                pline("? Seek error on 'data' file!");
+                        pline("? Seek error on 'data' file!");
 */
-                pline("'data'ファイルのシークエラー！");
+                        pline("'data'ファイルのシークエラー！");
                         goto checkfile_done;
                     }
                     datawin = create_nhwindow(NHW_MENU);
@@ -985,9 +985,9 @@ char *supplemental_name;
                 }
             } else if (user_typed_name && pass == 0 && !pass1found_in_file)
 /*JP
-        pline("I don't have any information on those things.");
+                pline("I don't have any information on those things.");
 */
-        pline("そんな名前は聞いたことがない．");
+                pline("そんな名前は聞いたことがない．");
         }
     }
     goto checkfile_done; /* skip error feedback */

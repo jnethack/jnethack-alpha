@@ -2108,9 +2108,9 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             }
             if (cc.x == u.ux && cc.y == u.uy) {
 /*JP
-            pline_The("scroll erupts in a tower of flame!");
+                pline_The("scroll erupts in a tower of flame!");
 */
-            pline("巻物から火柱が立ち昇った！");
+                pline("巻物から火柱が立ち昇った！");
                 iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
                 burn_away_slime();
             }
@@ -3169,9 +3169,9 @@ struct _create_particular_data *d;
     }
     /* decide whether a valid monster was chosen */
 /*JP
-        if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "random"))) {
+    if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "random"))) {
 */
-        if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "ランダム"))) {
+    if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "ランダム"))) {
         d->randmonst = TRUE;
         return TRUE;
     }

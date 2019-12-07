@@ -471,9 +471,9 @@ struct kinfo *kptr;
     } else {
         killer.format = NO_KILLER_PREFIX;
 /*JP
-                    Strcpy(killer.name, "turned into green slime");
+        Strcpy(killer.name, "turned into green slime");
 */
-                    Strcpy(killer.name, "緑スライムになった");
+        Strcpy(killer.name, "緑スライムになった");
     }
     dealloc_killer(kptr);
 

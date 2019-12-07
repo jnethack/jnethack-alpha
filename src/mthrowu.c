@@ -126,9 +126,9 @@ const char *name; /* if null, then format `*objp' */
                 && Hate_silver) {
                 /* extra damage already applied by dmgval() */
 /*JP
-            pline_The("silver sears your flesh!");
+                pline_The("silver sears your flesh!");
 */
-            pline("あなたの体は銀で焼かれた！");
+                pline("あなたの体は銀で焼かれた！");
                 exercise(A_CON, FALSE);
             }
             if (is_acid)
@@ -1314,21 +1314,21 @@ boolean your_fault, from_invent;
     }
     else if (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
 /*JP
-            pline("Whang!");
+        pline("Whang!");
 */
-            pline("ぐわーん！");
+        pline("ぐわーん！");
     else if (otmp->oclass == COIN_CLASS
              || objects[obj_type].oc_material == GOLD
              || objects[obj_type].oc_material == SILVER)
 /*JP
-            pline("Clink!");
+        pline("Clink!");
 */
-            pline("チャリン！");
+        pline("チャリン！");
     else
 /*JP
-            pline("Clonk!");
+        pline("Clonk!");
 */
-            pline("ゴツン！");
+        pline("ゴツン！");
 }
 
 /* TRUE iff thrown/kicked/rolled object doesn't pass through iron bars */

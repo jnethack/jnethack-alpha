@@ -1728,9 +1728,9 @@ register const char *let, *word;
 
             if (!allowcnt) {
 /*JP
-            pline("No count allowed with this command.");
+                pline("No count allowed with this command.");
 */
-            pline("このコマンドに数字はつかえない．");
+                pline("このコマンドに数字はつかえない．");
                 continue;
             }
             ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt, TRUE);

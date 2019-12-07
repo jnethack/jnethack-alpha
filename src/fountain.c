@@ -245,13 +245,13 @@ boolean isyou;
                     && mtmp->mpeaceful) {
                     if (!Deaf) {
 /*JP
-                    pline("%s yells:", Amonnam(mtmp));
+                        pline("%s yells:", Amonnam(mtmp));
 */
-                    pline("%sは叫んだ：", Amonnam(mtmp));
+                        pline("%sは叫んだ：", Amonnam(mtmp));
 /*JP
-                    verbalize("Hey, stop using that fountain!");
+                        verbalize("Hey, stop using that fountain!");
 */
-                    verbalize("おい，泉を汚すな！");
+                        verbalize("おい，泉を汚すな！");
                     } else {
                         pline("%s earnestly %s %s %s!",
                               Amonnam(mtmp),

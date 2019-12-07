@@ -2401,9 +2401,9 @@ int style;
                 if (rn2(3)) {
                     if (cansee(bhitpos.x, bhitpos.y))
 /*JP
-                    pline("%s snatches the boulder.", Monnam(mtmp));
+                        pline("%s snatches the boulder.", Monnam(mtmp));
 */
-                    pline("%s‚ÍŠâ‚ð‚Â‚©‚ÝŽæ‚Á‚½D", Monnam(mtmp));
+                        pline("%s‚ÍŠâ‚ð‚Â‚©‚ÝŽæ‚Á‚½D", Monnam(mtmp));
                     singleobj->otrapped = 0;
                     (void) mpickobj(mtmp, singleobj);
                     used_up = TRUE;
@@ -6039,14 +6039,14 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         *noticed = TRUE;
         if (u.usteed)
 /*JP
-                Sprintf(buf, "%s is", noit_Monnam(u.usteed));
+            Sprintf(buf, "%s is", noit_Monnam(u.usteed));
 */
-                Strcpy(buf, noit_Monnam(u.usteed));
+            Strcpy(buf, noit_Monnam(u.usteed));
         else
 /*JP
-                Strcpy(buf, "You are");
+            Strcpy(buf, "You are");
 */
-                Strcpy(buf, "‚ ‚È‚½");
+            Strcpy(buf, "‚ ‚È‚½");
 /*JP
         pline("%s released from %s%s.", buf, which, trapdescr);
 */
