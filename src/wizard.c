@@ -852,7 +852,7 @@ register struct monst *mtmp;
 /*JP
             pline("%s casts aspersions on your ancestry.", Monnam(mtmp));
 */
-                pline("%s‚Í‚ ‚È‚½‚Ì‰Æ•¿‚ğ’†‚µ‚½D", Monnam(mtmp));
+            pline("%s‚Í‚ ‚È‚½‚Ì‰Æ•¿‚ğ’†‚µ‚½D", Monnam(mtmp));
         else
             com_pager(rn2(QTN_DEMONIC) + QT_DEMONIC);
     }

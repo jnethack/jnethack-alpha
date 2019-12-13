@@ -482,7 +482,7 @@ register struct obj *obj;
 /*JP
             You_hear("the crackling of hellfire.");
 */
-          You_hear("地獄の炎がパチパチ燃えている音を聞いた．");
+            You_hear("地獄の炎がパチパチ燃えている音を聞いた．");
         else
 /*JP
             pline_The("%s seems healthy enough.", surface(u.ux, u.uy));

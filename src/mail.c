@@ -522,7 +522,7 @@ struct obj *otmp UNUSED;
 /*JP
      "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
 */
-      "レベルアップの薬がたったの1980円!祝福保証!",
+     "レベルアップの薬がたったの1980円!祝福保証!",
 /*JP
         "Invitation: Visit the NetHack web site at http://www.nethack.org!"
 */

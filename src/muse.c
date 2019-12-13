@@ -844,7 +844,7 @@ struct monst *mtmp;
 /*JP
                 pline_The("%s here is too hard to dig in.",
 */
-                        pline("‚±‚±‚Ì%s‚ÍŒÅ‚­‚ÄŒ@‚ê‚È‚¢D",
+                pline("‚±‚±‚Ì%s‚ÍŒÅ‚­‚ÄŒ@‚ê‚È‚¢D",
                           surface(mtmp->mx, mtmp->my));
             return 2;
         }

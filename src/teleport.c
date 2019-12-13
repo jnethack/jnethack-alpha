@@ -926,7 +926,7 @@ level_tele()
 /*JP
             You("cease to exist.");
 */
-                Your("ë∂ç›ÇÕè¡ñ≈ÇµÇΩÅD");
+            Your("ë∂ç›ÇÕè¡ñ≈ÇµÇΩÅD");
             if (invent)
 /*JP
                 Your("possessions land on the %s with a thud.",

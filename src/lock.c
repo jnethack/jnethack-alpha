@@ -1343,7 +1343,7 @@ int x, y;
 /*JP
             msg = "The door locks!";
 */
-                msg = "扉に鍵がかかった！";
+            msg = "扉に鍵がかかった！";
             break;
         case D_ISOPEN:
 /*JP
@@ -1362,7 +1362,7 @@ int x, y;
 /*JP
                "A cloud of dust springs up and assembles itself into a door!";
 */
-                "ほこりがたちこめ，集まって扉になった！";
+               "ほこりがたちこめ，集まって扉になった！";
             break;
         default:
             res = FALSE;

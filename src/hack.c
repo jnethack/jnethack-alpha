@@ -438,7 +438,7 @@ moverock()
 /*JP
                    "However, you can squeeze yourself into a small opening.");
 */
-                    "しかし，あなたは小さい隙間にこじ入った．");
+                   "しかし，あなたは小さい隙間にこじ入った．");
                 sokoban_guilt();
                 break;
             } else

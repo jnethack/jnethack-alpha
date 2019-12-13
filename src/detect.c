@@ -1164,76 +1164,76 @@ d_level *where;
 /*JP
                 return "far away";
 */
-              return "はるか彼方に";
+                return "はるか彼方に";
             else
 /*JP
                 return "far below";
 */
-        return "はるか下方に";
+                return "はるか下方に";
         else if (ll < -1)
             if (!indun)
 /*JP
                 return "away below you";
 */
-              return "ずっと下方に";
+                return "ずっと下方に";
             else
 /*JP
                 return "below you";
 */
-              return "下方に";
+                return "下方に";
         else if (!indun)
 /*JP
             return "in the distance";
 */
-          return "遠くに";
+            return "遠くに";
         else
 /*JP
             return "just below";
 */
-          return "真下に";
+            return "真下に";
     } else if (ll > 0) {
         if (ll > (8 + rn2(3)))
             if (!indun)
 /*JP
                 return "far away";
 */
-              return "はるか彼方に";
+                return "はるか彼方に";
             else
 /*JP
                 return "far above";
 */
-              return "はるか上方に";
+                return "はるか上方に";
         else if (ll > 1)
             if (!indun)
 /*JP
                 return "away above you";
 */
-              return "ずっと上方に";
+                return "ずっと上方に";
             else
 /*JP
                 return "above you";
 */
-              return "上方に";
+                return "上方に";
         else if (!indun)
 /*JP
             return "in the distance";
 */
-          return "遠くに";
+            return "遠くに";
         else
 /*JP
             return "just above";
 */
-          return "真上に";
+            return "真上に";
     } else if (!indun)
 /*JP
         return "in the distance";
 */
-      return "遠くに";
+        return "遠くに";
     else
 /*JP
         return "near you";
 */
-      return "近くに";
+        return "近くに";
 }
 
 static const struct {

@@ -1057,12 +1057,12 @@ register struct permonst *ptr;
 /*JP
                 You_feel("grounded in reality.");
 */
-              You("実はアースされているような気がした．");
+                You("実はアースされているような気がした．");
             else
 /*JP
                 Your("health currently feels amplified!");
 */
-              pline("健康が増幅されたような気がした！");
+                pline("健康が増幅されたような気がした！");
             HShock_resistance |= FROMOUTSIDE;
         }
         break;

@@ -470,62 +470,62 @@ register struct monst *mtmp;
 /*JP
         ret = "hiss";
 */
-            ret = "シーッと鳴いた";
+        ret = "シーッと鳴いた";
         break;
     case MS_BARK:
     case MS_GROWL:
 /*JP
         ret = "growl";
 */
-            ret = "はげしく吠えた";
+        ret = "はげしく吠えた";
         break;
     case MS_ROAR:
 /*JP
         ret = "roar";
 */
-            ret = "吠えた";
+        ret = "吠えた";
         break;
     case MS_BUZZ:
 /*JP
         ret = "buzz";
 */
-            ret = "ブーッと鳴いた";
+        ret = "ブーッと鳴いた";
         break;
     case MS_SQEEK:
 /*JP
         ret = "squeal";
 */
-            ret = "キーキー鳴いた";
+        ret = "キーキー鳴いた";
         break;
     case MS_SQAWK:
 /*JP
         ret = "screech";
 */
-            ret = "金切り声を立てた";
+        ret = "金切り声を立てた";
         break;
     case MS_NEIGH:
 /*JP
         ret = "neigh";
 */
-            ret = "いなないた";
+        ret = "いなないた";
         break;
     case MS_WAIL:
 /*JP
         ret = "wail";
 */
-            ret = "悲しく鳴いた";
+        ret = "悲しく鳴いた";
         break;
     case MS_SILENT:
 /*JP
         ret = "commotion";
 */
-                ret = "興奮した";
+        ret = "興奮した";
         break;
     default:
 /*JP
         ret = "scream";
 */
-                ret = "金切り声をあげた";
+        ret = "金切り声をあげた";
     }
     return ret;
 }
@@ -1113,7 +1113,7 @@ register struct monst *mtmp;
 /*JP
                 verbl_msg = "I'm free!";
 */
-                    verbl_msg = "やっと自由になった！";
+                verbl_msg = "やっと自由になった！";
         } else {
             if (ptr != &mons[PM_PRISONER])
 /*JP

@@ -466,12 +466,12 @@ int expltype;
 /*JP
                                 adj = "overwhelmed by pure energy";
 */
-                            adj = "ò‰»‚Ì—Í‚ğ—‚Ñ‚½";
+                                adj = "ò‰»‚Ì—Í‚ğ—‚Ñ‚½";
                             else
 /*JP
                                 adj = "perforated";
 */
-                            adj = "ŒŠ‚ğ‚ ‚¯‚ç‚ê‚½";
+                                adj = "ŒŠ‚ğ‚ ‚¯‚ç‚ê‚½";
                             break;
                         case AD_ELEC:
 /*JP

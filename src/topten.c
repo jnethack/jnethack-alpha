@@ -107,12 +107,12 @@ boolean incl_helpless;
 /*JP
         "drowned in ", "burned by ", "dissolved in ", "crushed to death by ",
 */
-         "“M€‚µ‚½","Ä€‚µ‚½", "—nŠâ‚É—n‚¯‚½", "‰Ÿ‚µ’×‚³‚ê‚½",
+        "“M€‚µ‚½","Ä€‚µ‚½", "—nŠâ‚É—n‚¯‚½", "‰Ÿ‚µ’×‚³‚ê‚½",
         /* STONING, TURNED_SLIME, GENOCIDED, */
 /*JP
         "petrified by ", "turned to slime by ", "killed by ",
 */
-         "Î‚É‚È‚Á‚½", "‚ÉƒXƒ‰ƒCƒ€‚É‚³‚ê‚½", "‹sE‚³‚ê‚½",
+        "Î‚É‚È‚Á‚½", "‚ÉƒXƒ‰ƒCƒ€‚É‚³‚ê‚½", "‹sE‚³‚ê‚½",
         /* PANICKED, TRICKED, QUIT, ESCAPED, ASCENDED */
         "", "", "", "", ""
     };

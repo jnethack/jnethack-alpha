@@ -3498,7 +3498,7 @@ dotypeinv()
 /*JP
             You("have no %sobjects%s.", before, after);
 */
-                You("%s%s‚à‚Ì‚Í‰½‚à‚Á‚Ä‚¢‚È‚¢D", before, after);
+            You("%s%s‚à‚Ì‚Í‰½‚à‚Á‚Ä‚¢‚È‚¢D", before, after);
             return 0;
         }
         this_type = oclass;

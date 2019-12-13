@@ -701,11 +701,11 @@ doengrave()
 /*JP
         You("tickle %s with %s.", mon_nam(u.ustuck), writer);
 */
-                You("%sで%sをくすぐった．", writer, mon_nam(u.ustuck));
+        You("%sで%sをくすぐった．", writer, mon_nam(u.ustuck));
 /*JP
         Your("message dissolves...");
 */
-                Your("メッセージは消えた．．．");
+        Your("メッセージは消えた．．．");
         return 0;
     }
     if (otmp->oclass != WAND_CLASS && !can_reach_floor(TRUE)) {
@@ -828,7 +828,7 @@ doengrave()
 /*JP
                     "The wand unsuccessfully fights your attempt to write!");
 */
-                       "あなたが書こうとすると杖は抵抗した！");
+                    "あなたが書こうとすると杖は抵抗した！");
                 break;
             case WAN_SLOW_MONSTER:
                 if (!Blind) {

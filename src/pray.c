@@ -1330,7 +1330,7 @@ aligntyp g_align;
 /*JP
                        "To enter the castle, thou must play the right tune!");
 */
-                        "汝城に入らんと欲するならば，正しき調べを奏でるべし！");
+                       "汝城に入らんと欲するならば，正しき調べを奏でるべし！");
                     u.uevent.uheard_tune++;
                     break;
                 } else if (u.uevent.uheard_tune < 2) {
@@ -1995,7 +1995,7 @@ dosacrifice()
 /*JP
                "An invisible choir sings, and you are bathed in radiance...");
 */
-                "どこからともなく聖歌隊の歌が聞こえ，あなたは光に包まれた．．．");
+               "どこからともなく聖歌隊の歌が聞こえ，あなたは光に包まれた．．．");
 /*JP
                 godvoice(altaralign, "Mortal, thou hast done well!");
 */

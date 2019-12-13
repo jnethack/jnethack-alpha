@@ -3194,7 +3194,7 @@ register struct obj *atmp;
 /*JP
         Your("gloves vanish!");
 */
-                Your("¬è‚ÍÁ‚¦‚½I");
+        Your("¬è‚ÍÁ‚¦‚½I");
         (void) Gloves_off();
         useup(otmp);
 /*JP
