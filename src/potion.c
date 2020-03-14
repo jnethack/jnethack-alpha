@@ -858,7 +858,7 @@ register struct obj *otmp;
 #else
         pline("うぇっぷ！これは%s%sのような味がする！",
               otmp->odiluted ? "水で薄めた" : "",
-              Hallucination ? "タンポポワイン" : "燃料オイル");
+              Hallucination ? "たんぽぽのお酒" : "燃料オイル");
 #endif
         if (!otmp->blessed)
             make_confused(itimeout_incr(HConfusion, d(3, 8)), FALSE);

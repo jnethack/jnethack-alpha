@@ -6510,9 +6510,9 @@ const char *msg;
             prefixhandling ? " to " : "", prefixhandling ? dothat : "",
             NODIAG(u.umonnum) ? " in your current form" : "");
 #else
-    Sprintf(buf, "%s%s%sでの有効な方向指定は:",
-            prefixhandling ? " to " : "", prefixhandling ? dothat : "",
-            NODIAG(u.umonnum) ? " in your current form" : "");
+    Sprintf(buf, "%s%s%s有効な方向指定は:",
+            prefixhandling ? dothat : "", prefixhandling ? "ための" : "",
+            NODIAG(u.umonnum) ? " 現在の姿での" : "");
 #endif
     putstr(win, 0, buf);
     show_direction_keys(win, !prefixhandling ? '.' : ' ', NODIAG(u.umonnum));

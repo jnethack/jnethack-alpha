@@ -1486,7 +1486,8 @@ register struct obj *obj;
             is_plural(obj) ? "these" : "this");
     (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
 #else
-    (void) safe_qbuf(qbuf, "", "ÇâΩÇ∆ñºÇ√ÇØÇ‹Ç∑Ç©ÅH", obj, xname, simpleonames, "item");
+    (void) safe_qbuf(qbuf, "", "ÇâΩÇ∆ñºÇ√ÇØÇ‹Ç∑Ç©ÅH", obj, xname,
+                     simpleonames, "ÇªÇÍ");
 #endif
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')

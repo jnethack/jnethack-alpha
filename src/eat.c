@@ -3267,8 +3267,12 @@ doeat()
                       ? foodword(otmp)
                       : singular(otmp, xname));
 #else
-            pline("‚±‚Ì%s‚ÍŽ|‚¢I",
-                  otmp->oclass == COIN_CLASS
+            pline("%s%s‚ÍŽ|‚¢I",
+                  (obj_is_pname(otmp)
+                   && otmp->oartifact < ART_ORB_OF_DETECTION)
+                      ? ""
+                      : "‚±‚Ì",
+                  (otmp->oclass == COIN_CLASS)
                       ? foodword(otmp)
                       : singular(otmp, xname));
 #endif
