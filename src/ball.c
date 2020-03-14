@@ -612,7 +612,7 @@ boolean allow_drag;
  drag:
 
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("cannot %sdrag the heavy iron ball.",
             invent ? "carry all that and also " : "");
 #else
@@ -780,7 +780,7 @@ xchar x, y;
                 pline(pullmsg, "ŒF‚Ìã©");
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Your("%s %s is severely damaged.",
                          (side == LEFT_SIDE) ? "left" : "right",
                          body_part(LEG));
@@ -789,7 +789,7 @@ xchar x, y;
                          (side == LEFT_SIDE) ? "¶" : "‰E",
                          body_part(LEG));
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     losehp(Maybe_Half_Phys(2),
                            "leg damage from being pulled out of a bear trap",
                            KILLED_BY);
@@ -851,7 +851,7 @@ litter()
         nextobj = otmp->nobj;
         if ((otmp != uball) && (rnd(capacity) <= (int) otmp->owt)) {
             if (canletgo(otmp, "")) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("drop %s and %s %s down the stairs with you.",
                     yname(otmp), (otmp->quan == 1L) ? "it" : "they",
                     otense(otmp, "fall"));

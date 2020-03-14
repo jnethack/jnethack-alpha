@@ -339,7 +339,7 @@ unsigned corpseflags;
     case PM_BLACK_UNICORN:
         if (mtmp->mrevived && rn2(2)) {
             if (canseemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s recently regrown horn crumbles to dust.",
                       s_suffix(Monnam(mtmp)));
 #else
@@ -925,7 +925,7 @@ register struct monst *mtmp;
             && touch_artifact(otmp, mtmp)) {
             if (mtmp->data == &mons[PM_RUST_MONSTER] && otmp->oerodeproof) {
                 if (canseemon(mtmp) && flags.verbose) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s eats %s!", Monnam(mtmp),
                           distant_name(otmp, doname));
 #else
@@ -937,7 +937,7 @@ register struct monst *mtmp;
                 otmp->oerodeproof = 0;
                 mtmp->mstun = 1;
                 if (canseemon(mtmp) && flags.verbose) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s spits %s out in disgust!", Monnam(mtmp),
                           distant_name(otmp, doname));
 #else
@@ -947,7 +947,7 @@ register struct monst *mtmp;
                 }
             } else {
                 if (cansee(mtmp->mx, mtmp->my) && flags.verbose)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s eats %s!", Monnam(mtmp),
                           distant_name(otmp, doname));
 #else
@@ -1072,7 +1072,7 @@ struct monst *mtmp;
             /* engulf */
             ++ecount;
             if (ecount == 1)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(buf, "%s engulfs %s.", Monnam(mtmp),
                         distant_name(otmp, doname));
 #else
@@ -1093,7 +1093,7 @@ struct monst *mtmp;
             ++count;
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (flags.verbose)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s eats %s!", Monnam(mtmp),
                           distant_name(otmp, doname));
 #else
@@ -1161,7 +1161,7 @@ struct monst *mtmp;
         if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
             pline1(buf);
         else if (flags.verbose)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You_hear("%s slurping sound%s.",
                      (ecount == 1) ? "a" : "several", plur(ecount));
 #else
@@ -1188,7 +1188,7 @@ register struct monst *mtmp;
         add_to_minv(mtmp, gold);
         if (cansee(mtmp->mx, mtmp->my)) {
             if (flags.verbose && !mtmp->isgd)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s picks up some %s.", Monnam(mtmp),
                       mat_idx == GOLD ? "gold" : "money");
 #else
@@ -1235,7 +1235,7 @@ register const char *str;
                 otmp3 = splitobj(otmp, carryamt);
             }
             if (cansee(mtmp->mx, mtmp->my) && flags.verbose)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s picks up %s.", Monnam(mtmp),
                       (distu(mtmp->mx, mtmp->my) <= 5)
                           ? doname(otmp3)
@@ -2204,7 +2204,7 @@ boolean was_swallowed; /* digestion */
                     There("is an explosion in your %s!", body_part(STOMACH));
 */
                     pline("%s‚Ì’†‚Å”š”­‚ª‹N‚«‚½I", body_part(STOMACH));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Sprintf(killer.name, "%s explosion",
                             s_suffix(mdat->mname));
 #else
@@ -2384,7 +2384,7 @@ struct monst *mdef;
     mondead(mdef);
     if (wasinside) {
         if (is_animal(mdef->data))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s through an opening in the new %s.",
                 locomotion(youmonst.data, "jump"), xname(otmp));
 #else
@@ -2588,7 +2588,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
                 /* oc_big is also oc_bimanual and oc_bulky */
                 && (otmp->owt > 30 || objects[otyp].oc_big)) {
                 delobj(otmp);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             } else if (!flooreffects(otmp, x, y, nomsg ? "" : "fall")) {
 #else
             } else if (!flooreffects(otmp, x, y, nomsg ? "" : "—Ž‚¿‚é")) {
@@ -2648,7 +2648,7 @@ cleanup:
     /* adjust alignment points */
     if (mtmp->m_id == quest_status.leader_m_id) { /* REAL BAD! */
         adjalign(-(u.ualign.record + (int) ALIGNLIM / 2));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("That was %sa bad idea...",
               u.uevent.qcompleted ? "probably " : "");
 #else
@@ -2742,7 +2742,7 @@ struct monst *mtmp;
                                && closed_door(mtmp->mx, mtmp->my));
 
             /* construct a format string before transformation */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "The lapidifying %s %s %s",
                     x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
                              (SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
@@ -2789,7 +2789,7 @@ struct monst *mtmp;
             else
                 mtmp->cham = mndx;
             if (canspotmon(mtmp)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s rises from the %s with renewed agility!",
                       Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
 #else
@@ -2840,7 +2840,7 @@ struct monst *mtmp;
     if (!in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
         if (!couldspot && canspotmon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s suddenly %s!", Amonnam(mtmp),
                   !Blind ? "appears" : "arrives");
 #else
@@ -3044,7 +3044,7 @@ boolean via_attack;
         if (got_mad && !Hallucination) {
             const char *who = q_guardian->mname;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             if (got_mad > 1)
                 who = makeplural(who);
             pline_The("%s %s to be angry too...",
@@ -3863,7 +3863,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                     char msgtrail[BUFSZ];
 
                     if (is_vampshifter(mtmp)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         Sprintf(msgtrail, " which was a shapeshifted %s",
                                 noname_monnam(mtmp, ARTICLE_NONE));
 #else
@@ -3880,7 +3880,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                     }
 
                     /* Do this even if msg is FALSE */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("%s %s%s!",
                         (amorphous(olddata) || is_whirly(olddata))
                             ? "emerge from" : "break out of",
@@ -3922,12 +3922,12 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     if (msg) {
         Strcpy(newname, noname_monnam(mtmp, ARTICLE_A));
         /* oldname was capitalized above; newname will be lower case */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         if (!strcmpi(newname, "it")) { /* can't see or sense it now */
 #else
         if (!strcmpi(newname, "‰½ŽÒ‚©")) { /* can't see or sense it now */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             if (!!strcmpi(oldname, "it")) /* could see or sense it before */
 #else
             if (!!strcmpi(oldname, "‰½ŽÒ‚©")) /* could see or sense it before */
@@ -3935,7 +3935,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                 pline("%s disappears!", oldname);
             (void) usmellmon(mdat);
         } else { /* can see or sense it now */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             if (!strcmpi(oldname, "it")) /* couldn't see or sense it before */
 #else
             if (!strcmpi(oldname, "‰½ŽÒ‚©")) /* couldn't see or sense it before */
@@ -3958,7 +3958,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     possibly_unwield(mtmp, polyspot); /* might lose use of weapon */
     mon_break_armor(mtmp, polyspot);
     if (!(mtmp->misc_worn_check & W_ARMG))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         mselftouch(mtmp, "No longer petrify-resistant, ",
                    !context.mon_moving);
 #else
@@ -4204,7 +4204,7 @@ boolean silent;
     if (ct) {
         if (!silent) { /* do we want pline msgs? */
             if (slct)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline_The("guard%s wake%s up!", slct > 1 ? "s" : "",
                           slct == 1 ? "s" : "");
 #else
@@ -4212,14 +4212,14 @@ boolean silent;
 #endif
             if (nct || sct) {
                 if (nct)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline_The("guard%s get%s angry!", nct == 1 ? "" : "s",
                               nct == 1 ? "s" : "");
 #else
                     pline("”Ô•º‚Í“{‚Á‚½I");
 #endif
                 else if (!Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You_see("%sangry guard%s approaching!",
                             sct == 1 ? "an " : "", sct > 1 ? "s" : "");
 #else
@@ -4263,7 +4263,7 @@ short otyp;
         break;
     case M_AP_OBJECT:
         if (otyp == SPE_HEALING || otyp == SPE_EXTRA_HEALING) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s seems a more vivid %s than before.",
                   The(simple_typename(ap)),
                   c_obj_colors[objects[ap].oc_color]);
@@ -4396,7 +4396,7 @@ struct permonst *mdat;
                 msg_given = TRUE;
                 break;
             case S_UNICORN:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("detect a%s odor reminiscent of a stable.",
                     (mndx == PM_PONY) ? "n" : " strong");
 #else

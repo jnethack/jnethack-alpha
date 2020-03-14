@@ -30,7 +30,7 @@
  * God names use a leading underscore to flag goddesses.
  */
 const struct Role roles[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Archeologist", 0 },
       { { "Digger", 0 },
         { "Field Worker", 0 },
@@ -56,7 +56,7 @@ const struct Role roles[] = {
       "ケツアルカトル", "カマキシトリ", "フヘトトル", /* Central American */
 #endif
       "Arc",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the College of Archeology",
       "the Tomb of the Toltec Kings",
 #else
@@ -91,7 +91,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_MAGIC_MAPPING,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Barbarian", 0 },
       { { "Plunderer", "Plunderess" },
         { "Pillager", 0 },
@@ -117,7 +117,7 @@ const struct Role roles[] = {
       "ミトラ", "クロム", "セト", /* Hyborian */
 #endif
       "Bar",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Camp of the Duali Tribe",
       "the Duali Oasis",
 #else
@@ -152,7 +152,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_HASTE_SELF,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Caveman", "Cavewoman" },
       { { "Troglodyte", 0 },
         { "Aborigine", 0 },
@@ -178,7 +178,7 @@ const struct Role roles[] = {
       "アヌ", "_イシュタル", "アンシャル", /* Babylonian */
 #endif
       "Cav",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Caves of the Ancestors",
       "the Dragon's Lair",
 #else
@@ -213,7 +213,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_DIG,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Healer", 0 },
       { { "Rhizotomist", 0 },
         { "Empiric", 0 },
@@ -239,7 +239,7 @@ const struct Role roles[] = {
       "_アテナ", "ヘルメス", "ポセイドン", /* Greek */
 #endif
       "Hea",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Temple of Epidaurus",
       "the Temple of Coeus",
 #else
@@ -273,7 +273,7 @@ const struct Role roles[] = {
       A_WIS,
       SPE_CURE_SICKNESS,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Knight", 0 },
       { { "Gallant", 0 },
         { "Esquire", 0 },
@@ -299,7 +299,7 @@ const struct Role roles[] = {
       "ルーフ", "_ブリジット", "マナンナン・マクリール", /* Celtic */
 #endif
       "Kni",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "Camelot Castle",
       "the Isle of Glass",
 #else
@@ -333,7 +333,7 @@ const struct Role roles[] = {
       A_WIS,
       SPE_TURN_UNDEAD,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Monk", 0 },
       { { "Candidate", 0 },
         { "Novice", 0 },
@@ -359,7 +359,7 @@ const struct Role roles[] = {
       "山雷精", "赤松子", "黄帝", /* Chinese */
 #endif
       "Mon",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Monastery of Chan-Sune",
       "the Monastery of the Earth-Lord",
 #else
@@ -394,7 +394,7 @@ const struct Role roles[] = {
       A_WIS,
       SPE_RESTORE_ABILITY,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Priest", "Priestess" },
       { { "Aspirant", 0 },
         { "Acolyte", 0 },
@@ -420,7 +420,7 @@ const struct Role roles[] = {
       0, 0, 0, /* deities from a randomly chosen other role will be used */
 #endif
       "Pri",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Great Temple",
       "the Temple of Nalzok",
 #else
@@ -457,7 +457,7 @@ const struct Role roles[] = {
       -4 },
     /* Note:  Rogue precedes Ranger so that use of `-R' on the command line
        retains its traditional meaning. */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Rogue", 0 },
       { { "Footpad", 0 },
         { "Cutpurse", 0 },
@@ -483,7 +483,7 @@ const struct Role roles[] = {
       "イセック", "モグ", "コス", /* Nehwon */
 #endif
       "Rog",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Thieves' Guild Hall",
       "the Assassins' Guild Hall",
 #else
@@ -517,7 +517,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_DETECT_TREASURE,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Ranger", 0 },
       {
 #if 0 /* OBSOLETE */
@@ -557,7 +557,7 @@ const struct Role roles[] = {
       "マーキュリー", "_ビーナス", "マーズ", /* Roman/planets */
 #endif
       "Ran",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "Orion's camp",
       "the cave of the wumpus",
 #else
@@ -592,7 +592,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_INVISIBILITY,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Samurai", 0 },
       { { "Hatamoto", 0 },       /* Banner Knight */
         { "Ronin", 0 },          /* no allegiance */
@@ -618,7 +618,7 @@ const struct Role roles[] = {
       "_天照大神", "雷神", "須佐之男", /* Japanese */
 #endif
       "Sam",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Castle of the Taro Clan",
       "the Shogun's Castle",
 #else
@@ -652,7 +652,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_CLAIRVOYANCE,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Tourist", 0 },
       { { "Rambler", 0 },
         { "Sightseer", 0 },
@@ -678,7 +678,7 @@ const struct Role roles[] = {
       "盲目のイオ", "_＜女神＞", "オフラー", /* Discworld */
 #endif
       "Tou",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "Ankh-Morpork",
       "the Thieves' Guild Hall",
 #else
@@ -712,7 +712,7 @@ const struct Role roles[] = {
       A_INT,
       SPE_CHARM_MONSTER,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Valkyrie", 0 },
       { { "Stripling", 0 },
         { "Skirmisher", 0 },
@@ -738,7 +738,7 @@ const struct Role roles[] = {
       "チュール", "オーディン", "ロキ", /* Norse */
 #endif
       "Val",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Shrine of Destiny",
       "the cave of Surtur",
 #else
@@ -772,7 +772,7 @@ const struct Role roles[] = {
       A_WIS,
       SPE_CONE_OF_COLD,
       -4 },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { { "Wizard", 0 },
       { { "Evoker", 0 },
         { "Conjurer", 0 },
@@ -798,7 +798,7 @@ const struct Role roles[] = {
       "プタハ", "トート", "アンフル", /* Egyptian */
 #endif
       "Wiz",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "the Lonely Tower",
       "the Tower of Darkness",
 #else
@@ -868,7 +868,7 @@ struct Role urole = {
 /* Table of all races */
 const struct Race races[] = {
     {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "human",
         "human",
         "humanity",
@@ -878,7 +878,7 @@ const struct Race races[] = {
         "人間",
 #endif
         "Hum",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         { "man", "woman" },
 #else
         { "男", "女" },
@@ -900,7 +900,7 @@ const struct Race races[] = {
         { 1, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "elf",
         "elven",
         "elvenkind",
@@ -927,7 +927,7 @@ const struct Race races[] = {
         { 2, 0, 3, 0, 3, 0 }  /* Energy */
     },
     {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "dwarf",
         "dwarven",
         "dwarvenkind",
@@ -954,7 +954,7 @@ const struct Race races[] = {
         { 0, 0, 0, 0, 0, 0 }  /* Energy */
     },
     {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "gnome",
         "gnomish",
         "gnomehood",
@@ -981,7 +981,7 @@ const struct Race races[] = {
         { 2, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "orc",
         "orcish",
         "orcdom",
@@ -1042,7 +1042,7 @@ struct Race urace = {
   該当部も要修正。
 */
 const struct Gender genders[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { "male", "he", "him", "his", "Mal", ROLE_MALE },
     { "female", "she", "her", "her", "Fem", ROLE_FEMALE },
     { "neuter", "it", "it", "its", "Ntr", ROLE_NEUTER }
@@ -1055,7 +1055,7 @@ const struct Gender genders[] = {
 
 /* Table of all alignments */
 const struct Align aligns[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { "law", "lawful", "Law", ROLE_LAWFUL, A_LAWFUL },
     { "balance", "neutral", "Neu", ROLE_NEUTRAL, A_NEUTRAL },
     { "chaos", "chaotic", "Cha", ROLE_CHAOTIC, A_CHAOTIC },

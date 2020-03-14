@@ -1886,7 +1886,7 @@ xchar x, y;
         return;
 
     if (!(u.uz.dnum == oracle_level.dnum      /* in main dungeon */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
           && !at_dgn_entrance("The Quest")    /* but not Quest's entry */
 #else
           && !at_dgn_entrance("クエスト")     /* but not Quest's entry */

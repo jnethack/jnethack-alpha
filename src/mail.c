@@ -276,7 +276,7 @@ coord *startp; /* starting position (read only) */
 }
 
 /* Let the mail daemon have a larger vocabulary. */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
                                             "Pardon me!" };
 #else
@@ -439,7 +439,7 @@ struct mail_info *info;
 */
             verbalize("ÇŸÇÁÇÊÅI");
         display_nhwindow(WIN_MESSAGE, FALSE);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         obj = hold_another_object(obj, "Oops!", (const char *) 0,
                                   (const char *) 0);
 #else
@@ -610,7 +610,7 @@ boolean adminmsg;
     struct flock fl = { 0 };
 #endif
     const char *msgfrom = adminmsg
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         ? "The voice of %s booms through the caverns:"
         : "This message is from '%s'.";
 #else
@@ -643,7 +643,7 @@ boolean adminmsg;
             fl.l_type = F_UNLCK;
             fcntl (fileno(mb), F_UNLCK, &fl);
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("There is a%s message on this scroll.",
                   seen_one_already ? "nother" : "");
 #else

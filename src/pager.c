@@ -72,7 +72,7 @@ const char *new_str;
     space_left = BUFSZ - strlen(buf) - 1;
     if (space_left < 1)
         return 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     (void) strncat(buf, " or ", space_left);
     (void) strncat(buf, new_str, space_left - 4);
 #else
@@ -96,7 +96,7 @@ char *outbuf;
         Sprintf(race, "%s ", urace.adj);
 */
         Sprintf(race, "%s", urace.adj);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(outbuf, "%s%s%s called %s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
@@ -168,7 +168,7 @@ char *outbuf;
 #endif
     } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (altmon)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(outbuf, ", masquerading as %s",
                     an(mons[mon->mappearance].mname));
 #else
@@ -190,7 +190,7 @@ char *outbuf;
                 goto objfrommap;
             Strcat(outbuf, something);
         } else if (is_hider(mon->data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(eos(outbuf), " on the %s",
                     (is_flyer(mon->data) || mon->data->mlet == S_PIERCER)
                        ? "ceiling"
@@ -203,7 +203,7 @@ char *outbuf;
 #endif
         } else {
             if (mon->data->mlet == S_EEL && is_pool(x, y))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Strcat(outbuf, " in murky water");
 #else
                 Strcat(outbuf, "‚É‚²‚Á‚½…‚Ì’†");
@@ -332,7 +332,7 @@ int x, y, glyph;
 */
         Strcat(buf, "C…’†‚É‚ ‚é");
     else if (is_lava(x, y))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Strcat(buf, " in molten lava"); /* [can this ever happen?] */
 #else
         Strcat(buf, "C—nŠâ‚Ì’†‚É‚ ‚é");        /* [can this ever happen?] */
@@ -352,7 +352,7 @@ int x, y;
     name = (mtmp->data == &mons[PM_COYOTE] && accurate)
               ? coyotename(mtmp, monnambuf)
               : distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(buf, "%s%s%s",
             (mtmp->mx != x || mtmp->my != y)
                 ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
@@ -377,7 +377,7 @@ int x, y;
 #endif
     if (u.ustuck == mtmp) {
         if (u.uswallow || iflags.save_uswallow) /* monster detection */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Strcat(buf, is_animal(mtmp->data)
                           ? ", swallowing you" : ", engulfing you");
 #else
@@ -485,7 +485,7 @@ int x, y;
                     unsigned long mW = (context.warntype.obj
                                         | context.warntype.polyd),
                                   m2 = mtmp->data->mflags2;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     const char *whom = ((mW & M2_HUMAN & m2) ? "human"
                                         : (mW & M2_ELF & m2) ? "elf"
                                           : (mW & M2_ORC & m2) ? "orc"
@@ -561,7 +561,7 @@ char *buf, *monbuf;
                 how |= 4;
 
             if (how)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(eos(buf), " [seen: %s%s%s%s%s]",
                         (how & 1) ? "infravision" : "",
                         /* add comma if telep and infrav */
@@ -610,13 +610,13 @@ char *buf, *monbuf;
          * chests so that they can have their own glyphs and tiles.
          */
         if (trapped_chest_at(tnum, x, y))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Strcpy(buf, "trapped chest"); /* might actually be a large box */
 #else
             Strcpy(buf, "ã©‚ÌŽdŠ|‚¯‚ç‚ê‚½” "); /* might actually be a large box */
 #endif
         else if (trapped_door_at(tnum, x, y))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Strcpy(buf, "trapped door"); /* not "trap door"... */
 #else
             Strcpy(buf, "ã©‚ÌŽdŠ|‚¯‚ç‚ê‚½”à"); /* not "trap door"... */
@@ -944,7 +944,7 @@ char *supplemental_name;
                     char *entrytext = pass ? alt : dbase_str;
                     char question[QBUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Strcpy(question, "More info about \"");
                     /* +2 => length of "\"?" */
                     copynchars(eos(question), entrytext,
@@ -1174,7 +1174,7 @@ struct permonst **for_supplement;
                 i = 0; /* undo loop increment */
             x_str = defsyms[i].explanation;
             if (submerged && !strcmp(x_str, defsyms[0].explanation))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 x_str = "land"; /* replace "dark part of a room" */
 #else
                 x_str = "’n–Ê"; /* replace "dark part of a room" */
@@ -1201,7 +1201,7 @@ struct permonst **for_supplement;
                     Sprintf(out_str, "%sã©", prefix);
                     hit_trap = TRUE;
                 } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Sprintf(out_str, "%s%s", prefix,
                             article == 2 ? the(x_str)
                             : article == 1 ? an(x_str) : x_str);
@@ -1218,7 +1218,7 @@ struct permonst **for_supplement;
                        && (i != S_vibrating_square || Inhell
                            || (looked && glyph_is_trap(glyph)
                                && glyph_to_trap(glyph) == VIBRATING_SQUARE))) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 found += append_str(out_str, (article == 2) ? the(x_str)
                                              : (article == 1) ? an(x_str)
                                                : x_str);
@@ -1671,7 +1671,7 @@ boolean do_mons; /* True => monsters, False => objects */
     if (count)
         display_nhwindow(win, TRUE);
     else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("No %s are currently shown %s.",
               do_mons ? "monsters" : "objects",
               nearby ? "nearby" : "on the map");
@@ -1841,7 +1841,7 @@ doidtrap()
                     break;
             }
             tt = what_trap(tt, rn2_on_display_rng);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("That is %s%s%s.",
                   an(defsyms[trap_to_defsym(tt)].explanation),
                   !trap->madeby_u
@@ -2197,7 +2197,7 @@ dowhatdoes()
             whatdoes_help();
         pline("%s", reslt);
     } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("No such command '%s', char code %d (0%03o or 0x%02x).",
               visctrl(q), (uchar) q, (uchar) q, (uchar) q);
 #else

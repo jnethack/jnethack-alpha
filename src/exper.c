@@ -313,7 +313,7 @@ boolean incr; /* true iff via incremental experience growth */
             u.uexp = newuexp(u.ulevel);
         }
         ++u.ulevel;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Welcome %sto experience level %d.",
               u.ulevelmax < u.ulevel ? "" : "back ",
               u.ulevel);

@@ -189,25 +189,25 @@ makedog()
     if (!*petname && pettype == PM_LITTLE_DOG) {
         /* All of these names were for dogs. */
         if (Role_if(PM_CAVEMAN))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             petname = "Slasher"; /* The Warrior */
 #else
             petname = "スラッシャー";
 #endif
         if (Role_if(PM_SAMURAI))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             petname = "Hachi"; /* Shibuya Station */
 #else
             petname = "ハチ公";
 #endif
         if (Role_if(PM_BARBARIAN))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             petname = "Idefix"; /* Obelix */
 #else
             petname = "イデフィクス";
 #endif
         if (Role_if(PM_RANGER))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             petname = "Sirius"; /* Orion's dog */
 #else
             petname = "シリウス";
@@ -640,7 +640,7 @@ boolean pets_only; /* true for ascension or final escape */
                 mdrop_special_objs(mtmp); /* drop Amulet */
             } else if (mtmp->meating || mtmp->mtrapped) {
                 if (canseemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s is still %s.", Monnam(mtmp),
                           mtmp->meating ? "eating" : "trapped");
 #else
@@ -659,7 +659,7 @@ boolean pets_only; /* true for ascension or final escape */
             }
             if (stay_behind) {
                 if (mtmp->mleashed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s leash suddenly comes loose.",
                           humanoid(mtmp->data)
                               ? (mtmp->female ? "Her" : "His")
@@ -954,7 +954,7 @@ register struct obj *obj;
                 boolean big_corpse =
                     (obj->otyp == CORPSE && obj->corpsenm >= LOW_PM
                      && mons[obj->corpsenm].msize > mtmp->data->msize);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s catches %s%s", Monnam(mtmp), the(xname(obj)),
                       !big_corpse ? "." : ", or vice versa!");
 #else
@@ -1046,7 +1046,7 @@ boolean was_dead;
         if (!quietly && cansee(mtmp->mx, mtmp->my)) {
             if (haseyes(youmonst.data)) {
                 if (haseyes(mtmp->data))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s to look you in the %s.", Monnam(mtmp),
                           mtmp->mpeaceful ? "seems unable" : "refuses",
                           body_part(EYE));
@@ -1072,7 +1072,7 @@ boolean was_dead;
 
     if (!mtmp->mtame) {
         if (!quietly && canspotmon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s.", Monnam(mtmp),
                   mtmp->mpeaceful ? "is no longer tame" : "has become feral");
 #else

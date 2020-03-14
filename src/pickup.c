@@ -632,7 +632,7 @@ int what; /* should be a long */
             for (i = 0; i < n; i++)
                 pick_list[i].count = count;
         } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             n = query_objlist("Pick up what?", objchain_p,
                               (traverse_how | FEEL_COCKATRICE),
                               &pick_list, PICK_ANY, all_but_uchain);
@@ -687,7 +687,7 @@ int what; /* should be a long */
             There("are %s objects here.", (ct <= 10) ? "several" : "many");
 */
             pline("ここには%sものがある．", (ct <= 10) ? "いくつか" : "沢山の");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             if (!query_classes(oclasses, &selective, &all_of_a_type,
                                "pick up", *objchain_p,
                                (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
@@ -702,7 +702,7 @@ int what; /* should be a long */
                     goto pickupdone;
                 if (selective)
                     traverse_how |= INVORDER_SORT;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 n = query_objlist("Pick up what?", objchain_p, traverse_how,
                                   &pick_list, PICK_ANY,
                                   (via_menu == -2) ? allow_all
@@ -730,7 +730,7 @@ int what; /* should be a long */
             if (!all_of_a_type) {
                 char qbuf[BUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 (void) safe_qbuf(qbuf, "Pick up ", "?", obj, doname,
                                  ansimpleoname, something);
 #else
@@ -1010,7 +1010,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
 
         any = zeroany;
         if (sorted && n > 1) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "%s Creatures",
                     is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
 #else
@@ -1265,7 +1265,7 @@ int how;               /* type of query */
         invlet = 'X';
         any = zeroany;
         any.a_int = 'X';
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(win, NO_GLYPH, &any, invlet, 0, ATR_NONE,
                  "Items of unknown Bless/Curse status", MENU_UNSELECTED);
 #else
@@ -1468,7 +1468,7 @@ int *wt_before, *wt_after;
     /* we can carry qq of them */
     if (qq > 0) {
         if (qq < count)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("can only %s %s of the %s %s.", verb,
                 (qq == 1L) ? "one" : "some", obj_nambuf, where);
 #else
@@ -1480,7 +1480,7 @@ int *wt_before, *wt_after;
     }
 
     if (!container)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Strcpy(where, "here"); /* slightly shorter form */
 #else
         Strcpy(where, "ここには");  /* slightly shorter form */
@@ -1525,7 +1525,7 @@ boolean telekinesis;
     int result, old_wt, new_wt, prev_encumbr, next_encumbr;
 
     if (obj->otyp == BOULDER && Sokoban) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("cannot get your %s around this %s.", body_part(HAND),
             xname(obj));
 #else
@@ -1544,7 +1544,7 @@ boolean telekinesis;
             return 1; /* lift regardless of current situation */
         /* if we reach here, we're out of slots and already have at least
            one of these, so treat this one more like a normal item */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("are carrying too much stuff to pick up %s %s.",
             (obj->quan == 1L) ? "another" : "more", simpleonames(obj));
 #else
@@ -1671,7 +1671,7 @@ boolean telekinesis; /* not picking it up directly by hand */
         else if (!obj->spe && !obj->cursed)
             obj->spe = 1;
         else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("scroll%s %s to dust as you %s %s up.", plur(obj->quan),
                       otense(obj, "turn"), telekinesis ? "raise" : "pick",
                       (obj->quan == 1L) ? "it" : "them");
@@ -1782,7 +1782,7 @@ encumber_msg()
             You("荷物の釣合をとり直したが，動きにくい．");
             break;
         case 3:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s under your heavy load.  Movement is very hard.",
                 stagger(youmonst.data, "stagger"));
 #else
@@ -1790,7 +1790,7 @@ encumber_msg()
 #endif
             break;
         default:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s move a handspan with this load!",
                 newcap == 4 ? "can barely" : "can't even");
 #else
@@ -1820,7 +1820,7 @@ encumber_msg()
             You("荷物の釣合をとり直した．だがまだ動くのはきつい．");
             break;
         case 3:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s under your load.  Movement is still very hard.",
                 stagger(youmonst.data, "stagger"));
 #else
@@ -2002,7 +2002,7 @@ doloot()
         return 0;
     }
     if (nohands(youmonst.data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("have no hands!"); /* not `body_part(HAND)' */
 #else
         pline("あなたには手がない！");
@@ -2091,7 +2091,7 @@ doloot()
                 nobj = cobj->nexthere;
 
                 if (Is_container(cobj)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     c = ynq(safe_qbuf(qbuf, "There is ", " here, loot it?",
                                       cobj, doname, ansimpleoname,
                                       "a container"));
@@ -2143,7 +2143,7 @@ doloot()
         } else
             underfoot = FALSE;
         if (u.dz < 0) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s to loot on the %s.", dont_find_anything,
                 ceiling(cc.x, cc.y));
 #else
@@ -2169,7 +2169,7 @@ doloot()
         if (!underfoot) {
             if (container_at(cc.x, cc.y, FALSE)) {
                 if (mtmp) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You_cant("loot anything %sthere with %s in the way.",
                              prev_inquiry ? "else " : "", mon_nam(mtmp));
 #else
@@ -2178,14 +2178,14 @@ doloot()
 #endif
                     return timepassed;
                 } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("have to be at a container to loot it.");
 #else
                     You("は箱を開けるためには同じ位置にいなければならない．");
 #endif
                 }
             } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("%s %sthere to loot.", dont_find_anything,
                     (prev_inquiry || prev_loot) ? "else " : "");
 #else
@@ -2196,7 +2196,7 @@ doloot()
             }
         }
     } else if (c != 'y' && c != 'n') {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("%s %s to loot.", dont_find_anything,
             underfoot ? "here" : "there");
 #else
@@ -2321,7 +2321,7 @@ boolean *prev_loot;
 
         if (passed_info)
             *passed_info = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(qbuf, "Do you want to remove the saddle from %s?",
                 x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                          SUPPRESS_SADDLE, FALSE));
@@ -2332,7 +2332,7 @@ boolean *prev_loot;
 #endif
         if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
             if (nolimbs(youmonst.data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You_cant("do that without limbs."); /* not body_part(HAND) */
 #else
                 You_cant("手がないとできない．");
@@ -2452,7 +2452,7 @@ register struct obj *obj;
         pline("それは興味をそそられるトポロジーの問題だ．");
         return 0;
     } else if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Norep("You cannot %s %s you are wearing.",
               Icebox ? "refrigerate" : "stash", something);
 #else
@@ -2718,7 +2718,7 @@ struct obj *item;
 */
         pline("%sは消え去った！", Doname2(item));
     else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("%s %s disappear!", Blind ? "notice" : "see", doname(item));
 #else
         You("%sが見えなくなるの%s．", doname(item), Blind ? "に気づいた" : "を見た");
@@ -2767,7 +2767,7 @@ boolean makecat, givemsg;
             set_malign(livecat);
             if (givemsg) {
                 if (!canspotmon(livecat))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("think %s brushed your %s.", something,
                         body_part(FOOT));
 #else
@@ -2775,7 +2775,7 @@ boolean makecat, givemsg;
                         body_part(FOOT));
 #endif
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s inside the box is still alive!",
                           Monnam(livecat));
 #else
@@ -2831,7 +2831,7 @@ explain_container_prompt(more_containers)
 boolean more_containers;
 {
     static const char *const explaintext[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "Container actions:",
         "",
         " : -- Look: examine contents",
@@ -2878,7 +2878,7 @@ boolean
 u_handsy()
 {
     if (nohands(youmonst.data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("have no hands!"); /* not `body_part(HAND)' */
 #else
         pline("あなたには手がない！");  /* not `body_part(HAND)' */
@@ -3014,7 +3014,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
     for (;;) { /* repeats iff '?' or ":' gets chosen */
         outmaybe = (outokay || !current_container->cknown);
         if (!outmaybe)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             (void) safe_qbuf(qbuf, (char *) 0, " is empty.  Do what with it?",
                              current_container, Yname2, Ysimple_name2,
                              "This");
@@ -3024,7 +3024,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
                              "これ");
 #endif
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             (void) safe_qbuf(qbuf, "Do what with ", "?", current_container,
                              yname, ysimple_name, "it");
 #else
@@ -3101,7 +3101,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
 
     if ((loot_in || stash_one)
         && (!invent || (invent == current_container && !invent->nobj))) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("don't have anything%s to %s.", invent ? " else" : "",
             stash_one ? "stash" : "put in");
 #else
@@ -3371,7 +3371,7 @@ boolean outokay, inokay, alreadyused, more_containers;
     }
     if (inokay) {
         any.a_int = 5; /* 'r' */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%sput in, then take out",
                 outokay ? "both reversed; " : "");
 #else
@@ -3392,7 +3392,7 @@ boolean outokay, inokay, alreadyused, more_containers;
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
     if (more_containers) {
         any.a_int = 7; /* 'n' */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
                  "loot next container", MENU_SELECTED);
 #else
@@ -3444,7 +3444,7 @@ dotip()
 
     /* check floor container(s) first; at most one will be accessed */
     if ((boxes = container_at(cc.x, cc.y, TRUE)) > 0) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "You can't tip %s while carrying so much.",
                 !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
 #else
@@ -3480,7 +3480,7 @@ dotip()
                     /* use 'i' for inventory unless there are so many
                        containers that it's already being used */
                     i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     add_menu(win, NO_GLYPH, &any, i, 0, ATR_NONE,
                              "tip something being carried", MENU_SELECTED);
 #else
@@ -3518,7 +3518,7 @@ dotip()
                     nobj = cobj->nexthere;
                     if (!Is_container(cobj))
                         continue;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?",
                                       cobj,
                                       doname, ansimpleoname, "container"));
@@ -3590,13 +3590,13 @@ dotip()
 */
             Strcpy(buf, "そして徐々に散っていった．");
         else if (is_lava(u.ux, u.uy))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, " and immediately %s away",
                     vtense(spillage, "burn"));
 #else
             Strcpy(buf, "そしてすぐに燃えつきた．");
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Some %s %s onto the %s%s.", spillage,
               vtense(spillage, "spill"), surface(u.ux, u.uy), buf);
 #else
@@ -3690,7 +3690,7 @@ struct obj *box; /* or bag */
 
         if (box->spe < old_spe) {
             if (bag)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline((seen == 0) ? "Nothing seems to happen."
                                   : (seen == 1) ? "A monster appears."
                                                 : "Monsters appear!");

@@ -156,7 +156,7 @@ boolean talk;
 
     if (wizard && talk) {
         if (u.ualign.type != original_alignment) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("are currently %s instead of %s.", align_str(u.ualign.type),
                 align_str(original_alignment));
 #else
@@ -169,7 +169,7 @@ boolean talk;
 */
             You("“]Œü‚µ‚Ä‚¢‚éD");
         } else if (u.ualign.record < MIN_QUEST_ALIGN) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("are currently %d and require %d.", u.ualign.record,
                 MIN_QUEST_ALIGN);
 #else

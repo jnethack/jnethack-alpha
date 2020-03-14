@@ -1250,7 +1250,7 @@ register int type;
  * http://concord.wikia.com/wiki/List_of_Fictional_Currencies
  */
 static const char *const currencies[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "Altarian Dollar",       /* The Hitchhiker's Guide to the Galaxy */
     "Ankh-Morpork Dollar",   /* Discworld */
     "auric",                 /* The Domination of Draka */
@@ -1303,7 +1303,7 @@ long amount;
 {
     const char *res;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     res = Hallucination ? currencies[rn2(SIZE(currencies))] : "zorkmid";
     if (amount != 1L)
         res = makeplural(res);
@@ -2100,7 +2100,7 @@ unsigned *resultflags;
     ilets[iletct] = '\0';
 
     for (;;) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]",
                 word, ilets);
 #else
@@ -2332,7 +2332,7 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
                     Sprintf(qpfx, "%s: ", word), *qpfx = highc(*qpfx);
                 first = FALSE;
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             (void) safe_qbuf(qbuf, qpfx, "?", otmp,
                              ininv ? safeq_xprname : doname,
                              ininv ? safeq_shortxprname : ansimpleoname,
@@ -2637,7 +2637,7 @@ long quan;       /* if non-0, print this quantity, not obj->quan */
      */
     if (cost != 0 || let == '*') {
         /* if dot is true, we're doing Iu, otherwise Ix */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(li,
                 iflags.menu_tab_sep ? "%c - %s\t%6ld %s"
                                     : "%c - %-45s %6ld %s",
@@ -2905,7 +2905,7 @@ long *out_cnt;
     }
     if (iflags.force_invmenu && lets && want_reply) {
         any = zeroany;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                  "Special", MENU_UNSELECTED);
 #else
@@ -2913,7 +2913,7 @@ long *out_cnt;
                  "ì¡éÍ", MENU_UNSELECTED);
 #endif
         any.a_char = '*';
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE,
                  "(list everything)", MENU_UNSELECTED);
 #else
@@ -3266,7 +3266,7 @@ dounpaid()
     }
 
     putstr(win, 0, "");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     putstr(win, 0,
            xprname((struct obj *) 0, "Total:", '*', FALSE, totcost, 0L));
 #else
@@ -3426,7 +3426,7 @@ dotypeinv()
         if (billx)
             (void) doinvbill(1);
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("No used-up objects%s.",
                   unpaid_count ? " on your shopping bill" : "");
 #else
@@ -3563,7 +3563,7 @@ char *buf;
     else if (IS_SINK(ltyp))
         cmap = S_sink; /* "sink" */
     else if (IS_ALTAR(ltyp)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(altbuf, "%saltar to %s (%s)",
                 ((lev->altarmask & AM_SHRINE)
                  && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
@@ -3771,7 +3771,7 @@ boolean picked_some;
 */
             There("Ç±Ç±Ç…ÇÕ%sàÍÇ¬Ç‡ÇÃÇ™Ç†ÇÈÅD", picked_some ? "Ç‡Ç§" : "");
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             There("are %s%s objects here.",
                   (obj_cnt < 5)
                       ? "a few"
@@ -3833,7 +3833,7 @@ boolean picked_some;
             putstr(tmpwin, 0, fbuf);
             putstr(tmpwin, 0, "");
         }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%s that %s here:",
                 picked_some ? "Other things" : "Things",
                 Blind ? "you feel" : "are");
@@ -3903,7 +3903,7 @@ boolean force_touch;
         Strcpy(kbuf, corpse_xname(otmp, (const char *) 0, CXN_PFX_THE));
 
         if (poly_when_stoned(youmonst.data))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("touched %s with your bare %s.", kbuf,
                 makeplural(body_part(HAND)));
 #else
@@ -4265,7 +4265,7 @@ long numused;
  * This must match the object class order.
  */
 STATIC_VAR NEARDATA const char *names[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     0, "Illegal objects", "Weapons", "Armor", "Rings", "Amulets", "Tools",
     "Comestibles", "Potions", "Scrolls", "Spellbooks", "Wands", "Coins",
     "Gems/Stones", "Boulders/Statues", "Iron balls", "Chains", "Venoms"
@@ -4539,7 +4539,7 @@ doorganize() /* inventory organizer by Del Lamb */
                 pline1(Never_mind);
             return 0;
         } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("Only gold coins may be moved into the '%c' slot.",
                   GOLD_SYM);
 #else
@@ -4556,7 +4556,7 @@ doorganize() /* inventory organizer by Del Lamb */
             break; /* got one */
         if (trycnt == 5)
             goto noadjust;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Select an inventory slot letter."); /* else try again */
 #else
         pline("éùÇøï®ÇÃï∂éöÇëIÇÒÇ≈Ç≠ÇæÇ≥Ç¢ÅD");
@@ -4751,7 +4751,7 @@ char *title;
         have_inv = (mon->minvent != 0), have_any = (have_inv || incl_hero),
         pickings = (dflags & MINV_PICKMASK);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(tmp, "%s %s:", s_suffix(noit_Monnam(mon)),
             do_all ? "possessions" : "armament");
 #else
@@ -4804,7 +4804,7 @@ register struct obj *obj;
     int n;
     menu_item *selected = 0;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     (void) safe_qbuf(qbuf, "Contents of ", ":", obj, doname, ansimpleoname,
                      "that");
 #else

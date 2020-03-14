@@ -569,7 +569,7 @@ char errbuf[];
        settle for `lock' instead of `fq_lock' because the latter
        might end up being too big for nethack's BUFSZ */
     if (fd < 0 && errbuf)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(errbuf, "Cannot open file \"%s\" for level %d (errno %d).",
                 lock, lev, errno);
 #else

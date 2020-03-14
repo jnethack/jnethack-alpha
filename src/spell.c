@@ -166,7 +166,7 @@ struct obj *bp;
 */
         pline("Ç±ÇÃñ{ÇÕê⁄êGå^ÇÃì≈Ç≈ï¢ÇÌÇÍÇƒÇ¢ÇÈÅI");
         if (uarmg) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             erode_obj(uarmg, "gloves", ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
 #else
             erode_obj(uarmg, "è¨éË", ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
@@ -177,7 +177,7 @@ struct obj *bp;
         was_in_use = bp->in_use;
         bp->in_use = FALSE;
         losestr(Poison_resistance ? rn1(2, 1) : rn1(4, 3));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         losehp(rnd(Poison_resistance ? 6 : 10), "contact-poisoned spellbook",
                KILLED_BY_AN);
 #else
@@ -238,7 +238,7 @@ struct obj *spellbook;
         useup(spellbook);
         gone = TRUE;
     } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("find yourself reading the %s line over and over again.",
             spellbook == context.spbook.book ? "next" : "first");
 #else
@@ -489,7 +489,7 @@ learn(VOID_ARGS)
             You("Ç∑Ç≈Ç…%sÇènímÇµÇƒÇ¢ÇÈÅD", splname);
             costly = FALSE;
         } else { /* spellknow(i) <= KEEN/10 */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Your("knowledge of %s is %s.", splname,
                  spellknow(i) ? "keener" : "restored");
 #else
@@ -584,7 +584,7 @@ register struct obj *spellbook;
         /* handle the sequence: start reading, get interrupted, have
            context.spbook.book become erased somehow, resume reading it */
         && booktype != SPE_BLANK_PAPER) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("continue your efforts to %s.",
             (booktype == SPE_NOVEL) ? "read the novel" : "memorize the spell");
 #else
@@ -661,7 +661,7 @@ register struct obj *spellbook;
                 if (Role_if(PM_WIZARD) && read_ability < 20 && !confused) {
                     char qbuf[QBUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Sprintf(qbuf,
                     "This spellbook is %sdifficult to comprehend.  Continue?",
                             (read_ability < 12 ? "very " : ""));
@@ -720,7 +720,7 @@ register struct obj *spellbook;
         }
         spellbook->in_use = FALSE;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("begin to %s the runes.",
             spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? "recite" : "memorize");
 #else
@@ -1043,7 +1043,7 @@ cast_protection()
                                             : "air");
 */
                                             : "ãÛãC");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline_The("%s around you begins to shimmer with %s haze.",
                           atmosphere, an(hgolden));
 #else
@@ -1996,7 +1996,7 @@ int *spell_no;
      * given string and are of the form "a - ".
      */
     if (!iflags.menu_tab_sep) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%-20s     Level %-12s Fail Retention", "    Name",
                 "Category");
 #else

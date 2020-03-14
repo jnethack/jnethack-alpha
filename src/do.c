@@ -88,7 +88,7 @@ boolean pushing;
                 Strcpy(whobuf, "あなた");
                 if (u.usteed)
                     Strcpy(whobuf, y_monnam(u.usteed));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s %s into the %s.", upstart(whobuf),
                       vtense(whobuf, "push"), the(xname(otmp)), what);
 #else
@@ -106,7 +106,7 @@ boolean pushing;
         if (!fills_up || !pushing) { /* splashing occurs */
             if (!u.uinwater) {
                 if (pushing ? !Blind : cansee(rx, ry)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     There("is a large splash as %s %s the %s.",
                           the(xname(otmp)), fills_up ? "fills" : "falls into",
                           what);
@@ -201,7 +201,7 @@ const char *verb;
         if (((mtmp = m_at(x, y)) && mtmp->mtrapped)
             || (u.utrap && u.ux == x && u.uy == y)) {
             if (*verb && (cansee(x, y) || distu(x, y) == 0))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s boulder %s into the pit%s.",
                       Blind ? "A" : "The",
                       vtense((const char *) 0, verb),
@@ -229,7 +229,7 @@ const char *verb;
                         mtmp->mhp -= damage;
                         if (DEADMONSTER(mtmp)) {
                             if (canspotmon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                                 pline("%s is %s!", Monnam(mtmp),
                                       (nonliving(mtmp->data)
                                        || is_vampshifter(mtmp))
@@ -270,7 +270,7 @@ const char *verb;
 */
                 You_hear("足元で何かが砕ける音を聞いた．");
             } else if (!Blind && cansee(x, y)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline_The("boulder %s%s.",
                           (ttyp == TRAPDOOR && !tseen)
                               ? "triggers and " : "",
@@ -371,7 +371,7 @@ register struct obj *obj;
     }
 
     if (obj->blessed || obj->cursed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         There("is %s flash as %s %s the altar.",
               an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj),
               otense(obj, "hit"));
@@ -609,7 +609,7 @@ register struct obj *obj;
             if (otmp != uball && otmp != uchain
                 && !obj_resists(otmp, 1, 99)) {
                 if (!Blind) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("Suddenly, %s %s from the sink!", doname(otmp),
                           otense(otmp, "vanish"));
 #else
@@ -676,7 +676,7 @@ register struct obj *obj;
             pline("指輪が排水口をするりと避けるのを見た！");
             break;
         case RIN_SEE_INVISIBLE:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You_see("some %s in the sink.",
                     Hallucination ? "oxygen molecules" : "air");
 #else
@@ -794,7 +794,7 @@ const char *word;
             if (!strcmp(word, "throw") && obj->quan > 1L)
                 obj->corpsenm = 1;
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("For some reason, you cannot %s%s the stone%s!", word,
                   obj->corpsenm ? " any of" : "", plur(obj->quan));
 #else
@@ -858,7 +858,7 @@ register struct obj *obj;
             /* doname can call s_suffix, reusing its buffer */
             Strcpy(monbuf, s_suffix(mon_nam(u.ustuck)));
             onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("drop %s into %s %s.", onam_p, monbuf,
                 mbodypart(u.ustuck, STOMACH));
 #else
@@ -1136,7 +1136,7 @@ int retry;
         bypass_objlist(invent, FALSE);
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         n = query_objlist("What would you like to drop?", &invent,
                           (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
@@ -1255,7 +1255,7 @@ dodown()
 */
             You("%sの中に浮いている．", surface(u.ux, u.uy));
         else if (Is_waterlevel(&u.uz))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("are floating in %s.",
                 is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
 #else
@@ -1347,7 +1347,7 @@ dodown()
         if (youmonst.data->msize >= MZ_HUGE) {
             char qbuf[QBUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("don't fit %s easily.", down_or_thru);
             Sprintf(qbuf, "Try to squeeze %s?", down_or_thru);
 #else
@@ -1379,7 +1379,7 @@ dodown()
                 return 0;
             }
         }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("%s %s the %s.", actn, down_or_thru,
             trap->ttyp == HOLE ? "hole" : "trap door");
 #else
@@ -1424,7 +1424,7 @@ doup()
         return 0;
     }
     if (u.ustuck) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("are %s, and cannot go up.",
             !u.uswallow ? "being held" : is_animal(u.ustuck->data)
                                              ? "swallowed"
@@ -1439,7 +1439,7 @@ doup()
     }
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Your("load is too heavy to climb the %s.",
              levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
 #else
@@ -1880,7 +1880,7 @@ boolean at_stairs, falling, portal;
                 selftouch("落ちながら，あなたは");
             } else { /* ordinary descent */
                 if (flags.verbose)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("%s.", at_ladder ? "climb down the ladder"
                                          : "descend the stairs");
 #else
@@ -1990,7 +1990,7 @@ boolean at_stairs, falling, portal;
             "You feel like you've been here before.",
 */
             "前にここに来たことがあるような気がした．",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             "This place %s familiar...", 0 /* no message */
 #else
             "この場所は懐かしい．．．", 0 /* no message */
@@ -2005,7 +2005,7 @@ boolean at_stairs, falling, portal;
             "You are surrounded by twisty little passages, all alike.",
 */
             "あなたはまがりくねった通路にかこまれていた．．．",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             "Gee, this %s like uncle Conan's place...", 0 /* no message */
 #else
             "ゲー！コナンおじさんの場所に似ている．．．", 0 /* no message */
@@ -2199,7 +2199,7 @@ struct obj *corpse;
     where = corpse->where;
     is_uwep = (corpse == uwep);
     chewed = (corpse->oeaten != 0);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Strcpy(cname, corpse_xname(corpse,
                                chewed ? "bite-covered" : (const char *) 0,
                                CXN_SINGULAR));
@@ -2239,7 +2239,7 @@ struct obj *corpse;
 
         case OBJ_FLOOR:
             if (cansee(mtmp->mx, mtmp->my))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s rises from the dead!",
                       chewed ? Adjmonnam(mtmp, "bite-covered")
                              : Monnam(mtmp));
@@ -2253,7 +2253,7 @@ struct obj *corpse;
         case OBJ_MINVENT: /* probably a nymph's */
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (canseemon(mcarry))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("Startled, %s drops %s as it revives!",
                           mon_nam(mcarry), an(cname));
 #else
@@ -2261,7 +2261,7 @@ struct obj *corpse;
                           cname, mon_nam(mcarry), cname);
 #endif
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s suddenly appears!",
                           chewed ? Adjmonnam(mtmp, "bite-covered")
                                  : Monnam(mtmp));
@@ -2284,7 +2284,7 @@ struct obj *corpse;
                       yname(container));
             } else if (container_where == OBJ_INVENT && container) {
                 Strcpy(sackname, an(xname(container)));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s out of %s in your pack!",
                       Blind ? Something : Amonnam(mtmp),
                       locomotion(mtmp->data, "writhes"), sackname);
@@ -2339,13 +2339,13 @@ long timeout UNUSED;
 */
                 pline("%sは消えた．", monname);
             else if (!notice_it && canseemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s appears.", Monnam(mtmp)); /* not pre-rloc monname */
 #else
                 pline("%sが現れた．", Monnam(mtmp)); /* not pre-rloc monname */
 #endif
             else if (notice_it && dist2(mtmp->mx, mtmp->my, x, y) > 2)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s teleports.", monname); /* saw it and still see it */
 #else
                 pline("%sは瞬間移動した．", monname); /* saw it and still see it */
@@ -2475,7 +2475,7 @@ int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
            before the final stages and that calls us (how==2) to cure
            wounded legs, but we want to suppress the feel better message */
         if (!u.usteed && how != 2) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             const char *legs = body_part(LEG);
 
             if ((EWounded_legs & BOTH_SIDES) == BOTH_SIDES)

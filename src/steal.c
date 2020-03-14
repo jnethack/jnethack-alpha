@@ -447,7 +447,7 @@ gotobj:
                     unmul((char *) 0);
                 slowly = (armordelay >= 1 || multi < 0);
                 if (flags.female)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s charms you.  You gladly %s your %s.",
                           !seen ? "She" : Monnam(mtmp),
                           curssv ? "let her take"
@@ -465,7 +465,7 @@ gotobj:
                                                          : "‚Í‚¸‚µŽn‚ß");
 #endif
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s seduces you and %s off your %s.",
                           !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
                           curssv
@@ -691,7 +691,7 @@ int ochance, achance; /* percent chance for ordinary item, artifact */
             if (!strcmp(MonName, "It"))
                 MonName = "Something";
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s pulls %s away from you and absorbs %s!", MonName,
                   yname(obj), (obj->quan > 1L) ? "them" : "it");
 #else
@@ -703,7 +703,7 @@ int ochance, achance; /* percent chance for ordinary item, artifact */
 
             if (bimanual(obj))
                 hand_s = makeplural(hand_s);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s pulled from your %s!", upstart(yname(obj)),
                   otense(obj, "are"), hand_s);
 #else
@@ -818,7 +818,7 @@ boolean is_pet; /* If true, pet should keep wielded/worn items */
     /* vault guard's gold goes away rather than be dropped... */
     if (mtmp->isgd && (otmp = findgold(mtmp->minvent)) != 0) {
         if (canspotmon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s gold %s.", s_suffix(Monnam(mtmp)),
                   canseemon(mtmp) ? "vanishes" : "seems to vanish");
 #else

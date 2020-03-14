@@ -15,7 +15,7 @@
 
 extern const char *hu_stat[]; /* defined in eat.c */
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
                                  "Strained", "Overtaxed", "Overloaded" };
 #else
@@ -97,7 +97,7 @@ do_statusline1()
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(nb = eos(nb), "St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d",
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
@@ -108,7 +108,7 @@ do_statusline1()
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(nb = eos(nb),
             (u.ualign.type == A_CHAOTIC)
                 ? "  Chaotic"
@@ -168,7 +168,7 @@ do_statusline2()
     hpmax = Upolyd ? u.mhmax : u.uhpmax;
     if (hp < 0)
         hp = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(hlth, "HP:%d(%d) Pw:%d(%d) AC:%-2d",
             min(hp, 9999), min(hpmax, 9999),
             min(u.uen, 9999), min(u.uenmax, 9999), u.uac);
@@ -716,7 +716,7 @@ bot_via_windowport()
     blstats[idx][BL_CH].a.a_int = ACURR(A_CHA);
 
     /* Alignment */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Strcpy(blstats[idx][BL_ALIGN].val, (u.ualign.type == A_CHAOTIC)
                                           ? "Chaotic"
                                           : (u.ualign.type == A_NEUTRAL)

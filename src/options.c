@@ -329,7 +329,7 @@ static struct Comp_Opt {
 */
     { "font_map", "マップウィンドウに使用するフォント", 40,
       DISP_IN_GAME },                                              /*WC*/
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { "font_menu", "the font to use in menus", 40, DISP_IN_GAME }, /*WC*/
 #else
     { "font_menu", "メニューに使用するフォント", 40, DISP_IN_GAME }, /*WC*/
@@ -339,7 +339,7 @@ static struct Comp_Opt {
 */
     { "font_message", "メッセージウィンドウに使用するフォント", 40,
       DISP_IN_GAME },                                                  /*WC*/
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { "font_size_map", "the size of the map font", 20, DISP_IN_GAME }, /*WC*/
 #else
     { "font_size_map", "マップフォントのサイズ", 20, DISP_IN_GAME }, /*WC*/
@@ -387,7 +387,7 @@ static struct Comp_Opt {
 */
     { "horsename", "冒険を供にする(最初の)馬の名前 (例 ghoulname:シルバー)",
       PL_PSIZ, DISP_IN_GAME },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { "map_mode", "map display mode under Windows", 20, DISP_IN_GAME }, /*WC*/
 #else
     { "map_mode", "ウィンドウ表示時のマップの表示モード", 20, DISP_IN_GAME }, /*WC*/
@@ -1381,7 +1381,7 @@ bad_negation(optname, with_parameter)
 const char *optname;
 boolean with_parameter;
 {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     pline_The("%s option may not %sbe negated.", optname,
               with_parameter ? "both have a value and " : "");
 #else
@@ -1508,7 +1508,7 @@ const char *optn;
     if (!initial) {
         Sprintf(buf, "%lu.%lu.%lu", FEATURE_NOTICE_VER_MAJ,
                 FEATURE_NOTICE_VER_MIN, FEATURE_NOTICE_VER_PATCH);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline(
           "Feature change alerts disabled for NetHack %s features and prior.",
               buf);
@@ -1598,7 +1598,7 @@ int iscompound; /* 0 == boolean option, 1 == compound */
      * For now just return.
      */
 #else /* !MAC */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     config_error_add("%s option specified multiple times: %s",
                      iscompound ? "compound" : "boolean", opts);
 #else
@@ -2986,7 +2986,7 @@ boolean tinitial, tfrom_file;
                     forig = fruit_from_name(pl_fruit, FALSE, (int *) 0);
 
                 if (!forig && fnum >= 100) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     config_error_add(
                              "Doing that so many times isn't very fruitful.");
 #else
@@ -4889,7 +4889,7 @@ doset() /* changing options via menu by Per Liboriussen */
     indexoffset = boolcount;
     any = zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
              "Compounds (selecting will prompt for new value):",
              MENU_UNSELECTED);
@@ -5032,22 +5032,22 @@ int numtotal;
         char letr;
         const char *desc;
     } action_titles[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         { 'a', "add new %s" },         /* [0] */
 #else
         { 'a', "新しい%sを追加" },     /* [0] */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         { 'l', "list %s" },            /* [1] */
 #else
         { 'l', "%sを一覧表示" },       /* [1] */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         { 'r', "remove existing %s" }, /* [2] */
 #else
         { 'r', "既にある%sを削除" },   /* [2] */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         { 'x', "exit this menu" },     /* [3] */
 #else
         { 'x', "このメニューを閉じる" }, /* [3] */
@@ -5481,7 +5481,7 @@ boolean setinitial, setfromfile;
         any.a_int = ALIGN_RIGHT;
         add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "right",
                  MENU_UNSELECTED);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(abuf, "Select %s window placement relative to the map:",
                 msg ? "message" : "status");
 #else
@@ -5626,7 +5626,7 @@ boolean setinitial, setfromfile;
                          MENU_UNSELECTED);
                 tmp = tmp->next;
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(mtbuf, "%s message types",
                     (opt_idx == 1) ? "List of" : "Remove which");
 #else
@@ -5717,7 +5717,7 @@ boolean setinitial, setfromfile;
                          MENU_UNSELECTED);
                 tmp = tmp->next;
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(mcbuf, "%s menu colors",
                     (opt_idx == 1) ? "List of" : "Remove which");
 #else
@@ -5886,7 +5886,7 @@ boolean setinitial, setfromfile;
                              buf, MENU_UNSELECTED);
                 }
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "Select %ssymbol set:",
                     rogueflag ? "rogue level " : "");
 #else
@@ -5992,7 +5992,7 @@ get_compopt_value(optname, buf)
 const char *optname;
 char *buf;
 {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     static const char none[] = "(none)", randomrole[] = "random",
                       to_be_done[] = "(to be done)",
                       defopt[] = "default", defbrief[] = "def";
@@ -6193,7 +6193,7 @@ char *buf;
             "4=on, phone layout, MSDOS compatible",
 */
             "4=有効，電話式の配置，MSDOS 互換",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             "-1=off, y & z swapped", /*[5]*/
 #else
             "-1=無効，yとzを入れ替え", /*[5]*/
@@ -6235,7 +6235,7 @@ char *buf;
         else
             Strcpy(buf, defopt);
     } else if (!strcmp(optname, "pettype")) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%s", (preferred_pet == 'c') ? "cat"
                            : (preferred_pet == 'd') ? "dog"
                              : (preferred_pet == 'h') ? "horse"
@@ -6300,7 +6300,7 @@ char *buf;
                 break;
             }
     } else if (!strcmp(optname, "player_selection")) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");
 #else
         Sprintf(buf, "%s入力", iflags.wc_player_selection ? "プロンプト" : "ダイアログ");
@@ -6423,7 +6423,7 @@ dotogglepickup()
     flags.pickup = !flags.pickup;
     if (flags.pickup) {
         oc_to_str(flags.pickup_types, ocl);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
                 (iflags.autopickup_exceptions[AP_LEAVE]
                  || iflags.autopickup_exceptions[AP_GRAB])

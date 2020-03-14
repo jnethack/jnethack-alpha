@@ -74,7 +74,7 @@ const char *shout;
             /* Sidenote on "A watchman angrily waves her arms!"
              * Female being called watchman is correct (career name).
              */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s angrily %s %s %s!",
                 Amonnam(mon),
                 nolimbs(mon->data) ? "shakes" : "waves",
@@ -508,7 +508,7 @@ register struct monst *mtmp;
     if (nearby && mdat->msound == MS_BRIBE && mtmp->mpeaceful && !mtmp->mtame
         && !u.uswallow) {
         if (mtmp->mux != u.ux || mtmp->muy != u.uy) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s whispers at thin air.",
                   cansee(mtmp->mux, mtmp->muy) ? Monnam(mtmp) : "It");
 #else
@@ -569,7 +569,7 @@ register struct monst *mtmp;
 
             if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
                 int dmg;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("It locks on to your %s!",
                       m_sen ? "telepathy" : Blind_telepat ? "latent telepathy"
                                                           : "mind");
@@ -1399,7 +1399,7 @@ register int after;
                 if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                     && amorphous(ptr)) {
                     if (flags.verbose && canseemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
                                || ptr->mlet == S_LIGHT) ? "flows" : "oozes");
@@ -1829,7 +1829,7 @@ boolean domsg;
     }
 
     if (reslt && domsg) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("You %s %s where %s was.",
               !canseemon(mon) ? "now detect" : "observe",
               noname_monnam(mon, ARTICLE_A), oldmtype);

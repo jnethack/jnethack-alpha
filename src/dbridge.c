@@ -459,7 +459,7 @@ int xkill_flags, how;
             /* So, you didn't die */
             if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
                 if (enexto(&xy, etmp->ex, etmp->ey, etmp->edata)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("A %s force teleports you away...",
                           Hallucination ? "normal" : "strange");
 #else
@@ -595,7 +595,7 @@ struct entity *etmp;
 
     if (automiss(etmp) && e_survives_at(etmp, oldx, oldy)) {
         if (e_inview && (at_portcullis || IS_DRAWBRIDGE(crm->typ)))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("%s passes through %s!",
                       at_portcullis ? "portcullis" : "drawbridge",
                       e_nam(etmp));

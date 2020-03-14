@@ -54,7 +54,7 @@ lock_action()
 {
     /* "unlocking"+2 == "locking" */
     static const char *actions[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "unlocking the door",   /* [0] */
         "unlocking the chest",  /* [1] */
         "unlocking the box",    /* [2] */
@@ -173,7 +173,7 @@ picklock(VOID_ARGS)
                 what = (xlock.box->otyp == CHEST) ? "宝箱" : "箱";
                 alreadyunlocked = !xlock.box->olocked;
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("succeed in disarming the trap.  The %s is still %slocked.",
                 what, alreadyunlocked ? "un" : "");
 #else
@@ -303,7 +303,7 @@ forcelock(VOID_ARGS)
             /* for a +0 weapon, probability that it survives an unsuccessful
              * attempt to force the lock is (.992)^50 = .67
              */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%sour %s broke!", (uwep->quan > 1L) ? "One of y" : "Y",
                   xname(uwep));
 #else
@@ -439,7 +439,7 @@ struct obj *pick;
         You("%sをつかむことができない！手がないんだもの！", xname(pick));
         return PICKLOCK_DID_NOTHING;
     } else if (u.uswallow) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You_cant("%sunlock %s.", (picktyp == CREDIT_CARD) ? "" : "lock or ",
                  mon_nam(u.ustuck));
 #else
@@ -472,7 +472,7 @@ struct obj *pick;
         int count;
 
         if (u.dz < 0) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             There("isn't any sort of lock up %s.",
                   Levitation ? "here" : "there");
 #else
@@ -535,7 +535,7 @@ struct obj *pick;
                 Sprintf(qsfx, " here; %s %s?", verb, it ? "it" : "its lock");
 */
                 Sprintf(qsfx, "がある．%s？", verb);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 (void) safe_qbuf(qbuf, "There is ", qsfx, otmp, doname,
                                  ansimpleoname, "a box");
 #else
@@ -558,7 +558,7 @@ struct obj *pick;
                     return PICKLOCK_LEARNED_SOMETHING;
                 } else if (picktyp == CREDIT_CARD && !otmp->olocked) {
                     /* credit cards are only good for unlocking */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You_cant("do that with %s.",
                              an(simple_typename(picktyp)));
 #else
@@ -617,7 +617,7 @@ struct obj *pick;
 */
                 verbalize("いつもニコニコ現金払い．");
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("I don't think %s would appreciate that.",
                       mon_nam(mtmp));
 #else
@@ -673,7 +673,7 @@ struct obj *pick;
                 return PICKLOCK_LEARNED_SOMETHING;
             }
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(qbuf, "%s it?",
                     (door->doormask & D_LOCKED) ? "Unlock" : "Lock");
 #else
@@ -732,7 +732,7 @@ doforce()
                   || objects[uwep->otyp].oc_skill == P_FLAIL
                   || objects[uwep->otyp].oc_skill > P_LANCE)
                : uwep->oclass != ROCK_CLASS)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You_cant("force anything %s weapon.",
                  !uwep ? "when not wielding a"
                        : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))
@@ -775,7 +775,7 @@ doforce()
                    since we're about to set lknown, there's no need to
                    remember and then reset its current value */
                 otmp->lknown = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 There("is %s here, but its lock is already %s.",
                       doname(otmp), otmp->obroken ? "broken" : "unlocked");
 #else
@@ -786,7 +786,7 @@ doforce()
                 otmp->lknown = 1;
                 continue;
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             (void) safe_qbuf(qbuf, "There is ", " here; force its lock?",
                              otmp, doname, ansimpleoname, "a box");
 #else
@@ -922,7 +922,7 @@ int x, y;
 */
             pline_The("跳ね橋はもう開いている．");
         else if (container_at(cc.x, cc.y, TRUE))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s like something lootable over there.",
                   Blind ? "Feels" : "Seems");
 #else
@@ -1022,7 +1022,7 @@ boolean quietly;
         if (!quietly) {
             if ((mtmp->mx != x) || (mtmp->my != y)) {
                 /* worm tail */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s%s blocks the way!",
                       !canspotmon(mtmp) ? Something : s_suffix(Monnam(mtmp)),
                       !canspotmon(mtmp) ? "" : " tail");
@@ -1032,7 +1032,7 @@ boolean quietly;
                       !canspotmon(mtmp) ? "" : "の尻尾");
 #endif
             } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s blocks the way!",
                       !canspotmon(mtmp) ? "Some creature" : Monnam(mtmp));
 #else
@@ -1328,7 +1328,7 @@ int x, y;
         /* & trap doors, but is it ever OK for anything else? */
         if (t_at(x, y)) {
             /* maketrap() clears doormask, so it should be NODOOR */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s springs up in the doorway, but %s.", dustcloud,
                   quickly_dissipates);
 #else
@@ -1459,7 +1459,7 @@ struct obj *otmp;
     long save_Blinded;
 
     if (otmp->oclass == POTION_CLASS) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("%s %s shatter!", Blind ? "hear" : "see", an(bottlename()));
 #else
         if (Blind)

@@ -61,7 +61,7 @@ boolean FDECL((*gp_getvalidf), (int, int));
   [2] "use XXX to move the cursor to %s"
   */
 static const char *const gloc_descr[NUM_GLOCS][4] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { "any monsters", "monster", "next/previous monster", "monsters" },
     { "any items", "item", "next/previous object", "objects" },
     { "any doors", "door", "next/previous door or doorway", "doors or doorways" },
@@ -82,7 +82,7 @@ static const char *const gloc_descr[NUM_GLOCS][4] = {
 };
 
 static const char *const gloc_filtertxt[NUM_GFILTER] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "",
     " in view",
     " in this area"
@@ -102,7 +102,7 @@ int gloc;
 {
     char sbuf[BUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(sbuf, "Use '%s'/'%s' to %s%s%s.",
             k1, k2,
             iflags.getloc_usemenu ? "get a menu of "
@@ -126,7 +126,7 @@ getpos_help(force, goal)
 boolean force;
 const char *goal;
 {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     static const char *const fastmovemode[2] = { "8 units at a time",
                                                  "skipping same glyphs" };
 #else
@@ -137,7 +137,7 @@ const char *goal;
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(sbuf,
             "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
             Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
@@ -147,7 +147,7 @@ const char *goal;
             Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E, goal);
 #endif
     putstr(tmpwin, 0, sbuf);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(sbuf,
             "Use 'H', 'J', 'K', 'L' to fast-move the cursor, %s.",
             fastmovemode[iflags.getloc_moveskip]);
@@ -161,7 +161,7 @@ const char *goal;
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
 */
     putstr(tmpwin, 0, "”wŒi‚ÌƒVƒ“ƒ{ƒ‹‚ð“ü—Í‚·‚é‚Æ‚»‚ÌˆÊ’u‚ÉˆÚ“®‚·‚é(—áF'<')D");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
            visctrl(Cmd.spkeys[NHKF_GETPOS_SELF]));
 #else
@@ -197,7 +197,7 @@ const char *goal;
                              visctrl(Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
             visctrl(Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
             fastmovemode[!iflags.getloc_moveskip]);
@@ -208,7 +208,7 @@ const char *goal;
 #endif
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) == 0) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
                 visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
 #else
@@ -216,7 +216,7 @@ const char *goal;
                 visctrl(Cmd.spkeys[NHKF_GETPOS_MENU]));
 #endif
         putstr(tmpwin, 0, sbuf);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(sbuf,
                 "Use '%s' to change the mode of limiting possible targets.",
                 visctrl(Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
@@ -231,7 +231,7 @@ const char *goal;
         char kbuf[BUFSZ];
 
         if (getpos_getvalid) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
                     visctrl(Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
@@ -261,7 +261,7 @@ const char *goal;
 #endif
         putstr(tmpwin, 0, sbuf);
         if (iflags.cmdassist) { /* assisting the '/' command, I suppose... */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(sbuf,
                     (iflags.getpos_coords == GPCOORDS_NONE)
          ? "(Set 'whatis_coord' option to include coordinates with '%s' text.)"
@@ -279,7 +279,7 @@ const char *goal;
            getpos call, but only matter for dowhatis (and doquickwhatis) */
         doing_what_is = (goal == what_is_an_unknown_object);
         if (doing_what_is) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(kbuf, "'%s' or '%s' or '%s' or '%s'",
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]),
                     visctrl(Cmd.spkeys[NHKF_GETPOS_PICK_Q]),
@@ -612,7 +612,7 @@ boolean fulldir;
         Sprintf(buf, "%s", directionname(dst));
     } else {
         static const char *dirnames[4][2] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             { "n", "north" },
             { "s", "south" },
             { "w", "west" },
@@ -701,7 +701,7 @@ int cx, cy;
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch,
                               (struct permonst **) 0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         custompline(SUPPRESS_HISTORY,
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
@@ -740,7 +740,7 @@ int gloc;
 
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("cannot %s %s.",
             iflags.getloc_filter == GFILTER_VIEW ? "see" : "detect",
             gloc_descr[gloc][0]);
@@ -858,7 +858,7 @@ const char *goal;
 */
         goal = "–Ú“I’n";
     if (flags.verbose) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("(For instructions type a '%s')",
               visctrl(Cmd.spkeys[NHKF_GETPOS_HELP]));
 #else
@@ -1005,7 +1005,7 @@ const char *goal;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
             static const char *const view_filters[NUM_GFILTER] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 "Not limiting targets",
                 "Limiting targets to those in sight",
                 "Limiting targets to those in same area"
@@ -1055,7 +1055,7 @@ const char *goal;
             goto nxtc;
         } else if (c == Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
             iflags.getloc_moveskip = !iflags.getloc_moveskip;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%skipping over similar terrain when fastmoving the cursor.",
                   iflags.getloc_moveskip ? "S" : "Not s");
 #else
@@ -1168,7 +1168,7 @@ const char *goal;
 */
                         Strcpy(note, "’†’f‚µ‚½");
                     else /* hjkl */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         Sprintf(note, "use '%c', '%c', '%c', '%c' or '%s'",
                                 Cmd.move_W, Cmd.move_S, Cmd.move_N, Cmd.move_E,
                                 visctrl(Cmd.spkeys[NHKF_GETPOS_PICK]));
@@ -1342,7 +1342,7 @@ char *monnambuf, *usrbuf;
         /* catch trying to name "the {priest,Angel} of Crom" as "Crom" */
         || ((p = strstri(monnambuf, " of ")) != 0
             && fuzzymatch(usrbuf, p + 4, " -_", TRUE))) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s is already called %s.",
               upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
 #else
@@ -1481,7 +1481,7 @@ register struct obj *obj;
         return;
     }
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(qbuf, "What do you want to name %s ",
             is_plural(obj) ? "these" : "this");
     (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
@@ -1784,7 +1784,7 @@ struct obj *obj;
         Sprintf(qbuf, "%s‰t‘Ì:",
                 OBJ_DESCR(objects[obj->otyp]));
     else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         (void) safe_qbuf(qbuf, "Call ", ":", obj,
                          docall_xname, simpleonames, "thing");
 #else
@@ -1832,7 +1832,7 @@ namefloorobj()
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(buf, "object on map (or '.' for one %s you)",
             (u.uundetected && hides_under(youmonst.data)) ? "over" : "under");
 #else
@@ -1850,7 +1850,7 @@ namefloorobj()
     }
     if (!obj) {
         /* "under you" is safe here since there's no object to hide under */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("There doesn't seem to be any object %s.",
               (cc.x == u.ux && cc.y == u.uy) ? "under you" : "there");
 #else
@@ -2343,7 +2343,7 @@ char *outbuf;
        its own obfuscation) */
     if (mon->data == &mons[PM_HIGH_PRIEST] && !Hallucination
         && Is_astralevel(&u.uz) && distu(mon->mx, mon->my) > 2) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Strcpy(outbuf, article == ARTICLE_THE ? "the " : "");
         Strcat(outbuf, mon->female ? "high priestess" : "high priest");
 #else
@@ -2433,7 +2433,7 @@ roguename()
 }
 
 static NEARDATA const char *const hcolors[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "ultraviolet", "infrared", "bluish-orange", "reddish-green", "dark white",
     "light black", "sky blue-pink", "salty", "sweet", "sour", "bitter",
     "striped", "spiral", "swirly", "plaid", "checkered", "argyle", "paisley",
@@ -2476,7 +2476,7 @@ rndcolor()
 }
 
 static NEARDATA const char *const hliquids[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "yoghurt", "oobleck", "clotted blood", "diluted water", "purified water",
     "instant coffee", "tea", "herbal infusion", "liquid rainbow",
     "creamy foam", "mulled wine", "bouillon", "nectar", "grog", "flubber",

@@ -140,7 +140,7 @@ int distance;
 */
                     You("%sが音楽に合わせて揺れているのに気付いた．", a_monnam(mtmp));
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s freezes, then sways with the music%s.",
                           Monnam(mtmp),
                           was_peaceful ? "" : ", and now seems quieter");
@@ -512,7 +512,7 @@ int force;
                             if (keepfooting)
                                 exercise(A_DEX, TRUE);
                             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                                 selftouch(
                                     (Upolyd && (slithy(youmonst.data)
                                                 || nolimbs(youmonst.data)))
@@ -752,7 +752,7 @@ struct obj *instr;
         break;
     case WOODEN_HARP: /* May calm Nymph */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s.", Yname2(instr),
               do_spec ? "produces a lilting melody" : "twangs");
 #else
@@ -963,7 +963,7 @@ struct obj *instr;
                         }
                     if (tumblers)
                         if (gears)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                             You_hear("%d tumbler%s click and %d gear%s turn.",
                                      tumblers, plur(tumblers), gears,
                                      plur(gears));
@@ -972,7 +972,7 @@ struct obj *instr;
                                 tumblers, gears);
 #endif
                         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                             You_hear("%d tumbler%s click.", tumblers,
                                      plur(tumblers));
 #else

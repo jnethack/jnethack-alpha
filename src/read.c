@@ -85,7 +85,7 @@ char *buf;
 {
     static const char *shirt_msgs[] = {
         /* Scott Bigham */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
       "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
         "Is that Mjollnir in your pocket or are you just happy to see me?",
       "It's not the size of your sword, it's how #enhance'd you are with it.",
@@ -121,7 +121,7 @@ char *buf;
         "‚g‚…‚Œ|‚k‚n‚n‚nC‚m‚•‚’‚“‚…I",                     /* Animaniacs */
 #endif
         "=^.^=",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "100% goblin hair - do not wash",
         "Aberzombie and Fitch",
         "cK -- Cockatrice touches the Kop",
@@ -158,7 +158,7 @@ char *buf;
         "Ž„‚ÍƒSƒ€‚Ì–Ø‚É’µ‚Ë•Ô‚Á‚½",         /* Monkey Island */
         "—ª’D“‡—°‰©ŠCŠÝƒNƒ‰ƒu", /* Monkey Island */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "If you can read this, I can hit you with my polearm",
         "I'm confused!",
         "I scored with the princess",
@@ -191,7 +191,7 @@ char *buf;
         "The Hellhound Gang",
         "The Werewolves",
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "They Might Be Storm Giants",
         "Weapons don't kill people, I kill people",
         "White Zombie",
@@ -353,7 +353,7 @@ doread()
         return 1;
     } else if (scroll->otyp == CREDIT_CARD) {
         static const char *card_msgs[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             "Leprechaun Gold Tru$t - Shamrock Card",
             "Magic Memory Vault Charge Card",
             "Larn National Bank",                /* Larn */
@@ -539,7 +539,7 @@ doread()
            maintained illiterate conduct so far, and this mail
            scroll didn't come from bones, ask for confirmation */
         if (!u.uconduct.literate) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             if (!scroll->spe && yn(
              "Reading mail will violate \"illiterate\" conduct.  Read anyway?"
                                    ) != 'y')
@@ -573,7 +573,7 @@ doread()
                        || (scroll->otyp == SCR_REMOVE_CURSE
                            && scroll->cursed));
         if (Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline(nodisappear
                       ? "You %s the formula on the scroll."
                       : "As you %s the formula on it, the scroll disappears.",
@@ -585,7 +585,7 @@ doread()
                   silently ? "”O‚¶" : "¥‚¦");
 #endif
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline(nodisappear ? "You read the scroll."
                               : "As you read the scroll, it disappears.");
 #else
@@ -599,7 +599,7 @@ doread()
 */
                 pline("‚Æ‚Ä‚à‚Ö‚ë‚Ö‚ë‚È‚Ì‚ÅC‚­‚µ‚á‚­‚µ‚á‚É‚µ‚Ä‚µ‚Ü‚Á‚½DDD");
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("Being confused, you %s the magic words...",
                       silently ? "misunderstand" : "mispronounce");
 #else
@@ -655,7 +655,7 @@ p_glow2(otmp, color)
 register struct obj *otmp;
 register const char *color;
 {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     pline("%s%s%s for a moment.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
           Blind ? "" : " ", Blind ? "" : hcolor(color));
 #else
@@ -765,7 +765,7 @@ int curse_bless;
 
         /* destruction depends on current state, not adjustment */
         if (obj->spe > rn2(7) || obj->spe <= -5) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s momentarily, then %s!", Yobjnam2(obj, "pulsate"),
                   otense(obj, "explode"));
 #else
@@ -782,7 +782,7 @@ int curse_bless;
         } else {
             long mask = is_on ? (obj == uleft ? LEFT_RING : RIGHT_RING) : 0L;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s spins %sclockwise for a moment.", Yname2(obj),
                   s < 0 ? "counter" : "");
 #else
@@ -873,7 +873,7 @@ int curse_bless;
                 stripspe(obj);
                 if (obj->lamplit) {
                     if (!Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         pline("%s out!", Tobjnam(obj, "go"));
 #else
                         pline("%s‚ÍÁ‚¦‚½I", xname(obj));
@@ -1291,7 +1291,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 
         otmp = some_armor(&youmonst);
         if (!otmp) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             strange_feeling(sobj, !Blind
                                       ? "Your skin glows then fades."
                                       : "Your skin feels warm for a moment.");
@@ -1317,7 +1317,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 Your("%s‚Íˆêu’g‚©‚­‚È‚Á‚½D", xname(otmp));
             } else {
                 otmp->rknown = TRUE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s covered by a %s %s %s!", Yobjnam2(otmp, "are"),
                       scursed ? "mottled" : "shimmering",
                       hcolor(scursed ? NH_BLACK : NH_GOLDEN),
@@ -1333,7 +1333,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             }
             if (new_erodeproof && (otmp->oeroded || otmp->oeroded2)) {
                 otmp->oeroded = otmp->oeroded2 = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s as good as new!",
                       Yobjnam2(otmp, Blind ? "feel" : "look"));
 #else
@@ -1366,7 +1366,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         s = scursed ? -otmp->spe : otmp->spe;
         if (s > (special_armor ? 5 : 3) && rn2(s)) {
             otmp->in_use = TRUE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s violently %s%s%s for a while, then %s.", Yname2(otmp),
                   otense(otmp, Blind ? "vibrate" : "glow"),
                   (!Blind && !same_color) ? " " : "",
@@ -1409,7 +1409,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 alter_cost(otmp, 0L); /* shop bill */
             break;
         }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s%s%s%s for a %s.", Yname2(otmp),
               s == 0 ? "violently " : "",
               otense(otmp, Blind ? "vibrate" : "glow"),
@@ -1446,7 +1446,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 
         if ((otmp->spe > (special_armor ? 5 : 3))
             && (special_armor || !rn2(7)))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s.", Yobjnam2(otmp, "suddenly vibrate"),
                   Blind ? "again" : "unexpectedly");
 #else
@@ -1515,7 +1515,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             make_confused(HConfusion + rnd(100), FALSE);
         } else if (confused) {
             if (!sblessed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("%s begin to %s%s.", makeplural(body_part(HAND)),
                      Blind ? "tingle" : "glow ",
                      Blind ? "" : hcolor(NH_PURPLE));
@@ -1526,7 +1526,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #endif
                 make_confused(HConfusion + rnd(100), FALSE);
             } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("A %s%s surrounds your %s.",
                       Blind ? "" : hcolor(NH_RED),
                       Blind ? "faint buzz" : " glow", body_part(HEAD));
@@ -1540,7 +1540,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             }
         } else {
             if (!sblessed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("%s%s %s%s.", makeplural(body_part(HAND)),
                      Blind ? "" : " begin to glow",
                      Blind ? (const char *) "tingle" : hcolor(NH_RED),
@@ -1554,7 +1554,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 u.umconf++;
             } else {
                 if (Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Your("%s tingle %s sharply.", makeplural(body_part(HAND)),
                          u.umconf ? "even more" : "very");
 #else
@@ -1562,7 +1562,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                          u.umconf ? "­‚µ" : "‚Æ‚Ä‚à");
 #endif
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Your("%s glow a%s brilliant %s.",
                          makeplural(body_part(HAND)),
                          u.umconf ? "n even more" : "", hcolor(NH_RED));
@@ -1598,7 +1598,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             }
         }
         if (otyp == SCR_SCARE_MONSTER || !ct)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You_hear("%s %s.", (confused || scursed) ? "sad wailing"
                                                      : "maniacal laughter",
                      !ct ? "in the distance" : "close by");
@@ -1626,7 +1626,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SPE_REMOVE_CURSE: {
         register struct obj *obj;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You_feel(!Hallucination
                      ? (!confused ? "like someone is helping you."
                                   : "like you need some help.")
@@ -1742,7 +1742,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 pline("•Ší‚ªˆêu’g‚©‚­‚È‚Á‚½‚æ‚¤‚È‹C‚ª‚µ‚½D");
             } else {
                 uwep->rknown = TRUE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s covered by a %s %s %s!", Yobjnam2(uwep, "are"),
                       scursed ? "mottled" : "shimmering",
                       hcolor(scursed ? NH_PURPLE : NH_GOLDEN),
@@ -1756,7 +1756,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             }
             if (new_erodeproof && (uwep->oeroded || uwep->oeroded2)) {
                 uwep->oeroded = uwep->oeroded2 = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s as good as new!",
                       Yobjnam2(uwep, Blind ? "feel" : "look"));
 #else
@@ -1807,7 +1807,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 }
         }
         if (!results) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("Nothing interesting %s.",
                   !candidates ? "happens" : "seems to happen");
 #else
@@ -1815,7 +1815,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                   !candidates ? "" : "‚æ‚¤‚¾");
 #endif
         } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("neighborhood %s %sfriendlier.",
                       vis_results ? "is" : "seems",
                       (results < 0) ? "un" : "");
@@ -1985,7 +1985,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         /*FALLTHRU*/
     case SPE_MAGIC_MAPPING:
         if (level.flags.nommap) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Your("%s spins as %s blocks the spell!", body_part(HEAD),
                  something);
 #else
@@ -2132,7 +2132,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 */
                 You_hear("ƒSƒƒSƒ‚Æ‚¢‚¤‰¹‚ð•·‚¢‚½D");
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
                           sblessed ? "around" : "above");
 #else
@@ -2186,7 +2186,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 */
             You("ˆ«L‰_‚ÌŠª•¨‚ð”­Œ©‚µ‚½I");
         known = TRUE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Where do you want to center the %scloud?",
               already_known ? "stinking " : "");
 #else
@@ -2309,7 +2309,7 @@ boolean confused, byu;
             if (mtmp->minvis && !canspotmon(mtmp))
                 map_invisible(mtmp->mx, mtmp->my);
         } else if (u.uswallow && mtmp == u.ustuck)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You_hear("something hit %s %s over your %s!",
                      s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH),
                      body_part(HEAD));
@@ -2337,7 +2337,7 @@ boolean confused, byu;
                     mdmg = 2;
             } else {
                 if (canspotmon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s's %s does not protect %s.", Monnam(mtmp),
                           xname(helmet), mhim(mtmp));
 #else
@@ -2424,7 +2424,7 @@ int chg; /* recharging */
     /* inflict damage and destroy the wand */
     dmg = d(n, k);
     obj->in_use = TRUE; /* in case losehp() is fatal (or --More--^C) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     pline("%s %s explodes!", Yname2(obj), expl);
 #else
     pline("%s‚Í%s”š”­‚µ‚½I", xname(obj), expl);
@@ -2513,7 +2513,7 @@ struct obj *obj;
             if (Blind)
                 ; /* no feedback */
             else if (is_animal(u.ustuck->data))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s is lit.", s_suffix(Monnam(u.ustuck)),
                       mbodypart(u.ustuck, STOMACH));
 #else
@@ -2619,7 +2619,7 @@ do_class_genocide()
             (void) mungspaces(buf);
         } while (!*buf);
         /* choosing "none" preserves genocideless conduct */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         if (*buf == '\033' || !strcmpi(buf, "none")
             || !strcmpi(buf, "nothing"))
 #else
@@ -2915,7 +2915,7 @@ int how;
     if (how & REALLY) {
         /* setting no-corpse affects wishing and random tin generation */
         mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Wiped out %s%s.", which,
               (*which != 'a') ? buf : makeplural(buf));
 #else
@@ -2988,7 +2988,7 @@ int how;
             /* accumulated 'cnt' doesn't take groups into account;
                assume bringing in new mon(s) didn't remove any old ones */
             cnt = monster_census(FALSE) - census;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("Sent in %s%s.", (cnt > 1) ? "some " : "",
                   (cnt > 1) ? makeplural(buf) : an(buf));
 #else
@@ -3142,7 +3142,7 @@ struct _create_particular_data *d;
     }
     bufp = mungspaces(bufp); /* after potential memset(' ') */
     /* allow the initial disposition to be specified */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     if (!strncmpi(bufp, "tame ", 5)) {
         bufp += 5;
 #else
@@ -3150,7 +3150,7 @@ struct _create_particular_data *d;
         bufp += 14;
 #endif
         d->maketame = TRUE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     } else if (!strncmpi(bufp, "peaceful ", 9)) {
         bufp += 9;
 #else
@@ -3158,7 +3158,7 @@ struct _create_particular_data *d;
         bufp += 8;
 #endif
         d->makepeaceful = TRUE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     } else if (!strncmpi(bufp, "hostile ", 8)) {
         bufp += 8;
 #else
@@ -3214,7 +3214,7 @@ struct _create_particular_data *d;
             /* wizard mode can override handling of special monsters */
             char buf[BUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "Creating %s instead; force %s?",
                     mons[d->which].mname, mons[firstchoice].mname);
 #else

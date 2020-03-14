@@ -971,7 +971,7 @@ genericptr_t p2;
             make_blinded(1L, FALSE);
         }
         if (!Poison_resistance) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s is burning your %s!", Something,
                   makeplural(body_part(LUNG)));
 #else

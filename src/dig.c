@@ -108,7 +108,7 @@ register boolean rockit;
 */
         pline("げげん！あなたのまわりの天井が崩れた！");
     else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("A mysterious force %s cave around you!",
               (levl[u.ux][u.uy].typ == CORR) ? "creates a" : "extends the");
 #else
@@ -311,7 +311,7 @@ dig(VOID_ARGS)
         }
         if (IS_ROCK(lev->typ) && !may_dig(dpx, dpy)
             && dig_typ(uwep, dpx, dpy) == DIGTYP_ROCK) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("This %s is too hard to %s.",
                   is_db_wall(dpx, dpy) ? "drawbridge" : "wall", verb);
 #else
@@ -406,7 +406,7 @@ dig(VOID_ARGS)
                 You("hit yourself in the %s.", body_part(FOOT));
 */
                 pline("%sに当たった．", body_part(FOOT));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(kbuf, "chopping off %s own %s", uhis(),
                         body_part(FOOT));
 #else
@@ -415,7 +415,7 @@ dig(VOID_ARGS)
 #endif
                 losehp(Maybe_Half_Phys(dmg), kbuf, KILLED_BY);
             } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("destroy the bear trap with %s.",
                     yobjnam(uwep, (const char *) 0));
 #else
@@ -780,7 +780,7 @@ int ttyp;
         } else if (mtmp) {
             if (is_flyer(mtmp->data) || is_floater(mtmp->data)) {
                 if (canseemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s over the pit.", Monnam(mtmp),
                           (is_flyer(mtmp->data)) ? "flies" : "floats");
 #else
@@ -1011,7 +1011,7 @@ coord *cc;
     } else if ((boulder_here = sobj_at(BOULDER, dig_x, dig_y)) != 0) {
         if (ttmp && is_pit(ttmp->ttyp)
             && rn2(2)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("boulder settles into the %spit.",
                       (dig_x != u.ux || dig_y != u.uy) ? "adjacent " : "");
 #else
@@ -1047,7 +1047,7 @@ coord *cc;
              * We can't dig a hole here since that will destroy
              * the drawbridge.  The following is a cop-out. --dlc
              */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("%s %shere is too hard to dig in.",
                       surface(dig_x, dig_y),
                       (dig_x != u.ux || dig_y != u.uy) ? "t" : "");
@@ -1087,7 +1087,7 @@ coord *cc;
         lev->flags = 0;
         if (typ != ROOM) {
             lev->typ = typ;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             liquid_flow(dig_x, dig_y, typ, ttmp,
                         "As you dig, the hole fills with %s!");
 #else
@@ -1432,7 +1432,7 @@ struct obj *obj;
                 }
             } else if (u.utrap && u.utraptype == TT_PIT
                        && (trap_with_u = t_at(u.ux, u.uy)) != 0) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("swing %s, but the rubble has no place to go.",
                     yobjnam(obj, (char *) 0));
 #else
@@ -1812,7 +1812,7 @@ zap_dig()
 
         if (!is_whirly(mtmp->data)) {
             if (is_animal(mtmp->data))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("pierce %s %s wall!", s_suffix(mon_nam(mtmp)),
                     mbodypart(mtmp, STOMACH));
 #else
@@ -1830,7 +1830,7 @@ zap_dig()
             if (u.dz < 0 || On_stairs(u.ux, u.uy)) {
                 int dmg;
                 if (On_stairs(u.ux, u.uy))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline_The("beam bounces off the %s and hits the %s.",
                               (u.ux == xdnladder || u.ux == xupladder)
                                   ? "ladder"
@@ -2150,7 +2150,7 @@ char *msg;
             supporting = "跳ね橋";
 
         if (supporting) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(msg, "The %s%ssupporting structures remain intact.",
                     supporting ? s_suffix(supporting) : "",
                     supporting ? " " : "");
@@ -2405,7 +2405,7 @@ int x, y;
     newsym(x, y);
 
     if (costly && loss) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("owe %s %ld %s for burying merchandise.", mon_nam(shkp), loss,
             currency(loss));
 #else
@@ -2613,7 +2613,7 @@ escape_tomb()
             || (unsolid(youmonst.data)
                 && youmonst.data != &mons[PM_WATER_ELEMENTAL])
             || (tunnels(youmonst.data) && !needspick(youmonst.data))) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s up through the %s.",
                 (tunnels(youmonst.data) && !needspick(youmonst.data))
                    ? "try to tunnel"

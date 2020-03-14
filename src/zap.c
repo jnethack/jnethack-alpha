@@ -67,7 +67,7 @@ STATIC_VAR const char are_blinded_by_the_flash[] =
 
 const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
     {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "magic missile", /* Wands must be 0-9 */
         "bolt of fire", "bolt of cold", "sleep ray", "death ray",
         "bolt of lightning", "", "", "", "",
@@ -84,7 +84,7 @@ const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
         "",
 #endif
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "magic missile", /* Spell equivalents must be 10-19 */
         "fireball", "cone of cold", "sleep ray", "finger of death",
         "bolt of lightning", /* there is no spell, used for retribution */
@@ -102,7 +102,7 @@ const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
         "",
 #endif
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         "blast of missiles", /* Dragon breath equivalents 20-29*/
         "blast of fire", "blast of frost", "blast of sleep gas",
         "blast of disintegration", "blast of lightning",
@@ -419,7 +419,7 @@ struct obj *otmp;
         } else if ((obj = which_armor(mtmp, W_SADDLE)) != 0) {
             char buf[BUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "%s %s", s_suffix(Monnam(mtmp)),
                     distant_name(obj, xname));
 #else
@@ -429,7 +429,7 @@ struct obj *otmp;
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (!canspotmon(mtmp))
                     Strcpy(buf, An(distant_name(obj, xname)));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s falls to the %s.", buf,
                       surface(mtmp->mx, mtmp->my));
 #else
@@ -469,7 +469,7 @@ struct obj *otmp;
                     } else
                         mimic_hit_msg(mtmp, otyp);
                 } else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s looks%s better.", Monnam(mtmp),
                           otyp == SPE_EXTRA_HEALING ? " much" : "");
 #else
@@ -603,7 +603,7 @@ struct monst *mtmp;
         (void) display_minventory(mtmp, MINV_ALL | MINV_NOLET | PICK_NONE,
                                   (char *) 0);
     } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s is not carrying anything%s.", noit_Monnam(mtmp),
               (u.uswallow && mtmp == u.ustuck) ? " besides you" : "");
 #else
@@ -1010,7 +1010,7 @@ boolean by_hero;
         ghost = find_mid(m_id, FM_FMON);
         if (ghost && ghost->data == &mons[PM_GHOST]) {
             if (canseemon(ghost))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s is suddenly drawn into its former body!",
 #else
                 pline("%sは突然もとの体に引き込まれた！",
@@ -1509,7 +1509,7 @@ int okind;
     default:
         /* if all else fails... */
         pm_index = PM_STRAW_GOLEM;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         material = "";
 #else
         material = "物体";
@@ -1524,7 +1524,7 @@ int okind;
     polyuse(obj, okind, (int) mons[pm_index].cwt);
 
     if (mtmp && cansee(mtmp->mx, mtmp->my)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Some %sobjects meld, and %s arises from the pile!", material,
               a_monnam(mtmp));
 #else
@@ -1926,7 +1926,7 @@ struct obj *obj;
                     else
                         delobj(obj);
                     if (cansee(mon->mx, mon->my))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         pline_The("figurine %sanimates!",
                                   golem_xform ? "turns to flesh and " : "");
 #else
@@ -2123,7 +2123,7 @@ struct obj *obj, *otmp;
                     /* we don't want to force alive vs dead
                        determination for Schroedinger's Cat here,
                        so just make probing be inconclusive for it */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("aren't sure whether %s has %s or its corpse inside.",
                         the(xname(obj)),
                         /* unfortunately, we can't tell whether rndmonnam()
@@ -2235,7 +2235,7 @@ struct obj *obj, *otmp;
                 } else {
                     if (cansee(ox, oy)) {
                         if (canspotmon(mtmp)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                             pline("%s is resurrected!",
                                   upstart(noname_monnam(mtmp, ARTICLE_THE)));
 #else
@@ -2796,7 +2796,7 @@ boolean ordinary;
         learn_it = TRUE;
         (void) unturn_dead(&youmonst);
         if (is_undead(youmonst.data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You_feel("frightened and %sstunned.",
                      Stunned ? "even more " : "");
 #else
@@ -3248,7 +3248,7 @@ struct obj *obj; /* wand or spell */
                    && !Is_qstart(&u.uz)) {
             int dmg;
             /* similar to zap_dig() */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("A rock is dislodged from the %s and falls on your %s.",
                   ceiling(x, y), body_part(HEAD));
 #else
@@ -3296,7 +3296,7 @@ struct obj *obj; /* wand or spell */
                 /* locking transforms hole into trapdoor */
                 ttmp->ttyp = TRAPDOOR;
                 if (Blind || !ttmp->tseen) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("Some %s swirls beneath you.",
                           is_ice(x, y) ? "frost" : "dust");
 #else
@@ -3378,7 +3378,7 @@ struct obj *obj; /* wand or spell */
             case SPE_STONE_TO_FLESH:
                 if (e->engr_type == ENGRAVE) {
                     /* only affects things in stone */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline_The(Hallucination
                                   ? "floor runs like butter!"
                                   : "edges on the floor get smoother.");
@@ -3585,7 +3585,7 @@ const char *force; /* usually either "." or "!" */
 */
         pline("%sは何かに命中した．", str);
     else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s %s%s", The(str), vtense(str, "hit"),
               mon_nam(mtmp), force);
 #else
@@ -3599,7 +3599,7 @@ miss(str, mtmp)
 register const char *str;
 register struct monst *mtmp;
 {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     pline(
         "%s %s %s.", The(str), vtense(str, "miss"),
         ((cansee(bhitpos.x, bhitpos.y) || canspotmon(mtmp)) && flags.verbose)
@@ -3764,7 +3764,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
             if (is_pool(bhitpos.x, bhitpos.y) && !mtmp) {
                 in_skip = TRUE;
                 if (!Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s%s.", Yname2(obj), otense(obj, "skip"),
                           skipcount ? " again" : "");
 #else
@@ -3788,7 +3788,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
                     skiprange(range, &skiprange_start, &skiprange_end);
             } else if (mtmp && M_IN_WATER(mtmp->data)) {
                 if ((!Blind && canseemon(mtmp)) || sensemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s over %s.", Yname2(obj), otense(obj, "pass"),
                           mon_nam(mtmp));
 #else
@@ -3909,7 +3909,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
 
             if ((bobj = sobj_at(BOULDER, x, y)) != 0) {
                 if (cansee(x, y))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s hits %s.", The(distant_name(obj, xname)),
                           an(xname(bobj)));
 #else
@@ -3921,7 +3921,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
                 if (!test_move(x - ddx, y - ddy, ddx, ddy, TEST_MOVE)) {
                     /* nb: it didn't hit anything directly */
                     if (cansee(x, y))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         pline("%s jerks to an abrupt halt.",
                               The(distant_name(obj, xname))); /* lame */
 #else
@@ -4574,7 +4574,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
         if (!u.ustuck)
             u.uswallow = 0;
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s rips into %s%s", The(fltxt), mon_nam(u.ustuck),
                   exclam(tmp));
 #else
@@ -4639,7 +4639,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                     if (cansee(mon->mx, mon->my)) {
                         hit(fltxt, mon, exclam(0));
                         shieldeff(mon->mx, mon->my);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         (void) mon_reflects(mon,
                                             "But it reflects from %s %s!");
 #else
@@ -4688,7 +4688,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                             hit(fltxt, mon, ".");
 */
                             hit(fltxt, mon, "．");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                             pline("%s absorbs the deadly %s!", Monnam(mon),
                                   type == ZT_BREATH(ZT_DEATH) ? "blast"
                                                               : "ray");
@@ -4732,7 +4732,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                         } else {
                             /* some armor was destroyed; no damage done */
                             if (canseemon(mon))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                                 pline("%s %s is disintegrated!",
                                       s_suffix(Monnam(mon)),
                                       distant_name(otmp, xname));
@@ -4765,7 +4765,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                 pline("%sはあなたに命中した！", fltxt);
                 if (Reflecting) {
                     if (!Blind) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         (void) ureflects("But %s reflects from your %s!",
                                          "it");
 #else
@@ -4867,7 +4867,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
     if (type == ZT_SPELL(ZT_FIRE))
         explode(sx, sy, type, d(12, 6), 0, EXPL_FIERY);
     if (shopdamage)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pay_for_damage(abstype == ZT_FIRE
                           ? "burn away"
                           : abstype == ZT_COLD
@@ -5230,14 +5230,14 @@ short exploding_wand_typ;
     /* set up zap text for possible door feedback; for exploding wand, we
        want "the blast" rather than "your blast" even if hero caused it */
     yourzap = (type >= 0 && !exploding_wand_typ);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     zapverb = "blast"; /* breath attack or wand explosion */
 #else
     zapverb = "衝撃"; /* breath attack or wand explosion */
 #endif
     if (!exploding_wand_typ) {
         if (abs(type) < ZT_SPELL(0))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             zapverb = "bolt"; /* wand zap */
 #else
             zapverb = "光線"; /* wand zap */
@@ -5256,7 +5256,7 @@ short exploding_wand_typ;
            (except on rogue level) */
         newsym(x, y);
         if (see_it)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s reveals a secret door.",
                   yourzap ? "Your" : "The", zapverb);
 #else
@@ -5347,7 +5347,7 @@ short exploding_wand_typ;
 */
                     pline_The("扉は無傷だ．");
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline_The("door absorbs %s %s!", yourzap ? "your" : "the",
                               zapverb);
 #else
@@ -5639,7 +5639,7 @@ int osym, dmgtyp;
 
         if (!cnt)
             return;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         mult = (cnt == 1L)
                 ? ((quan == 1L) ? "Your"                         /* 1 of 1 */
                                 : "One of your")                 /* 1 of N */
@@ -5822,7 +5822,7 @@ int osym, dmgtyp;
             if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
                 skip++;
                 if (vis)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s glows a strange %s, but remains intact.",
                           The(distant_name(obj, xname)), hcolor("dark red"));
 #else
@@ -5892,7 +5892,7 @@ int osym, dmgtyp;
             if (!cnt)
                 continue;
             if (vis)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s%s %s!",
                       (cnt == obj->quan) ? "" : (cnt > 1L) ? "Some of "
                                                            : "One of ",

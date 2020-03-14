@@ -629,7 +629,7 @@ unsigned int *stuckid, *steedid;
 #endif
     if (u.uhp <= 0 && (!Upolyd || u.mh <= 0)) {
         u.ux = u.uy = 0; /* affects pline() [hence You()] */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("were not healthy enough to survive restoration.");
 #else
         You("ÄŠJ‚Å‚«‚é‚Ù‚ÇŒ’N‚Å‚Í‚È‚©‚Á‚½D");
@@ -866,7 +866,7 @@ register int fd;
         clear_nhwindow(WIN_MAP);
 #endif
     clear_nhwindow(WIN_MESSAGE);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     You("return to level %d in %s%s.", depth(&u.uz),
         dungeons[u.uz.dnum].dname,
         flags.debug ? " while in debug mode"
@@ -1390,7 +1390,7 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                      MENU_UNSELECTED);
         }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "Select one of your saved games", MENU_UNSELECTED);
 #else
@@ -1404,7 +1404,7 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
         }
         clet = (k <= 'n' - 'a') ? 'n' : 0; /* new game */
         any.a_int = -1;                    /* not >= 0 */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(tmpwin, NO_GLYPH, &any, clet, 0, ATR_NONE,
                  "Start a new character", MENU_UNSELECTED);
 #else
@@ -1413,7 +1413,7 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
 #endif
         clet = (k + 1 <= 'q' - 'a') ? 'q' : 0; /* quit */
         any.a_int = -2;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(tmpwin, NO_GLYPH, &any, clet, 0, ATR_NONE,
                  "Never mind (quit)", MENU_SELECTED);
 #else

@@ -133,7 +133,7 @@ register struct monst *mon;
     }
 
     if (canseemon(mon) && !Hallucination)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s changes into a %s.", Monnam(mon),
               is_human(&mons[pm]) ? "human" : mons[pm].mname + 4);
 #else

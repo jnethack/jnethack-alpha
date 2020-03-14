@@ -83,7 +83,7 @@ struct obj *obj;
     if (obj->cursed && !rn2(2)) {
         (void) zapyourself(obj, TRUE);
     } else if (u.uswallow) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("take a picture of %s %s.", s_suffix(mon_nam(u.ustuck)),
             mbodypart(u.ustuck, STOMACH));
 #else
@@ -132,7 +132,7 @@ struct obj *obj;
         case 2:
             old = Glib;
             incr_itimeout(&Glib, rn1(10, 3));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Your("%s %s!", makeplural(body_part(HAND)),
                  (old ? "are filthier than ever" : "get slimy"));
 #else
@@ -146,7 +146,7 @@ struct obj *obj;
             if (!ublindf) {
                 old = u.ucreamed;
                 u.ucreamed += rn1(10, 3);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("Yecch!  Your %s %s gunk on it!", body_part(FACE),
                       (old ? "has more" : "now has"));
 #else
@@ -157,7 +157,7 @@ struct obj *obj;
             } else {
                 const char *what;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 what = (ublindf->otyp == LENSES)
                            ? "lenses"
                            : (obj->otyp == ublindf->otyp) ? "other towel"
@@ -169,7 +169,7 @@ struct obj *obj;
                                                           : "目隠し";
 #endif
                 if (ublindf->cursed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("push your %s %s.", what,
                         rn2(2) ? "cock-eyed" : "crooked");
 #else
@@ -226,7 +226,7 @@ struct obj *obj;
         return 1;
     }
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Your("%s and %s are already clean.", body_part(FACE),
          makeplural(body_part(HAND)));
 #else
@@ -419,7 +419,7 @@ register struct obj *obj;
                             && !rn2(Role_if(PM_HEALER) ? 10 : 3));
 
     if (nohands(youmonst.data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("have no hands!"); /* not `body_part(HAND)' */
 #else
         pline("あなたには手がない！");
@@ -589,7 +589,7 @@ register struct obj *obj;
     }
 
     if (!its_dead(rx, ry, &res))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("hear nothing special."); /* not You_hear()  */
 #else
         pline("特に何も聞こえない．");
@@ -618,7 +618,7 @@ struct obj *obj;
         You("%sを通して泡を出した．", xname(obj));
     } else {
         if (Deaf)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You_feel("rushing air tickle your %s.",
                         body_part(NOSE));
 #else
@@ -648,7 +648,7 @@ struct obj *obj;
 */
         You("笛を使う能力がない．");
     } else if (obj->cursed && !rn2(2)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("produce a %shigh-pitched humming noise.",
             Underwater ? "very " : "");
 #else
@@ -660,7 +660,7 @@ struct obj *obj;
         int pet_cnt = 0, omx, omy;
 
         /* it's magic!  it works underwater too (at a higher pitch) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You(whistle_str,
             Hallucination ? "normal" : Underwater ? "strange, high-pitched"
                                                   : "strange");
@@ -803,7 +803,7 @@ struct obj *obj;
            it from the engulfer versus from some other creature
            (note: the two in-use cases can't actually occur; all
            leashes are released when the hero gets engulfed) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You_cant((!obj->leashmon
                   ? "leash %s from inside."
                   : (obj->leashmon == (int) u.ustuck->m_id)
@@ -871,7 +871,7 @@ struct obj *obj;
            (and also that it doesn't change location by retry time) */
         map_invisible(cc.x, cc.y);
     } else if (!mtmp->mtame) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s leashed!", Monnam(mtmp),
               (!obj->leashmon) ? "cannot be" : "is not");
 #else
@@ -881,7 +881,7 @@ struct obj *obj;
     } else if (!obj->leashmon) {
         /* applying a leash which isn't currently in use */
         if (mtmp->mleashed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("This %s is already leashed.",
                   spotmon ? l_monnam(mtmp) : "creature");
 #else
@@ -889,7 +889,7 @@ struct obj *obj;
                   spotmon ? l_monnam(mtmp) : "怪物");
 #endif
         } else if (!leashable(mtmp)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("The leash won't fit onto %s%s.", spotmon ? "your " : "",
                   l_monnam(mtmp));
 #else
@@ -897,7 +897,7 @@ struct obj *obj;
                   l_monnam(mtmp));
 #endif
         } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("slip the leash around %s%s.", spotmon ? "your " : "",
                 l_monnam(mtmp));
 #else
@@ -924,7 +924,7 @@ struct obj *obj;
         } else {
             mtmp->mleashed = 0;
             obj->leashmon = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("remove the leash from %s%s.",
                 spotmon ? "your " : "", l_monnam(mtmp));
 #else
@@ -970,7 +970,7 @@ next_to_u()
                         && otmp->leashmon == (int) mtmp->m_id) {
                         if (otmp->cursed)
                             return FALSE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         You_feel("%s leash go slack.",
                                  (number_leashed() > 1) ? "a" : "the");
 #else
@@ -1181,7 +1181,7 @@ struct obj *obj;
     }
     if (u.uswallow) {
         if (useeit)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("reflect %s %s.", s_suffix(mon_nam(u.ustuck)),
                 mbodypart(u.ustuck, STOMACH));
 #else
@@ -1192,7 +1192,7 @@ struct obj *obj;
     }
     if (Underwater) {
         if (useeit)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You(Hallucination ? "give the fish a chance to fix their makeup."
                               : "reflect the murky water.");
 #else
@@ -1248,7 +1248,7 @@ struct obj *obj;
         /* infravision doesn't produce an image in the mirror */
     } else if ((how_seen & SEENMON) == MONSEEN_INFRAVIS) {
         if (vis) /* (redundant) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s is too far away to see %sself in the dark.",
                   Monnam(mtmp), mhim(mtmp));
 #else
@@ -1352,7 +1352,7 @@ struct obj *obj;
         else if ((mtmp->minvis && !perceives(mtmp->data))
                  /* redundant: can't get here if these are true */
                  || !haseyes(mtmp->data) || notonhead || !mtmp->mcansee)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s doesn't seem to notice %s reflection.", Monnam(mtmp),
                   mhis(mtmp));
 #else
@@ -1555,7 +1555,7 @@ register struct obj *obj;
     }
     if (u.uswallow || obj->cursed) {
         if (!Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("%s %s for a moment, then %s.", s, vtense(s, "flicker"),
                       vtense(s, "die"));
 #else
@@ -1564,7 +1564,7 @@ register struct obj *obj;
         return;
     }
     if (obj->spe < 7) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         There("%s only %d %s in %s.", vtense(s, "are"), obj->spe, s,
               the(xname(obj)));
 #else
@@ -1572,7 +1572,7 @@ register struct obj *obj;
               xname(obj), obj->spe);
 #endif
         if (!Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s lit.  %s dimly.", obj->spe == 1 ? "It is" : "They are",
                   Tobjnam(obj, "shine"));
 #else
@@ -1580,7 +1580,7 @@ register struct obj *obj;
                   xname(obj), xname(obj));
 #endif
     } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s's %s burn%s", The(xname(obj)), s,
               (Blind ? "." : " brightly!"));
 #else
@@ -1677,7 +1677,7 @@ struct obj **optr;
 #endif
         } else
             *optr = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("attach %ld%s %s to %s.", obj->quan, !otmp->spe ? "" : " more", s,
             the(xname(otmp)));
 #else
@@ -1708,7 +1708,7 @@ struct obj **optr;
             verbalize("火をつけたなら，買ってもらおう！");
 #endif
         if (obj->quan < 7L && otmp->spe == 7)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s now has seven%s candles attached.", The(xname(otmp)),
                   otmp->lamplit ? " lit" : "");
 #else
@@ -1746,7 +1746,7 @@ struct obj *otmp;
 
         (void) get_obj_location(otmp, &x, &y, 0);
         if (otmp->where == OBJ_MINVENT ? cansee(x, y) : !Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s%scandle%s flame%s extinguished.", Shk_Your(buf, otmp),
                   (candle ? "" : "candelabrum's "), (many ? "s'" : "'s"),
                   (many ? "s are" : " is"));
@@ -1854,7 +1854,7 @@ struct obj *obj;
         return;
     }
     if (Underwater) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline(!Is_candle(obj) ? "This is not a diving lamp"
                               : "Sorry, fire and water don't mix.");
 #else
@@ -1880,7 +1880,7 @@ struct obj *obj;
     }
     if (obj->cursed && !rn2(2)) {
         if (!Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s for a moment, then %s.", Tobjnam(obj, "flicker"),
                   otense(obj, "die"));
 #else
@@ -1896,7 +1896,7 @@ struct obj *obj;
 */
             pline("%sランプに灯が灯った．", Shk_Your(buf, obj));
         } else { /* candle(s) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s flame%s %s%s", s_suffix(Yname2(obj)), plur(obj->quan),
                   otense(obj, "burn"), Blind ? "." : " brightly!");
 #else
@@ -1958,7 +1958,7 @@ struct obj **optr;
     if (split1off)
         obj = splitobj(obj, 1L);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     You("light %spotion.%s", shk_your(buf, obj),
         Blind ? "" : "  It gives off a dim light.");
 #else
@@ -2341,7 +2341,7 @@ int magic; /* 0=Physical, otherwise skill level */
 */
             pline("%sは跳べる状態ではない．", Monnam(u.usteed));
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Your("%s%s %s in no shape for jumping.",
                  (wl == LEFT_SIDE) ? "left " : (wl == RIGHT_SIDE) ? "right "
                                                                   : "",
@@ -2418,7 +2418,7 @@ int magic; /* 0=Physical, otherwise skill level */
                 return 1;
             case TT_BURIEDBALL:
             case TT_INFLOOR:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("strain your %s, but you're still %s.",
                     makeplural(body_part(LEG)),
                     (u.utraptype == TT_INFLOOR)
@@ -2511,7 +2511,7 @@ struct obj *obj;
         char kbuf[BUFSZ];
 
         if (poly_when_stoned(youmonst.data))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("tin %s without wearing gloves.",
                 an(mons[corpse->corpsenm].mname));
 #else
@@ -2519,14 +2519,14 @@ struct obj *obj;
                 mons[corpse->corpsenm].mname);
 #endif
         else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("Tinning %s without wearing gloves is a fatal mistake...",
                   an(mons[corpse->corpsenm].mname));
 #else
             pline("%sを小手なしで缶詰にするのは致命的な間違いだ．．．",
                   mons[corpse->corpsenm].mname);
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(kbuf, "trying to tin %s without gloves",
                     an(mons[corpse->corpsenm].mname));
 #else
@@ -2580,7 +2580,7 @@ struct obj *obj;
                 verbalize(you_buy_it);
             useupf(corpse, 1L);
         }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         (void) hold_another_object(can, "You make, but cannot pick up, %s.",
                                    doname(can), (const char *) 0);
 #else
@@ -2615,7 +2615,7 @@ struct obj *obj;
             break;
         case 2:
             if (!Confusion)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("suddenly feel %s.",
                     Hallucination ? "trippy" : "confused");
 #else
@@ -2770,7 +2770,7 @@ struct obj *obj;
     if (did_attr || did_prop)
         context.botl = TRUE;
     if (did_attr)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("This makes you feel %s!",
               (did_prop + did_attr) == (trouble_count + unfixable_trbl)
                   ? "great"
@@ -2856,7 +2856,7 @@ long timeout;
         switch (figurine->where) {
         case OBJ_INVENT:
             if (Blind || suppress_see)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You_feel("%s %s from your pack!", something,
                          locomotion(mtmp->data, "drop"));
 #else
@@ -2975,7 +2975,7 @@ boolean quietly;
     if (IS_ROCK(levl[x][y].typ)
         && !(passes_walls(&mons[obj->corpsenm]) && may_passwall(x, y))) {
         if (!quietly)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("cannot place a figurine in %s!",
                 IS_TREE(levl[x][y].typ) ? "a tree" : "solid rock");
 #else
@@ -3020,7 +3020,7 @@ struct obj **optr;
     /* Passing FALSE arg here will result in messages displayed */
     if (!figurine_location_checks(obj, &cc, FALSE))
         return;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     You("%s and it %stransforms.",
         (u.dx || u.dy) ? "set the figurine beside you"
                        : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
@@ -3055,7 +3055,7 @@ struct obj *obj;
     struct obj *otmp;
 
     if (Glib) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s from your %s.", Tobjnam(obj, "slip"),
               makeplural(body_part(FINGER)));
 #else
@@ -3070,7 +3070,7 @@ struct obj *obj;
         if ((obj->cursed || Fumbling) && !rn2(2)) {
             consume_obj_charge(obj, TRUE);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s from your %s.", Tobjnam(obj, "slip"),
                   makeplural(body_part(FINGER)));
 #else
@@ -3180,7 +3180,7 @@ struct obj *tstone;
 */
             pline("ワーォ！なんてきれいな破片なんだ．");
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("A sharp crack shatters %s%s.",
                   (obj->quan > 1L) ? "one of " : "", the(xname(obj)));
 #else
@@ -3195,7 +3195,7 @@ struct obj *tstone;
         pline(scritch);
         return;
     } else if (Hallucination) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Oh wow, man: Fractals!");
 #else
         pline("ワーォ！フラクタル模様だ！");
@@ -3232,7 +3232,7 @@ struct obj *tstone;
     default:
         switch (objects[obj->otyp].oc_material) {
         case CLOTH:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s a little more polished now.", Tobjnam(tstone, "look"));
 #else
             pline("%sはさらにつやが出たように見える．", xname(tstone));
@@ -3240,27 +3240,27 @@ struct obj *tstone;
             return;
         case LIQUID:
             if (!obj->known) /* note: not "whetstone" */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("must think this is a wetstone, do you?");
 #else
                 You("これは砥石だと思った？");
 #endif
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s a little wetter now.", Tobjnam(tstone, "are"));
 #else
                 pline("%sは少しぬれた．", xname(tstone));
 #endif
             return;
         case WAX:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             streak_color = "waxy";
 #else
             streak_color = "脂っぽい";
 #endif
             break; /* okay even if not touchstone */
         case WOOD:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             streak_color = "wooden";
 #else
             streak_color = "おがくずのような";
@@ -3268,7 +3268,7 @@ struct obj *tstone;
             break; /* okay even if not touchstone */
         case GOLD:
             do_scratch = TRUE; /* scratching and streaks */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             streak_color = "golden";
 #else
             streak_color = "金色の";
@@ -3276,7 +3276,7 @@ struct obj *tstone;
             break;
         case SILVER:
             do_scratch = TRUE; /* scratching and streaks */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             streak_color = "silvery";
 #else
             streak_color = "銀色の";
@@ -3299,7 +3299,7 @@ struct obj *tstone;
     Sprintf(stonebuf, "stone%s", plur(tstone->quan));
 #endif
     if (do_scratch)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("make %s%sscratch marks on the %s.",
             streak_color ? streak_color : (const char *) "",
             streak_color ? " " : "", stonebuf);
@@ -3340,7 +3340,7 @@ struct obj *otmp;
     const char *what = (char *) 0;
     char buf[BUFSZ];
     int levtyp = levl[u.ux][u.uy].typ;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     const char *occutext = "setting the trap";
 #else
     const char *occutext = "罠を仕掛けている";
@@ -3383,7 +3383,7 @@ struct obj *otmp;
 */
         what = "溶岩の中では";
     else if (On_stairs(u.ux, u.uy))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         what = (u.ux == xdnladder || u.ux == xupladder) ? "on the ladder"
                                                         : "on the stairs";
 #else
@@ -3397,7 +3397,7 @@ struct obj *otmp;
 */
         what = "ここでは";
     else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         what = (levtyp == AIR)
                    ? "in midair"
                    : (levtyp == CLOUD)
@@ -3639,7 +3639,7 @@ struct obj *obj;
                 return 1;
             }
             if (otmp && proficient) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("wrap your bullwhip around %s on the %s.",
                     an(singular(otmp, xname)), surface(u.ux, u.uy));
 #else
@@ -3766,7 +3766,7 @@ struct obj *obj;
 */
             You("鞭を%sにからませた．", xname(otmp));
             if (gotit && mwelded(otmp)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s welded to %s %s%c",
                       (otmp->quan == 1L) ? "It is" : "They are", mhis(mtmp),
                       mon_hand, !otmp->bknown ? '!' : '.');
@@ -3852,7 +3852,7 @@ struct obj *obj;
                     break;
                 default:
                     /* to floor beneath mon */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("yank %s from %s %s!", the(onambuf),
                         s_suffix(mon_nam(mtmp)), mon_hand);
 #else
@@ -4146,7 +4146,7 @@ struct obj *obj;
 */
         You("クリームパックをした．");
     else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("You immerse your %s in %s%s.", body_part(FACE),
               several ? "one of " : "",
               several ? makeplural(the(xname(obj))) : the(xname(obj)));
@@ -4160,7 +4160,7 @@ struct obj *obj;
         u.ucreamed += blindinc;
         make_blinded(Blinded + (long) blindinc, FALSE);
         if (!Blind || (Blind && wasblind))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("There's %ssticky goop all over your %s.",
                   wascreamed ? "more " : "", body_part(FACE));
 #else
@@ -4257,7 +4257,7 @@ struct obj *obj;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
                  MENU_UNSELECTED);
         any.a_int++;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "a monster",
                  MENU_UNSELECTED);
 #else
@@ -4392,7 +4392,7 @@ struct obj *obj;
 */
     boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "バルサの杖"));
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     if (!paranoid_query(ParanoidBreakwand,
                        safe_qbuf(confirm,
                                  "Are you really sure you want to break ",
@@ -4720,7 +4720,7 @@ doapply()
         } else if (!ublindf) {
             Blindf_on(obj);
         } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("are already %s.", ublindf->otyp == TOWEL
                                        ? "covered by a towel"
                                        : ublindf->otyp == BLINDFOLD

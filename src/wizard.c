@@ -436,7 +436,7 @@ register struct monst *mtmp;
 
                 if ((otmp = on_ground(which_arti(targ))) != 0) {
                     if (cansee(mtmp->mx, mtmp->my))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         pline("%s picks up %s.", Monnam(mtmp),
                               (distu(mtmp->mx, mtmp->my) <= 5)
                                   ? doname(otmp)
@@ -755,7 +755,7 @@ wizdead()
 }
 
 const char *const random_insult[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "antic",      "blackguard",   "caitiff",    "chucklehead",
     "coistrel",   "craven",       "cretin",     "cur",
     "dastard",    "demon fodder", "dimwit",     "dolt",
@@ -777,7 +777,7 @@ const char *const random_insult[] = {
 };
 
 const char *const random_malediction[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "Hell shall soon claim thy remains,", "I chortle at thee, thou pathetic",
     "Prepare to die, thou", "Resistance is useless,",
     "Surrender or die, thou", "There shall be no mercy, thou",
@@ -819,7 +819,7 @@ register struct monst *mtmp;
             verbalize("魔よけを手放せ，%s！",
                       random_insult[rn2(SIZE(random_insult))]);
         else if (u.uhp < 5 && !rn2(2)) /* Panic */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             verbalize(rn2(2) ? "Even now thy life force ebbs, %s!"
                              : "Savor thy breath, %s, it be thy last!",
                       random_insult[rn2(SIZE(random_insult))]);
@@ -834,7 +834,7 @@ register struct monst *mtmp;
 */
             verbalize(rn2(2) ? "余は必ず帰ってくる．" : "余は戻ってくる．");
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             verbalize("%s %s!",
                       random_malediction[rn2(SIZE(random_malediction))],
                       random_insult[rn2(SIZE(random_insult))]);

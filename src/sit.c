@@ -104,7 +104,7 @@ dosit()
 
         obj = level.objects[u.ux][u.uy];
         if (youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("coil up around your %shoard.",
                 (obj->quan + money_cnt(invent) < u.ulevel * 1000) ? "meager "
                                                                   : "");
@@ -286,7 +286,7 @@ dosit()
                 (void) adjattrib(rn2(A_MAX), 1, FALSE);
                 break;
             case 3:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("A%s electric shock shoots through your body!",
                       (Shock_resistance) ? "n" : " massive");
 #else
@@ -341,7 +341,7 @@ dosit()
                 pline("A voice echoes:");
 */
                 pline("º‚ª‹¿‚¢‚½:");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 verbalize("Thy audience hath been summoned, %s!",
                           flags.female ? "Dame" : "Sire");
 #else
@@ -358,7 +358,7 @@ dosit()
                 pline("A voice echoes:");
 */
                 pline("º‚ª‹¿‚¢‚½:");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 verbalize("By thine Imperious order, %s...",
                           flags.female ? "Dame" : "Sire");
 #else
@@ -472,7 +472,7 @@ dosit()
         struct obj *uegg;
 
         if (!flags.female) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s can't lay eggs!",
                   Hallucination
                       ? "You may think you are a platypus, but a male still"
@@ -515,7 +515,7 @@ dosit()
         /* this sets hatch timers if appropriate */
         set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
         uegg->known = uegg->dknown = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("%s an egg.", eggs_in_water(youmonst.data) ? "spawn" : "lay");
 #else
         You("—‘‚ðŽY‚ñ‚¾D");
@@ -607,7 +607,7 @@ rndcurse()
         else
             curse(otmp);
         if (!Blind) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s.", Yobjnam2(otmp, "glow"),
                   hcolor(otmp->cursed ? NH_BLACK : (const char *) "brown"));
 #else
@@ -689,7 +689,7 @@ attrcurse()
     case 7:
         if (HSee_invisible & INTRINSIC) {
             HSee_invisible &= ~INTRINSIC;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s!", Hallucination ? "tawt you taw a puttie tat"
                                      : "thought you saw something");
 #else

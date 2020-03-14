@@ -15,14 +15,14 @@
 
 /* part of the output on gain or loss of attribute */
 static const char
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     *const plusattr[] = { "strong", "smart", "wise",
                           "agile",  "tough", "charismatic" },
 #else
     *const plusattr[] = { "ã≠Ç¢", "å´ñæÇæ", "å´Ç¢",
                           "ã@ïqÇæ", "äÊè‰Çæ", "ñ£óÕìIÇæ" },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     *const minusattr[] = { "weak",    "stupid",
                            "foolish", "clumsy",
                            "fragile", "repulsive" };
@@ -33,7 +33,7 @@ static const char
 #endif
 /* also used by enlightenment for non-abbreviated status info */
 const char
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     *const attrname[] = { "strength", "intelligence", "wisdom",
                           "dexterity", "constitution", "charisma" };
 #else
@@ -274,7 +274,7 @@ int msgflg; /* positive => no message, zero => message, and */
     if (ACURR(ndx) == old_acurr) {
         if (msgflg == 0 && flags.verbose) {
             if (ABASE(ndx) == old_abase && AMAX(ndx) == old_amax) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("You're %s as %s as you can get.",
                       abonflg ? "currently" : "already", attrstr);
 #else
@@ -284,7 +284,7 @@ int msgflg; /* positive => no message, zero => message, and */
             } else {
                 /* current stayed the same but base value changed, or
                    base is at minimum and reduction caused max to drop */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("innate %s has %s.", attrname[ndx],
                      (incr > 0) ? "improved" : "declined");
 #else
@@ -352,32 +352,32 @@ static const struct poison_effect_message {
     void VDECL((*delivery_func), (const char *, ...));
     const char *effect_msg;
 } poiseff[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { You_feel, "weaker" },             /* A_STR */
 #else
     { You_feel, "é„Ç≠Ç»Ç¡ÇΩ" },         /* A_STR */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { Your, "brain is on fire" },       /* A_INT */
 #else
     { You, "ì™Ç…ååÇ™ÇÃÇ⁄Ç¡ÇΩ" },        /* A_INT */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { Your, "judgement is impaired" },  /* A_WIS */
 #else
     { You, "îªífóÕÇé∏Ç¡ÇΩ" },          /* A_WIS */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { Your, "muscles won't obey you" }, /* A_DEX */
 #else
     { You, "évÇ§ÇÊÇ§Ç…ìÆÇØÇ»Ç¢" },      /* A_DEX */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { You_feel, "very sick" },          /* A_CON */
 #else
     { You_feel, "Ç∆ÇƒÇ‡ãCï™Ç™à´Ç≠Ç»Ç¡ÇΩ" }, /* A_CON */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { You, "break out in hives" }       /* A_CHA */
 #else
     { You, "Ç∂ÇÒÇ‹ÇµÇÒÇ™Ç†ÇÁÇÌÇÍÇΩ" }   /* A_CHA */
@@ -430,7 +430,7 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     /* inform player about being poisoned unless that's already been done;
        "blast" has given a "blast of poison gas" message; "poison arrow",
        "poison dart", etc have implicitly given poison messages too... */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     if (strcmp(reason, "blast") && !strstri(reason, "poison")) {
 #else
     if (strcmp(reason, "ïó") && strcmp(reason, "ëß") && !strstri(reason, "ì≈")) {
@@ -440,7 +440,7 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
 #endif
 
         /* avoid "The" Orcus's sting was poisoned... */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s%s %s poisoned!",
               isupper((uchar) *reason) ? "" : "The ", reason,
               plural ? "were" : "was");
@@ -690,7 +690,7 @@ exerper()
 /* exercise/abuse text (must be in attribute order, not botl order);
    phrased as "You must have been [][0]." or "You haven't been [][1]." */
 static NEARDATA const char *const exertext[A_MAX][2] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { "exercising diligently", "exercising properly" },           /* Str */
     { 0, 0 },                                                     /* Int */
     { "very observant", "paying attention" },                     /* Wis */
@@ -780,7 +780,7 @@ exerchk()
                 /* if you actually changed an attrib - zero accumulation */
                 AEXE(i) = ax = 0;
                 /* then print an explanation */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("%s %s.",
                     (mod_val > 0) ? "must have been" : "haven't been",
                     exertext[i][(mod_val > 0) ? 0 : 1]);
@@ -1071,7 +1071,7 @@ int propidx; /* special cases can have negative values */
 */
                 Strcpy(buf, "åªç›ÇÃépÇ…ÇÊÇ¡Çƒ");
             else if (propidx == FAST && Very_fast)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(buf, because_of,
                         ((HFast & TIMEOUT) != 0L) ? "a potion or spell"
                           : ((EFast & W_ARMF) != 0L && uarmf->dknown
@@ -1400,7 +1400,7 @@ int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
         /* worn helm of opposite alignment might block change */
         if (!uarmh || uarmh->otyp != HELM_OF_OPPOSITE_ALIGNMENT)
             u.ualign.type = u.ualignbase[A_CURRENT];
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("have a %ssense of a new direction.",
             (u.ualign.type != oldalign) ? "sudden " : "");
 #else
@@ -1416,7 +1416,7 @@ int reason; /* 0==conversion, 1==helm-of-OA on, 2==helm-of-OA off */
 */
             You("%sêQï‘Ç¡ÇΩÅD", Hallucination ? "çrÇ¡Ç€Ç≠" : "Ç†Ç¡Ç≥ÇËÇ∆");
         else if (reason == 2)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Your("mind is %s.", Hallucination
                                     ? "much of a muchness"
                                     : "back in sync with your body");

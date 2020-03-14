@@ -367,7 +367,7 @@ doextcmd(VOID_ARGS)
             return 0;
         }
         if (iflags.menu_requested && !accept_menu_prefix(func)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("'%s' prefix has no effect for the %s command.",
                   visctrl(Cmd.spkeys[NHKF_REQMENU]),
                   extcmdlist[idx].ef_txt);
@@ -397,7 +397,7 @@ doextlist(VOID_ARGS)
     int n, pass;
     int menumode = 0, menushown[2], onelist = 0;
     boolean redisplay = TRUE, search = FALSE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     static const char *headings[] = { "Extended commands",
                                       "Debugging Extended Commands" };
 #else
@@ -412,7 +412,7 @@ doextlist(VOID_ARGS)
         redisplay = FALSE;
         any = zeroany;
         start_menu(menuwin);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "Extended Commands List", MENU_UNSELECTED);
 #else
@@ -422,7 +422,7 @@ doextlist(VOID_ARGS)
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "", MENU_UNSELECTED);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Strcpy(buf, menumode ? "Show" : "Hide");
         Strcat(buf, " commands that don't autocomplete");
         if (!menumode)
@@ -442,7 +442,7 @@ doextlist(VOID_ARGS)
                actual list of extended commands shown via separator lines;
                having ':' as an explicit selector overrides the default
                menu behavior for it; we retain 's' as a group accelerator */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             add_menu(menuwin, NO_GLYPH, &any, ':', 's', ATR_NONE,
                      "Search extended commands", MENU_UNSELECTED);
 #else
@@ -450,7 +450,7 @@ doextlist(VOID_ARGS)
                      "拡張コマンドを検索する", MENU_UNSELECTED);
 #endif
         } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Strcpy(buf, "Show all, clear search");
 #else
             Strcpy(buf, "全て表示; 検索をクリア");
@@ -468,7 +468,7 @@ doextlist(VOID_ARGS)
         }
         if (wizard) {
             any.a_int = 4;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             add_menu(menuwin, NO_GLYPH, &any, 'z', 0, ATR_NONE,
                      onelist ? "Show debugging commands in separate section"
                      : "Show all alphabetically, including debugging commands",
@@ -540,7 +540,7 @@ doextlist(VOID_ARGS)
                          "", MENU_UNSELECTED);
         }
         if (*searchbuf && !n)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "no matches", MENU_UNSELECTED);
 #else
@@ -577,7 +577,7 @@ doextlist(VOID_ARGS)
             searchbuf[0] = '\0';
         }
         if (search) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Strcpy(promptbuf, "Extended command list search phrase");
             Strcat(promptbuf, "?");
 #else
@@ -1840,7 +1840,7 @@ char *outbuf;
     /* Protection amount is typically larger than damage or to-hit;
        reduce magnitude by a third in order to stretch modifier ranges
        (small:1..5, moderate:6..10, large:11..19, huge:20+) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     if (!strcmp(inctyp, "defense"))
 #else
     if (!strcmp(inctyp, "防御"))
@@ -1921,7 +1921,7 @@ int final;
         category_name = "不明";
         break;
     }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(buf, " %s %s damage", (final || wizard) ? "half" : "reduced",
             category_name);
     enl_msg(You_, "take", "took", buf, from_what(category));
@@ -1995,7 +1995,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
     /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(buf, "%s the %s's attributes:", tmpbuf,
             ((Upolyd ? u.mfemale : flags.female) && urole.name.f)
                 ? urole.name.f
@@ -2085,7 +2085,7 @@ int final;
             Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
 */
             Sprintf(tmpbuf, "%sの", genders[flags.female ? 1 : 0].adj);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%sin %s%s form", !final ? "currently " : "", tmpbuf,
                 uasmon->mname);
 #else
@@ -2109,14 +2109,14 @@ int final;
         Sprintf(tmpbuf, "%s", genders[innategend].adj);
     buf[0] = '\0';
     if (Upolyd)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Strcpy(buf, "actually "); /* "You are actually a ..." */
 #else
         Strcpy(buf, "実際には"); /* "あなたは実際には..." */
 #endif
     if (!strcmpi(rank_titl, role_titl)) {
         /* omit role when rank title matches it */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(buf), "%s, level %d %s%s", an(rank_titl), u.ulevel,
                 tmpbuf, urace.noun);
 #else
@@ -2124,7 +2124,7 @@ int final;
                 tmpbuf, urace.adj, role_titl);
 #endif
     } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(buf), "%s, a level %d %s%s %s", an(rank_titl), u.ulevel,
                 tmpbuf, urace.adj, role_titl);
 #else
@@ -2181,7 +2181,7 @@ int final;
     Strcpy(buf, "あなたは");
 #endif
     if (u.ualign.type != A_LAWFUL)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(buf), " %s (%s) and", align_gname(A_LAWFUL),
                 align_str(A_LAWFUL));
 #else
@@ -2189,7 +2189,7 @@ int final;
                 align_str(A_LAWFUL));
 #endif
     if (u.ualign.type != A_NEUTRAL)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(buf), " %s (%s)%s", align_gname(A_NEUTRAL),
                 align_str(A_NEUTRAL),
                 (u.ualign.type != A_CHAOTIC) ? " and" : "");
@@ -2199,7 +2199,7 @@ int final;
                 (u.ualign.type != A_CHAOTIC) ? "および" : "");
 #endif
     if (u.ualign.type != A_CHAOTIC)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(buf), " %s (%s)", align_gname(A_CHAOTIC),
                 align_str(A_CHAOTIC));
 #else
@@ -2618,7 +2618,7 @@ int mode, final, attrindx;
 */
         paren_pfx = final ? " (" : " (現在; ";
         if (acurrent != abase) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(eos(valubuf), "%sbase:%s", paren_pfx,
                     attrval(attrindx, abase, valstring));
 #else
@@ -2628,7 +2628,7 @@ int mode, final, attrindx;
             paren_pfx = ", ";
         }
         if (abase != apeak) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(eos(valubuf), "%speak:%s", paren_pfx,
                     attrval(attrindx, apeak, valstring));
 #else
@@ -2638,7 +2638,7 @@ int mode, final, attrindx;
             paren_pfx = ", ";
         }
         if (interesting_alimit) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(eos(valubuf), "%s%slimit:%s", paren_pfx,
                     /* more verbose if exceeding 'limit' due to magic bonus */
                     (acurrent > alimit) ? "innate " : "",
@@ -2711,7 +2711,7 @@ int final;
     /* not a trouble, but we want to display riding status before maybe
        reporting steed as trapped or hero stuck to cursed saddle */
     if (Riding) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "riding %s", steedname);
         you_are(buf, "");
 #else
@@ -2836,7 +2836,7 @@ int final;
     if (Blind) {
         /* from_what() (currently wizard-mode only) checks !haseyes()
            before u.uroleplay.blind, so we should too */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%s blind",
                 !haseyes(youmonst.data) ? "innately"
                 : u.uroleplay.blind ? "permanently"
@@ -3129,7 +3129,7 @@ int final;
             (void) lcase(skill_level_name(wtype, sklvlbuf));
         /* "you have no/basic/expert/master/grand-master skill with <skill>"
            or "you are unskilled/skilled in <skill>" */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%s %s %s", sklvlbuf,
                 hav ? "skill with" : "in", skill_name(wtype));
 #else
@@ -3146,13 +3146,13 @@ int final;
     /* report 'nudity' */
     if (!uarm && !uarmu && !uarmc && !uarms && !uarmg && !uarmf && !uarmh) {
         if (u.uroleplay.nudist)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             enl_msg(You_, "do", "did", " not wear any armor", "");
 #else
             enl_msg(You_, "い", "かった", "何の鎧も装備しな", "");
 #endif
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             you_are("not wearing any armor", "");
 #else
             enl_msg(You_, "い", "かった", "何の鎧も装備していな", "");
@@ -3183,7 +3183,7 @@ int final;
     enlght_out(final ? "最終属性:" : "現在の属性:");
 
     if (u.uevent.uhand_of_elbereth) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         static const char *const hofe_titles[3] = { "the Hand of Elbereth",
                                                     "the Envoy of Balance",
                                                     "the Glory of Arioch" };
@@ -3205,7 +3205,7 @@ int final;
         you_have(buf, "");
 
     if (wizard) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, " %d", u.ualign.record);
         enl_msg("Your alignment ", "is", "was", buf, "");
 #else
@@ -3276,7 +3276,7 @@ int final;
 */
         you_have("石化への耐性", from_what(STONE_RES));
     if (Halluc_resistance)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         enl_msg(You_, "resist", "resisted", " hallucinations",
                 from_what(HALLUC_RES));
 #else
@@ -3302,7 +3302,7 @@ int final;
 */
             enl_msg("あなたは透明なものを見られ", "る", "た", "", from_what(SEE_INVIS));
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             enl_msg(You_, "will see", "would have seen",
                     " invisible when not blind", from_what(SEE_INVIS));
 #else
@@ -3321,7 +3321,7 @@ int final;
 */
         you_have("警戒能力", from_what(WARNING));
     if (Warn_of_mon && context.warntype.obj) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "aware of the presence of %s",
                 (context.warntype.obj & M2_ORC) ? "orcs"
                 : (context.warntype.obj & M2_ELF) ? "elves"
@@ -3532,7 +3532,7 @@ int final;
 
         BFlying = 0L;
         if (Flying) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             enl_msg(You_, "would fly", "would have flown",
                     /* wording quibble: for past tense, "hadn't been"
                        would sound better than "weren't" (and
@@ -3644,7 +3644,7 @@ int final;
     if ((armpro = magic_negation(&youmonst)) > 0) {
         /* magic cancellation factor, conferred by worn armor */
         static const char *const mc_types[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             "" /*ordinary*/, "warded", "guarded", "protected",
 #else
             "" /*ordinary*/, "衛られて", "護られて", "守られて",
@@ -3793,7 +3793,7 @@ int final;
     /*** Miscellany ***/
     if (Luck) {
         ltmp = abs((int) Luck);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%s%slucky",
                 ltmp >= 10 ? "extremely " : ltmp >= 5 ? "very " : "",
                 Luck < 0 ? "un" : "");
@@ -3961,7 +3961,7 @@ int final;
             case 1:
                 break; /* just "are dead" */
             default:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(buf, " (%d%s time!)", u.umortality,
                         ordin(u.umortality));
 #else
@@ -4102,7 +4102,7 @@ minimal_enlightenment()
              "Deities", FALSE);
 */
              "神", FALSE);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(buf2, deity_fmtstr, align_gname(A_CHAOTIC),
             (u.ualignbase[A_ORIGINAL] == u.ualign.type
              && u.ualign.type == A_CHAOTIC)               ? " (s,c)"
@@ -4121,7 +4121,7 @@ minimal_enlightenment()
     Sprintf(buf, fmtstr, "混沌", buf2);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(buf2, deity_fmtstr, align_gname(A_NEUTRAL),
             (u.ualignbase[A_ORIGINAL] == u.ualign.type
              && u.ualign.type == A_NEUTRAL)               ? " (s,c)"
@@ -4140,7 +4140,7 @@ minimal_enlightenment()
     Sprintf(buf, fmtstr, "中立", buf2);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(buf2, deity_fmtstr, align_gname(A_LAWFUL),
             (u.ualignbase[A_ORIGINAL] == u.ualign.type
              && u.ualign.type == A_LAWFUL)                ? " (s,c)"
@@ -4249,7 +4249,7 @@ int msgflag;          /* for variant message phrasing */
             if (u.utrap && u.utraptype == TT_PIT) {
                 struct trap *t = t_at(u.ux, u.uy);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(bp, " in a %spit",
                         (t && t->ttyp == SPIKED_PIT) ? "spiked " : "");
 #else
@@ -4351,7 +4351,7 @@ int final;
 */
         you_have_never("あなたは装備している武器で攻撃し");
     } else if (wizard) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "used a wielded weapon %ld time%s", u.uconduct.weaphit,
                 plur(u.uconduct.weaphit));
         you_have_X(buf);
@@ -4437,7 +4437,7 @@ int final;
 */
         you_have_never("あなたは願い事をし");
     } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "used %ld wish%s", u.uconduct.wishes,
                 (u.uconduct.wishes > 1L) ? "es" : "");
 #else
@@ -4488,19 +4488,19 @@ int final;
 struct ext_func_tab extcmdlist[] = {
     { '#', "#", "perform an extended command",
             doextcmd, IFBURIED | GENERALCMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('?'), "?", "list all extended commands",
 #else
     { M('?'), "?", "この拡張コマンド一覧を表示する",
 #endif
             doextlist, IFBURIED | AUTOCOMPLETE | GENERALCMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('a'), "adjust", "adjust inventory letters",
 #else
     { M('a'), "adjust", "持ち物一覧の調整",
 #endif
             doorganize, IFBURIED | AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('A'), "annotate", "name current level",
 #else
     { M('A'), "annotate", "現在の階に名前をつける",
@@ -4514,19 +4514,19 @@ struct ext_func_tab extcmdlist[] = {
             dotogglepickup, IFBURIED },
     { 'C', "call", "call (name) something", docallcmd, IFBURIED },
     { 'Z', "cast", "zap (cast) a spell", docast, IFBURIED },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('c'), "chat", "talk to someone", dotalk, IFBURIED | AUTOCOMPLETE },
 #else
     { M('c'), "chat", "誰かと話す", dotalk, IFBURIED | AUTOCOMPLETE },
 #endif
     { 'c', "close", "close a door", doclose },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('C'), "conduct", "list voluntary challenges you have maintained",
 #else
     { M('C'), "conduct", "どういう行動をとったか見る",
 #endif
             doconduct, IFBURIED | AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('d'), "dip", "dip an object into something", dodip, AUTOCOMPLETE },
 #else
     { M('d'), "dip", "何かに物を浸す", dodip, AUTOCOMPLETE },
@@ -4536,20 +4536,20 @@ struct ext_func_tab extcmdlist[] = {
     { 'D', "droptype", "drop specific item types", doddrop },
     { 'e', "eat", "eat something", doeat },
     { 'E', "engrave", "engrave writing on the floor", doengrave },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('e'), "enhance", "advance or check weapon and spell skills",
 #else
     { M('e'), "enhance", "武器熟練度を高める",
 #endif
             enhance_weapon_skill, IFBURIED | AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "exploremode", "enter explore (discovery) mode",
 #else
     { '\0', "exploremode", "探検(発見)モードに入る",
 #endif
             enter_explore_mode, IFBURIED },
     { 'f', "fire", "fire ammunition from quiver", dofire },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('f'), "force", "force a lock", doforce, AUTOCOMPLETE },
 #else
     { M('f'), "force", "鍵をこじあける", doforce, AUTOCOMPLETE },
@@ -4564,13 +4564,13 @@ struct ext_func_tab extcmdlist[] = {
     { 'i', "inventory", "show your inventory", ddoinv, IFBURIED },
     { 'I', "inventtype", "inventory specific item types",
             dotypeinv, IFBURIED },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('i'), "invoke", "invoke an object's special powers",
 #else
     { M('i'), "invoke", "物の特別な力を使う",
 #endif
             doinvoke, IFBURIED | AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('j'), "jump", "jump to another location", dojump, AUTOCOMPLETE },
 #else
     { M('j'), "jump", "他の位置に飛びうつる", dojump, AUTOCOMPLETE },
@@ -4580,45 +4580,45 @@ struct ext_func_tab extcmdlist[] = {
             dodiscovered, IFBURIED | GENERALCMD },
     { '`', "knownclass", "show discovered types for one class of objects",
             doclassdisco, IFBURIED | GENERALCMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "levelchange", "change experience level",
 #else
     { '\0', "levelchange", "経験レベルを変える",
 #endif
             wiz_level_change, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "lightsources", "show mobile light sources",
 #else
     { '\0', "lightsources", "移動光源を見る",
 #endif
             wiz_light_sources, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { ':', "look", "look at what is here", dolook, IFBURIED },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('l'), "loot", "loot a box on the floor", doloot, AUTOCOMPLETE },
 #else
     { M('l'), "loot", "床の上の箱を開ける", doloot, AUTOCOMPLETE },
 #endif
 #ifdef DEBUG_MIGRATING_MONS
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "migratemons", "migrate N random monsters",
 #else
     { '\0', "migratemons", "ランダムな怪物を何体か移住させる",
 #endif
             wiz_migrate_mons, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('m'), "monster", "use monster's special ability",
 #else
     { M('m'), "monster", "怪物の特別能力を使う",
 #endif
             domonability, IFBURIED | AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { 'N', "name", "name a monster or an object",
 #else
     { 'N', "name", "アイテムや物に名前をつける",
 #endif
             docallcmd, IFBURIED | AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('o'), "offer", "offer a sacrifice to the gods",
 #else
     { M('o'), "offer", "神に供物を捧げる",
@@ -4627,13 +4627,13 @@ struct ext_func_tab extcmdlist[] = {
     { 'o', "open", "open a door", doopen },
     { 'O', "options", "show option settings, possibly change them",
             doset, IFBURIED | GENERALCMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { C('o'), "overview", "show a summary of the explored dungeon",
 #else
     { C('o'), "overview", "探索した迷宮の概要を表示する",
 #endif
             dooverview, IFBURIED | AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "panic", "test panic routine (fatal to game)",
 #else
     { '\0', "panic", "パニックルーチンをテストする(致命的)",
@@ -4641,13 +4641,13 @@ struct ext_func_tab extcmdlist[] = {
             wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { 'p', "pay", "pay your shopping bill", dopay },
     { ',', "pickup", "pick up things at the current location", dopickup },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "polyself", "polymorph self",
 #else
     { '\0', "polyself", "変化する",
 #endif
             wiz_polyself, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('p'), "pray", "pray to the gods for help",
 #else
     { M('p'), "pray", "神に祈る",
@@ -4657,7 +4657,7 @@ struct ext_func_tab extcmdlist[] = {
             doprev_message, IFBURIED | GENERALCMD },
     { 'P', "puton", "put on an accessory (ring, amulet, etc)", doputon },
     { 'q', "quaff", "quaff (drink) something", dodrink },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('q'), "quit", "exit without saving current game",
 #else
     { M('q'), "quit", "セーブしないで終了",
@@ -4667,19 +4667,19 @@ struct ext_func_tab extcmdlist[] = {
     { 'r', "read", "read a scroll or spellbook", doread },
     { C('r'), "redraw", "redraw screen", doredraw, IFBURIED | GENERALCMD },
     { 'R', "remove", "remove an accessory (ring, amulet, etc)", doremring },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('R'), "ride", "mount or dismount a saddled steed",
 #else
     { M('R'), "ride", "怪物に乗る(または降りる)",
 #endif
             doride, AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('r'), "rub", "rub a lamp or a stone", dorub, AUTOCOMPLETE },
 #else
     { M('r'), "rub", "ランプをこする", dorub, AUTOCOMPLETE },
 #endif
     { 'S', "save", "save the game and exit", dosave, IFBURIED | GENERALCMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { 's', "search", "search for traps and secret doors",
             dosearch, IFBURIED, "searching" },
 #else
@@ -4692,7 +4692,7 @@ struct ext_func_tab extcmdlist[] = {
     { ARMOR_SYM, "seearmor", "show the armor currently worn",
             doprarm, IFBURIED },
     { GOLD_SYM, "seegold", "count your gold", doprgold, IFBURIED },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "seenv", "show seen vectors",
 #else
     { '\0', "seenv", "視線ベクトルを見る",
@@ -4713,12 +4713,12 @@ struct ext_func_tab extcmdlist[] = {
                        | CMD_NOT_AVAILABLE
 #endif /* SHELL */
     },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('s'), "sit", "sit down", dosit, AUTOCOMPLETE },
 #else
     { M('s'), "sit", "座る", dosit, AUTOCOMPLETE },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "stats", "show memory statistics",
 #else
     { '\0', "stats", "メモリ状態を見る",
@@ -4734,7 +4734,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'T', "takeoff", "take off one piece of armor", dotakeoff },
     { 'A', "takeoffall", "remove all armor", doddoremarm },
     { C('t'), "teleport", "teleport around the level", dotelecmd, IFBURIED },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "terrain", "show map without obstructions",
 #else
     { '\0', "terrain", "邪魔されずに地図を見る",
@@ -4744,56 +4744,56 @@ struct ext_func_tab extcmdlist[] = {
             "menu of commands you can do from here to adjacent spot",
             dotherecmdmenu },
     { 't', "throw", "throw something", dothrow },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "timeout", "look at timeout queue and hero's timed intrinsics",
 #else
     { '\0', "timeout", "時間切れキューとプレイヤーの時間経過を見る",
 #endif
             wiz_timeout_queue, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('T'), "tip", "empty a container", dotip, AUTOCOMPLETE },
 #else
     { M('T'), "tip", "入れ物を空にする", dotip, AUTOCOMPLETE },
 #endif
     { '_', "travel", "travel to a specific location on the map", dotravel },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('t'), "turn", "turn undead away", doturn, IFBURIED | AUTOCOMPLETE },
 #else
     { M('t'), "turn", "アンデットを土に返す", doturn, IFBURIED | AUTOCOMPLETE },
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { 'X', "twoweapon", "toggle two-weapon combat",
 #else
     { 'X', "twoweapon", "両手持ちの切り替え",
 #endif
             dotwoweapon, AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('u'), "untrap", "untrap something", dountrap, AUTOCOMPLETE },
 #else
     { M('u'), "untrap", "罠をはずす", dountrap, AUTOCOMPLETE },
 #endif
     { '<', "up", "go up a staircase", doup },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "vanquished", "list vanquished monsters",
 #else
     { '\0', "vanquished", "倒した怪物の一覧を見る",
 #endif
             dovanquished, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { M('v'), "version",
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             "list compile time options for this version of NetHack",
 #else
             "コンパイル時のオプションを表示する",
 #endif
             doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD },
     { 'v', "versionshort", "show version", doversion, IFBURIED | GENERALCMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "vision", "show vision array",
 #else
     { '\0', "vision", "視界配列を見る",
 #endif
             wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '.', "wait", "rest one move while doing nothing",
             donull, IFBURIED, "waiting" },
 #else
@@ -4805,13 +4805,13 @@ struct ext_func_tab extcmdlist[] = {
     { '/', "whatis", "show what type of thing a symbol corresponds to",
             dowhatis, IFBURIED | GENERALCMD },
     { 'w', "wield", "wield (put in use) a weapon", dowield },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { M('w'), "wipe", "wipe off your face", dowipe, AUTOCOMPLETE },
 #else
     { M('w'), "wipe", "顔を拭う", dowipe, AUTOCOMPLETE },
 #endif
 #ifdef DEBUG
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "wizbury", "bury objs under and around you",
 #else
     { '\0', "wizbury", "物をあなたの周りに埋める",
@@ -4832,13 +4832,13 @@ struct ext_func_tab extcmdlist[] = {
             wiz_makemap, IFBURIED | WIZMODECMD },
     { C('f'), "wizmap", "map the level",
             wiz_map, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "wizrumorcheck", "verify rumor boundaries",
 #else
     { '\0', "wizrumorcheck", "噂の境界を検証する",
 #endif
             wiz_rumor_check, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "wizsmell", "smell monster",
 #else
     { '\0', "wizsmell", "怪物の匂いを嗅ぐ",
@@ -4848,7 +4848,7 @@ struct ext_func_tab extcmdlist[] = {
             wiz_where, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { C('w'), "wizwish", "wish for something",
             wiz_wish, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { '\0', "wmode", "show wall modes",
 #else
     { '\0', "wmode", "壁モードを見る",
@@ -6505,7 +6505,7 @@ const char *msg;
         }
     }
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(buf, "Valid direction keys%s%s%s are:",
             prefixhandling ? " to " : "", prefixhandling ? dothat : "",
             NODIAG(u.umonnum) ? " in your current form" : "");

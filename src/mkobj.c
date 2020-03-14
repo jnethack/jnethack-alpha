@@ -684,7 +684,7 @@ register struct obj *otmp;
 
 /* alteration types; must match COST_xxx macros in hack.h */
 static const char *const alteration_verbs[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "cancel", "drain", "uncharge", "unbless", "uncurse", "disenchant",
     "degrade", "dilute", "erase", "burn", "neutralize", "destroy", "splatter",
     "bite", "open", "break the lock on", "rust", "rot", "tarnish"
@@ -1260,7 +1260,7 @@ int old_range;
             *buf = '\0';
             if (iflags.last_msg == PLNMSG_OBJ_GLOWS)
                 /* we just saw "The <obj> glows <color>." from dipping */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Strcpy(buf, (obj->quan == 1L) ? "It" : "They");
 #else
                 Strcpy(buf, "‚»‚ê");
@@ -1273,7 +1273,7 @@ int old_range;
                    when changing intensity, using "less brightly" is
                    straightforward for dimming, but we need "brighter"
                    rather than "more brightly" for brightening; ugh */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s %s%s.", buf, otense(obj, "shine"),
                       (abs(delta) > 1) ? "much " : "",
                       (delta > 0) ? "brighter" : "less brightly");
@@ -2233,7 +2233,7 @@ boolean tipping; /* caller emptying entire contents; affects shop handling */
            being included in its formatted name during next message */
         iflags.suppress_price++;
         if (!tipping) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             obj = hold_another_object(obj,
                                       u.uswallow
                                         ? "Oops!  %s out of your reach!"
@@ -2265,7 +2265,7 @@ boolean tipping; /* caller emptying entire contents; affects shop handling */
                 if (IS_ALTAR(levl[u.ux][u.uy].typ))
                     doaltarobj(obj); /* does its own drop message */
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s to the %s.", Doname2(obj),
                           otense(obj, "drop"), surface(u.ux, u.uy));
 #else
@@ -2891,7 +2891,7 @@ struct obj *otmp2;
              * they'll be out of our view (minvent or container)
              * so don't actually show anything */
         } else if (onfloor || inpack) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("The %s coalesce%s.", makeplural(obj_typename(otmp->otyp)),
                   inpack ? " inside your pack" : "");
 #else

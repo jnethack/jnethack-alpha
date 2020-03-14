@@ -104,7 +104,7 @@ const struct propname {
 
 /* He is being petrified - dialogue by inmet!tower */
 static NEARDATA const char *const stoned_texts[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "You are slowing down.",            /* 5 */
     "Your limbs are stiffening.",       /* 4 */
     "Your limbs have turned to stone.", /* 3 */
@@ -128,7 +128,7 @@ stoned_dialogue()
         char buf[BUFSZ];
 
         Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         if (nolimbs(youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
 #else
@@ -286,7 +286,7 @@ static NEARDATA const char *const choke_texts[] = {
 };
 
 static NEARDATA const char *const choke_texts2[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "Your %s is becoming constricted.",
     "Your blood is having trouble reaching your brain.",
     "The pressure on your %s increases.",
@@ -364,7 +364,7 @@ levitation_dialogue()
 }
 
 static NEARDATA const char *const slime_texts[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "You are turning a little %s.",   /* 5 */
     "Your limbs are getting oozy.",   /* 4 */
     "Your skin begins to peel away.", /* 3 */
@@ -395,7 +395,7 @@ slime_dialogue()
         char buf[BUFSZ];
 
         Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         if (nolimbs(youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
 #else
@@ -525,7 +525,7 @@ struct kinfo *kptr;
    move between things which are closely packed--like the substance of
    solid rock! */
 static NEARDATA const char *const phaze_texts[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "You start to feel bloated.",
     "You are feeling rather flabby.",
 #else
@@ -606,7 +606,7 @@ nh_timeout()
             u.uspellprot--;
             find_ac();
             if (!Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Norep("The %s haze around you %s.", hcolor(NH_GOLDEN),
                       u.uspellprot ? "becomes less dense" : "disappears");
 #else
@@ -683,7 +683,7 @@ nh_timeout()
                 break;
             case FAST:
                 if (!Very_fast)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You_feel("yourself slowing down%s.",
                              Fast ? " a bit" : "");
 #else
@@ -720,7 +720,7 @@ nh_timeout()
             case INVIS:
                 newsym(u.ux, u.uy);
                 if (!Invis && !BInvis && !Blind) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You(!See_invisible
                             ? "are no longer invisible."
                             : "can no longer see through yourself.");
@@ -787,7 +787,7 @@ nh_timeout()
                 if (!Warn_of_mon) {
                     context.warntype.speciesidx = NON_PM;
                     if (context.warntype.species) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         You("are no longer warned about %s.",
                             makeplural(context.warntype.species->mname));
 #else
@@ -806,7 +806,7 @@ nh_timeout()
 */
                         You_feel("また閉じ込められたようだ．");
                     else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         pline("You're back to your %s self again.",
                               !Upolyd ? "normal" : "unusual");
 #else
@@ -817,7 +817,7 @@ nh_timeout()
                 break;
             case STRANGLED:
                 killer.format = KILLED_BY;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Strcpy(killer.name,
                        (u.uburied) ? "suffocation" : "strangulation");
 #else
@@ -1026,7 +1026,7 @@ long timeout;
         if (cansee_hatchspot) {
             /* [bug?  m_monnam() yields accurate monster type
                regardless of hallucination] */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(monnambuf, "%s%s", siblings ? "some " : "",
                     siblings ? makeplural(m_monnam(mon)) : an(m_monnam(mon)));
 #else
@@ -1044,7 +1044,7 @@ long timeout;
         case OBJ_INVENT:
             knows_egg = TRUE; /* true even if you are blind */
             if (!cansee_hatchspot)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You_feel("%s %s from your pack!", something,
                          locomotion(mon->data, "drop"));
 #else
@@ -1052,7 +1052,7 @@ long timeout;
                       jpast(locomotion(mon->data, "落ちる")));
 #endif
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You_see("%s %s out of your pack!", monnambuf,
                         locomotion(mon->data, "drop"));
 #else
@@ -1060,7 +1060,7 @@ long timeout;
                     jpast(locomotion(mon->data, "落ちる")));
 #endif
             if (yours) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s cries sound like \"%s%s\"",
                       siblings ? "Their" : "Its",
                       flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
@@ -1069,7 +1069,7 @@ long timeout;
                       flags.female ? "ママ" : "パパ", egg->spe ? "" : "？");
 #endif
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 verbalize("Gleep!"); /* Mything eggs :-) */
 #else
                 verbalize("ブォー！"); /* Mything eggs :-) */
@@ -1203,7 +1203,7 @@ slip_or_trip()
           name; if not, look for rocks to trip over; trip over
           anonymous "something" if there aren't any rocks.
         */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         what = (iflags.last_msg == PLNMSG_ONE_ITEM_HERE)
                 ? ((otmp->quan == 1L) ? "it"
                       : Hallucination ? "they" : "them")
@@ -1224,7 +1224,7 @@ slip_or_trip()
         if (Hallucination) {
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("Egads!  %s bite%s your %s!", what,
                   (!otmp || otmp->quan == 1L) ? "s" : "", body_part(FOOT));
 #else
@@ -1238,7 +1238,7 @@ slip_or_trip()
         }
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(killer.name, "tripping over %s corpse",
                     an(mons[otmp->corpsenm].mname));
 #else
@@ -1248,7 +1248,7 @@ slip_or_trip()
             instapetrify(killer.name);
         }
     } else if (rn2(3) && is_ice(u.ux, u.uy)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s%s on the ice.",
               u.usteed ? upstart(x_monnam(u.usteed,
                                           (has_mname(u.usteed)) ? ARTICLE_NONE
@@ -1268,7 +1268,7 @@ slip_or_trip()
         if (on_foot) {
             switch (rn2(4)) {
             case 1:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("trip over your own %s.",
                     Hallucination ? "elbow" : makeplural(body_part(FOOT)));
 #else
@@ -1277,7 +1277,7 @@ slip_or_trip()
 #endif
                 break;
             case 2:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("slip %s.",
                     Hallucination ? "on a banana peel" : "and nearly fall");
 #else
@@ -1301,7 +1301,7 @@ slip_or_trip()
         } else {
             switch (rn2(4)) {
             case 1:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("%s slip out of the stirrups.",
                      makeplural(body_part(FOOT)));
 #else
@@ -1587,7 +1587,7 @@ long timeout;
                 switch (obj->where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s%scandle%s getting short.", whose,
                           menorah ? "candelabrum's " : "",
                           many ? "s are" : " is");
@@ -1597,7 +1597,7 @@ long timeout;
 #endif
                     break;
                 case OBJ_FLOOR:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You_see("%scandle%s getting short.",
                             menorah ? "a candelabrum's " : many ? "some "
                                                                 : "a ",
@@ -1615,7 +1615,7 @@ long timeout;
                 switch (obj->where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s%scandle%s flame%s flicker%s low!", whose,
                           menorah ? "candelabrum's " : "", many ? "s'" : "'s",
                           many ? "s" : "", many ? "" : "s");
@@ -1625,7 +1625,7 @@ long timeout;
 #endif
                     break;
                 case OBJ_FLOOR:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You_see("%scandle%s flame%s flicker low!",
                             menorah ? "a candelabrum's " : many ? "some "
                                                                 : "a ",
@@ -1655,7 +1655,7 @@ long timeout;
 #endif
                         break;
                     case OBJ_FLOOR:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         You_see("a candelabrum's flame%s die.",
                                 many ? "s" : "");
 #else
@@ -1670,7 +1670,7 @@ long timeout;
                            useupall() -> freeinv() handles it */
                         /*FALLTHRU*/
                     case OBJ_MINVENT:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         pline("%s %s consumed!", Yname2(obj),
                               many ? "are" : "is");
 #else
@@ -1682,7 +1682,7 @@ long timeout;
                           You see some wax candles consumed!
                           You see a wax candle consumed!
                          */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         You_see("%s%s consumed!", many ? "some " : "",
                                 many ? xname(obj) : an(xname(obj)));
 #else
@@ -1693,7 +1693,7 @@ long timeout;
                     }
 
                     /* post message */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline(Hallucination
                               ? (many ? "They shriek!" : "It shrieks!")
                               : Blind ? "" : (many ? "Their flames die."

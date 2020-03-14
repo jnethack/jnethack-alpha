@@ -373,7 +373,7 @@ register struct obj *sobj;
 */
                    "あなたは将来の経済状況が心配になった．");
             else if (steedgold)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(buf, "You feel interested in %s financial situation.",
                         s_suffix(x_monnam(u.usteed,
                                           u.usteed->mtame ? ARTICLE_YOUR
@@ -605,7 +605,7 @@ register struct obj *sobj;
         }
         if (sobj) {
             if (sobj->blessed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("%s %s to tingle and you smell %s.", body_part(NOSE),
                      u.uedibility ? "continues" : "starts", what);
 #else
@@ -1374,7 +1374,7 @@ struct obj **optr;
                 You("蛍光岩の上を金魚が泳いでいるのを見た．");
                 break;
             case 5:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You_see(
                     "tiny snowflakes spinning around a miniature farmhouse.");
 #else
@@ -1536,7 +1536,7 @@ do_mapping()
     if (!level.flags.hero_memory || unconstrained) {
         flush_screen(1);                 /* flush temp screen */
         /* browse_map() instead of display_nhwindow(WIN_MAP, TRUE) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ,
                    "anything of interest");
 #else
@@ -1771,7 +1771,7 @@ genericptr_t num;
 */
                 b_trapped("扉", 0);
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Norep("You %s an explosion!",
                       cansee(zx, zy) ? "see" : (!Deaf ? "hear"
                                                       : "feel the shock of"));
@@ -1913,7 +1913,7 @@ boolean via_warning;
         if (mtmp->mundetected
             && (is_hider(mtmp->data) || mtmp->data->mlet == S_EEL)) {
             if (via_warning) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("warning senses cause you to take a second %s.",
                      Blind ? "to check nearby" : "look close by");
 #else

@@ -269,7 +269,7 @@ boolean foundyou;
        penalizing mspec_used. */
     if (!foundyou && thinks_it_foundyou
         && !is_undirected_spell(mattk->adtyp, spellnum)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s casts a spell at %s!",
               canseemon(mtmp) ? Monnam(mtmp) : "Something",
               levl[mtmp->mux][mtmp->muy].typ == WATER ? "empty water"
@@ -511,19 +511,19 @@ int spellnum;
                only a single monster is seen */
             if (Invisible && !perceives(mtmp->data)
                 && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s around a spot near you!", mappear);
 #else
                 pline("‰ö•¨‚ª‚ ‚È‚½‚Ì‚·‚®‚»‚Î‚ÉŒ»‚ê‚½I");
 #endif
             else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s around your displaced image!", mappear);
 #else
                 pline("‰ö•¨‚ª‚ ‚È‚½‚ÌŒ¶‰e‚Ì‚·‚®‚»‚Î‚ÉŒ»‚ê‚½I");
 #endif
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s from nowhere!", mappear);
 #else
                 pline("‰ö•¨‚ª‚Ç‚±‚©‚ç‚Æ‚à‚È‚­Œ»‚ê‚½I");
@@ -587,7 +587,7 @@ int spellnum;
     case MGC_DISAPPEAR: /* makes self invisible */
         if (!mtmp->minvis && !mtmp->invis_blkd) {
             if (canseemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s suddenly %s!", Monnam(mtmp),
                       !See_invisible ? "disappears" : "becomes transparent");
 #else
@@ -794,7 +794,7 @@ int spellnum;
                 /* unseen caster summoned seen critter(s) */
                 arg = (newseen == oldseen + 1) ? an(what) : makeplural(what);
                 if (!Deaf)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You_hear("someone summoning something, and %s %s.", arg,
                              vtense(arg, "appear"));
 #else
@@ -848,7 +848,7 @@ int spellnum;
     case CLC_BLIND_YOU:
         /* note: resists_blnd() doesn't apply here */
         if (!Blinded) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             int num_eyes = eyecount(youmonst.data);
             pline("Scales cover your %s!", (num_eyes == 1)
                                                ? body_part(EYE)
@@ -1084,7 +1084,7 @@ register struct attack *mattk;
         nomul(0);
         if (mattk->adtyp && (mattk->adtyp < 11)) { /* no cf unsigned >0 */
             if (canseemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s zaps you with a %s!", Monnam(mtmp),
                       flash_types[ad_to_typ(mattk->adtyp)]);
 #else

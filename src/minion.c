@@ -277,7 +277,7 @@ register struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
     }
     if (youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
               flags.female ? "Sister" : "Brother");
 #else
@@ -304,7 +304,7 @@ register struct monst *mtmp;
         if (mon_has_amulet(mtmp))
             demand = cash + (long) rn1(1000, 40);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s demands %ld %s for safe passage.", Amonnam(mtmp), demand,
               currency(demand));
 #else

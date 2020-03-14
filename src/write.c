@@ -120,7 +120,7 @@ register struct obj *pen;
         You("‘‚­‚½‚ß‚É‚ÍŽè‚ª•K—v‚¾I");
         return 0;
     } else if (Glib) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s from your %s.", Tobjnam(pen, "slip"),
               makeplural(body_part(FINGER)));
 #else
@@ -137,7 +137,7 @@ register struct obj *pen;
         return 0;
     /* can't write on a novel (unless/until it's been converted into a blank
        spellbook), but we want messages saying so to avoid "spellbook" */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     typeword = (paper->otyp == SPE_NOVEL)
                   ? "book"
                   : (paper->oclass == SPBOOK_CLASS)
@@ -409,7 +409,7 @@ found:
     /* success */
     if (new_obj->oclass == SPBOOK_CLASS) {
         /* acknowledge the change in the object's description... */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline_The("spellbook warps strangely, then turns %s.",
                   new_book_description(new_obj->otyp, namebuf));
 #else

@@ -284,7 +284,7 @@ boolean devour;
 */
                 pline("%s‚ÍŒ@‚Á‚Ä‚¢‚éD", noit_Monnam(mtmp));
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s %s.", noit_Monnam(mtmp),
                       devour ? "devours" : "eats", distant_name(obj, doname));
 #else
@@ -292,7 +292,7 @@ boolean devour;
                       distant_name(obj, doname), devour ? "ˆù‚Ýž‚ñ‚Å" : "H‚×‚Ä");
 #endif
         } else if (seeobj)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("It %s %s.", devour ? "devours" : "eats",
                   distant_name(obj, doname));
 #else
@@ -338,7 +338,7 @@ boolean devour;
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
             oprice = unpaid_cost(obj, TRUE);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("That %s will cost you %ld %s.", objnambuf, oprice,
                   currency(oprice));
 #else
@@ -427,7 +427,7 @@ struct edog *edog;
 */
                 pline("%s‚Í‹Q‚¦‚ÅŽ€‚ñ‚¾D", Monnam(mtmp));
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You_feel("%s for a moment.",
                          Hallucination ? "bummed" : "sad");
 #else
@@ -1271,7 +1271,7 @@ int after; /* this is extra fast monster movement */
                                ? vobj_at(nix, niy) : 0;
             const char *what = o ? distant_name(o, doname) : something;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s reluctantly over %s.", noit_Monnam(mtmp),
                   vtense((char *) 0, locomotion(mtmp->data, "step")), what);
 #else
@@ -1473,7 +1473,7 @@ struct monst *mtmp;
            (on the other hand, perhaps you're sensing a brief glimpse
            of its mind as it changes form) */
         newsym(mtmp->mx, mtmp->my);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("%s %s %sappear%s where %s was!",
             cansee(mtmp->mx, mtmp->my) ? "see" : "sense that",
             (M_AP_TYPE(mtmp) == M_AP_FURNITURE)

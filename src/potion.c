@@ -97,7 +97,7 @@ boolean talk;
 
     if (!xtime && old) {
         if (talk)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You_feel("%s now.",
                      Hallucination ? "less wobbly" : "a bit steadier");
 #else
@@ -424,7 +424,7 @@ long mask; /* nonzero if resistance status should change by mask */
     if (Unaware)
         talk = FALSE;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     message = (!xtime) ? "Everything %s SO boring now."
                        : "Oh wow!  Everything %s so cosmic!";
 #else
@@ -454,7 +454,7 @@ long mask; /* nonzero if resistance status should change by mask */
             if (!haseyes(youmonst.data)) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blind) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 const char *eyes = body_part(EYE);
 
                 if (eyecount(youmonst.data) != 1)
@@ -522,7 +522,7 @@ boolean talk;
 void
 self_invis_message()
 {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     pline("%s %s.",
           Hallucination ? "Far out, man!  You"
                         : "Gee!  All of a sudden, you",
@@ -555,7 +555,7 @@ ghost_from_bottle()
         pline("瓶を開けると，何かが出てきた．");
         return;
     }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     pline("As you open the bottle, an enormous %s emerges!",
           Hallucination ? rndmonnam(NULL) : (const char *) "ghost");
 #else
@@ -688,7 +688,7 @@ register struct obj *otmp;
 
     if (nothing) {
         unkn++;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("have a %s feeling for a moment, then it passes.",
             Hallucination ? "normal" : "peculiar");
 #else
@@ -725,7 +725,7 @@ register struct obj *otmp;
             break;
         } else {
             /* unlike unicorn horn, overrides Fixed_abil */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("Wow!  This makes you feel %s!",
                   (otmp->blessed)
                       ? (unfixable_trouble_count(FALSE) ? "better" : "great")
@@ -851,7 +851,7 @@ register struct obj *otmp;
         break;
     case POT_BOOZE:
         unkn++;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Ooph!  This tastes like %s%s!",
               otmp->odiluted ? "watered down " : "",
               Hallucination ? "dandelion wine" : "liquid fire");
@@ -941,7 +941,7 @@ register struct obj *otmp;
 
         unkn++;
         if (otmp->cursed)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("Yecch!  This tastes %s.",
                   Hallucination ? "overripe" : "rotten");
 #else
@@ -949,7 +949,7 @@ register struct obj *otmp;
                   Hallucination ? "熟しすぎた" : "腐った");
 #endif
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline(
                 Hallucination
                     ? "This tastes like 10%% real %s%s all-natural beverage."
@@ -1007,7 +1007,7 @@ register struct obj *otmp;
 */
                 You("その場で動けなくなった！");
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("%s are frozen to the %s!", makeplural(body_part(FOOT)),
                      surface(u.ux, u.uy));
 #else
@@ -1111,7 +1111,7 @@ register struct obj *otmp;
                 char contaminant[BUFSZ];
                 int typ = rn2(A_MAX);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(contaminant, "%s%s",
                         (Poison_resistance) ? "mildly " : "",
                         (otmp->fromsink) ? "contaminated tap water"
@@ -1451,7 +1451,7 @@ register struct obj *otmp;
         } else {
             int dmg;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("This burns%s!",
                   otmp->blessed ? " a little" : otmp->cursed ? " a lot"
                                                              : " like acid");
@@ -1542,7 +1542,7 @@ struct obj *obj;
 const char *txt;
 {
     if (flags.beginner || !txt)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("have a %s feeling for a moment, then it passes.",
             Hallucination ? "normal" : "strange");
 #else
@@ -1562,7 +1562,7 @@ const char *txt;
     useup(obj);
 }
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",
                               "flask",  "jar",   "vial" };
 #else
@@ -1634,13 +1634,13 @@ const char *objphrase; /* "Your widget glows" or "Steed's saddle glows" */
             glowcolor = hcolor(glowcolor);
             /*JP:3.6.0時点では動詞は"glow"だけなので決め撃ち*/
             if (altfmt)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s with %s aura.", objphrase, an(glowcolor));
 #else
                 pline("%sは%sオーラにつつまれた．", objphrase, glowcolor);
 #endif
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s.", objphrase, glowcolor);
 #else
                 pline("%sは%s輝いた．", objphrase, jconj_adj(glowcolor));
@@ -1719,7 +1719,7 @@ int how;
             char buf[BUFSZ];
 
             if (hit_saddle && saddle) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(buf, "%s saddle",
                         s_suffix(x_monnam(mon, ARTICLE_THE, (char *) 0,
                                           (SUPPRESS_IT | SUPPRESS_SADDLE),
@@ -1731,7 +1731,7 @@ int how;
                                           FALSE));
 #endif
             } else if (has_head(mon->data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(buf, "%s %s", s_suffix(mnam),
                         (notonhead ? "body" : "head"));
 #else
@@ -1741,7 +1741,7 @@ int how;
             } else {
                 Strcpy(buf, mnam);
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("%s crashes on %s and breaks into shards.", botlnam,
                       buf);
 #else
@@ -1862,7 +1862,7 @@ int how;
                 /* most common case */
                 || resists_poison(mon)) {
                 if (canseemon(mon))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s looks unharmed.", Monnam(mon));
 #else
                     pline("%sはなんともないようだ．", Monnam(mon));
@@ -1932,7 +1932,7 @@ int how;
             if (is_undead(mon->data) || is_demon(mon->data)
                 || is_were(mon->data) || is_vampshifter(mon)) {
                 if (obj->blessed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s in pain!", Monnam(mon),
                           is_silent(mon->data) ? "writhes" : "shrieks");
 #else
@@ -1982,7 +1982,7 @@ int how;
             break;
         case POT_ACID:
             if (!resists_acid(mon) && !resist(mon, POTION_CLASS, 0, NOTELL)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s in pain!", Monnam(mon),
                       is_silent(mon->data) ? "writhes" : "shrieks");
 #else
@@ -2069,7 +2069,7 @@ register struct obj *obj;
 */
                 pline("ウゲェ！薬はものすごい匂いがする！");
             else if (haseyes(youmonst.data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 const char *eyes = body_part(EYE);
 
                 if (eyecount(youmonst.data) != 1)
@@ -2157,7 +2157,7 @@ register struct obj *obj;
     case POT_INVISIBILITY:
         if (!Blind && !Invis) {
             kn++;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("For an instant you %s!",
                   See_invisible ? "could see right through yourself"
                                 : "couldn't see yourself");
@@ -2636,7 +2636,7 @@ dodip()
            been made in order to get the merge result for both cases;
            as a consequence, mixing while Fumbling drops the mixture */
         freeinv(obj);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         (void) hold_another_object(obj, "You drop %s!", doname(obj),
                                    (const char *) 0);
 #else
@@ -2648,7 +2648,7 @@ dodip()
 
     if (potion->otyp == POT_ACID && obj->otyp == CORPSE
         && obj->corpsenm == PM_LICHEN && !Blind) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s %s around the edges.", The(cxname(obj)),
               otense(obj, "turn"),
               potion->odiluted ? hcolor(NH_ORANGE) : hcolor(NH_RED));
@@ -2725,14 +2725,14 @@ dodip()
         } else if ((!is_rustprone(obj) && !is_corrodeable(obj))
                    || is_ammo(obj) || (!obj->oeroded && !obj->oeroded2)) {
             /* uses up potion, doesn't set obj->greased */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s with an oily sheen.", Yname2(obj),
                   otense(obj, "gleam"));
 #else
                 pline("%sは油の光沢できらりと光った．", Yname2(obj));
 #endif
         } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s less %s.", Yname2(obj), otense(obj, "are"),
                   (obj->oeroded && obj->oeroded2)
                       ? "corroded and rusty"
@@ -3014,7 +3014,7 @@ struct monst *mon,  /* monster being split */
 
     reason[0] = '\0';
     if (mtmp)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(reason, " from %s heat",
                 (mtmp == &youmonst) ? the_your[1]
                                     : (const char *) s_suffix(mon_nam(mtmp)));

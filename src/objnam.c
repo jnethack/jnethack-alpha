@@ -58,7 +58,7 @@ struct Jitem {
              && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
              && typ != OPAL)))
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { BROADSWORD, "ninja-to" },
                                              { FLAIL, "nunchaku" },
@@ -1076,7 +1076,7 @@ struct obj *obj;
         bareobj.spe = obj->spe;
 
     bufp = distant_name(&bareobj, xname); /* xname(&bareobj) */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     if (!strncmp(bufp, "uncursed ", 9))
         bufp += 9; /* Role_if(PM_PRIEST) */
 #else
@@ -1210,7 +1210,7 @@ char *prefix;
         Strcat(prefix, is_corrodeable(obj) ? "ïÖêHÇµÇΩ" : "ïÖÇ¡ÇΩ");
     }
     if (rknown && obj->oerodeproof)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Strcat(prefix, iscrys
                           ? "fixed "
                           : is_rustprone(obj)
@@ -1298,7 +1298,7 @@ unsigned doname_flags;
      * combining both into one function taking a parameter.
      */
     /* must check opoisoned--someone can have a weirdly-named fruit */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     if (!strncmp(bp, "poisoned ", 9) && obj->opoisoned) {
         bp += 9;
         ispoisoned = TRUE;
@@ -1508,7 +1508,7 @@ unsigned doname_flags;
                 impossible("leashed monster not on this level");
                 obj->leashmon = 0;
             } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(eos(bp), " (attached to %s)",
                         noit_mon_nam(mlsh));
 #else
@@ -1622,7 +1622,7 @@ unsigned doname_flags;
 #endif
             if (omndx >= LOW_PM
                 && (known || (mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Strcat(prefix, mons[omndx].mname);
                 Strcat(prefix, " ");
 #else
@@ -1748,7 +1748,7 @@ unsigned doname_flags;
     } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
         long quotedprice = unpaid_cost(obj, TRUE);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(bp), " (%s, %ld %s)",
                 obj->unpaid ? "unpaid" : "contents",
                 quotedprice, currency(quotedprice));
@@ -3594,21 +3594,21 @@ struct obj *no_wish;
             while (*bp == ' ')
                 bp++;
             l = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "blessed ", l = 8)
                    || !strncmpi(bp, "holy ", l = 5)) {
 #else
         } else if (!strncmpi(bp, "èjïüÇ≥ÇÍÇΩ", l = 10)) {
 #endif
             blessed = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "moist ", l = 6)
                    || !strncmpi(bp, "wet ", l = 4)) {
 #else
         } else if (!strncmpi(bp, "éºÇ¡ÇΩ", l = 6)
                    || !strncmpi(bp, "îGÇÍÇΩ", l = 6)) {
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             if (!strncmpi(bp, "wet ", 4))
 #else
             if (!strncmpi(bp, "îGÇÍÇΩ", 6))
@@ -3616,20 +3616,20 @@ struct obj *no_wish;
                 wetness = rn2(3) + 3;
             else
                 wetness = rnd(2);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "cursed ", l = 7)
                    || !strncmpi(bp, "unholy ", l = 7)) {
 #else
         } else if (!strncmpi(bp, "éÙÇÌÇÍÇΩ", l = 8)) {
 #endif
             iscursed = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "uncursed ", l = 9)) {
 #else
         } else if (!strncmpi(bp, "éÙÇÌÇÍÇƒÇ¢Ç»Ç¢", l = 14)) {
 #endif
             uncursed = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "rustproof ", l = 10)
                    || !strncmpi(bp, "erodeproof ", l = 11)
                    || !strncmpi(bp, "corrodeproof ", l = 13)
@@ -3643,7 +3643,7 @@ struct obj *no_wish;
                    || !strncmpi(bp, "îRÇ¶Ç»Ç¢", l = 8)) {
 #endif
             erodeproof = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "lit ", l = 4)
                    || !strncmpi(bp, "burning ", l = 8)) {
 #else
@@ -3651,7 +3651,7 @@ struct obj *no_wish;
                    || !strncmpi(bp, "îRÇ¶ÇƒÇ¢ÇÈ", l = 10)) {
 #endif
             islit = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "unlit ", l = 6)
                    || !strncmpi(bp, "extinguished ", l = 13)) {
 #else
@@ -3659,7 +3659,7 @@ struct obj *no_wish;
 #endif
             islit = 0;
             /* "unlabeled" and "blank" are synonymous */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "unlabeled ", l = 10)
                    || !strncmpi(bp, "unlabelled ", l = 11)
                    || !strncmpi(bp, "blank ", l = 6)) {
@@ -3668,7 +3668,7 @@ struct obj *no_wish;
                    || !strncmpi(bp, "ê^Ç¡îíÇ»", l = 8)) {
 #endif
             unlabeled = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "poisoned ", l = 9)) {
 #else
         } else if (!strncmpi(bp, "ì≈ÇÃìhÇÁÇÍÇΩ", l = 12)) {
@@ -3682,45 +3682,45 @@ struct obj *no_wish;
         } else if (!strncmpi(bp, "untrapped ", l = 10)) {
             trapped = 2; /* not trapped */
         /* locked, unlocked, broken: box/chest lock states */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "locked ", l = 7)) {
 #else
         } else if (!strncmpi(bp, "åÆÇÃä|Ç©Ç¡ÇΩ", l = 12)) {
 #endif
             locked = 1, unlocked = broken = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "unlocked ", l = 9)) {
 #else
         } else if (!strncmpi(bp, "åÆÇÃä|Ç©Ç¡ÇƒÇ¢Ç»Ç¢", l = 18)) {
 #endif
             unlocked = 1, locked = broken = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "broken ", l = 7)) {
 #else
         } else if (!strncmpi(bp, "åÆÇÃâÛÇÍÇΩ", l = 10)) {
 #endif
             broken = 1, locked = unlocked = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "greased ", l = 8)) {
 #else
         } else if (!strncmpi(bp, "ñ˚ÇÃìhÇÁÇÍÇΩ", l = 12)
                    || !strncmpi(bp, "éâÇÃìhÇÁÇÍÇΩ", l = 12)) {
 #endif
             isgreased = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "very ", l = 5)) {
 #else
         } else if (!strncmpi(bp, "Ç∆ÇƒÇ‡", l = 6)) {
 #endif
             /* very rusted very heavy iron ball */
             very = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "thoroughly ", l = 11)) {
 #else
         } else if (!strncmpi(bp, "Ç©Ç»ÇË", l = 6)) {
 #endif
             very = 2;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "rusty ", l = 6)
                    || !strncmpi(bp, "rusted ", l = 7)
                    || !strncmpi(bp, "burnt ", l = 6)
@@ -3731,7 +3731,7 @@ struct obj *no_wish;
 #endif
             eroded = 1 + very;
             very = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "corroded ", l = 9)
                    || !strncmpi(bp, "rotted ", l = 7)) {
 #else
@@ -3740,32 +3740,32 @@ struct obj *no_wish;
 #endif
             eroded2 = 1 + very;
             very = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "partly eaten ", l = 13)
                    || !strncmpi(bp, "partially eaten ", l = 16)) {
 #else
         } else if (!strncmpi(bp, "êHÇ◊Ç©ÇØÇÃ", l = 10)) {
 #endif
             halfeaten = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "historic ", l = 9)) {
 #else
         } else if (!strncmpi(bp, "óéjìIÇ»", l = 8)) {
 #endif
             ishistoric = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "diluted ", l = 8)) {
 #else
         } else if (!strncmpi(bp, "îñÇ‹Ç¡ÇΩ", l = 8)) {
 #endif
             isdiluted = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "empty ", l = 6)) {
 #else
         } else if (!strncmpi(bp, "ãÛÇ¡Ç€ÇÃ", l = 8)) {
 #endif
             contents = EMPTY;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "small ", l = 6)) { /* glob sizes */
 #else
         } else if (!strncmpi(bp, "è¨Ç≥Ç¢", l = 6)) { /* glob sizes */
@@ -3778,7 +3778,7 @@ struct obj *no_wish;
             if (strncmpi(bp + l, "glob", 4) && !strstri(bp + l, " glob"))
                 break;
             gsize = 1;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "medium ", l = 7)) {
 #else
         } else if (!strncmpi(bp, "íÜÇ≠ÇÁÇ¢ÇÃ", l = 10)) {
@@ -3787,7 +3787,7 @@ struct obj *no_wish;
                there'd be no way to ask for the intermediate size
                ("glob" without size prefix yields smallest one) */
             gsize = 2;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (!strncmpi(bp, "large ", l = 6)) {
 #else
         } else if (!strncmpi(bp, "ëÂÇ´Ç¢", l = 6)) {
@@ -4940,7 +4940,7 @@ struct obj *suit;
 
     if (suit) {
         if (Is_dragon_mail(suit))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             return "dragon mail"; /* <color> dragon scale mail */
 #else
             return "óÿäZ"; /* <color> dragon scale mail */
@@ -4952,7 +4952,7 @@ struct obj *suit;
             return "óÿ";
         suitnm = OBJ_NAME(objects[suit->otyp]);
         esuitp = eos((char *) suitnm);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail"))
             return "mail"; /* most suits fall into this category */
 #else

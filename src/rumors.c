@@ -372,7 +372,7 @@ int mechanism;
     switch (mechanism) {
     case BY_ORACLE:
         /* Oracle delivers the rumor */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("True to her word, the Oracle %ssays: ",
               (!rn2(4) ? "offhandedly "
                        : (!rn2(3) ? "casually "

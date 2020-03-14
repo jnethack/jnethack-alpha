@@ -683,7 +683,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
             }
         }
         if (trap)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s onto the teleportation trap.",
                 locomotion(youmonst.data, "jump"));
 #else
@@ -707,7 +707,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
             /* casting isn't inhibited by being Stunned (...it ought to be) */
             castit = (sp_no < MAXSPELL && !Confusion);
             if (!castit && !break_the_rules) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("%s.",
                     !Teleportation ? ((sp_no < MAXSPELL)
                                         ? "can't cast that spell"
@@ -760,7 +760,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
             cantdoit = "だけのエネルギーがない";
         }
         if (cantdoit) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s %s.", cantdoit,
                 castit ? "for a teleport spell" : "to teleport");
 #else
@@ -915,7 +915,7 @@ level_tele()
 */
             if (ynq("どことも知れぬ場所に行きます．よろしいですか？") != 'y')
                 return;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("%s in agony as your body begins to warp...",
                 is_silent(youmonst.data) ? "writhe" : "scream");
 #else
@@ -943,7 +943,7 @@ level_tele()
             pline("An energized cloud of dust begins to coalesce.");
 */
             pline("エネルギーをもったほこりの渦が結合しはじめた．");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Your("body rematerializes%s.",
                  invent ? ", and you gather up all your possessions" : "");
 #else
@@ -1443,7 +1443,7 @@ struct monst *mon;
 {
     if (level.flags.noteleport) {
         if (canseemon(mon))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("A mysterious force prevents %s from teleporting!",
                   mon_nam(mon));
 #else
@@ -1515,7 +1515,7 @@ int in_sight;
                 assign_level(&tolevel, &valley_level);
             } else if (Is_botlevel(&u.uz)) {
                 if (in_sight && trap->tseen)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s avoids the %s.", Monnam(mtmp),
                           (tt == HOLE) ? "hole" : "trap");
 #else

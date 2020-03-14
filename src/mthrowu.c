@@ -26,7 +26,7 @@ STATIC_DCL boolean FDECL(m_lined_up, (struct monst *, struct monst *));
  * Keep consistent with breath weapons in zap.c, and AD_* in monattk.h.
  */
 STATIC_OVL NEARDATA const char *breathwep[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "fragments", "fire", "frost", "sleep gas", "a disintegration blast",
     "lightning", "poison gas", "acid", "strange breath #8",
     "strange breath #9"
@@ -322,7 +322,7 @@ struct obj *otmp, *mwep;
         if (!strcmp(trgbuf, "it"))
             Strcpy(trgbuf, humanoid(mtmp->data) ? "someone" : something);
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s %s%s%s!", Monnam(mtmp),
               m_shot.s ? "shoots" : "throws", onm,
               mtarg ? " at " : "", trgbuf);
@@ -613,7 +613,7 @@ struct obj *obj;         /* missile (or stack providing it) */
 */
                 pline("%sははずした！", Monnam(mon));
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s as %s throws it!", Tobjnam(singleobj, "slip"),
                       mon_nam(mon));
 #else
@@ -660,7 +660,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                     You("catch the %s.", xname(singleobj));
 */
                     You("%sをつかまえた．", xname(singleobj));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     You("are not interested in %s junk.",
                         s_suffix(mon_nam(mon)));
 #else
@@ -676,7 +676,7 @@ struct obj *obj;         /* missile (or stack providing it) */
 */
                      "これが欲しかったんだと思いながら%sの贈り物を受けとった．",
                         s_suffix(mon_nam(mon)));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     (void) hold_another_object(singleobj,
                                                "You catch, but drop, %s.",
                                                xname(singleobj),
@@ -754,7 +754,7 @@ struct obj *obj;         /* missile (or stack providing it) */
 */
                         pline("ウェー．クリームをかぶった．");
                     else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         pline("There's %s sticky all over your %s.",
                               something, body_part(FACE));
 #else
@@ -1056,7 +1056,7 @@ struct monst *mtmp;
 
         if (canseemon(mtmp)) {
             onm = xname(otmp);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s thrusts %s.", Monnam(mtmp),
                   obj_is_pname(otmp) ? the(onm) : an(onm));
 #else
@@ -1106,7 +1106,7 @@ struct attack *mattk;
 
     if (mtmp->mcan) {
         if (!Deaf)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("A dry rattle comes from %s throat.",
                   s_suffix(mon_nam(mtmp)));
 #else
@@ -1175,7 +1175,7 @@ struct attack *mattk;
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
                 if (canseemon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s breathes %s!", Monnam(mtmp),
                           breathwep[typ - 1]);
 #else

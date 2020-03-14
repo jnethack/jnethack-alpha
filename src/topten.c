@@ -632,7 +632,7 @@ time_t when;
                 char pbuf[BUFSZ];
 
                 topten_print("");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(pbuf,
              "Since you were in %s mode, the score list will not be checked.",
                         wizard ? "wizard" : "discover");
@@ -749,7 +749,7 @@ time_t when;
                 } else {
                     char pbuf[BUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Sprintf(pbuf,
                             "You reached the %d%s place on the top %d list.",
                             rank0, ordin(rank0), sysopt.entrymax);

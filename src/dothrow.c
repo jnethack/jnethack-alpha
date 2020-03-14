@@ -103,7 +103,7 @@ int shotlimit;
     u_wipe_engr(2);
     if (!uarmg && obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])
         && !Stone_resistance) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("throw %s with your bare %s.",
             corpse_xname(obj, (const char *) 0, CXN_PFX_THE),
             /* throwing with one hand, but pluralize since the
@@ -231,7 +231,7 @@ int shotlimit;
        attempted to specify a count */
     if (multishot > 1 || shotlimit > 0) {
         /* "You shoot N arrows." or "You throw N daggers." */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("%s %d %s.", m_shot.s ? "shoot" : "throw",
             multishot, /* (might be 1 if player gave shotlimit) */
             (multishot == 1) ? singular(obj, xname) : xname(obj));
@@ -282,7 +282,7 @@ int *shotlimit_p; /* (see dothrow()) */
         You("何かを投げるのは物理的に無理だ．");
         return FALSE;
     } else if (nohands(youmonst.data)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You_cant("throw or shoot without hands."); /* not body_part(HAND) */
 #else
         You("手がない．"); /* not body_part(HAND) */
@@ -460,7 +460,7 @@ boolean verbose;
 {
     if (m_shot.i < m_shot.n) {
         if (verbose && !context.mon_moving) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("stop %s after the %d%s %s.",
                 m_shot.s ? "firing" : "throwing", m_shot.i, ordin(m_shot.i),
                 m_shot.s ? "shot" : "toss");
@@ -488,7 +488,7 @@ boolean verbosely; /* usually True; False if caller has given drop message */
     if (IS_ALTAR(levl[u.ux][u.uy].typ))
         doaltarobj(obj);
     else if (verbosely)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s %s the %s.", Doname2(obj), otense(obj, "hit"),
               surface(u.ux, u.uy));
 #else
@@ -696,7 +696,7 @@ int x, y;
 */
             You("鉄の棒にぶちあたった．いてっ！");
             dmg = rnd(2 + *range);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             losehp(Maybe_Half_Phys(dmg), "crashing into iron bars",
                    KILLED_BY);
 #else
@@ -726,7 +726,7 @@ int x, y;
 */
             You("何かにぶちあたった！");
             dmg = rnd(2 + *range);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             losehp(Maybe_Half_Phys(dmg), "touching the edge of the universe",
                    KILLED_BY);
 #else
@@ -742,7 +742,7 @@ int x, y;
 
             /* Move at a diagonal. */
             if (bigmonst(youmonst.data) || too_much) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("%sget forcefully wedged into a crevice.",
                     too_much ? "and all your belongings " : "");
 #else
@@ -750,7 +750,7 @@ int x, y;
                     too_much ? "と全部の荷物" : "");
 #endif
                 dmg = rnd(2 + *range);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 losehp(Maybe_Half_Phys(dmg), "wedging into a narrow crevice",
                        KILLED_BY);
 #else
@@ -791,7 +791,7 @@ int x, y;
 #endif
         }
         if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("find %s by bumping into %s.", mnam, pronoun);
 #else
             You("ぶちあたったことで%sを見つけた．", mnam);
@@ -895,7 +895,7 @@ int x, y;
             return TRUE;
         } else {
             if (ttmp->tseen)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 You("pass right over %s.",
                     an(defsyms[trap_to_defsym(ttmp->ttyp)].explanation));
 #else
@@ -963,7 +963,7 @@ boolean verbose;
         nomul(0);
         return;
     } else if (u.utrap) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("are anchored by the %s.",
             u.utraptype == TT_WEB
                 ? "web"
@@ -1238,7 +1238,7 @@ boolean hitsroof;
                         && polymon(PM_STONE_GOLEM))) {
  petrify:
             killer.format = KILLED_BY;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Strcpy(killer.name, "elementary physics"); /* "what goes up..." */
 #else
             Strcpy(killer.name, "初等物理により"); /* "what goes up..." */
@@ -1255,7 +1255,7 @@ boolean hitsroof;
         }
         hitfloor(obj, TRUE);
         thrownobj = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         losehp(Maybe_Half_Phys(dmg), "falling object", KILLED_BY_AN);
 #else
         losehp(Maybe_Half_Phys(dmg), "落下物で", KILLED_BY_AN);
@@ -1372,7 +1372,7 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
             && ((Role_if(PM_VALKYRIE) && obj->oartifact == ART_MJOLLNIR)
                 || tethered_weapon)
             && !impaired) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
 #else
@@ -1880,7 +1880,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
                 boolean next2u = monnear(mon, u.ux, u.uy);
 
                 finish_quest(obj); /* acknowledge quest completion */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s %s back to you.", Monnam(mon),
                       (next2u ? "hands" : "tosses"), the(xname(obj)));
 #else
@@ -2054,7 +2054,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
                 }
             }
         }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s into %s %s.", Tobjnam(obj, "vanish"),
               s_suffix(mon_nam(mon)),
               is_animal(u.ustuck->data) ? "entrails" : "currents");
@@ -2239,7 +2239,7 @@ xchar x, y;
         && (mtmp = makemon(&mons[rn2(3) ? PM_HOMUNCULUS : PM_IMP], x, y,
                            NO_MM_FLAGS)) != 0) {
         if (canspotmon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s is released!", Hallucination
                                          ? An(rndmonnam(NULL))
                                          : "The picture-painting demon");
@@ -2285,7 +2285,7 @@ boolean from_invent;
 */
                         You("薬っぽい匂いがした．．．");
                     } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         const char *eyes = body_part(EYE);
 
                         if (eyecount(youmonst.data) != 1)
@@ -2459,7 +2459,7 @@ struct obj *obj;
     }
     freeinv(obj);
     if (u.uswallow) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline(is_animal(u.ustuck->data) ? "%s in the %s's entrails."
                                         : "%s into %s.",
               "The money disappears", mon_nam(u.ustuck));
@@ -2475,7 +2475,7 @@ struct obj *obj;
     if (u.dz) {
         if (u.dz < 0 && !Is_airlevel(&u.uz) && !Underwater
             && !Is_waterlevel(&u.uz)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("gold hits the %s, then falls back on top of your %s.",
                       ceiling(u.ux, u.uy), body_part(HEAD));
 #else

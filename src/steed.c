@@ -252,7 +252,7 @@ boolean force;      /* Quietly force this animal */
 
     /* Is the player in the right form? */
     if (Hallucination && !force) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Maybe you should find a designated driver.");
 #else
         pline("おそらくあなたは指定ドライバーを探すべきだろう．");
@@ -371,7 +371,7 @@ boolean force;      /* Quietly force this animal */
     if (mtmp->mtrapped) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You_cant("mount %s while %s's trapped in %s.", mon_nam(mtmp),
                  mhe(mtmp), an(defsyms[trap_to_defsym(t->ttyp)].explanation));
 #else
@@ -384,7 +384,7 @@ boolean force;      /* Quietly force this animal */
     if (!force && !Role_if(PM_KNIGHT) && !(--mtmp->mtame)) {
         /* no longer tame */
         newsym(mtmp->mx, mtmp->my);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("%s resists%s!", Monnam(mtmp),
               mtmp->mleashed ? " and its leash comes off" : "");
 #else
@@ -422,7 +422,7 @@ boolean force;      /* Quietly force this animal */
         return (FALSE);
     }
     if (!force && uarm && is_metallic(uarm) && greatest_erosion(uarm)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Your("%s armor is too stiff to be able to mount %s.",
              uarm->oeroded ? "rusty" : "corroded", mon_nam(mtmp));
 #else
@@ -537,19 +537,19 @@ kick_steed()
                 u.usteed->mcanmove = 1;
             }
             if (u.usteed->msleeping || !u.usteed->mcanmove)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s stirs.", He);
 #else
                 pline("%sは身じろぎした．", He);
 #endif
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s rouses %sself!", He, mhim(u.usteed));
 #else
                 pline("%sは奮起した！", He);
 #endif
         } else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s does not respond.", He);
 #else
             pline("%sは反応しない．", He);
@@ -692,7 +692,7 @@ int reason; /* Player was thrown off etc. */
     case DISMOUNT_BYCHOICE:
     default:
         if (otmp && otmp->cursed) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("can't.  The saddle %s cursed.",
                 otmp->bknown ? "is" : "seems to be");
 #else
@@ -800,7 +800,7 @@ int reason; /* Player was thrown off etc. */
                         adjalign(-1);
                     }
                 } else if (is_lava(u.ux, u.uy)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s is pulled into the %s!", Monnam(mtmp),
                           hliquid("lava"));
 #else

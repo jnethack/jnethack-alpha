@@ -499,7 +499,7 @@ boolean mkspecl;
     int atype;
 
     /* 3.6 tribute */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     if (mkspecl && (!strcmp(shp->name, "rare books")
                     || !strcmp(shp->name, "second-hand bookstore"))) {
 #else

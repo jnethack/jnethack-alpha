@@ -49,7 +49,7 @@ dowatersnakes()
 
     if (!(mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
         if (!Blind)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("An endless stream of %s pours forth!",
                   Hallucination ? makeplural(rndmonnam(NULL)) : "snakes");
 #else
@@ -96,7 +96,7 @@ dowaterdemon()
             /* Give those on low levels a (slightly) better chance of survival
              */
             if (rnd(100) > (80 + level_difficulty())) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("Grateful for %s release, %s grants you a wish!",
                       mhis(mtmp), mhe(mtmp));
 #else
@@ -484,7 +484,7 @@ drinkfountain()
             dogushforth(TRUE);
             break;
         default:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("This tepid %s is tasteless.",
                   hliquid("water"));
 #else
@@ -516,7 +516,7 @@ register struct obj *obj;
         && !exist_artifact(LONG_SWORD, artiname(ART_EXCALIBUR))) {
         if (u.ualign.type != A_LAWFUL) {
             /* Ha!  Trying to cheat her. */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("A freezing mist rises from the %s and envelopes the sword.",
                   hliquid("water"));
 #else
@@ -750,7 +750,7 @@ drinksink()
         else {
             mtmp = makemon(&mons[PM_SEWER_RAT], u.ux, u.uy, NO_MM_FLAGS);
             if (mtmp)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("Eek!  There's %s in the sink!",
                       (Blind || !canspotmon(mtmp)) ? "something squirmy"
                                                    : a_monnam(mtmp));
@@ -770,7 +770,7 @@ drinksink()
             }
         } while (!otmp);
         otmp->cursed = otmp->blessed = 0;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pline("Some %s liquid flows from the faucet.",
               Blind ? "odd" : hcolor(OBJ_DESCR(objects[otmp->otyp])));
 #else
@@ -867,7 +867,7 @@ drinksink()
         }
         /*FALLTHRU*/
     default:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("take a sip of %s %s.",
             rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot",
             hliquid("water"));

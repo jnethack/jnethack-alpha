@@ -147,7 +147,7 @@ int expltype;
             adtyp = AD_MAGM;
             break;
         case 1:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             str = (olet == BURNING_OIL) ? "burning oil"
                      : (olet == SCROLL_CLASS) ? "tower of flame" : "fireball";
 #else
@@ -165,7 +165,7 @@ int expltype;
             adtyp = AD_COLD;
             break;
         case 4:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             str = (olet == WAND_CLASS) ? "death field"
                                        : "disintegration field";
 #else
@@ -570,7 +570,7 @@ int expltype;
                          * would be "you killed <mdef>" so give our own.
                          */
                         if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                             pline("%s is %s!", Monnam(mtmp),
                                   xkflg ? "burned completely"
                                         : nonliving(mtmp->data) ? "destroyed"
@@ -662,7 +662,7 @@ int expltype;
                     Strcat(killer.name, "‚Å");
 #endif
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     killer.format = NO_KILLER_PREFIX;
                     Sprintf(killer.name, "caught %sself in %s own %s", uhim(),
                             uhis(), str);
@@ -704,7 +704,7 @@ int expltype;
     }
 
     if (shopdamage) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         pay_for_damage((adtyp == AD_FIRE) ? "burn away"
                           : (adtyp == AD_COLD) ? "shatter"
                              : (adtyp == AD_DISN) ? "disintegrate"

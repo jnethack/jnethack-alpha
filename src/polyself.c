@@ -149,7 +149,7 @@ boolean on;
             && can_be_strangled(&youmonst)) {
             Strangled = 6L;
             context.botl = TRUE;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Your("%s %s your %s!", simpleonames(uamul),
                  Strangled ? "still constricts" : "begins constricting",
                  body_part(NECK)); /* "throat" */
@@ -568,7 +568,7 @@ int psflags;
 #endif
                     /* tricky phrasing; dragon scale mail
                        is singular, dragon scales are plural */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Your("%s reverts to scales as you merge with them.",
                          dsmail);
 #else
@@ -992,7 +992,7 @@ int mntmp;
         && (amorphous(youmonst.data) || is_whirly(youmonst.data)
             || unsolid(youmonst.data) || (youmonst.data->msize <= MZ_SMALL
                                           && u.utraptype == TT_BEARTRAP))) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("are no longer stuck in the %s.",
             u.utraptype == TT_WEB ? "web" : "bear trap");
 #else
@@ -1109,7 +1109,7 @@ break_armor()
     if (has_horns(youmonst.data)) {
         if ((otmp = uarmh) != 0) {
             if (is_flimsy(otmp) && !donning(otmp)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 char hornbuf[BUFSZ];
 
                 /* Future possibilities: This could damage/destroy helmet */
@@ -1122,7 +1122,7 @@ break_armor()
             } else {
                 if (donning(otmp))
                     cancel_don();
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("%s falls to the %s!", helm_simple_name(otmp),
                      surface(u.ux, u.uy));
 #else
@@ -1158,7 +1158,7 @@ break_armor()
         if ((otmp = uarmh) != 0) {
             if (donning(otmp))
                 cancel_don();
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Your("%s falls to the %s!", helm_simple_name(otmp),
                  surface(u.ux, u.uy));
 #else
@@ -1180,7 +1180,7 @@ break_armor()
 */
                 Your("ŒC‚Í’E‚°—Ž‚¿‚½I");
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Your("boots %s off your feet!",
                      verysmall(youmonst.data) ? "slide" : "are pushed");
 #else
@@ -1324,7 +1324,7 @@ rehumanize()
     vision_full_recalc = 1;
     (void) encumber_msg();
     if (was_flying && !Flying && u.usteed)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         You("and %s return gently to the %s.",
             mon_nam(u.usteed), surface(u.ux, u.uy));
 #else
@@ -1407,7 +1407,7 @@ doremove()
 {
     if (!Punished) {
         if (u.utrap && u.utraptype == TT_BURIEDBALL) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline_The("ball and chain are buried firmly in the %s.",
                       surface(u.ux, u.uy));
 #else
@@ -1538,7 +1538,7 @@ dospinweb()
             return 1;
         case HOLE:
         case TRAPDOOR:
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("web over the %s.",
                 (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole");
 #else
@@ -1692,7 +1692,7 @@ dogaze()
                 You("%s‚©‚ç–Ú‚ð‚»‚ç‚µ‚Ä‚µ‚Ü‚Á‚½D", y_monnam(mtmp));
             } else {
                 if (flags.confirm && mtmp->mpeaceful && !Confusion) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Sprintf(qbuf, "Really %s %s?",
                             (adtyp == AD_CONF) ? "confuse" : "attack",
                             mon_nam(mtmp));
@@ -1759,7 +1759,7 @@ dogaze()
 
                 if (mtmp->data == &mons[PM_FLOATING_EYE] && !mtmp->mcan) {
                     if (!Free_action) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         You("are frozen by %s gaze!",
                             s_suffix(mon_nam(mtmp)));
 #else
@@ -1777,7 +1777,7 @@ dogaze()
                         nomovemsg = 0;
                         return 1;
                     } else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         You("stiffen momentarily under %s gaze.",
                             s_suffix(mon_nam(mtmp)));
 #else
@@ -1967,7 +1967,7 @@ domindblast()
             continue;
         u_sen = telepathic(mtmp->data) && !mtmp->mcansee;
         if (u_sen || (telepathic(mtmp->data) && rn2(2)) || !rn2(10)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             You("lock in on %s %s.", s_suffix(mon_nam(mtmp)),
                 u_sen ? "telepathy"
                       : telepathic(mtmp->data) ? "latent telepathy" : "mind");
@@ -2248,7 +2248,7 @@ int part;
         return "trunk";
 #endif
     if (mptr == &mons[PM_SHARK] && part == HAIR)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         return "skin"; /* sharks don't have scales */
 #else
         return "“ª"; /* sharks don't have scales */
@@ -2457,7 +2457,7 @@ udeadinside()
        seems silly when you're polymorphed into something undead;
        monkilled() distinguishes between living (killed) and non (destroyed)
        for monster death message; we refine the nonliving aspect a bit */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     return !nonliving(youmonst.data)
              ? "dead"          /* living, including demons */
              : !weirdnonliving(youmonst.data)

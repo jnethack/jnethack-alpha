@@ -639,7 +639,7 @@ outer_break:
                 Sprintf(buf, "%sをはずして", distant_name(old, doname));
             else
                 buf[0] = '\0';
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s%s puts on %s.", Monnam(mon), buf,
                   distant_name(best, doname));
 #else
@@ -647,7 +647,7 @@ outer_break:
                   distant_name(best,doname));
 #endif
             if (autocurse)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s %s %s %s for a moment.", s_suffix(Monnam(mon)),
                       simpleonames(best), otense(best, "glow"),
                       hcolor(NH_BLACK));
@@ -895,7 +895,7 @@ boolean polyspot;
         if ((otmp = which_armor(mon, W_ARMC)) != 0) {
             if (otmp->oartifact) {
                 if (vis)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s falls off!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
 #else
@@ -907,7 +907,7 @@ boolean polyspot;
                 m_lose_armor(mon, otmp);
             } else {
                 if (vis)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s tears apart!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
 #else
@@ -938,7 +938,7 @@ boolean polyspot;
     } else if (sliparm(mdat)) {
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
             if (vis)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s armor falls around %s!", s_suffix(Monnam(mon)),
                       pronoun);
 #else
@@ -956,7 +956,7 @@ boolean polyspot;
         if ((otmp = which_armor(mon, W_ARMC)) != 0) {
             if (vis) {
                 if (is_whirly(mon->data))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s %s falls, unsupported!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
 #else
@@ -964,7 +964,7 @@ boolean polyspot;
                           cloak_simple_name(otmp));
 #endif
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s shrinks out of %s %s!", Monnam(mon), ppronoun,
                           cloak_simple_name(otmp));
 #else
@@ -979,14 +979,14 @@ boolean polyspot;
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis) {
                 if (sliparm(mon->data))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s seeps right through %s shirt!", Monnam(mon),
                           ppronoun);
 #else
                     pline("%sは自分のシャツにしみ込んだ！", Monnam(mon));
 #endif
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s becomes much too small for %s shirt!",
                           Monnam(mon), ppronoun);
 #else
@@ -1003,7 +1003,7 @@ boolean polyspot;
         /* [caller needs to handle weapon checks] */
         if ((otmp = which_armor(mon, W_ARMG)) != 0) {
             if (vis)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s drops %s gloves%s!", Monnam(mon), ppronoun,
                       MON_WEP(mon) ? " and weapon" : "");
 #else
@@ -1016,7 +1016,7 @@ boolean polyspot;
         }
         if ((otmp = which_armor(mon, W_ARMS)) != 0) {
             if (vis)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s can no longer hold %s shield!", Monnam(mon),
                       ppronoun);
 #else
@@ -1037,7 +1037,7 @@ boolean polyspot;
             /* flimsy test for horns matches polyself handling */
             && (handless_or_tiny || !is_flimsy(otmp))) {
             if (vis)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("%s helmet falls to the %s!", s_suffix(Monnam(mon)),
                       surface(mon->mx, mon->my));
 #else
@@ -1063,7 +1063,7 @@ boolean polyspot;
 */
                     pline("%sの靴はぬげ落ちた！", Monnam(mon));
                 else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     pline("%s boots %s off %s feet!", s_suffix(Monnam(mon)),
                           verysmall(mdat) ? "slide" : "are pushed", ppronoun);
 #else

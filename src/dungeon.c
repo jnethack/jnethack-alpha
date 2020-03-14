@@ -1853,7 +1853,7 @@ struct lchoice *lchoices_p;
     for (br = branches; br; br = br->next) {
         if (br->end1.dnum == dnum && lower_bound < br->end1.dlevel
             && br->end1.dlevel <= upper_bound) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "%c %s to %s: %d",
                     bymenu ? chr_u_on_lvl(&br->end1) : ' ',
                     br_string(br->type),
@@ -1907,7 +1907,7 @@ xchar *rdgn;
         descr = unplaced ? "地下" : "レベル";
         nlev = dptr->num_dunlevs;
         if (nlev > 1)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "%s: %s %d to %d", dptr->dname, makeplural(descr),
                     dptr->depth_start, dptr->depth_start + nlev - 1);
 #else
@@ -1925,7 +1925,7 @@ xchar *rdgn;
 */
                 Strcat(buf, ", 下からの入り口");
             else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(eos(buf), ", entrance on %d",
                         dptr->depth_start + dptr->entry_lev - 1);
 #else
@@ -2003,7 +2003,7 @@ xchar *rdgn;
                 putstr(win, 0, "浮動分岐");
                 first = FALSE;
             }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "   %s to %s", br_string(br->type),
                     dungeons[br->end2.dnum].dname);
 #else
@@ -2017,7 +2017,7 @@ xchar *rdgn;
     /* I hate searching for the invocation pos while debugging. -dean */
     if (Invocation_lev(&u.uz)) {
         putstr(win, 0, "");
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "Invocation position @ (%d,%d), hero @ (%d,%d)",
                 inv_pos.x, inv_pos.y, u.ux, u.uy);
 #else
@@ -2043,7 +2043,7 @@ xchar *rdgn;
                     trap->tx, trap->ty, u.ux, u.uy);
 
         /* only report "no portal found" when actually expecting a portal */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         else if (Is_earthlevel(&u.uz) || Is_waterlevel(&u.uz)
                  || Is_firelevel(&u.uz) || Is_airlevel(&u.uz)
                  || Is_qstart(&u.uz) || at_dgn_entrance("The Quest")
@@ -2138,7 +2138,7 @@ donamelevel()
     if (mptr->custom) {
         char tmpbuf[BUFSZ];
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?", mptr->custom,
                 (strlen(mptr->custom) > 30) ? "..." : "");
 #else
@@ -2938,7 +2938,7 @@ STATIC_OVL const char *
 shop_string(rtype)
 int rtype;
 {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     const char *str = "shop"; /* catchall */
 #else
     const char *str = "店"; /* catchall */
@@ -3055,7 +3055,7 @@ char *outbuf;
 #endif
 #define COMMA (i++ > 0 ? ", " : PREFIX)
 /* "iterate" once; safe to use as ``if (cond) ADDTOBUF(); else whatever;'' */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 #define ADDNTOBUF(nam, var)                                                  \
     do {                                                                     \
         if (var)                                                             \
@@ -3142,7 +3142,7 @@ boolean printdun;
     if (mptr->custom)
         Sprintf(eos(buf), " \"%s\"", mptr->custom);
     if (on_level(&u.uz, &mptr->lev))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(buf), " <- You %s here.",
                 (!final || (final == 1 && how == ASCENDED)) ? "are"
                   : (final == 1 && how == ESCAPED) ? "left from"
@@ -3236,7 +3236,7 @@ boolean printdun;
 */
         Sprintf(buf, "%sデルファイの神殿．", PREFIX);
     } else if (In_sokoban(&mptr->lev)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%s%s.", PREFIX,
                 mptr->flags.sokosolved ? "Solved" : "Unsolved");
 #else
@@ -3254,7 +3254,7 @@ boolean printdun;
 */
         Sprintf(buf, "%s単純な部屋．", PREFIX);
     } else if (on_level(&mptr->lev, &qstart_level)) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%sHome%s.", PREFIX,
                 mptr->flags.unreachable ? " (no way back...)" : "");
 #else
@@ -3308,7 +3308,7 @@ boolean printdun;
 
     /* print out branches */
     if (mptr->br) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(buf, "%s%s to %s", PREFIX, br_string2(mptr->br),
                 dungeons[mptr->br->end2.dnum].dname);
 #else

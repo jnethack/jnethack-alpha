@@ -31,7 +31,7 @@ nhsym l_syms[SYM_MAX] = DUMMY;   /* loaded symbols          */
 nhsym r_syms[SYM_MAX] = DUMMY;   /* rogue symbols           */
 
 nhsym warnsyms[WARNCOUNT] = DUMMY; /* the current warning display symbols */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
 #else
@@ -398,7 +398,7 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
  *  Default screen symbols with explanations and colors.
  */
 const struct symdef defsyms[MAXPCHARS] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 /* 0*/ { ' ', "dark part of a room", C(NO_COLOR) },  /* stone */
        { '|', "wall", C(CLR_GRAY) },                 /* vwall */
        { '-', "wall", C(CLR_GRAY) },                 /* hwall */
@@ -421,7 +421,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '-', "ï«", C(CLR_GRAY) },                   /* tuwall */
        { '-', "ï«", C(CLR_GRAY) },                   /* tdwall */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 /*10*/ { '|', "wall", C(CLR_GRAY) },                 /* tlwall */
        { '|', "wall", C(CLR_GRAY) },                 /* trwall */
        { '.', "doorway", C(CLR_GRAY) },              /* ndoor */
@@ -444,7 +444,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '#', "ñÿ", C(CLR_GREEN) },                  /* tree */
        { '.', "ïîâÆÇÃè∞", C(CLR_GRAY) },             /* room */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 /*20*/ { '.', "dark part of a room", C(CLR_BLACK) }, /* dark room */
        { '#', "corridor", C(CLR_GRAY) },             /* dark corr */
        { '#', "lit corridor", C(CLR_GRAY) },   /* lit corr (see mapglyph.c) */
@@ -467,7 +467,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '|', "ïÊ", C(CLR_WHITE) },                  /* grave */
        { '\\', "âÿÇ‚Ç©Ç»ã ç¿", C(HI_GOLD) },         /* throne */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 /*30*/ { '#', "sink", C(CLR_GRAY) },                 /* sink */
        { '{', "fountain", C(CLR_BRIGHT_BLUE) },      /* fountain */
        { '}', "water", C(CLR_BLUE) },                /* pool */
@@ -490,7 +490,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '#', "è„Ç¡ÇƒÇ¢ÇÈíµÇÀã¥", C(CLR_BROWN) },    /* hcdbridge */
        { ' ', "ãÛãCÇÃÇΩÇ‹Ç¡ÇΩèÍèä", C(CLR_CYAN) },   /* open air */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 /*40*/ { '#', "cloud", C(CLR_GRAY) },                /* [part of] a cloud */
        { '}', "water", C(CLR_BLUE) },                /* under water */
        { '^', "arrow trap", C(HI_METAL) },           /* trap */
@@ -513,7 +513,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "ãêä‚ÇÃ„©", C(CLR_GRAY) },             /* trap */
        { '^', "êáñ∞ÉKÉXÇÃ„©", C(HI_ZAP) },           /* trap */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 /*50*/ { '^', "rust trap", C(CLR_BLUE) },            /* trap */
        { '^', "fire trap", C(CLR_ORANGE) },          /* trap */
        { '^', "pit", C(CLR_BLACK) },                 /* trap */
@@ -536,7 +536,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "ñÇñ@ÇÃì¸å˚", C(CLR_BRIGHT_MAGENTA) }, /* trap */
        { '"', "Ç≠Ç‡ÇÃëÉ", C(CLR_GRAY) },             /* web */
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 /*60*/ { '^', "statue trap", C(CLR_GRAY) },            /* trap */
        { '^', "magic trap", C(HI_ZAP) },               /* trap */
        { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
@@ -570,7 +570,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '#', "", C(HI_ZAP) },
        { '@', "", C(HI_ZAP) },
        { '*', "", C(HI_ZAP) },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
        { '#', "poison cloud", C(CLR_BRIGHT_GREEN) },   /* part of a cloud */
        { '?', "valid position", C(CLR_BRIGHT_GREEN) }, /*  target position */
 #else

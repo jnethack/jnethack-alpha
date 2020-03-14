@@ -218,7 +218,7 @@ NEARDATA struct mvitals mvitals[NUMMONS];
 NEARDATA long domove_attempting = 0L;
 NEARDATA long domove_succeeded = 0L;
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 NEARDATA struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"
@@ -233,7 +233,7 @@ NEARDATA struct c_color_names c_color_names = {
 struct menucoloring *menu_colorings = NULL;
 
 const char *c_obj_colors[] = {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     "black",          /* CLR_BLACK */
     "red",            /* CLR_RED */
     "green",          /* CLR_GREEN */
@@ -270,7 +270,7 @@ const char *c_obj_colors[] = {
 #endif
 };
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 struct c_common_strings c_common_strings = { "Nothing happens.",
                                              "That's enough tries!",
                                              "That is a silly thing to %s.",
@@ -296,7 +296,7 @@ struct c_common_strings c_common_strings = { "âΩÇ‡ãNÇ´Ç»Ç©Ç¡ÇΩÅD",
 
 /* NOTE: the order of these words exactly corresponds to the
    order of oc_material values #define'd in objclass.h. */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
 const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
                              "flesh",      "paper",   "cloth",      "leather",
                              "wooden",     "bone",    "dragonhide", "iron",

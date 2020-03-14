@@ -389,7 +389,7 @@ boolean cuttier; /* hit is by wielded blade or axe or by thrown axe */
         place_worm_seg(worm, x, y); /* place the "head" segment back */
         if (context.mon_moving) {
             if (canspotmon(worm))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 pline("Part of %s tail has been cut off.",
                       s_suffix(mon_nam(worm)));
 #else

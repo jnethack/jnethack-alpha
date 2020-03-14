@@ -482,7 +482,7 @@ int how;
                set up fake mptr for type_is_pname/the_unique_pm */
             mptr = &mons[mtmp->mappearance];
             fakenm = mptr->mname;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         } else if (alt && strstri(realnm, "vampire")
                    && !strcmp(fakenm, "vampire bat")) {
             /* special case: use "vampire in bat form" in preference
@@ -510,7 +510,7 @@ int how;
         Strcpy(shape, fakenm);
 #endif
         /* omit "called" to avoid excessive verbosity */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(buf),
                 alt ? "%s in %s form"
                     : mimicker ? "%s disguised as %s"
@@ -689,7 +689,7 @@ VA_DECL(const char *, str)
         raw_print("\nError save file being written.\n");
 #else /* !NOTIFY_NETHACK_BUGS */
     if (!wizard) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         const char *maybe_rebuild = !program_state.something_worth_saving
                                      ? "."
                                      : "\nand it may be possible to rebuild.";
@@ -706,7 +706,7 @@ VA_DECL(const char *, str)
             raw_printf("To report this error, contact %s%s",
                        sysopt.fmtd_wizard_list, maybe_rebuild);
         else
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             raw_printf("Report error to \"%s\"%s", WIZARD_NAME,
                        maybe_rebuild);
 #else
@@ -895,7 +895,7 @@ boolean taken;
 
     if (invent && !done_stopprint) {
         if (taken)
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(qbuf, "Do you want to see what you had when you %s?",
                     (how == QUIT) ? "quit" : "died");
 #else
@@ -921,7 +921,7 @@ boolean taken;
 
     if (!done_stopprint) {
         ask = should_query_disclose_option('a', &defquery);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         c = ask ? yn_function("Do you want to see your attributes?", ynqchars,
                               defquery)
                 : defquery;
@@ -950,7 +950,7 @@ boolean taken;
 
     if (!done_stopprint) {
         ask = should_query_disclose_option('c', &defquery);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         c = ask ? yn_function("Do you want to see your conduct?", ynqchars,
                               defquery)
                 : defquery;
@@ -967,7 +967,7 @@ boolean taken;
 
     if (!done_stopprint) {
         ask = should_query_disclose_option('o', &defquery);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         c = ask ? yn_function("Do you want to see the dungeon overview?",
                               ynqchars, defquery)
                 : defquery;
@@ -1149,7 +1149,7 @@ winid endwin;
                 discover_object(otmp->otyp, TRUE, FALSE);
                 otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
                 /* assumes artifacts don't have quan > 1 */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
                         the_unique_obj(otmp) ? "The " : "",
                         otmp->oartifact ? artifact_name(xname(otmp), &dummy)
@@ -1284,7 +1284,7 @@ int how;
         }
     }
     /* explore and wizard modes offer player the option to keep playing */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     if (!survive && (wizard || discover) && how <= GENOCIDED
         && !paranoid_query(ParanoidDie, "Die?")) {
 #else
@@ -1529,7 +1529,7 @@ int how;
         /* give this feedback even if bones aren't going to be created,
            so that its presence or absence doesn't tip off the player to
            new bones or their lack; it might be a lie if makemon fails */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Your("%s as %s...",
              (u.ugrave_arise != PM_GREEN_SLIME)
                  ? "body rises from the dead"
@@ -1612,7 +1612,7 @@ int how;
         /* don't bother counting to see whether it should be plural */
     }
 
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     Sprintf(pbuf, "%s %s the %s...", Goodbye(), plname,
             (how != ASCENDED)
                 ? (const char *) ((flags.female && urole.name.f)
@@ -1695,7 +1695,7 @@ int how;
 */
             Strcat(pbuf, "‚Í");
         }
-#if 0 /*JP*/
+#if 0 /*JP:T*/
         Sprintf(eos(pbuf), "%s with %ld point%s,",
                 how == ASCENDED ? "went to your reward"
                                  : "escaped from the dungeon",
@@ -1733,7 +1733,7 @@ int how;
                     if (has_oname(otmp))
                         free_oname(otmp);
                     otmp->quan = count;
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Sprintf(pbuf, "%8ld %s (worth %ld %s),", count,
                             xname(otmp), count * (long) objects[typ].oc_cost,
                             currency(2L));
@@ -1744,7 +1744,7 @@ int how;
 #endif
                     obfree(otmp, (struct obj *) 0);
                 } else {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                     Sprintf(pbuf, "%8ld worthless piece%s of colored glass,",
                             count, plur(count));
 #else
@@ -1761,7 +1761,7 @@ int how;
         if (u.uz.dnum == 0 && u.uz.dlevel <= 0) {
             /* level teleported out of the dungeon; `how' is DIED,
                due to falling or to "arriving at heaven prematurely" */
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(pbuf, "You %s beyond the confines of the dungeon",
                     (u.uz.dlevel < 0) ? "passed away" : ends[how]);
 #else
@@ -1782,7 +1782,7 @@ int how;
 */
             Sprintf(pbuf, "‚ ‚È‚½‚Í%s", where);
             if (!In_endgame(&u.uz) && !Is_knox(&u.uz))
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                 Sprintf(eos(pbuf), " on dungeon level %d",
                         In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
 #else
@@ -2195,7 +2195,7 @@ boolean ask;
                     Sprintf(buf, "%s", mons[i].mname);
 #endif
                     if (nkilled > 1) {
-#if 0 /*JP*/
+#if 0 /*JP:T*/
                         switch (nkilled) {
                         case 2:
                             Sprintf(eos(buf), " (twice)");
@@ -2341,7 +2341,7 @@ boolean ask;
             done_stopprint++;
         if (c == 'y') {
             klwin = create_nhwindow(NHW_MENU);
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(buf, "%s%s species:",
                     (ngenocided) ? "Genocided" : "Extinct",
                     (nextinct && ngenocided) ? " or extinct" : "");
