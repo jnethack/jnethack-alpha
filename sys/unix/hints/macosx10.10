@@ -58,7 +58,7 @@ GAMEGRP  = games
 # build to run in the source tree - primarily for development.  Build with "make all"
 #WANT_SOURCE_INSTALL=1
 
-CC=gcc-8
+CC=gcc-9
 CFLAGS+=-fexec-charset=cp932 -Wno-comment -Wno-unused-parameter -Wno-overlength-strings -Wno-format-overflow
 
 # At the moment this is just for debugging, but in the future it could be
