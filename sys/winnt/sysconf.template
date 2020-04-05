@@ -104,3 +104,5 @@ WIZARDS=*
 #
 # The location that file synchronization locks are stored (writeable)
 #LOCKDIR=c:\ProgramData\NetHack\3.6
+
+PORTABLE_DEVICE_PATHS=1
