@@ -19,8 +19,11 @@ extern const char *hu_stat[]; /* defined in eat.c */
 const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
                                  "Strained", "Overtaxed", "Overloaded" };
 #else
+      /*オプションのパースで英語版も必要*/
 const char *const enc_stat[] = { "",     "よろめき", "圧迫",
                                  "限界", "荷重",     "超過"};
+const char *const enc_stat_opt[] = { "",         "Burdened",  "Stressed",
+                                     "Strained", "Overtaxed", "Overloaded" };
 #endif
 
 STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
@@ -2210,10 +2213,17 @@ boolean from_configfile;
                 up = TRUE;
             changed = TRUE;
         } else if (fld == BL_CAP
+#if 0 /*JP*/
                    && is_fld_arrayvalues(s[sidx], enc_stat,
                                          SLT_ENCUMBER, OVERLOADED + 1,
                                          &kidx)) {
             txt = enc_stat[kidx];
+#else
+                   && is_fld_arrayvalues(s[sidx], enc_stat_opt,
+                                         SLT_ENCUMBER, OVERLOADED + 1,
+                                         &kidx)) {
+            txt = enc_stat_opt[kidx];
+#endif
             txtval = TRUE;
         } else if (fld == BL_ALIGN
                    && is_fld_arrayvalues(s[sidx], aligntxt, 0, 3, &kidx)) {
@@ -3449,9 +3459,15 @@ choose_value:
                  || fld == BL_TITLE) ? "Choose" : "Enter",
                 initblstats[fld].fldname);
         if (fld == BL_CAP) {
+#if 0 /*JP*/
             int rv = query_arrayvalue(qry_buf,
                                       enc_stat,
                                       SLT_ENCUMBER, OVERLOADED + 1);
+#else
+            int rv = query_arrayvalue(qry_buf,
+                                      enc_stat_opt,
+                                      SLT_ENCUMBER, OVERLOADED + 1);
+#endif
 
             if (rv < SLT_ENCUMBER)
                 goto choose_behavior;
