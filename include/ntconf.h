@@ -82,8 +82,13 @@
                      * objects being thrown when the hangup occurs.    \
                      */
 
+#if 0 /*JP*/
 #define CONFIG_FILE ".nethackrc"
 #define CONFIG_TEMPLATE ".nethackrc.template"
+#else
+#define CONFIG_FILE ".jnethackrc"
+#define CONFIG_TEMPLATE ".jnethackrc.template"
+#endif
 #define SYSCF_TEMPLATE "sysconf.template"
 #define SYMBOLS_TEMPLATE "symbols.template"
 #define GUIDEBOOK_FILE "Guidebook.txt"

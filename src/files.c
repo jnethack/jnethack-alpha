@@ -1941,7 +1941,11 @@ const char *filename;
 
 const char *default_configfile =
 #ifdef UNIX
+#if 0 /*JP*/
     ".nethackrc";
+#else
+    ".jnethackrc";
+#endif
 #else
 #if defined(MAC) || defined(__BEOS__)
     "NetHack Defaults";

@@ -702,7 +702,7 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(GAMEDIR)\JNetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/JNetHack.PDB to conserve space
 	@if exist $(GAMEDIR)\JNetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/JNetHackW.PDB to conserve space
-	if exist $(MSWSYS)\.nethackrc.template copy $(MSWSYS)\.nethackrc.template $(GAMEDIR)
+	if exist $(MSWSYS)\.nethackrc.template copy $(MSWSYS)\.nethackrc.template $(GAMEDIR)\.jnethackrc.template
 	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	echo install done > $@
 
