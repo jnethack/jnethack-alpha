@@ -103,7 +103,7 @@ altmeta        unixとVMSで，jnethackがプレイヤーのキーボードから       [FALSE]
                コマンドを得る時，2文字並び"ESC c"をM-c(Meta+c,
                最上位ビット設定)として扱う．
 
-コンパイル時に USE_TILES が設定されているならば (MSDOS プロテクトモードのみ):
+コンパイル時に USE_TILES が設定されているならば (MSDOS プロテクトモード):
 preload_tiles  ゲーム開始時にタイルを予め RAM に読み込むかを制御する． [TRUE]
                これによりタイルグラフィックの性能が向上するが，
                より多くのメモリを使う．
@@ -161,6 +161,10 @@ paranoid_confirmation  想定と違う問い合わせをする状況の空白区切りのリスト
               die     -- (探索やデバッグモードで)死ぬときの確認はyesかyか
               bones   -- デバッグモードで骨を残す確認はyesかyか
               attack  -- 友好的な怪物を攻撃する確認はyesかyか
+              wand-break  -- 杖を折る確認はyesかyか
+              eating  -- 食べ続ける確認はyesかyか
+              Were-change -- プレイヤーが変化制御を持っているときに
+                      獣化病による変化の確認はyesかyか
               pray    -- 祈るときにyで確認する; デフォルトでon
               Remove  -- 外すことができるアイテムが一つの時も'R'や'T'で確認
                          するか

@@ -1,4 +1,4 @@
-/* NetHack 3.6	write.c	$NHDT-Date: 1450261366 2015/12/16 10:22:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	write.c	$NHDT-Date: 1573346194 2019/11/10 00:36:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.20 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* JNetHack Copyright */
@@ -122,10 +122,10 @@ register struct obj *pen;
     } else if (Glib) {
 #if 0 /*JP:T*/
         pline("%s from your %s.", Tobjnam(pen, "slip"),
-              makeplural(body_part(FINGER)));
+              fingers_or_gloves(FALSE));
 #else
         pline("%sÇ™%sÇ©ÇÁääÇËÇ®ÇøÇΩÅD", xname(pen),
-              body_part(FINGER));
+              fingers_or_gloves(FALSE));
 #endif
         dropx(pen);
         return 1;

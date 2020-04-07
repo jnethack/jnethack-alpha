@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1555627307 2019/04/18 22:41:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1574722864 2019/11/25 23:01:04 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -251,12 +251,19 @@ struct obj **obj_p;
             otmp->quan = 2L; /* to force pluralization */
         else if (otmp->otyp == SLIME_MOLD)
             otmp->spe = context.current_fruit; /* give it a type */
-        if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
-            otmp->corpsenm = MCORPSENM(mtmp);
-        else if (otmp->otyp == CORPSE && glyph_is_body(glyph))
+        if (mtmp && has_mcorpsenm(mtmp)) { /* mimic as corpse/statue */
+            if (otmp->otyp == SLIME_MOLD)
+                /* override context.current_fruit to avoid
+                     look, use 'O' to make new named fruit, look again
+                   giving different results when current_fruit changes */
+                otmp->spe = MCORPSENM(mtmp);
+            else
+                otmp->corpsenm = MCORPSENM(mtmp);
+        } else if (otmp->otyp == CORPSE && glyph_is_body(glyph)) {
             otmp->corpsenm = glyph - GLYPH_BODY_OFF;
-        else if (otmp->otyp == STATUE && glyph_is_statue(glyph))
+        } else if (otmp->otyp == STATUE && glyph_is_statue(glyph)) {
             otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
+        }
         if (otmp->otyp == LEASH)
             otmp->leashmon = 0;
         /* extra fields needed for shop price with doname() formatting */
@@ -401,12 +408,14 @@ int x, y;
         int tt = t ? t->ttyp : NO_TRAP;
 
         /* newsym lets you know of the trap, so mention it here */
-        if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB)
+        if (tt == BEAR_TRAP || is_pit(tt) || tt == WEB) {
 /*JP
             Sprintf(eos(buf), ", trapped in %s",
 */
             Sprintf(eos(buf), ", %sÇ…ïﬂÇ‹Ç¡ÇƒÇ¢ÇÈ",
                     an(defsyms[trap_to_defsym(tt)].explanation));
+            t->tseen = 1;
+        }
     }
 
     /* we know the hero sees a monster at this location, but if it's shown
@@ -632,9 +641,17 @@ char *buf, *monbuf;
         Strcpy(buf, "unexplored area");
 */
         Strcpy(buf, "ñ¢íTçıÇÃèÍèä");
-    } else
+    } else {
+        int amsk;
+        aligntyp algn;
+
         switch (glyph_to_cmap(glyph)) {
         case S_altar:
+            amsk = ((mtmp = m_at(x, y)) != 0 && has_mcorpsenm(mtmp)
+                    && M_AP_TYPE(mtmp) == M_AP_FURNITURE
+                    && mtmp->mappearance == S_altar) ? MCORPSENM(mtmp)
+                   : levl[x][y].altarmask;
+            algn = Amask2align(amsk & ~AM_SHRINE);
 /*JP
             Sprintf(buf, "%s %saltar",
 */
@@ -646,9 +663,8 @@ char *buf, *monbuf;
                         ? "aligned"
 */
                         ? "ëÆê´ÇÃ"
-                        : align_str(
-                              Amask2align(levl[x][y].altarmask & ~AM_SHRINE)),
-                    ((levl[x][y].altarmask & AM_SHRINE)
+                        : align_str(algn),
+                    ((amsk & AM_SHRINE) != 0
                      && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
 /*JP
                         ? "high "
@@ -704,7 +720,7 @@ char *buf, *monbuf;
             Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
             break;
         }
-
+    }
     return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
 
@@ -1020,11 +1036,12 @@ struct permonst **for_supplement;
                       unreconnoitered[] = "ñ¢äœé@";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
-    int i, alt_i, glyph = NO_GLYPH,
+    int i, alt_i, j, glyph = NO_GLYPH,
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz));
     const char *x_str;
+    nhsym tmpsym;
 
     if (looked) {
         int oc;
@@ -1032,7 +1049,7 @@ struct permonst **for_supplement;
 
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
-        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
+        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, 0);
 
         Sprintf(prefix, "%s        ", encglyph(glyph));
     } else
@@ -1088,7 +1105,7 @@ struct permonst **for_supplement;
         if (x_str == unreconnoitered)
             goto didlook;
     }
-
+ check_monsters:
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
@@ -1268,22 +1285,59 @@ struct permonst **for_supplement;
         }
     }
 
-    /* handle optional boulder symbol as a special case */
-    if (iflags.bouldersym && sym == iflags.bouldersym) {
-        if (!found) {
+    /* Finally, handle some optional overriding symbols */
+    for (j = SYM_OFF_X; j < SYM_MAX; ++j) {
+        if (j == (SYM_INVISIBLE + SYM_OFF_X))
+            continue;       /* already handled above */
+        tmpsym = Is_rogue_level(&u.uz) ? ov_rogue_syms[j]
+                                       : ov_primary_syms[j];
+        if (tmpsym && sym == tmpsym) {
+            switch (j) {
+            case SYM_BOULDER + SYM_OFF_X:
+                if (!found) {
 /*JP
-            *firstmatch = "boulder";
+                    *firstmatch = "boulder";
 */
-            *firstmatch = "ä‚";
+                    *firstmatch = "ä‚";
+                    Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+                    found++;
+                } else {
+/*JP
+                    found += append_str(out_str, "boulder");
+*/
+                    found += append_str(out_str, "ä‚");
+                }
+                break;
+            case SYM_PET_OVERRIDE + SYM_OFF_X:
+                if (looked) {
+                    int oc = 0;
+                    unsigned os = 0;
+
+                    /* convert to symbol without override in effect */
+                    (void) mapglyph(glyph, &sym, &oc, &os,
+                                    cc.x, cc.y, MG_FLAG_NOOVERRIDE);
+                    goto check_monsters;
+                }
+                break;
+            case SYM_HERO_OVERRIDE + SYM_OFF_X:
+                sym = showsyms[S_HUMAN + SYM_OFF_M];
+                goto check_monsters;
+            }
+        }
+    }
+#if 0
+    /* handle optional boulder symbol as a special case */
+    if (o_syms[SYM_BOULDER + SYM_OFF_X]
+        && sym == o_syms[SYM_BOULDER + SYM_OFF_X]) {
+        if (!found) {
+            *firstmatch = "boulder";
             Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
             found++;
         } else {
-/*JP
             found += append_str(out_str, "boulder");
-*/
-            found += append_str(out_str, "ä‚");
         }
     }
+#endif
 
     /*
      * If we are looking at the screen, follow multiple possibilities or
@@ -1291,10 +1345,13 @@ struct permonst **for_supplement;
      */
 
     if (found > 4)
+        /* 3.6.3: this used to be "That can be many things" (without prefix)
+           which turned it into a sentence that lacked its terminating period;
+           we could add one below but reinstating the prefix here is better */
 /*JP
-        Sprintf(out_str, "%s", "That can be many things");
+        Sprintf(out_str, "%scan be many things", prefix);
 */
-        Sprintf(out_str, "%s", "Ç±Ç±Ç…ÇÕëΩÇ≠ÇÃÇ‡ÇÃÇ™Ç†ÇÈ");
+        Sprintf(out_str, "%sÇ±Ç±Ç…ÇÕëΩÇ≠ÇÃÇ‡ÇÃÇ™Ç†ÇÈ", prefix);
 
  didlook:
     if (looked) {
@@ -1725,7 +1782,7 @@ static const char *suptext2[] = {
 #endif
 };
 
-void
+STATIC_OVL void
 do_supplemental_info(name, pm, without_asking)
 char *name;
 struct permonst *pm;
@@ -1909,7 +1966,7 @@ whatdoes_help()
 {
     dlb *fp;
     char *p, buf[BUFSZ];
-    winid tmpwin = create_nhwindow(NHW_TEXT);
+    winid tmpwin;
 
     fp = dlb_fopen(KEYHELP, "r");
     if (!fp) {
@@ -1920,6 +1977,7 @@ whatdoes_help()
         display_nhwindow(WIN_MESSAGE, TRUE);
         return;
     }
+    tmpwin = create_nhwindow(NHW_TEXT);
     while (dlb_fgets(buf, (int) sizeof buf, fp)) {
         if (*buf == '#')
             continue;
@@ -2238,61 +2296,61 @@ docontact(VOID_ARGS)
     destroy_nhwindow(cwin);
 }
 
-void
+STATIC_OVL void
 dispfile_help(VOID_ARGS)
 {
     display_file(HELP, TRUE);
 }
 
-void
+STATIC_OVL void
 dispfile_shelp(VOID_ARGS)
 {
     display_file(SHELP, TRUE);
 }
 
-void
+STATIC_OVL void
 dispfile_optionfile(VOID_ARGS)
 {
     display_file(OPTIONFILE, TRUE);
 }
 
-void
+STATIC_OVL void
 dispfile_license(VOID_ARGS)
 {
     display_file(LICENSE, TRUE);
 }
 
-void
+STATIC_OVL void
 dispfile_debughelp(VOID_ARGS)
 {
     display_file(DEBUGHELP, TRUE);
 }
 
-void
+STATIC_OVL void
 hmenu_doextversion(VOID_ARGS)
 {
     (void) doextversion();
 }
 
-void
+STATIC_OVL void
 hmenu_dohistory(VOID_ARGS)
 {
     (void) dohistory();
 }
 
-void
+STATIC_OVL void
 hmenu_dowhatis(VOID_ARGS)
 {
     (void) dowhatis();
 }
 
-void
+STATIC_OVL void
 hmenu_dowhatdoes(VOID_ARGS)
 {
     (void) dowhatdoes();
 }
 
-void
+STATIC_OVL void
 hmenu_doextlist(VOID_ARGS)
 {
     (void) doextlist();

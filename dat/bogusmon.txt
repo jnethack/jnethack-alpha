@@ -1,4 +1,4 @@
-# NetHack 3.6  bogusmon.txt       $NHDT-Date: 1524689579 2018/04/25 20:52:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.7 $
+# NetHack 3.6  bogusmon.txt       $NHDT-Date: 1574387024 2019/11/22 01:43:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.8 $
 # Copyright (c) 2016 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -80,6 +80,15 @@ _準ゴルゴン
 shrinking violet
 shallow one
 spherical cow
+electric giraffe
+steam dragon
+omnibus
+slinky
+maxotaur
+octahedron
+dungeon core
+quale
+holloway
 
 # Quendor (Zork, &c.)
 グルー
@@ -189,6 +198,9 @@ spherical cow
 超微細宇宙艦隊
 がつがつむしゃむしゃトラアル獣
 
+# The Tough Guide to Fantasyland
+leathery-winged avian
+
 # TMNT
 激亀忍者
 
@@ -239,6 +251,7 @@ spherical cow
 クワッカ
 タチヨタカ
 レミング
+dhole
 
 # european cryptids
 ヴォルペルティンガー
@@ -275,6 +288,7 @@ spherical cow
 wiki
 ピア
 COBOL
+wire shark
 
 # bugs
 ボーアバグ
@@ -326,6 +340,7 @@ COBOL
 犂耕体
 合字
 判じ絵紋
+dinkus
 
 # Their actual character
 アポストロフィのゴーレム
@@ -335,6 +350,10 @@ COBOL
 +怒れる花ボブ
 +ストロング・バッド
 +マジカルトレバー
+
+# Girl Genius
+smakken
+mimmoth
 
 # KoL
 片翼の突き刺しコウモリ
@@ -424,6 +443,9 @@ ghoti
 # Fraggle Rock
 フラグル
 
+# Harry Harrison
+stainless steel rat
+
 # Spoonerism
 いぐもわら
 
@@ -474,8 +496,9 @@ ghoti
 小老なヘビ
 ブヨ蟻
 巨大フロ
-グラインドバグ
 授与カブトムシ
+greater snake
+グラインドバグ
 巨大マンゴー
 光沢仕上げのゴーレム
 ノームの受賞者

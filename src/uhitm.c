@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1555720104 2019/04/20 00:28:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1573764936 2019/11/14 20:55:36 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -754,14 +754,8 @@ int dieroll;
     long silverhit = 0L;
     int wtype;
     struct obj *monwep;
-#if 0 /*JP*/
-    char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
-#endif
     char saved_oname[BUFSZ];
 
-#if 0 /*JP*/
-    unconventional[0] = '\0';
-#endif
     saved_oname[0] = '\0';
 
     wakeup(mon, TRUE);
@@ -948,9 +942,6 @@ int dieroll;
         } else {
             if (mdat == &mons[PM_SHADE] && !shade_aware(obj)) {
                 tmp = 0;
-#if 0 /*JP*/
-                Strcpy(unconventional, cxname(obj));
-#endif
             } else {
                 switch (obj->otyp) {
                 case BOULDER:         /* 1d20 */
@@ -1293,25 +1284,14 @@ int dieroll;
             poiskilled = TRUE;
     }
     if (tmp < 1) {
+        boolean mon_is_shade = (mon->data == &mons[PM_SHADE]);
+
         /* make sure that negative damage adjustment can't result
            in inadvertently boosting the victim's hit points */
-        tmp = 0;
-        if (mdat == &mons[PM_SHADE]) {
-            if (!hittxt) {
-#if 0 /*JP*/
-                const char *what = *unconventional ? unconventional : "attack";
-
-                Your("%s %s harmlessly through %s.", what,
-                     vtense(what, "pass"), mon_nam(mon));
-#else
-                Your("攻撃は%sを通りぬけた．", mon_nam(mon));
-#endif
-                hittxt = TRUE;
-            }
-        } else {
-            if (get_dmg_bonus)
-                tmp = 1;
-        }
+        tmp = (get_dmg_bonus && !mon_is_shade) ? 1 : 0;
+        if (mon_is_shade && !hittxt
+            && thrown != HMON_THROWN && thrown != HMON_KICKED)
+            hittxt = shade_miss(&youmonst, mon, obj, FALSE, TRUE);
     }
 
     if (jousting) {
@@ -1599,6 +1579,52 @@ struct obj *obj;
     return FALSE;
 }
 
+/* used for hero vs monster and monster vs monster; also handles
+   monster vs hero but that won't happen because hero can't be a shade */
+boolean
+shade_miss(magr, mdef, obj, thrown, verbose)
+struct monst *magr, *mdef;
+struct obj *obj;
+boolean thrown, verbose;
+{
+    const char *what, *whose, *target;
+    boolean youagr = (magr == &youmonst), youdef = (mdef == &youmonst);
+
+    /* we're using dmgval() for zero/not-zero, not for actual damage amount */
+    if (mdef->data != &mons[PM_SHADE] || (obj && dmgval(obj, mdef)))
+        return FALSE;
+
+    if (verbose
+        && ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef))
+            || (magr == &youmonst && distu(mdef->mx, mdef->my) <= 2))) {
+        static const char harmlessly_thru[] = " harmlessly through ";
+
+        what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
+        target = youdef ? "you" : mon_nam(mdef);
+        if (!thrown) {
+/*JP
+            whose = youagr ? "Your" : s_suffix(Monnam(magr));
+*/
+            whose = youagr ? "あなたの" : s_suffix(Monnam(magr));
+#if 0 /*JP*/
+            pline("%s %s %s%s%s.", whose, what,
+                  vtense(what, "pass"), harmlessly_thru, target);
+#else
+            pline("%s%sは%sを通りぬけた．", whose, what,
+                  target);
+#endif
+        } else {
+            pline("%s %s%s%s.", The(what), /* note: not pline_The() */
+                  vtense(what, "pass"), harmlessly_thru, target);
+        }
+        if (!youdef && !canspotmon(mdef))
+            map_invisible(mdef->mx, mdef->my);
+    }
+    if (!youdef)
+        mdef->msleeping = 0;
+    return TRUE;
+}
+
 /* check whether slippery clothing protects from hug or wrap attack */
 /* [currently assumes that you are the attacker] */
 STATIC_OVL boolean
@@ -1749,10 +1775,11 @@ steal_it(mdef, mattk)
 struct monst *mdef;
 struct attack *mattk;
 {
-    struct obj *otmp, *stealoid, **minvent_ptr;
+    struct obj *otmp, *gold = 0, *stealoid, **minvent_ptr;
     long unwornmask;
 
-    if (!mdef->minvent)
+    otmp = mdef->minvent;
+    if (!otmp || (otmp->oclass == COIN_CLASS && !otmp->nobj))
         return; /* nothing to take */
 
     /* look for worn body armor */
@@ -1772,14 +1799,17 @@ struct attack *mattk;
             }
         *minvent_ptr = stealoid; /* put armor back into minvent */
     }
+    gold = findgold(mdef->minvent);
 
     if (stealoid) { /* we will be taking everything */
         if (gender(mdef) == (int) u.mfemale && youmonst.data->mlet == S_NYMPH)
-/*JP
-            You("charm %s.  She gladly hands over her possessions.",
-*/
-            You("%sをうっとりさせた．彼女はよろこんで持ち物をさしだした．",
-                mon_nam(mdef));
+#if 0 /*JP:T*/
+            You("charm %s.  She gladly hands over %sher possessions.",
+                mon_nam(mdef), !gold ? "" : "most of ");
+#else
+            You("%sをうっとりさせた．彼女はよろこんで持ち物%sをさしだした．",
+                mon_nam(mdef), !gold ? "" : "のほとんど");
+#endif
         else
 #if 0 /*JP:T*/
             You("seduce %s and %s starts to take off %s clothes.",
@@ -1790,7 +1820,18 @@ struct attack *mattk;
 #endif
     }
 
+    /* prevent gold from being stolen so that steal-item isn't a superset
+       of steal-gold; shuffling it out of minvent before selecting next
+       item, and then back in case hero or monster dies (hero touching
+       stolen c'trice corpse or monster wielding one and having gloves
+       stolen) is less bookkeeping than skipping it within the loop or
+       taking it out once and then trying to figure out how to put it back */
+    if (gold)
+        obj_extract_self(gold);
+
     while ((otmp = mdef->minvent) != 0) {
+        if (gold) /* put 'mdef's gold back after remembering mdef->minvent */
+            mpickobj(mdef, gold), gold = 0;
         if (!Upolyd)
             break; /* no longer have ability to steal */
         /* take the object away from the monster */
@@ -1832,12 +1873,25 @@ struct attack *mattk;
         } else if (unwornmask & W_ARMG) { /* stole worn gloves */
             mselftouch(mdef, (const char *) 0, TRUE);
             if (DEADMONSTER(mdef)) /* it's now a statue */
-                return;         /* can't continue stealing */
+                break; /* can't continue stealing */
         }
 
         if (!stealoid)
             break; /* only taking one item */
+
+        /* take gold out of minvent before making next selection; if it
+           is the only thing left, the loop will terminate and it will be
+           put back below */
+        if ((gold = findgold(mdef->minvent)) != 0)
+            obj_extract_self(gold);
     }
+
+    /* put gold back; won't happen if either hero or 'mdef' dies because
+       gold will be back in monster's inventory at either of those times
+       (so will be present in mdef's minvent for bones, or in its statue
+       now if it has just been turned into one) */
+    if (gold)
+        mpickobj(mdef, gold);
 }
 
 int
@@ -3413,6 +3467,18 @@ boolean wep_was_destroyed;
                                   Monnam(mon))) {
 #endif
                         ;
+                    } else if (Hallucination && rn2(4)) {
+                        /* [it's the hero who should be getting paralyzed
+                           and isn't; this message describes the monster's
+                           reaction rather than the hero's escape] */
+#if 0 /*JP:T*/
+                        pline("%s looks %s%s.", Monnam(mon),
+                              !rn2(2) ? "" : "rather ",
+                              !rn2(2) ? "numb" : "stupefied");
+#else
+                        pline("%sは%sばかになったようだ．", Monnam(mon),
+                              !rn2(2) ? "" : "少し");
+#endif
                     } else if (Free_action) {
 #if 0 /*JP:T*/
                         You("momentarily stiffen under %s gaze!",
@@ -3420,15 +3486,6 @@ boolean wep_was_destroyed;
 #else
                         You("%sのにらみで一瞬硬直した！",
                             mon_nam(mon));
-#endif
-                    } else if (Hallucination && rn2(4)) {
-#if 0 /*JP:T*/
-                        pline("%s looks %s%s.", Monnam(mon),
-                              !rn2(2) ? "" : "rather ",
-                              !rn2(2) ? "numb" : "stupified");
-#else
-                        pline("%sは%sばかになったようだ．", Monnam(mon),
-                              !rn2(2) ? "" : "少し");
 #endif
                     } else {
 /*JP

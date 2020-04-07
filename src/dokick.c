@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1551920353 2019/03/07 00:59:13 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1575245057 2019/12/02 00:04:17 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1360,7 +1360,7 @@ dokick()
                 return 1;
             } else if (!rn2(4)) {
                 if (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz)) {
-                    fall_through(FALSE);
+                    fall_through(FALSE, 0);
                     return 1;
                 } else
                     goto ouch;
@@ -1374,9 +1374,9 @@ dokick()
             You("kick %s.", (Blind ? something : "the altar"));
 */
             You("%sを蹴った．", (Blind ? "何か" : "祭壇"));
+            altar_wrath(x, y);
             if (!rn2(3))
                 goto ouch;
-            altar_wrath(x, y);
             exercise(A_DEX, TRUE);
             return 1;
         }
@@ -1565,14 +1565,25 @@ dokick()
                 exercise(A_DEX, TRUE);
                 return 1;
             } else if (!rn2(3)) {
+                if (Blind && Deaf)
+                    Sprintf(buf, " %s", body_part(FACE));
+                else
+                    buf[0] = '\0';
 #if 0 /*JP:T*/
-                pline("Flupp!  %s.",
-                      (Blind ? "You hear a sloshing sound"
-                             : "Muddy waste pops up from the drain"));
+                pline("%s%s%s.", !Deaf ? "Flupp! " : "",
+                      !Blind
+                          ? "Muddy waste pops up from the drain"
+                          : !Deaf
+                              ? "You hear a sloshing sound"  /* Deaf-aware */
+                              : "Something splashes you in the", buf);
 #else
-                pline("うわ！%s．",
-                      (Blind ? "あなたは，バチャバチャする音を聞いた"
-                             : "排水口からどろどろの廃棄物が出てくる"));
+                /*JP:TODO:「顔にかかった」の語順調整 */
+                pline("%s%s%s．", !Deaf ? "うわ！" : "",
+                      !Blind
+                          ? "排水口からどろどろの廃棄物が出てくる"
+                          : !Deaf
+                              ? "あなたは，バチャバチャする音を聞いた"  /* Deaf-aware */
+                              : "何かがあなたにかかった");
 #endif
                 if (!(maploc->looted & S_LRING)) { /* once per sink */
                     if (!Blind)
@@ -2220,7 +2231,7 @@ long num;
 #endif
 
     if (num) { /* means: other objects are impacted */
-        /* 3.6.2: use a separate buffer for the suffix to avoid risk of
+        /* As of 3.6.2: use a separate buffer for the suffix to avoid risk of
            overrunning obuf[] (let pline() handle truncation if necessary) */
 #if 0 /*JP*/
         Sprintf(xbuf, " %s %s object%s", otense(otmp, "hit"),

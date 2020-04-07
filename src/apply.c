@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1553363415 2019/03/23 17:50:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1573778560 2019/11/15 00:42:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.284 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -130,8 +130,8 @@ struct obj *obj;
 
         switch (rn2(3)) {
         case 2:
-            old = Glib;
-            incr_itimeout(&Glib, rn1(10, 3));
+            old = (Glib & TIMEOUT);
+            make_glib((int) old + rn1(10, 3)); /* + 3..12 */
 #if 0 /*JP:T*/
             Your("%s %s!", makeplural(body_part(HAND)),
                  (old ? "are filthier than ever" : "get slimy"));
@@ -195,11 +195,14 @@ struct obj *obj;
     }
 
     if (Glib) {
-        Glib = 0;
-/*JP
-        You("wipe off your %s.", makeplural(body_part(HAND)));
-*/
-        You("%sÇê@Ç¢ÇΩÅD", makeplural(body_part(HAND)));
+        make_glib(0);
+#if 0 /*JP*/
+        You("wipe off your %s.",
+            !uarmg ? makeplural(body_part(HAND)) : gloves_simple_name(uarmg));
+#else
+        You("%sÇê@Ç¢ÇΩÅD",
+            !uarmg ? makeplural(body_part(HAND)) : gloves_simple_name(uarmg));
+#endif
         if (is_wet_towel(obj))
             dry_a_towel(obj, -1, drying_feedback);
         return 1;
@@ -532,10 +535,27 @@ register struct obj *obj;
             const char *what = "thing";
 */
             const char *what = "ï®ëÃ";
+            boolean use_plural = FALSE;
+            struct obj dummyobj, *odummy;
 
             switch (M_AP_TYPE(mtmp)) {
             case M_AP_OBJECT:
-                what = simple_typename(mtmp->mappearance);
+                /* FIXME?
+                 *  we should probably be using object_from_map() here
+                 */
+                odummy = init_dummyobj(&dummyobj, mtmp->mappearance, 1L);
+                /* simple_typename() yields "fruit" for any named fruit;
+                   we want the same thing '//' or ';' shows: "slime mold"
+                   or "grape" or "slice of pizza" */
+                if (odummy->otyp == SLIME_MOLD
+                    && has_mcorpsenm(mtmp) && MCORPSENM(mtmp) != NON_PM) {
+                    odummy->spe = MCORPSENM(mtmp);
+                    what = simpleonames(odummy);
+                } else {
+                    what = simple_typename(odummy->otyp);
+                }
+                use_plural = (is_boots(odummy) || is_gloves(odummy)
+                              || odummy->otyp == LENSES);
                 break;
             case M_AP_MONSTER: /* ignore Hallucination here */
                 what = mons[mtmp->mappearance].mname;
@@ -545,10 +565,13 @@ register struct obj *obj;
                 break;
             }
             seemimic(mtmp);
-/*JP
-            pline("That %s is really %s.", what, mnm);
-*/
+#if 0 /*JP:T*/
+            pline("%s %s %s really %s.",
+                  use_plural ? "Those" : "That", what,
+                  use_plural ? "are" : "is", mnm);
+#else
             pline("Ç±ÇÃ%sÇÕé¿ç€Ç…ÇÕ%sÅD", what, mnm);
+#endif
         } else if (flags.verbose && !canspotmon(mtmp)) {
 /*JP
             There("is %s there.", mnm);
@@ -597,10 +620,14 @@ register struct obj *obj;
     return res;
 }
 
-/*JP
-static const char whistle_str[] = "produce a %s whistling sound.";
-*/
-static const char whistle_str[] = "ìJÇêÅÇ¢Çƒ%sâπÇÇΩÇƒÇΩÅD";
+#if 0 /*JP:T*/
+static const char whistle_str[] = "produce a %s whistling sound.",
+                  alt_whistle_str[] = "produce a %s, sharp vibration.";
+#else
+static const char whistle_str[] = "ìJÇêÅÇ¢Çƒ%sâπÇÇΩÇƒÇΩÅD",
+                  /*JP:TODO:âπÇ∆êUìÆÇçáÇÌÇπÇÈ*/
+                  alt_whistle_str[] = "ìJÇêÅÇ¢ÇƒêUìÆÇÇ®Ç±ÇµÇΩÅD";
+#endif
 
 STATIC_OVL void
 use_whistle(obj)
@@ -618,13 +645,10 @@ struct obj *obj;
         You("%sÇí ÇµÇƒñAÇèoÇµÇΩÅD", xname(obj));
     } else {
         if (Deaf)
-#if 0 /*JP:T*/
-            You_feel("rushing air tickle your %s.",
-                        body_part(NOSE));
-#else
-            You_feel("ãÛãCÇÃó¨ÇÍÇ™%sÇÇ≠Ç∑ÇÆÇ¡ÇΩÅD",
-                        body_part(NOSE));
-#endif
+/*JP
+            You_feel("rushing air tickle your %s.", body_part(NOSE));
+*/
+            You_feel("ãÛãCÇÃó¨ÇÍÇ™%sÇÇ≠Ç∑ÇÆÇ¡ÇΩÅD", body_part(NOSE));
         else
 /*JP
             You(whistle_str, obj->cursed ? "shrill" : "high");
@@ -649,25 +673,27 @@ struct obj *obj;
         You("ìJÇégÇ§î\óÕÇ™Ç»Ç¢ÅD");
     } else if (obj->cursed && !rn2(2)) {
 #if 0 /*JP:T*/
-        You("produce a %shigh-pitched humming noise.",
-            Underwater ? "very " : "");
+        You("produce a %shigh-%s.", Underwater ? "very " : "",
+            Deaf ? "frequency vibration" : "pitched humming noise");
 #else
-        You("%sçÇÇ¢í≤éqÇÃÇ§Ç»ÇÈÇÊÇ§Ç»âπÇÇΩÇƒÇΩÅD",
-            Underwater ? "Ç∆ÇƒÇ‡" : "");
+        You("%s%sÅD", Underwater ? "Ç∆ÇƒÇ‡" : "",
+            Deaf ? "çÇé¸îgÇÃêUìÆÇãNÇ±ÇµÇΩ" : "çÇÇ¢í≤éqÇÃÇ§Ç»ÇÈÇÊÇ§Ç»âπÇÇΩÇƒÇΩ");
 #endif
         wake_nearby();
     } else {
         int pet_cnt = 0, omx, omy;
 
         /* it's magic!  it works underwater too (at a higher pitch) */
-#if 0 /*JP:T*/
-        You(whistle_str,
-            Hallucination ? "normal" : Underwater ? "strange, high-pitched"
-                                                  : "strange");
+#if 0 /*JP*/
+        You(Deaf ? alt_whistle_str : whistle_str,
+            Hallucination ? "normal"
+            : (Underwater && !Deaf) ? "strange, high-pitched"
+              : "strange");
 #else
-        You(whistle_str,
-            Hallucination ? "ìJÇÃÇÊÇ§Ç»" : Underwater ? "ïsévãcÇ»çÇÇ¢í≤éqÇÃ"
-                                                  : "ïsévãcÇ»");
+        You(Deaf ? alt_whistle_str : whistle_str,
+            Hallucination ? "ìJÇÃÇÊÇ§Ç»"
+            : (Underwater && !Deaf) ? "ïsévãcÇ»çÇÇ¢í≤éqÇÃ"
+              : "ïsévãcÇ»");
 #endif
         for (mtmp = fmon; mtmp; mtmp = nextmon) {
             nextmon = mtmp->nmon; /* trap might kill mon */
@@ -777,15 +803,13 @@ unleash_all()
 
 #define MAXLEASHED 2
 
-/* TODO:
- *  This ought to exclude various other things, such as lights and gas
- *  spore, is_whirly() critters, ethereal creatures, possibly others.
- */
-static boolean
+boolean
 leashable(mtmp)
 struct monst *mtmp;
 {
-    return (boolean) (mtmp->mnum != PM_LONG_WORM);
+    return (boolean) (mtmp->mnum != PM_LONG_WORM
+                       && !unsolid(mtmp->data)
+                       && (!nolimbs(mtmp->data) || has_head(mtmp->data)));
 }
 
 /* ARGSUSED */
@@ -888,6 +912,11 @@ struct obj *obj;
             pline("%sÇÕÇ∑Ç≈Ç…åãÇ—Ç¬ÇØÇÁÇÍÇƒÇ¢ÇÈÅD",
                   spotmon ? l_monnam(mtmp) : "âˆï®");
 #endif
+        } else if (unsolid(mtmp->data)) {
+            pline("The leash would just fall off.");
+        } else if (nolimbs(mtmp->data) && !has_head(mtmp->data)) {
+            pline("%s has no extremities the leash would fit.",
+                  Monnam(mtmp));
         } else if (!leashable(mtmp)) {
 #if 0 /*JP:T*/
             pline("The leash won't fit onto %s%s.", spotmon ? "your " : "",
@@ -920,7 +949,7 @@ struct obj *obj;
             pline_The("leash would not come off!");
 */
             pline("ïRÇ™ÇÕÇ∏ÇÍÇ»Ç¢ÅI");
-            obj->bknown = 1;
+            set_bknown(obj, 1);
         } else {
             mtmp->mleashed = 0;
             obj->leashmon = 0;
@@ -2201,7 +2230,7 @@ int x,y;
             && is_valid_jump_pos(x, y, jumping_is_magic, FALSE));
 }
 
-void
+STATIC_OVL void
 display_jump_positions(state)
 int state;
 {
@@ -3057,25 +3086,27 @@ struct obj *obj;
     if (Glib) {
 #if 0 /*JP:T*/
         pline("%s from your %s.", Tobjnam(obj, "slip"),
-              makeplural(body_part(FINGER)));
+              fingers_or_gloves(FALSE));
 #else
         pline("%sÇÕÇ†Ç»ÇΩÇÃ%sÇ©ÇÁääÇËóéÇøÇΩÅD", xname(obj),
-              body_part(FINGER));
+              fingers_or_gloves(FALSE));
 #endif
         dropx(obj);
         return;
     }
 
     if (obj->spe > 0) {
+        int oldglib;
+
         if ((obj->cursed || Fumbling) && !rn2(2)) {
             consume_obj_charge(obj, TRUE);
 
 #if 0 /*JP:T*/
             pline("%s from your %s.", Tobjnam(obj, "slip"),
-                  makeplural(body_part(FINGER)));
+                  fingers_or_gloves(FALSE));
 #else
             pline("%sÇÕÇ†Ç»ÇΩÇÃ%sÇ©ÇÁääÇËóéÇøÇΩÅD", xname(obj),
-                  body_part(FINGER));
+                  fingers_or_gloves(FALSE));
 #endif
             dropx(obj);
             return;
@@ -3090,6 +3121,7 @@ struct obj *obj;
             return;
         consume_obj_charge(obj, TRUE);
 
+        oldglib = (int) (Glib & TIMEOUT);
         if (otmp != &zeroobj) {
 /*JP
             You("cover %s with a thick layer of grease.", yname(otmp));
@@ -3097,19 +3129,19 @@ struct obj *obj;
             You("%sÇ…éâÇíOîOÇ…ìhÇ¡ÇΩÅD", xname(otmp));
             otmp->greased = 1;
             if (obj->cursed && !nohands(youmonst.data)) {
-                incr_itimeout(&Glib, rnd(15));
+                make_glib(oldglib + rn1(6, 10)); /* + 10..15 */
 /*JP
                 pline("Some of the grease gets all over your %s.",
 */
                 pline("éâÇ™è≠Çµ%sÇ…Ç¬Ç¢ÇΩÅD",
-                      makeplural(body_part(HAND)));
+                      fingers_or_gloves(TRUE));
             }
         } else {
-            incr_itimeout(&Glib, rnd(15));
+            make_glib(oldglib + rn1(11, 5)); /* + 5..15 */
 /*JP
-            You("coat your %s with grease.", makeplural(body_part(FINGER)));
+            You("coat your %s with grease.", fingers_or_gloves(TRUE));
 */
-            You("%sÇ…éâÇìhÇ¡ÇΩÅD", makeplural(body_part(FINGER)));
+            You("%sÇ…éâÇìhÇ¡ÇΩÅD", fingers_or_gloves(TRUE));
         }
     } else {
         if (obj->known)
@@ -3131,16 +3163,17 @@ STATIC_OVL void
 use_stone(tstone)
 struct obj *tstone;
 {
-    struct obj *obj;
-    boolean do_scratch;
-    const char *streak_color, *choices;
-    char stonebuf[QBUFSZ];
 /*JP
     static const char scritch[] = "\"scritch, scritch\"";
 */
     static const char scritch[] = "ÅuÉSÉVÅCÉSÉVÅv";
     static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
     static const char coins_gems[3] = { COIN_CLASS, GEM_CLASS, 0 };
+    struct obj *obj;
+    boolean do_scratch;
+    const char *streak_color, *choices;
+    char stonebuf[QBUFSZ];
+    int oclass;
 
     /* in case it was acquired while blinded */
     if (!Blind)
@@ -3206,7 +3239,14 @@ struct obj *tstone;
     do_scratch = FALSE;
     streak_color = 0;
 
-    switch (obj->oclass) {
+    oclass = obj->oclass;
+    /* prevent non-gemstone rings from being treated like gems */
+    if (oclass == RING_CLASS
+        && objects[obj->otyp].oc_material != GEMSTONE
+        && objects[obj->otyp].oc_material != MINERAL)
+        oclass = RANDOM_CLASS; /* something that's neither gem nor ring */
+
+    switch (oclass) {
     case GEM_CLASS: /* these have class-specific handling below */
     case RING_CLASS:
         if (tstone->otyp != TOUCHSTONE) {
@@ -3776,7 +3816,7 @@ struct obj *obj;
                       mon_nam(mtmp), mon_hand,
                       !otmp->bknown ? "ÅI" : "ÅD");
 #endif
-                otmp->bknown = 1;
+                set_bknown(otmp, 1);
                 gotit = FALSE; /* can't pull it free */
             }
             if (gotit) {
@@ -3917,7 +3957,7 @@ static const char
     cant_reach[] = "Ç±Ç±Ç©ÇÁÇªÇ±Ç÷ÇÕìÕÇ©Ç»Ç¢ÅD";
 
 /* find pos of monster in range, if only one monster */
-boolean
+STATIC_OVL boolean
 find_poleable_mon(pos, min_range, max_range)
 coord *pos;
 int min_range, max_range;
@@ -3973,7 +4013,7 @@ int x, y;
             && distu(x, y) <= polearm_range_max);
 }
 
-void
+STATIC_OVL void
 display_polearm_positions(state)
 int state;
 {
@@ -4795,7 +4835,7 @@ doapply()
                     pline("%s %s.", Yobjnam2(obj, "glow"), hcolor("brown"));
 */
                     pline("%sÇÕ%sãPÇ¢ÇΩÅD", xname(obj), jconj_adj(hcolor("íÉêFÇÃ")));
-                    obj->bknown = 1;
+                    set_bknown(obj, 1);
                 }
                 unbless(obj);
             }
@@ -4907,25 +4947,34 @@ boolean is_horn;
 
     if (Stoned)
         unfixable_trbl++;
+    if (Slimed)
+        unfixable_trbl++;
     if (Strangled)
         unfixable_trbl++;
     if (Wounded_legs && !u.usteed)
         unfixable_trbl++;
-    if (Slimed)
-        unfixable_trbl++;
-    /* lycanthropy is undesirable, but it doesn't actually make you feel bad */
+    /* lycanthropy is undesirable, but it doesn't actually make you feel bad
+       so don't count it as a trouble which can't be fixed */
 
-    if (!is_horn || (Confusion & ~TIMEOUT))
+    /*
+     * Unicorn horn can fix these when they're timed but not when
+     * they aren't.  Potion of restore ability doesn't touch them,
+     * so they're always unfixable for the not-unihorn case.
+     * [Most of these are timed only, so always curable via horn.
+     * An exception is Stunned, which can be forced On by certain
+     * polymorph forms (stalker, bats).]
+     */
+    if (Sick && (!is_horn || (Sick & ~TIMEOUT) != 0L))
         unfixable_trbl++;
-    if (!is_horn || (Sick & ~TIMEOUT))
+    if (Stunned && (!is_horn || (HStun & ~TIMEOUT) != 0L))
         unfixable_trbl++;
-    if (!is_horn || (HHallucination & ~TIMEOUT))
+    if (Confusion && (!is_horn || (HConfusion & ~TIMEOUT) != 0L))
         unfixable_trbl++;
-    if (!is_horn || (Vomiting & ~TIMEOUT))
+    if (Hallucination && (!is_horn || (HHallucination & ~TIMEOUT) != 0L))
         unfixable_trbl++;
-    if (!is_horn || (HStun & ~TIMEOUT))
+    if (Vomiting && (!is_horn || (Vomiting & ~TIMEOUT) != 0L))
         unfixable_trbl++;
-    if (!is_horn || (HDeaf & ~TIMEOUT))
+    if (Deaf && (!is_horn || (HDeaf & ~TIMEOUT) != 0L))
         unfixable_trbl++;
 
     return unfixable_trbl;

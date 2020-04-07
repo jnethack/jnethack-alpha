@@ -1,4 +1,4 @@
-/* NetHack 3.6	exper.c	$NHDT-Date: 1553296396 2019/03/22 23:13:16 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.6	exper.c	$NHDT-Date: 1562114352 2019/07/03 00:39:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,6 +19,8 @@ long
 newuexp(lev)
 int lev;
 {
+    if (lev < 1) /* for newuexp(u.ulevel - 1) when u.ulevel is 1 */
+        return 0L;
     if (lev < 10)
         return (10L * (1L << lev));
     if (lev < 20)
@@ -182,6 +184,11 @@ register int exper, rexp;
         u.uexp = newexp;
         if (flags.showexp)
             context.botl = TRUE;
+        /* even when experience points aren't being shown, experience level
+           might be highlighted with a percentage highlight rule and that
+           percentage depends upon experience points */
+        if (!context.botl && exp_percent_changing())
+            context.botl = TRUE;
     }
     /* newrexp will always differ from oldrexp unless they're LONG_MAX */
     if (newrexp != oldrexp) {
@@ -315,11 +322,11 @@ boolean incr; /* true iff via incremental experience growth */
         ++u.ulevel;
 #if 0 /*JP:T*/
         pline("Welcome %sto experience level %d.",
-              u.ulevelmax < u.ulevel ? "" : "back ",
+              (u.ulevelmax < u.ulevel) ? "" : "back ",
               u.ulevel);
 #else
         pline("%sƒŒƒxƒ‹%d‚É‚æ‚¤‚±‚»D",
-              u.ulevelmax < u.ulevel ? "" : "Ä‚Ñ",
+              (u.ulevelmax < u.ulevel) ? "" : "Ä‚Ñ",
               u.ulevel);
 #endif
         if (u.ulevelmax < u.ulevel)

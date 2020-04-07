@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1549074257 2019/02/02 02:24:17 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1573346192 2019/11/10 00:36:32 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -546,10 +546,16 @@ int trouble;
             what = rightglow;
         else if (otmp == uleft)
             what = leftglow;
-    decurse:
+ decurse:
         if (!otmp) {
             impossible("fix_worst_trouble: nothing to uncurse.");
             return;
+        }
+        if (otmp == uarmg && Glib) {
+            make_glib(0);
+            Your("%s are no longer slippery.", gloves_simple_name(uarmg));
+            if (!otmp->cursed)
+                break;
         }
         if (!Blind || (otmp == ublindf && Blindfolded_only)) {
 #if 0 /*JP*/
@@ -562,7 +568,7 @@ int trouble;
                  jconj_adj(hcolor(NH_AMBER)));
 #endif
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
-            otmp->bknown = !Hallucination;
+            otmp->bknown = !Hallucination; /* ok to skip set_bknown() */
         }
         uncurse(otmp);
         update_inventory();
@@ -641,7 +647,7 @@ int trouble;
             pline("%s %s.", Yobjnam2(otmp, "softly glow"), hcolor(NH_AMBER));
 */
             pline("%sは%sやわらかく輝いた．", y_monnam(u.usteed), hcolor(NH_AMBER));
-            otmp->bknown = TRUE;
+            set_bknown(otmp, 1);
         }
         uncurse(otmp);
         break;
@@ -889,12 +895,13 @@ aligntyp resp_god;
                   ? "をさげすみしか？"
                   : "に祈りを求めしか？");
 #endif
+        /* [why isn't this using verbalize()?] */
 #if 0 /*JP:T*/
         pline("\"Then die, %s!\"",
-              youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
+              (youmonst.data->mlet == S_HUMAN) ? "mortal" : "creature");
 #else
         pline("「死ね，%sよ！」",
-              youmonst.data->mlet == S_HUMAN ? "定命のもの" : "生物");
+              (youmonst.data->mlet == S_HUMAN) ? "定命のもの" : "生物");
 #endif
         summon_minion(resp_god, FALSE);
         break;
@@ -954,6 +961,20 @@ gcrownu()
     HPoison_resistance |= FROMOUTSIDE;
     godvoice(u.ualign.type, (char *) 0);
 
+    class_gift = STRANGE_OBJECT;
+    /* 3.3.[01] had this in the A_NEUTRAL case,
+       preventing chaotic wizards from receiving a spellbook */
+    if (Role_if(PM_WIZARD)
+        && (!uwep || (uwep->oartifact != ART_VORPAL_BLADE
+                      && uwep->oartifact != ART_STORMBRINGER))
+        && !carrying(SPE_FINGER_OF_DEATH)) {
+        class_gift = SPE_FINGER_OF_DEATH;
+    } else if (Role_if(PM_MONK) && (!uwep || !uwep->oartifact)
+               && !carrying(SPE_RESTORE_ABILITY)) {
+        /* monks rarely wield a weapon */
+        class_gift = SPE_RESTORE_ABILITY;
+    }
+
     obj = ok_wep(uwep) ? uwep : 0;
     already_exists = in_hand = FALSE; /* lint suppression */
     switch (u.ualign.type) {
@@ -981,27 +1002,22 @@ gcrownu()
             exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
 #if 0 /*JP:T*/
         verbalize("Thou art chosen to %s for My Glory!",
-                  already_exists && !in_hand ? "take lives" : "steal souls");
+                  ((already_exists && !in_hand)
+                   || class_gift != STRANGE_OBJECT) ? "take lives"
+                  : "steal souls");
 #else
         verbalize("汝，我が栄光のため%s者として選ばれん！",
-                  already_exists && !in_hand ?
-                              "生きながらえん" : "魂を奪いしためる");
+                  ((already_exists && !in_hand)
+                   || class_gift != STRANGE_OBJECT) ? "生きながらえん"
+                  : "魂を奪いしためる");
 #endif
         break;
     }
 
-    class_gift = STRANGE_OBJECT;
-    /* 3.3.[01] had this in the A_NEUTRAL case below,
-       preventing chaotic wizards from receiving a spellbook */
-    if (Role_if(PM_WIZARD)
-        && (!uwep || (uwep->oartifact != ART_VORPAL_BLADE
-                      && uwep->oartifact != ART_STORMBRINGER))
-        && !carrying(SPE_FINGER_OF_DEATH)) {
-        class_gift = SPE_FINGER_OF_DEATH;
-    make_splbk:
+    if (objects[class_gift].oc_class == SPBOOK_CLASS) {
         obj = mksobj(class_gift, TRUE, FALSE);
         bless(obj);
-        obj->bknown = TRUE;
+        obj->bknown = 1; /* ok to skip set_bknown() */
 /*JP
         at_your_feet("A spellbook");
 */
@@ -1016,11 +1032,6 @@ gcrownu()
                     obj = uwep; /* to be blessed,&c */
                 break;
             }
-    } else if (Role_if(PM_MONK) && (!uwep || !uwep->oartifact)
-               && !carrying(SPE_RESTORE_ABILITY)) {
-        /* monks rarely wield a weapon */
-        class_gift = SPE_RESTORE_ABILITY;
-        goto make_splbk;
     }
 
     switch (u.ualign.type) {
@@ -1106,7 +1117,7 @@ gcrownu()
         bless(obj);
         obj->oeroded = obj->oeroded2 = 0;
         obj->oerodeproof = TRUE;
-        obj->bknown = obj->rknown = TRUE;
+        obj->bknown = obj->rknown = 1; /* ok to skip set_bknown() */
         if (obj->spe < 1)
             obj->spe = 1;
         /* acquire skill in this weapon */
@@ -1264,7 +1275,7 @@ aligntyp g_align;
                               xname(uwep));
 #endif
                     uncurse(uwep);
-                    uwep->bknown = TRUE;
+                    uwep->bknown = 1; /* ok to bypass set_bknown() */
                     *repair_buf = '\0';
                 } else if (!uwep->blessed) {
                     if (!Blind) {
@@ -1287,7 +1298,7 @@ aligntyp g_align;
                               xname(uwep));
 #endif
                     bless(uwep);
-                    uwep->bknown = TRUE;
+                    uwep->bknown = 1; /* ok to bypass set_bknown() */
                     *repair_buf = '\0';
                 }
 
@@ -1412,7 +1423,7 @@ aligntyp g_align;
                              jconj_adj(hcolor(NH_AMBER)));
 #endif
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
-                        otmp->bknown = TRUE;
+                        otmp->bknown = 1; /* ok to bypass set_bknown() */
                         ++any;
                     }
                     uncurse(otmp);
@@ -1543,7 +1554,7 @@ boolean bless_water;
             && (bless_water ? !otmp->blessed : !otmp->cursed)) {
             otmp->blessed = bless_water;
             otmp->cursed = !bless_water;
-            otmp->bknown = bc_known;
+            otmp->bknown = bc_known; /* ok to bypass set_bknown() */
             changed += otmp->quan;
         } else if (otmp->oclass == POTION_CLASS)
             other = TRUE;
@@ -1893,7 +1904,7 @@ dosacrifice()
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
         if (!highaltar) {
-        too_soon:
+ too_soon:
             if (altaralign == A_NONE && Inhell)
                 /* hero has left Moloch's Sanctum so is in the process
                    of getting away with the Amulet (outside of Gehennom,
@@ -2057,7 +2068,7 @@ dosacrifice()
     }
 
     if (altaralign != u.ualign.type && highaltar) {
-    desecrate_high_altar:
+ desecrate_high_altar:
         /*
          * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
          * gets the god who owns it truly pissed off.
@@ -2489,11 +2500,13 @@ prayer_done() /* M. Stephenson (1.0.3b) */
         return 1;
     }
     if (Inhell) {
-/*JP
-        pline("Since you are in Gehennom, %s won't help you.",
-*/
-        pline("ゲヘナに%sの力は届かない．",
+#if 0 /*JP:T*/
+        pline("Since you are in Gehennom, %s can't help you.",
               align_gname(alignment));
+#else
+        pline("あなたはゲヘナにいるので，%sはあなたを助けられない．",
+              align_gname(alignment));
+#endif
         /* haltingly aligned is least likely to anger */
         if (u.ualign.record <= 0 || rnl(u.ualign.record))
             angrygods(u.ualign.type);
@@ -2533,6 +2546,7 @@ doturn()
 {
     /* Knights & Priest(esse)s only please */
     struct monst *mtmp, *mtmp2;
+    const char *Gname;
     int once, range, xlev;
 
     if (!Role_if(PM_PRIEST) && !Role_if(PM_KNIGHT)) {
@@ -2558,42 +2572,63 @@ doturn()
         return 0;
     }
     u.uconduct.gnostic++;
+    Gname = halu_gname(u.ualign.type);
 
+    /* [What about needing free hands (does #turn involve any gesturing)?] */
+    if (!can_chant(&youmonst)) {
+        /* "evilness": "demons and undead" is too verbose and too precise */
+        You("are %s upon %s to turn aside evilness.",
+            Strangled ? "not able to call" : "incapable of calling", Gname);
+        /* violates agnosticism due to intent; conduct tracking is not
+           supposed to affect play but we make an exception here:  use a
+           move if this is the first time agnostic conduct has been broken */
+        return (u.uconduct.gnostic == 1);
+    }
     if ((u.ualign.type != A_CHAOTIC
          && (is_demon(youmonst.data) || is_undead(youmonst.data)))
         || u.ugangr > 6) { /* "Die, mortal!" */
 /*JP
-        pline("For some reason, %s seems to ignore you.", u_gname());
+        pline("For some reason, %s seems to ignore you.", Gname);
 */
-        pline("なぜか，%sはあなたを無視したようだ．", u_gname());
+        pline("なぜか，%sはあなたを無視したようだ．", Gname);
         aggravate();
         exercise(A_WIS, FALSE);
         return 1;
     }
     if (Inhell) {
-/*JP
-        pline("Since you are in Gehennom, %s won't help you.", u_gname());
-*/
-        pline("ゲヘナに%sの力は届かない．", u_gname());
+#if 0 /*JP*/
+        pline("Since you are in Gehennom, %s %s help you.",
+              /* not actually calling upon Moloch but use alternate
+                 phrasing anyway if hallucinatory feedback says it's him */
+              Gname, !strcmp(Gname, Moloch) ? "won't" : "can't");
+#else
+        pline("あなたはゲヘナにいるので，%sはあなたを助け%sない．",
+              /* not actually calling upon Moloch but use alternate
+                 phrasing anyway if hallucinatory feedback says it's him */
+              Gname, !strcmp(Gname, Moloch) ? "" : "られ");
+#endif
         aggravate();
         return 1;
     }
 /*JP
-    pline("Calling upon %s, you chant an arcane formula.", u_gname());
+    pline("Calling upon %s, you chant an arcane formula.", Gname);
 */
-    pline("%sに祈りを求めると，あなたは不可思議な言葉の聖歌を聞いた．", u_gname());
+    pline("%sに祈りを求めると，あなたは不可思議な言葉の聖歌を聞いた．", Gname);
     exercise(A_WIS, TRUE);
 
     /* note: does not perform unturn_dead() on victims' inventories */
-    range = BOLT_LIM + (u.ulevel / 5); /* 5 to 11 */
+    range = BOLT_LIM + (u.ulevel / 5); /* 8 to 14 */
     range *= range;
     once = 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp->nmon;
-
         if (DEADMONSTER(mtmp))
             continue;
-        if (!cansee(mtmp->mx, mtmp->my) || distu(mtmp->mx, mtmp->my) > range)
+        /* 3.6.3: used to use cansee() here but the purpose is to prevent
+           #turn operating through walls, not to require that the hero be
+           able to see the target location */
+        if (!couldsee(mtmp->mx, mtmp->my)
+            || distu(mtmp->mx, mtmp->my) > range)
             continue;
 
         if (!mtmp->mpeaceful
@@ -2615,15 +2650,20 @@ doturn()
                 /* this is intentional, lichs are tougher
                    than zombies. */
                 case S_LICH:
-                    xlev += 2; /*FALLTHRU*/
+                    xlev += 2;
+                    /*FALLTHRU*/
                 case S_GHOST:
-                    xlev += 2; /*FALLTHRU*/
+                    xlev += 2;
+                    /*FALLTHRU*/
                 case S_VAMPIRE:
-                    xlev += 2; /*FALLTHRU*/
+                    xlev += 2;
+                    /*FALLTHRU*/
                 case S_WRAITH:
-                    xlev += 2; /*FALLTHRU*/
+                    xlev += 2;
+                    /*FALLTHRU*/
                 case S_MUMMY:
-                    xlev += 2; /*FALLTHRU*/
+                    xlev += 2;
+                    /*FALLTHRU*/
                 case S_ZOMBIE:
                     if (u.ulevel >= xlev && !resist(mtmp, '\0', 0, NOTELL)) {
                         if (u.ualign.type == A_CHAOTIC) {
@@ -2642,6 +2682,22 @@ doturn()
             }
         }
     }
+
+    /*
+     *  There is no detrimental effect on self for successful #turn
+     *  while in demon or undead form.  That can only be done while
+     *  chaotic oneself (see "For some reason" above) and chaotic
+     *  turning only makes targets peaceful.
+     *
+     *  Paralysis duration probably ought to be based on the strengh
+     *  of turned creatures rather than on turner's level.
+     *  Why doesn't this honor Free_action?  [Because being able to
+     *  repeat #turn every turn would be too powerful.  Maybe instead
+     *  of nomul(-N) we should add the equivalent of mon->mspec_used
+     *  for the hero and refuse to #turn when it's non-zero?  Or have
+     *  both and u.uspec_used only matters when Free_action prevents
+     *  the brief paralysis?]
+     */
     nomul(-(5 - ((u.ulevel - 1) / 6))); /* -5 .. -1 */
 /*JP
     multi_reason = "trying to turn the monsters";
@@ -2836,22 +2892,35 @@ register int x, y;
 {
     aligntyp altaralign = a_align(x, y);
 
-    if (!strcmp(align_gname(altaralign), u_gname())) {
+    if (u.ualign.type == altaralign && u.ualign.record > -rn2(4)) {
 /*JP
         godvoice(altaralign, "How darest thou desecrate my altar!");
 */
         godvoice(altaralign, "汝，我が祭壇を汚すか！");
         (void) adjattrib(A_WIS, -1, FALSE);
+        u.ualign.record--;
     } else {
-/*JP
-        pline("A voice (could it be %s?) whispers:", align_gname(altaralign));
-*/
-        pline("ささやき声(たぶん%s？)が聞こえる:", align_gname(altaralign));
+#if 0 /*JP:T*/
+        pline("%s %s%s:",
+              !Deaf ? "A voice (could it be"
+                    : "Despite your deafness, you seem to hear",
+              align_gname(altaralign),
+              !Deaf ? "?) whispers" : " say");
+#else
+        pline("%s %s%s:",
+              !Deaf ? "ささやき声(たぶん"
+                    : "耳は聞こえないが，",
+              align_gname(altaralign),
+              !Deaf ? "？)が聞こえる" : "が話しているのが聞こえた気がした");
+#endif
 /*JP
         verbalize("Thou shalt pay, infidel!");
 */
         verbalize("異端者よ！報いを受けよ！");
-        change_luck(-1);
+        /* higher luck is more likely to be reduced; as it approaches -5
+           the chance to lose another point drops down, eventually to 0 */
+        if (Luck > -5 && rn2(Luck + 6))
+            change_luck(rn2(20) ? -1 : -2);
     }
 }
 

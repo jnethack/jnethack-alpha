@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1543492132 2018/11/29 11:48:52 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1559670611 2019/06/04 17:50:11 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -207,7 +207,7 @@ struct obj *wep;
             pline("%sは勝手にあなたの%sに装備された．",
                   xname(wep), body_part(HAND));
 #endif
-            wep->bknown = TRUE;
+            set_bknown(wep, 1);
         } else {
             /* The message must be printed before setuwep (since
              * you might die and be revived from changing weapons),
@@ -804,7 +804,7 @@ can_twoweapon()
         ; /* must be life-saved to reach here; return FALSE */
     } else if (Glib || uswapwep->cursed) {
         if (!Glib)
-            uswapwep->bknown = TRUE;
+            set_bknown(uswapwep, 1);
         drop_uswapwep();
     } else
         return TRUE;
@@ -932,7 +932,7 @@ register int amount;
                 Sprintf(buf, "%sは%sオーラにつつまれた．",
                         xname(uwep), hcolor(NH_AMBER));
 #endif
-                uwep->bknown = !Hallucination;
+                uwep->bknown = !Hallucination; /* ok to bypass set_bknown() */
             } else {
                 /* cursed tin opener is wielded in right hand */
 /*JP
@@ -1102,7 +1102,7 @@ welded(obj)
 register struct obj *obj;
 {
     if (obj && obj == uwep && will_weld(obj)) {
-        obj->bknown = TRUE;
+        set_bknown(obj, 1);
         return 1;
     }
     return 0;

@@ -1526,7 +1526,7 @@ struct obj *obj;
             is_pool(u.ux, u.uy) ? "…–Ê‰º" : "—nŠâ‚Ì’†");
 #endif
     } else if ((trap = t_at(u.ux, u.uy)) != 0
-               && uteetering_at_seen_pit(trap)) {
+               && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         dotrap(trap, FORCEBUNGLE);
         /* might escape trap and still be teetering at brink */
         if (!u.utrap)

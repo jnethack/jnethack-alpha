@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1545597424 2018/12/23 20:37:04 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1568508711 2019/09/15 00:51:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -494,14 +494,19 @@ void
 readmail(otmp)
 struct obj *otmp UNUSED;
 {
-    static char *junk[] = {
-        NULL, /* placeholder for "Report bugs to <devteam@nethack.org>.", */
-/*JP
-        "Please disregard previous letter.", "Welcome to NetHack.",
-*/
-        "前のメールは忘れてください．", "JNetHackへようこそ！",
+    static const char *junk[] = {
+#if 0 /*JP:T*/
+        "Report bugs to <%s>.", /*** must be first entry ***/
+        "Please disregard previous letter.",
+        "Welcome to NetHack.",
+#else
+        "Report bugs to <%s>.", /*** must be first entry ***/
+        "前のメールは忘れてください．",
+        "JNetHackへようこそ！",
+#endif
 #ifdef AMIGA
-        "Only Amiga makes it possible.", "CATS have all the answers.",
+        "Only Amiga makes it possible.",
+        "CATS have all the answers.",
 #endif
 /*JP
         "This mail complies with the Yendorian Anti-Spam Act (YASA)",
@@ -519,24 +524,59 @@ struct obj *otmp UNUSED;
         "Please return to sender (Asmodeus)",
 */
         "送信者(アスモデウス)に送り返してください",
+        /* when enclosed by "It reads:  \"...\"", this is too long
+           for an ordinary 80-column display so wraps to a second line
+           (suboptimal but works correctly);
+           dollar sign and fractional zorkmids are inappropriate within
+           nethack but are suitable for typical dysfunctional spam mail */
 /*JP
      "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
 */
      "レベルアップの薬がたったの1980円!祝福保証!",
+        /* DEVTEAM_URL will be substituted for "%s"; terminating punctuation
+           (formerly "!") has deliberately been omitted so that it can't be
+           mistaken for part of the URL (unfortunately that is still followed
+           by a closing quote--in the pline below, not the data here) */
 /*JP
-        "Invitation: Visit the NetHack web site at http://www.nethack.org!"
+        "Invitation: Visit the NetHack web site at %s"
 */
-        "招待状: NetHack ウェブサイト http://www.nethack.org に来てね!"
+        "招待状: NetHack ウェブサイト %s に来てね!"
     };
 
     /* XXX replace with more general substitution code and add local
-     * contact message.  Also use DEVTEAM_URL */
-    if (junk[0] == NULL) {
-#define BUGS_FORMAT "Report bugs to <%s>."
-        /* +2 from '%s' suffices as substitute for usual +1 for terminator */
-        junk[0] = (char *) alloc(strlen(BUGS_FORMAT) + strlen(DEVTEAM_EMAIL));
-        Sprintf(junk[0], BUGS_FORMAT, DEVTEAM_EMAIL);
-#undef BUGS_FORMAT
+     * contact message.
+     *
+     * FIXME:  this allocated memory is never freed.  However, if the
+     * game is restarted, the junk[] update will be a no-op for second
+     * and subsequent runs and this updated text will still be appropriate.
+     */
+    if (index(junk[0], '%')) {
+        char *tmp;
+        int i;
+
+        for (i = 0; i < SIZE(junk); ++i) {
+            if (index(junk[i], '%')) {
+                if (i == 0) {
+                    /* +2 from '%s' in junk[0] suffices as substitute
+                       for usual +1 for terminator */
+                    tmp = (char *) alloc(strlen(junk[0])
+                                         + strlen(DEVTEAM_EMAIL));
+                    Sprintf(tmp, junk[0], DEVTEAM_EMAIL);
+                    junk[0] = tmp;
+                } else if (strstri(junk[i], "web site")) {
+                    /* as with junk[0], room for terminator is present */
+                    tmp = (char *) alloc(strlen(junk[i])
+                                         + strlen(DEVTEAM_URL));
+                    Sprintf(tmp, junk[i], DEVTEAM_URL);
+                    junk[i] = tmp;
+                } else {
+                    /* could check for "%%" but unless that becomes needed,
+                       handling it is more complicated than necessary */
+                    impossible("fake mail #%d has undefined substitution", i);
+                    junk[i] = "Bad fake mail...";
+                }
+            }
+        }
     }
     if (Blind) {
 /*JP

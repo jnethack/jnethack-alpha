@@ -1,4 +1,4 @@
-/* NetHack 3.6	mcastu.c	$NHDT-Date: 1436753517 2015/07/13 02:11:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	mcastu.c	$NHDT-Date: 1567418129 2019/09/02 09:55:29 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -92,10 +92,12 @@ boolean undirected;
         pline("%sは%s指差し，呪いをかけた．", Monnam(mtmp), point_msg);
     } else if ((!(moves % 4) || !rn2(4))) {
         if (!Deaf)
-/*JP
-            Norep("You hear a mumbled curse.");
-*/
+#if 0 /*JP*/
+            Norep("You hear a mumbled curse.");   /* Deaf-aware */
+#else
+            /*JP:TODO:Deaf対応*/
             Norep("呪いの言葉をつぶやく声を聞いた．");
+#endif
     }
 }
 
@@ -298,7 +300,7 @@ boolean foundyou;
               canspotmon(mtmp) ? Monnam(mtmp) : "Something",
               is_undirected_spell(mattk->adtyp, spellnum)
                   ? ""
-                  : (Invisible && !perceives(mtmp->data)
+                  : (Invis && !perceives(mtmp->data)
                      && (mtmp->mux != u.ux || mtmp->muy != u.uy))
                         ? " at a spot near you"
                         : (Displaced
@@ -496,20 +498,20 @@ int spellnum;
 
         count = nasty(mtmp); /* summon something nasty */
 #endif
-        if (mtmp->iswiz)
+        if (mtmp->iswiz) {
 /*JP
             verbalize("Destroy the thief, my pet%s!", plur(count));
 */
             verbalize("盗賊を殺せ！我が下僕よ！");
-        else {
+        } else {
 #if 0 /*JP*/
-            const char *mappear =
-                (count == 1) ? "A monster appears" : "Monsters appear";
+            const char *mappear = (count == 1) ? "A monster appears"
+                                               : "Monsters appear";
 #endif
 
             /* messages not quite right if plural monsters created but
                only a single monster is seen */
-            if (Invisible && !perceives(mtmp->data)
+            if (Invis && !perceives(mtmp->data)
                 && (mtmp->mux != u.ux || mtmp->muy != u.uy))
 #if 0 /*JP:T*/
                 pline("%s around a spot near you!", mappear);
@@ -808,11 +810,11 @@ int spellnum;
                     pline("%sが現れた．", arg);
             }
 
-            /* seen caster, possibly producing unseen--or just one--critters;
-               hero is told what the caster is doing and doesn't necessarily
-               observe complete accuracy of that caster's results (in other
-               words, no need to fuss with visibility or singularization;
-               player is told what's happening even if hero is unconscious) */
+        /* seen caster, possibly producing unseen--or just one--critters;
+           hero is told what the caster is doing and doesn't necessarily
+           observe complete accuracy of that caster's results (in other
+           words, no need to fuss with visibility or singularization;
+           player is told what's happening even if hero is unconscious) */
         } else if (!success)
 /*JP
             fmt = "%s casts at a clump of sticks, but nothing happens.";
@@ -823,7 +825,7 @@ int spellnum;
             fmt = "%s transforms a clump of sticks into snakes!";
 */
             fmt = "%sは棒切れをヘビに変えた！";
-        else if (Invisible && !perceives(mtmp->data)
+        else if (Invis && !perceives(mtmp->data)
                  && (mtmp->mux != u.ux || mtmp->muy != u.uy))
 /*JP
             fmt = "%s summons insects around a spot near you!";

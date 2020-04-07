@@ -84,7 +84,8 @@ boolean forceshow;
             } else if (!in_fcorridor(grd, u.ux, u.uy)) {
                 if (mtmp->mtame)
                     yelp(mtmp);
-                (void) rloc(mtmp, FALSE);
+                if (!rloc(mtmp, TRUE))
+                    m_into_limbo(mtmp);
             }
         }
         lev = &levl[fcx][fcy];
@@ -903,9 +904,10 @@ register struct monst *grd;
         if (!u_in_vault
             && (grd_in_vault || (in_fcorridor(grd, grd->mx, grd->my)
                                  && !in_fcorridor(grd, u.ux, u.uy)))) {
-            (void) rloc(grd, FALSE);
+            (void) rloc(grd, TRUE);
             wallify_vault(grd);
-            (void) clear_fcorr(grd, TRUE);
+            if (!in_fcorridor(grd, grd->mx, grd->my))
+                (void) clear_fcorr(grd, TRUE);
             goto letknow;
         }
         if (!in_fcorridor(grd, grd->mx, grd->my))

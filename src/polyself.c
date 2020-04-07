@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1556497911 2019/04/29 00:31:51 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1573290419 2019/11/09 09:06:59 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.135 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,6 +28,7 @@
 
 STATIC_DCL void FDECL(check_strangling, (BOOLEAN_P));
 STATIC_DCL void FDECL(polyman, (const char *, const char *));
+STATIC_DCL void FDECL(dropp, (struct obj *));
 STATIC_DCL void NDECL(break_armor);
 STATIC_DCL void FDECL(drop_weapon, (int));
 STATIC_DCL int FDECL(armor_to_dragon, (int));
@@ -181,7 +182,7 @@ polyman(fmt, arg)
 const char *fmt, *arg;
 {
     boolean sticky = (sticks(youmonst.data) && u.ustuck && !u.uswallow),
-            was_mimicking = (U_AP_TYPE == M_AP_OBJECT);
+            was_mimicking = (U_AP_TYPE != M_AP_NOTHING);
     boolean was_blind = !!Blind;
 
     if (Upolyd) {
@@ -204,6 +205,7 @@ const char *fmt, *arg;
         if (multi < 0)
             unmul("");
         youmonst.m_ap_type = M_AP_NOTHING;
+        youmonst.mappearance = 0;
     }
 
     newsym(u.ux, u.uy);
@@ -704,6 +706,7 @@ int mntmp;
     if (mons[mntmp].mlet != S_MIMIC) {
         /* as in polyman() */
         youmonst.m_ap_type = M_AP_NOTHING;
+        youmonst.mappearance = 0;
     }
     if (is_male(&mons[mntmp])) {
         if (flags.female)
@@ -783,7 +786,7 @@ int mntmp;
     }
     check_strangling(FALSE); /* maybe stop strangling */
     if (nohands(youmonst.data))
-        Glib = 0;
+        make_glib(0);
 
     /*
     mlvl = adj_lev(&mons[mntmp]);
@@ -1025,6 +1028,33 @@ int mntmp;
     return 1;
 }
 
+/* dropx() jacket for break_armor() */
+STATIC_OVL void
+dropp(obj)
+struct obj *obj;
+{
+    struct obj *otmp;
+
+    /*
+     * Dropping worn armor while polymorphing might put hero into water
+     * (loss of levitation boots or water walking boots that the new
+     * form can't wear), where emergency_disrobe() could remove it from
+     * inventory.  Without this, dropx() could trigger an 'object lost'
+     * panic.  Right now, boots are the only armor which might encounter
+     * this situation, but handle it for all armor.
+     *
+     * Hypothetically, 'obj' could have merged with something (not
+     * applicable for armor) and no longer be a valid pointer, so scan
+     * inventory for it instead of trusting obj->where.
+     */
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (otmp == obj) {
+            dropx(obj);
+            break;
+        }
+    }
+}
+
 STATIC_OVL void
 break_armor()
 {
@@ -1049,7 +1079,7 @@ break_armor()
 */
                 Your("%sは脱げ落ちた！", cloak_simple_name(otmp));
                 (void) Cloak_off();
-                dropx(otmp);
+                dropp(otmp);
             } else {
 /*JP
                 Your("%s tears apart!", cloak_simple_name(otmp));
@@ -1075,7 +1105,7 @@ break_armor()
 */
             Your("鎧はあなたのまわりに落ちた！");
             (void) Armor_gone();
-            dropx(otmp);
+            dropp(otmp);
         }
         if ((otmp = uarmc) != 0) {
             if (is_whirly(youmonst.data))
@@ -1089,7 +1119,7 @@ break_armor()
 */
                 You("%sから縮み出た！", cloak_simple_name(otmp));
             (void) Cloak_off();
-            dropx(otmp);
+            dropp(otmp);
         }
         if ((otmp = uarmu) != 0) {
             if (is_whirly(youmonst.data))
@@ -1103,7 +1133,7 @@ break_armor()
 */
                 You("シャツよりずっと小さくなった！");
             setworn((struct obj *) 0, otmp->owornmask & W_ARMU);
-            dropx(otmp);
+            dropp(otmp);
         }
     }
     if (has_horns(youmonst.data)) {
@@ -1130,7 +1160,7 @@ break_armor()
                      surface(u.ux, u.uy));
 #endif
                 (void) Helmet_off();
-                dropx(otmp);
+                dropp(otmp);
             }
         }
     }
@@ -1145,7 +1175,8 @@ break_armor()
             You("小手%sを落した！", uwep ? "や武器" : "");
             drop_weapon(0);
             (void) Gloves_off();
-            dropx(otmp);
+            /* Glib manipulation (ends immediately) handled by Gloves_off */
+            dropp(otmp);
         }
         if ((otmp = uarms) != 0) {
 /*JP
@@ -1153,7 +1184,7 @@ break_armor()
 */
             You("もう盾を持ってられない！");
             (void) Shield_off();
-            dropx(otmp);
+            dropp(otmp);
         }
         if ((otmp = uarmh) != 0) {
             if (donning(otmp))
@@ -1166,7 +1197,7 @@ break_armor()
                  surface(u.ux, u.uy));
 #endif
             (void) Helmet_off();
-            dropx(otmp);
+            dropp(otmp);
         }
     }
     if (nohands(youmonst.data) || verysmall(youmonst.data)
@@ -1188,7 +1219,7 @@ break_armor()
                      verysmall(youmonst.data) ? "滑り落ちた" : "脱げ落ちた");
 #endif
             (void) Boots_off();
-            dropx(otmp);
+            dropp(otmp);
         }
     }
 }
@@ -1262,6 +1293,10 @@ int alone;
                 updateinv = FALSE;
             else if (candropwep)
                 dropx(otmp);
+            /* [note: dropp vs dropx -- if heart of ahriman is wielded, we
+               might be losing levitation by dropping it; but that won't
+               happen until the drop, unlike Boots_off() dumping hero into
+               water and triggering emergency_disrobe() before dropx()] */
 
             if (updateinv)
                 update_inventory();

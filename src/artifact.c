@@ -998,14 +998,10 @@ boolean vis;               /* whether the action can be seen */
 char *hittee;              /* target's name: "you" or mon_nam(mdef) */
 {
     struct permonst *old_uasmon;
-#if 0 /*JP*//* not used */
-    const char *verb, *fakename;
-#else
     const char *verb;
-#endif
     boolean youattack = (magr == &youmonst), youdefend = (mdef == &youmonst),
             resisted = FALSE, do_stun, do_confuse, result;
-    int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;
+    int attack_indx, fakeidx, scare_dieroll = MB_MAX_DIEROLL / 2;
 
     result = FALSE; /* no message given yet */
     /* the most severe effects are less likely at higher enchantment */
@@ -1165,16 +1161,14 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
             mdef->mconf = 1;
     }
 
-#if 0 /*JP*//* not used */
-    /* now give message(s) describing side-effects;
-       don't let vtense() be fooled by assigned name ending in 's' */
-    fakename = youdefend ? "you" : "mon";
-#endif
+    /* now give message(s) describing side-effects; Use fakename
+       so vtense() won't be fooled by assigned name ending in 's' */
+    fakeidx = youdefend ? 1 : 0;
     if (youattack || youdefend || vis) {
         (void) upstart(hittee); /* capitalize */
         if (resisted) {
 /*JP
-            pline("%s %s!", hittee, vtense(fakename, "resist"));
+            pline("%s %s!", hittee, vtense(fakename[fakeidx], "resist"));
 */
             pline("%s‚Í–h‚¢‚¾I", hittee);
             shieldeff(youdefend ? u.ux : mdef->mx,
@@ -1184,14 +1178,14 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
             char buf[BUFSZ];
 
             buf[0] = '\0';
-#if 0 /*JP:T*/
+#if 0 /*JP*/
             if (do_stun)
                 Strcat(buf, "stunned");
             if (do_stun && do_confuse)
                 Strcat(buf, " and ");
             if (do_confuse)
                 Strcat(buf, "confused");
-            pline("%s %s %s%c", hittee, vtense(fakename, "are"), buf,
+            pline("%s %s %s%c", hittee, vtense(fakename[fakeidx], "are"), buf,
                   (do_stun && do_confuse) ? '!' : '.');
 #else
             if (do_stun && do_confuse)
