@@ -19,8 +19,7 @@ addons:
     - gcc@9
 
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sh japanese/set_mac.sh ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh japanese/set_lnx.sh ; fi
+   - sh configure
 
 script:
   - make install
