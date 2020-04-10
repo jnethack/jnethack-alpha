@@ -599,7 +599,6 @@ int how;
               ‰ö•¨‚É‚æ‚éê‡‚Í "‚ÉE‚³‚ê‚½" ‚ğ•â‚¤B
          */
         killer.format = KILLED_SUFFIX;
-        done(DIED);
     }
 #endif
     done(how);
