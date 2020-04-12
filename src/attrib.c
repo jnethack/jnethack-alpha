@@ -29,7 +29,7 @@ static const char
 #else
     *const minusattr[] = { "ã‚¢", "‹ğ‚©‚¾",
                            "ŠÔ”²‚¯‚¾", "•sŠí—p‚¾",
-                           "‚Ğã‚¾","X‚¢" };
+                           "‚Ğã‚¾", "X‚¢" };
 #endif
 /* also used by enlightenment for non-abbreviated status info */
 const char
@@ -120,7 +120,7 @@ static const struct innate {
 /*JP
                  { 17, &(HTeleport_control), "controlled", "uncontrolled" },
 */
-                 { 17, &(HTeleport_control), "§Œä—Í‚ğ“¾‚½","§Œä—Í‚ğ¸‚Á‚½" },
+                 { 17, &(HTeleport_control), "§Œä—Í‚ğ“¾‚½", "§Œä—Í‚ğ¸‚Á‚½" },
                  { 0, 0, 0, 0 } },
 
 /*JP
@@ -180,7 +180,7 @@ static const struct innate {
 /*JP
                  { 17, &(HTeleport_control), "controlled", "uncontrolled" },
 */
-                 { 17, &(HTeleport_control), "§Œä—Í‚ğ“¾‚½","§Œä—Í‚ğ¸‚Á‚½" },
+                 { 17, &(HTeleport_control), "§Œä—Í‚ğ“¾‚½", "§Œä—Í‚ğ¸‚Á‚½" },
                  { 0, 0, 0, 0 } },
 
   /* Intrinsics conferred by race */

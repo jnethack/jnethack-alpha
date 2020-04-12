@@ -3377,9 +3377,15 @@ doeat()
         } else if (!already_partly_eaten) {
             fprefx(otmp);
         } else {
+#if 0 /*JP:T*/
             You("%s %s.",
                 (context.victual.reqtime == 1) ? "eat" : "begin eating",
                 doname(otmp));
+#else
+            You("%s‚ğH‚×%s‚½D",
+                doname(otmp),
+                (context.victual.reqtime == 1) ? "" : "‚Í‚¶‚ß");
+#endif
         }
     }
 

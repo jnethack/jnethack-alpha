@@ -3355,7 +3355,10 @@ struct monst *mon;
                       flags.female ? "チャーミング" : "すてき");
 #endif
         else if (seewho)
+/*JP
             pline("%s appears to sigh.", Monnam(mon));
+*/
+            pline("%sはため息をついたようだ．", Monnam(mon));
         /* else no regret message if can't see or hear seducer */
 
         if (!tele_restrict(mon))
@@ -3576,7 +3579,10 @@ const char *str;
 
     /* being deaf overrides confirmation prompt for high charisma */
     if (Deaf) {
+/*JP
         pline("%s takes off your %s.", seducer, str);
+*/
+        pline("%sはあなたの%sを脱がせた．", seducer, str);
     } else if (rn2(20) < ACURR(A_CHA)) {
 #if 0 /*JP:T*/
         Sprintf(qbuf, "\"Shall I remove your %s, %s?\"", str,

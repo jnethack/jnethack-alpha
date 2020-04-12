@@ -2000,7 +2000,7 @@ int *spell_no;
         Sprintf(buf, "%-20s     Level %-12s Fail Retention", "    Name",
                 "Category");
 #else
-        Sprintf(buf, "%-20s     Level  %-12s ¬Œ÷—¦", "    Name", "•ª—Ş");
+        Sprintf(buf, "%-20s     Level  %-12s ¬Œ÷—¦", "    –¼‘O", "•ª—Ş");
 #endif
         fmt = "%-20s  %2d   %-12s %3d%% %9s";
     } else {

@@ -553,7 +553,10 @@ int trouble;
         }
         if (otmp == uarmg && Glib) {
             make_glib(0);
+/*JP
             Your("%s are no longer slippery.", gloves_simple_name(uarmg));
+*/
+            Your("%sはもうぬるぬるではなくなった．", gloves_simple_name(uarmg));
             if (!otmp->cursed)
                 break;
         }
@@ -606,10 +609,10 @@ int trouble;
             if (eyecount(youmonst.data) != 1)
                 eyes = makeplural(eyes);
 #endif
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             Sprintf(msgbuf, "Your %s %s better", eyes, vtense(eyes, "feel"));
 #else
-            Sprintf(msgbuf, "%sが回復したような気がした．", body_part(EYE));
+            Sprintf(msgbuf, "%sが回復したような気がした", body_part(EYE));
 #endif
             u.ucreamed = 0;
             make_blinded(0L, FALSE);
@@ -617,11 +620,19 @@ int trouble;
         if (cure_deaf) {
             make_deaf(0L, FALSE);
             if (!Deaf)
+#if 0 /*JP:T*/
                 Sprintf(eos(msgbuf), "%s can hear again",
                         !*msgbuf ? "You" : " and you");
+#else
+                Sprintf(eos(msgbuf), "%sまた聞こえるようになった",
+                        !*msgbuf ? "" : "，そして");
+#endif
         }
         if (*msgbuf)
+/*JP
             pline("%s.", msgbuf);
+*/
+            pline("%s．", msgbuf);
         break;
     }
     case TROUBLE_WOUNDED_LEGS:
@@ -2577,8 +2588,13 @@ doturn()
     /* [What about needing free hands (does #turn involve any gesturing)?] */
     if (!can_chant(&youmonst)) {
         /* "evilness": "demons and undead" is too verbose and too precise */
+#if 0 /*JP*/
         You("are %s upon %s to turn aside evilness.",
             Strangled ? "not able to call" : "incapable of calling", Gname);
+#else
+        You("悪を退けるために%sを呼び出す%sない．",
+            Gname, Strangled ? "ことができ" : "能力が");
+#endif
         /* violates agnosticism due to intent; conduct tracking is not
            supposed to affect play but we make an exception here:  use a
            move if this is the first time agnostic conduct has been broken */

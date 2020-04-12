@@ -233,12 +233,12 @@ char *buf;
         "このＴシャツを買うお金がなかったのでこれは盗んだ！",
         "マインドフレヤ氏ね",
         "私はパンツを穿いていません",
-        "Down with the living!",
+        "生活をぶっ壊せ！",
         "プリン農家",
         "ベジタリアン",
         "やあ，私が『戦争』だ！",
-        "It is better to light a candle than to curse the darkness",
-        "It is easier to curse the darkness than to light a candle",
+        "暗いと不平を言うよりも，すすんであかりをつけましょう",
+        "すすんであかりをつけるより，暗いと不平を言う方が簡単",
         /* expanded "rock--paper--scissors" featured in TV show "Big Bang
            Theory" although they didn't create it (and an actual T-shirt
            with pentagonal diagram showing which choices defeat which) */

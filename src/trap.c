@@ -648,11 +648,19 @@ unsigned ftflags;
     }
     if ((Flying || is_clinger(youmonst.data))
         && (ftflags & TOOKPLUNGE) && td && t)
+#if 0 /*JP:T*/
         You("%s down %s!",
             Flying ? "swoop" : "deliberately drop",
             (t->ttyp == TRAPDOOR)
                 ? "through the trap door"
                 : "into the gaping hole");
+#else
+        You("%s‚É%sI",
+            (t->ttyp == TRAPDOOR)
+                ? "—Ž‚µ”à"
+                : "ŒŠ",
+            Flying ? "‹}~‰º‚µ‚½" : "‚í‚´‚Æ—Ž‚¿‚½");
+#endif
 
     if (*u.ushops)
         shopdig(1);

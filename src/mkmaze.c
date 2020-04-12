@@ -1370,7 +1370,11 @@ fumaroles()
         }
     }
     if (snd && !Deaf)
+#if 0 /*JP:T*/
         Norep("You hear a %swhoosh!", loud ? "loud " : "");  /* Deaf-aware */
+#else
+        Norep("%sƒVƒ…[‚Æ‚¢‚¤‰¹‚ğ•·‚¢‚½I", loud ? "‘å‚«‚È" : "");  /* Deaf-aware */
+#endif
 }
 
 /*

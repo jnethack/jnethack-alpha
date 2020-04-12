@@ -1597,16 +1597,24 @@ boolean thrown, verbose;
     if (verbose
         && ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef))
             || (magr == &youmonst && distu(mdef->mx, mdef->my) <= 2))) {
+#if 0 /*JP*/
         static const char harmlessly_thru[] = " harmlessly through ";
+#endif
 
+/*JP
         what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
+*/
+        what = (!obj || shade_aware(obj)) ? "UŒ‚" : cxname(obj);
+/*JP
         target = youdef ? "you" : mon_nam(mdef);
+*/
+        target = youdef ? "‚ ‚È‚½" : mon_nam(mdef);
         if (!thrown) {
 /*JP
             whose = youagr ? "Your" : s_suffix(Monnam(magr));
 */
             whose = youagr ? "‚ ‚È‚½‚Ì" : s_suffix(Monnam(magr));
-#if 0 /*JP*/
+#if 0 /*JP:T*/
             pline("%s %s %s%s%s.", whose, what,
                   vtense(what, "pass"), harmlessly_thru, target);
 #else
@@ -1614,8 +1622,12 @@ boolean thrown, verbose;
                   target);
 #endif
         } else {
+#if 0 /*JP:T*/
             pline("%s %s%s%s.", The(what), /* note: not pline_The() */
                   vtense(what, "pass"), harmlessly_thru, target);
+#else
+            pline("%s‚Í%s‚ğ’Ê‚è‚Ê‚¯‚½D", what, target);
+#endif
         }
         if (!youdef && !canspotmon(mdef))
             map_invisible(mdef->mx, mdef->my);

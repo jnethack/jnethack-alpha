@@ -691,8 +691,13 @@ char *enterstring;
                   Shknam(shkp));
 #endif
         else
+#if 0 /*JP:T*/
             pline("%s is combing through %s inventory list.",
                   Shknam(shkp), noit_mhis(shkp));
+#else
+            pline("%s‚Í%s‚Ì‚¿•¨ˆê——‚ÉŒ‹‡‚³‚ê‚½D",
+                  Shknam(shkp), noit_mhis(shkp));
+#endif
     } else {
         if (!Deaf && !muteshk(shkp))
 #if 0 /*JP:T*/
@@ -3707,7 +3712,7 @@ xchar x, y;
                       delta, currency(delta), eshkp->credit,
                       currency(eshkp->credit));
 #else
-                pline("—a‚¯‹à‚É%ld%s’Ç‰Á‚³‚ê‚½; ‡Œv‚Í%ld%s‚É‚È‚Á‚½D.",
+                pline("—a‚¯‹à‚É%ld%s’Ç‰Á‚³‚ê‚½; ‡Œv‚Í%ld%s‚É‚È‚Á‚½D",
                       delta, currency(delta), eshkp->credit,
                       currency(eshkp->credit));
 #endif
@@ -4243,7 +4248,10 @@ boolean croaked;
     if (saw_untrap == 1 && shk_inv
         && (shk_inv->otyp == BEARTRAP || shk_inv->otyp == LAND_MINE)
         && canseemon(shkp)) {
+/*JP
         pline("%s untraps %s.", Shknam(shkp), ansimpleoname(shk_inv));
+*/
+        pline("%s‚Í%s‚Ìã©‚ğ‚Í‚¸‚µ‚½D", Shknam(shkp), ansimpleoname(shk_inv));
         /* we've already reported this trap (and know it's the only one) */
         saw_untrap = 0;
         skip_msg = !(saw_walls || saw_door || saw_floor);
@@ -5978,9 +5986,15 @@ struct obj *obj_absorber, *obj_absorbed;
                         eshkp->loan = 0L;
                 }
                 eshkp->debit -= amount;
+#if 0 /*JP*/
                 pline_The("donated %s %spays off your debt.",
                           obj_typename(obj_absorbed->otyp),
                           eshkp->debit ? "partially " : "");
+#else
+                pline_The("Šñ•t‚³‚ê‚½%s‚Í%sØ‹à‚É[‚Ä‚ç‚ê‚½D",
+                          obj_typename(obj_absorbed->otyp),
+                          eshkp->debit ? "•”•ª“I‚É" : "");
+#endif
             } else {
                 long delta = amount - eshkp->debit;
 
@@ -5988,18 +6002,34 @@ struct obj *obj_absorber, *obj_absorbed;
                 if (eshkp->debit) {
                     eshkp->debit = 0L;
                     eshkp->loan = 0L;
+/*JP
                     Your("debt is paid off.");
+*/
+                    Your("Ø‹à‚Íx•¥‚í‚ê‚½D");
                 }
                 if (eshkp->credit == delta)
+#if 0 /*JP:T*/
                     pline_The("%s established %ld %s credit.",
                               obj_typename(obj_absorbed->otyp),
                               delta, currency(delta));
+#else
+                    pline_The("%s‚Í%ld%s‚ğ—a‚¯‚½D",
+                              obj_typename(obj_absorbed->otyp),
+                              delta, currency(delta));
+#endif
                 else
+#if 0 /*JP:T*/
                     pline_The("%s added %ld %s %s %ld %s.",
                               obj_typename(obj_absorbed->otyp),
                               delta, currency(delta),
                               "to your credit; total is now",
                               eshkp->credit, currency(eshkp->credit));
+#else
+                    pline_The("%s‚Í—a‚¯‹à‚É%ld%s’Ç‰Á‚³‚ê‚½D‡Œv‚Í%ld%s‚É‚È‚Á‚½D",
+                              obj_typename(obj_absorbed->otyp),
+                              delta, currency(delta),
+                              eshkp->credit, currency(eshkp->credit));
+#endif
             }
         }
         return;

@@ -635,7 +635,10 @@ register struct monst *mtmp;
                     pline("%sは溺れた．", Monnam(mtmp));
                 else
                     /* hero used fire to melt ice that monster was on */
+/*JP
                     You("drown %s.", mon_nam(mtmp));
+*/
+                    You("%sに溺れた．", mon_nam(mtmp));
             }
             if (u.ustuck && u.uswallow && u.ustuck == mtmp) {
                 /* This can happen after a purple worm plucks you off a
@@ -1105,9 +1108,11 @@ struct monst *mtmp;
                           distant_name(otmp, doname));
 #endif
                 /* give this one even if !verbose */
+#if 0 /*JP*//*日本語版ではこれはない*/
                 if (otmp->oclass == SCROLL_CLASS
                     && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
                     pline("Yum%c", otmp->blessed ? '!' : '.');
+#endif
             } else {
                 if (flags.verbose)
 /*JP
@@ -2892,7 +2897,10 @@ struct monst *mon;
         m1 = m2 = m3 = m4 = m5 = zm = (struct monst *) 0;
         if (!msgmv || (moves - msgmv) > 200L) {
             if (!msgmv || rn2(2))
+/*JP
                 You_feel("besieged.");
+*/
+                You_feel("包囲されたように感じた．");
             msgmv = moves;
         }
         /*
@@ -3221,7 +3229,7 @@ boolean via_attack;
 /*JP
             "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
 */
-            "ぐはっ！", "うわ．", "Oh my!", "なにっ？", "なんだ？",
+            "ぐはっ！", "うわ．", "なんと！", "なにっ？", "なんだ？",
         };
         struct monst *mon;
         int mndx = monsndx(mtmp->data);
@@ -4121,7 +4129,10 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 #else
             if (!!strcmpi(oldname, "何者か")) /* could see or sense it before */
 #endif
+/*JP
                 pline("%s disappears!", oldname);
+*/
+                pline("%sは消えた！", oldname);
             (void) usmellmon(mdat);
         } else { /* can see or sense it now */
 #if 0 /*JP:T*/
@@ -4129,7 +4140,10 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 #else
             if (!strcmpi(oldname, "何者か")) /* couldn't see or sense it before */
 #endif
+/*JP
                 pline("%s appears!", upstart(newname));
+*/
+                pline("%sが現れた！", upstart(newname));
             else
 /*JP
                 pline("%s turns into %s!", oldname, newname);

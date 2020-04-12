@@ -951,10 +951,17 @@ register struct monst *mon;
 #endif
             /* 3.6.3: artifact might be getting wielded by invisible monst */
             else if (cansee(mon->mx, mon->my))
+#if 0 /*JP*/
                 pline("Light begins shining %s.",
                       (distu(mon->mx, mon->my) <= 5 * 5)
                           ? "nearby"
                           : "in the distance");
+#else
+                pline("–¾‚©‚è‚ª%s‚Å‹P‚«‚Í‚¶‚ß‚½D",
+                      (distu(mon->mx, mon->my) <= 5 * 5)
+                          ? "‹ß‚­"
+                          : "‰“‚­");
+#endif
         }
         obj->owornmask = W_WEP;
         return 1;

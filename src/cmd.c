@@ -2348,9 +2348,17 @@ int final;
        won't vary if user leaves a disclosure prompt or --More-- unanswered
        long enough for the dynamic value to change between then and now */
     if (final ? iflags.at_midnight : midnight()) {
+#if 0 /*JP:T*/
         enl_msg("It ", "is ", "was ", "the midnight hour", "");
+#else
+        enl_msg("時間帯は深夜", "だ", "だった", "", "");
+#endif
     } else if (final ? iflags.at_night : night()) {
+#if 0 /*JP:T*/
         enl_msg("It ", "is ", "was ", "nighttime", "");
+#else
+        enl_msg("時間帯は夜", "だ", "だった", "", "");
+#endif
     }
     /* other environmental factors */
     if (flags.moonphase == FULL_MOON || flags.moonphase == NEW_MOON) {
@@ -2360,6 +2368,7 @@ int final;
            have dragged on for an arbitrary amount of time.  We want to
            report the values that currently affect play--or affected
            play when game ended--rather than actual outside situation.] */
+#if 0 /*JP:T*/
         Sprintf(buf, "a %s moon in effect%s",
                 (flags.moonphase == FULL_MOON) ? "full"
                 : (flags.moonphase == NEW_MOON) ? "new"
@@ -2371,6 +2380,19 @@ int final;
                    vs died--so settle for general platitude */
                 final ? " when your adventure ended" : "");
         enl_msg("There ", "is ", "was ", buf, "");
+#else
+        Sprintf(buf, "%s%s月",
+                /* we don't have access to 'how' here--aside from survived
+                   vs died--so settle for general platitude */
+                final ? "冒険を終えたとき，" : "",
+                (flags.moonphase == FULL_MOON) ? "満"
+                : (flags.moonphase == NEW_MOON) ? "新"
+                  /* showing these would probably just lead to confusion
+                     since they have no effect on game play... */
+                  : (flags.moonphase < FULL_MOON) ? "上弦の"
+                    : "下弦の");
+        enl_msg("", "だ", "だった", buf, "");
+#endif
     }
     if (flags.friday13) {
         /* let player know that friday13 penalty is/was in effect;
@@ -2378,12 +2400,21 @@ int final;
            the start of the session and it might be past midnight (or
            days later if the game has been paused without save/restore),
            so phrase this similar to the start up message */
+#if 0 /*JP:T*/
         Sprintf(buf, " Bad things %s on Friday the 13th.",
                 !final ? "can happen"
                 : (final == ENL_GAMEOVERALIVE) ? "could have happened"
                   /* there's no may to tell whether -1 Luck made a
                      difference but hero has died... */
                   : "happened");
+#else
+        Sprintf(buf, "１３日の金曜日にはよくないことが%s．",
+                !final ? "ある"
+                : (final == ENL_GAMEOVERALIVE) ? "あったかもしれない"
+                  /* there's no may to tell whether -1 Luck made a
+                     difference but hero has died... */
+                  : "あった");
+#endif
         enlght_out(buf);
     }
 
@@ -2836,7 +2867,10 @@ int final;
     /* internal troubles, mostly in the order that prayer ranks them */
     if (Stoned) {
         if (final && (Stoned & I_SPECIAL))
+/*JP
             enlght_out(" You turned into stone.");
+*/
+            enlght_out(" あなたは石になった．");
         else
 /*JP
             you_are("turning to stone", "");
@@ -2845,7 +2879,10 @@ int final;
     }
     if (Slimed) {
         if (final && (Slimed & I_SPECIAL))
+/*JP
             enlght_out(" You turned into slime.");
+*/
+            enlght_out(" あなたはスライムになった．");
         else
 /*JP
             you_are("turning into slime", "");
@@ -2860,7 +2897,10 @@ int final;
             you_are_ing("窒息して", "");
         } else {
             if (final && (Strangled & I_SPECIAL)) {
+/*JP
                 enlght_out(" You died from strangulation.");
+*/
+                enlght_out(" あなたは窒息死した．");
             } else {
 /*JP
                 Strcpy(buf, "being strangled");
@@ -2881,9 +2921,15 @@ int final;
            puts TermIll before FoodPois and death due to timeout reports
            terminal illness if both are in effect, so do the same here */
         if (final && (Sick & I_SPECIAL)) {
+#if 0 /*JP:T*/
             Sprintf(buf, " %sdied from %s.", You_, /* has trailing space */
                     (u.usick_type & SICK_NONVOMITABLE)
                     ? "terminal illness" : "food poisoning");
+#else
+            Sprintf(buf, " %s%sで死んだ．", You_, /* has trailing space */
+                    (u.usick_type & SICK_NONVOMITABLE)
+                    ? "病気" : "食中毒");
+#endif
             enlght_out(buf);
         } else {
             /* unlike death due to sickness, report the two cases separately
@@ -3215,7 +3261,10 @@ int final;
         boolean hav = (sklvl != P_UNSKILLED && sklvl != P_SKILLED);
 
         if (sklvl == P_ISRESTRICTED)
+/*JP
             Strcpy(sklvlbuf, "no");
+*/
+            Strcpy(sklvlbuf, "制限");
         else
             (void) lcase(skill_level_name(wtype, sklvlbuf));
         /* "you have no/basic/expert/master/grand-master skill with <skill>"
@@ -3227,8 +3276,13 @@ int final;
         Sprintf(buf, "%sの%sスキル", skill_name(wtype), sklvlbuf);
 #endif
         if (can_advance(wtype, FALSE))
+#if 0 /*JP:T*/
             Sprintf(eos(buf), " and %s that",
                     !final ? "can enhance" : "could have enhanced");
+#else
+            Sprintf(eos(buf), "(高めることができ%s)",
+                    !final ? "る" : "た");
+#endif
         if (hav)
             you_have(buf, "");
         else

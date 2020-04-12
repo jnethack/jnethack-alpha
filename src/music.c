@@ -459,7 +459,10 @@ int force;
                                things this way, entering the new pit below
                                will override current trap anyway, but too
                                late to get Lev and Fly handling. */
+/*JP
                             Your("chain breaks!");
+*/
+                            Your("鎖は壊れた！");
                             reset_utrap(TRUE);
                         }
                         if (Levitation || Flying
@@ -665,9 +668,15 @@ struct obj *instr;
         break;
     case PLAY_STUNNED:
         if (!Deaf)
+/*JP
             You("radiate an obnoxious droning sound.");
+*/
+            You("不愉快で単調な音を発した．");
         else
+/*JP
             You_feel("a monotonous vibration.");
+*/
+            You_feel("単調な振動を感じた．");
         break;
     case PLAY_CONFUSED:
         if (!Deaf)
@@ -676,7 +685,10 @@ struct obj *instr;
 */
             You("耳障りな音を出した．");
         else
+/*JP
             You_feel("a jarring vibration.");
+*/
+            You_feel("耳障りな振動を感じた．");
         break;
     case PLAY_HALLU:
 /*JP
@@ -725,7 +737,10 @@ struct obj *instr;
 */
             pline("%sを%sた．", xname(instr), do_spec ? "奏で" : "吹い");
         else
+/*JP
             You_feel("%s %s.", yname(instr), do_spec ? "trill" : "toot");
+*/
+            You_feel("%sを%sた感じがした．", yname(instr), do_spec ? "奏で" : "吹い");
         if (do_spec)
             charm_snakes(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -763,7 +778,10 @@ struct obj *instr;
 */
             You("身震いするような死者の音楽を奏でた．");
         else
+/*JP
             You("blow into the horn.");
+*/
+            You("ホルンを吹いた．");
         awaken_monsters(u.ulevel * 30);
         exercise(A_WIS, FALSE);
         break;
@@ -774,7 +792,10 @@ struct obj *instr;
 */
             You("%sから大きな耳障りな音を出した．", yname(instr));
         else
+/*JP
             You("blow into the bugle.");
+*/
+            You("ラッパを吹いた．");
         awaken_soldiers(&youmonst);
         exercise(A_WIS, FALSE);
         break;
@@ -787,7 +808,10 @@ struct obj *instr;
 */
             pline("%sはとても魅力的な音楽を奏でた．", xname(instr));
         else
+/*JP
             You_feel("very soothing vibrations.");
+*/
+            You_feel("とても落ち着いた雰囲気を感じた．");
         charm_monsters((u.ulevel - 1) / 3 + 1);
         exercise(A_DEX, TRUE);
         break;
@@ -802,7 +826,10 @@ struct obj *instr;
             do_spec ? "軽快な音楽を奏でた" : "ポローンという音を出した");
 #endif
         else
+/*JP
             You_feel("soothing vibrations.");
+*/
+            You_feel("落ち着いた雰囲気を感じた．");
         if (do_spec)
             calm_nymphs(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -836,13 +863,22 @@ struct obj *instr;
                 You("耳が聞こえなくなるくらい叩いた！");
                 incr_itimeout(&HDeaf, rn1(20, 30));
             } else {
+/*JP
                 You("pound on the drum.");
+*/
+                You("太鼓を激しく叩いた．");
             }
             exercise(A_WIS, FALSE);
         } else
+#if 0 /*JP*/
             You("%s %s.",
                 rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
                 an(beats[rn2(SIZE(beats))]));
+#else
+            /*少しシンプルに*/
+            You("%sを叩いた．",
+                beats[rn2(SIZE(beats))]);
+#endif
         awaken_monsters(u.ulevel * (mundane ? 5 : 40));
         context.botl = TRUE;
         break;

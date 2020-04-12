@@ -389,10 +389,7 @@ const char *verb;
 {
     static char wholebuf[80];
 
-#if 1 /*JP*/
-    Strcpy(wholebuf, is_u(etmp) ? "‚ ‚È‚½" : Monnam(etmp->emon));
-    return wholebuf;
-#else
+#if 0 /*JP*/
     Strcpy(wholebuf, is_u(etmp) ? "You" : Monnam(etmp->emon));
     if (!verb || !*verb)
         return wholebuf;
@@ -401,6 +398,9 @@ const char *verb;
         Strcat(wholebuf, verb);
     else
         Strcat(wholebuf, vtense((char *) 0, verb));
+    return wholebuf;
+#else
+    Strcpy(wholebuf, is_u(etmp) ? "‚ ‚È‚½" : Monnam(etmp->emon));
     return wholebuf;
 #endif
 }

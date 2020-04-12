@@ -156,7 +156,10 @@ struct monst *mon;
                     (atyp != u.ualign.type) ^ !mtmp->mpeaceful;
             }
             if (is_demon(ptr) && canseemon(mtmp))
+/*JP
                 pline("%s appears in a cloud of smoke!", Amonnam(mtmp));
+*/
+                pline("%sが煙の中から現れた！", Amonnam(mtmp));
         }
         cnt--;
     }
@@ -222,8 +225,13 @@ boolean talk;
 */
                 pline("%sの声が響いた:", align_gname(alignment));
             else
+#if 0 /*JP:T*/
                 You_feel("%s booming voice:",
                          s_suffix(align_gname(alignment)));
+#else
+                You_feel("%sの響く声を感じた:",
+                         s_suffix(align_gname(alignment)));
+#endif
 /*JP
             verbalize("Thou shalt pay for thine indiscretion!");
 */
@@ -294,7 +302,10 @@ register struct monst *mtmp;
               flags.female ? "妹" : "弟");
 #endif
         else if (canseemon(mtmp))
+/*JP
             pline("%s says something.", Amonnam(mtmp));
+*/
+            pline("%sは何かを言った．", Amonnam(mtmp));
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, TRUE);
         return 1;
@@ -328,7 +339,10 @@ register struct monst *mtmp;
                   Amonnam(mtmp), demand, currency(demand));
 #endif
         else if (canseemon(mtmp))
+/*JP
             pline("%s seems to be demanding something.", Amonnam(mtmp));
+*/
+            pline("%sは何かを要求しているようだ．", Amonnam(mtmp));
 
         offer = 0L;
         if (!Deaf && ((offer = bribe(mtmp)) >= demand)) {
@@ -538,7 +552,10 @@ gain_guardian_angel()
 */
             pline("声が響いた:");
         else
+/*JP
             You_feel("a booming voice:");
+*/
+            You_feel("響く声を感じた:");
 /*JP
         verbalize("Thy desire for conflict shall be fulfilled!");
 */
@@ -552,7 +569,10 @@ gain_guardian_angel()
 */
             pline("ささやき声が聞こえた:");
         else
+/*JP
             You_feel("a soft voice:");
+*/
+            You_feel("やわらかい声を感じた:");
 /*JP
         verbalize("Thou hast been worthy of me!");
 */

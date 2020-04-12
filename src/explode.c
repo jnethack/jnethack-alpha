@@ -778,7 +778,10 @@ struct obj *obj; /* only scatter this obj        */
     while ((otmp = (individual_object ? obj : level.objects[sx][sy])) != 0) {
         if (otmp == uball || otmp == uchain) {
             boolean waschain = (otmp == uchain);
+/*JP
             pline_The("chain shatters!");
+*/
+            pline("çΩÇÕÇŒÇÁÇŒÇÁÇ…Ç»Ç¡ÇΩÅI");
             unpunish();
             if (waschain)
                 continue;

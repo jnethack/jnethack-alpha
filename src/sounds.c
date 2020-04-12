@@ -575,7 +575,7 @@ register struct monst *mtmp;
 /*JP
             yelp_verb = (!Deaf) ? "yowl" : "arch";
 */
-            yelp_verb = (!Deaf) ? "悲しく鳴いた" : "arch";
+            yelp_verb = (!Deaf) ? "悲しく鳴いた" : "弓なりになった";
             break;
         case MS_BARK:
         case MS_GROWL:
@@ -799,7 +799,7 @@ register struct monst *mtmp;
 #else
                 Sprintf(verbuf, "ご主人様，%s%s",
                         isnight ? "こんばんは" : "こんにちは",
-                        isnight ? "!" : "．お休みになりませんか？");
+                        isnight ? "！" : "．お休みになりませんか？");
 #endif
                 verbl_msg = verbuf;
             } else {
@@ -1239,8 +1239,13 @@ register struct monst *mtmp;
                          Phase 1         Phase 2      Phase 3
                    Collect underpants       ?          Profit
                and they never verbalize step 2 so we don't either */
+#if 0 /*JP:T*/
             verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
                                          : "Phase three, profit!";
+#else
+            verbl_msg = (gnomeplan == 1) ? "その１，パンツを集める．"
+                                         : "その３，収益化！";
+#endif
         else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:

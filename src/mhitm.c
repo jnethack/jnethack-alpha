@@ -507,8 +507,13 @@ register struct monst *magr, *mdef;
         case AT_ENGL:
             if (mdef->data == &mons[PM_SHADE]) { /* no silver teeth... */
                 if (vis)
+#if 0 /*JP:T*/
                     pline("%s attempt to engulf %s is futile.",
                           s_suffix(Monnam(magr)), mon_nam(mdef));
+#else
+                    pline("%s‚Í%s‚ðˆù‚Ýž‚à‚¤‚Æ‚µ‚½‚ª‚Þ‚¾‚¾‚Á‚½D",
+                          Monnam(magr), mon_nam(mdef));
+#endif
                 strike = 0;
                 break;
             }
@@ -686,7 +691,7 @@ struct attack *mattk;
 /*JP
                 Sprintf(buf, "%s hits", magr_name);
 */
-                Sprintf(buf,"%s‚Ì%%s‚Ö‚ÌUŒ‚‚Í–½’†‚µ‚½D", magr_name);
+                Sprintf(buf, "%s‚Ì%%s‚Ö‚ÌUŒ‚‚Í–½’†‚µ‚½D", magr_name);
             }
 #if 0 /*JP*/
             pline("%s %s.", buf, mon_nam_too(mdef, magr));
@@ -709,11 +714,19 @@ struct attack *mattk;
                         (void) strsubst(mdef_name, "herself", "her own");
                         (void) strsubst(mdef_name, "itself", "its own");
                     }
+/*JP
                     Strcat(mdef_name, " flesh");
+*/
+                    Strcat(mdef_name, "‚Ì“÷");
                 }
 
+#if 0 /*JP:T*/
                 pline("%s %s sears %s!", magr_name, /*s_suffix(magr_name), */
                       simpleonames(otmp), mdef_name);
+#else
+                pline("%s‚Ì%s‚ª%s‚ðÄ‚¢‚½I", magr_name, /*s_suffix(magr_name), */
+                      simpleonames(otmp), mdef_name);
+#endif
             }
         }
     } else
@@ -969,7 +982,10 @@ struct attack *mattk;
         /* mondead() -> m_detach() -> m_unleash() always suppresses
            the m_unleash() slack message, so deliver it here instead */
         if (was_leashed)
+/*JP
             Your("leash falls slack.");
+*/
+            Your("•R‚ª‚½‚é‚ñ‚Å—Ž‚¿‚½D");
     }
     if (magr->mtame) /* give this one even if it was visible */
 /*JP

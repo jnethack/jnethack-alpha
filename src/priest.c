@@ -543,7 +543,7 @@ int roomno;
 /*JP
                 msg2 = (u.ualign.record >= ALGN_PIOUS) ? "a" : "an unusual";
 */
-                msg2 = (u.ualign.record >= ALGN_PIOUS) ? "a" : "‚¢‚Â‚É‚È‚­";
+                msg2 = (u.ualign.record >= ALGN_PIOUS) ? "" : "‚¢‚Â‚É‚È‚­";
                 this_time = &epri_p->peaceful_time;
                 other_time = &epri_p->hostile_time;
             }

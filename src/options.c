@@ -463,12 +463,12 @@ static struct Comp_Opt {
 /*JP
     { "msg_window", "the type of message window required", 1, SET_IN_GAME },
 */
-    {"msg_window", "メッセージウィンドウのタイプを設定",1, SET_IN_GAME },
+    { "msg_window", "メッセージウィンドウのタイプを設定",1, SET_IN_GAME },
 #else
 /*JP
     { "msg_window", "the type of message window required", 1, SET_IN_FILE },
 */
-    {"msg_window", "メッセージウィンドウのタイプを設定", 1, SET_IN_FILE },
+    { "msg_window", "メッセージウィンドウのタイプを設定", 1, SET_IN_FILE },
 #endif
 /*JP
     { "name", "your character's name (e.g., name:Merlin-W)", PL_NSIZ,
@@ -636,7 +636,7 @@ static struct Comp_Opt {
 /*JP
     { "subkeyvalue", "override keystroke value", 7, SET_IN_FILE },
 */
-    {"subkeyvalue", "キーマッピングを変更する", 7, SET_IN_FILE },
+    { "subkeyvalue", "キーマッピングを変更する", 7, SET_IN_FILE },
 #endif
 /*JP
     { "suppress_alert", "suppress alerts about version-specific features", 8,

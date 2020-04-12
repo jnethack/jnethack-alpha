@@ -334,10 +334,18 @@ boolean fleemsg;
                 pline("%s‚Í‚µ‚è‚²‚İ‚µ‚Ä‚¢‚é‚æ‚¤‚¾D", Monnam(mtmp));
             } else if (flees_light(mtmp)) {
                 if (rn2(10) || Deaf)
+#if 0 /*JP*/
                     pline("%s flees from the painful light of %s.",
                           Monnam(mtmp), bare_artifactname(uwep));
+#else
+                    pline("%s‚Í%s‚ÌŒõ‚É‚¨‚Ñ‚¦‚½D",
+                          Monnam(mtmp), bare_artifactname(uwep));
+#endif
                 else
+/*JP
                     verbalize("Bright light!");
+*/
+                    verbalize("‹P‚­ŒõI");
             } else
 /*JP
                 pline("%s turns to flee.", Monnam(mtmp));

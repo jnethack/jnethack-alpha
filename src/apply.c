@@ -913,9 +913,15 @@ struct obj *obj;
                   spotmon ? l_monnam(mtmp) : "‰ö•¨");
 #endif
         } else if (unsolid(mtmp->data)) {
+/*JP
             pline("The leash would just fall off.");
+*/
+            pline("•R‚Í‚»‚Ìê‚É—‚¿‚½D");
         } else if (nolimbs(mtmp->data) && !has_head(mtmp->data)) {
+/*JP
             pline("%s has no extremities the leash would fit.",
+*/
+            pline("%s‚É‚Í•R‚ğ‚Â‚¯‚ç‚ê‚»‚¤‚È‚Æ‚±‚ë‚ª‚È‚¢D",
                   Monnam(mtmp));
         } else if (!leashable(mtmp)) {
 #if 0 /*JP:T*/

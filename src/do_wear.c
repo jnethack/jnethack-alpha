@@ -1775,8 +1775,13 @@ struct obj *otmp;
             /* for weapon, we'll only get here via 'A )' */
             && (uarmg ? (otmp == uwep)
                       : ((otmp->owornmask & (W_WEP | W_RING)) != 0)))
+#if 0 /*JP:T*/
             pline("Despite your slippery %s, you can't.",
                   fingers_or_gloves(TRUE));
+#else
+            pline("%sはすべりやすいけれども，それはできない．",
+                  fingers_or_gloves(TRUE));
+#endif
         else
 /*JP
             You("can't.  %s cursed.", use_plural ? "They are" : "It is");
@@ -2121,8 +2126,13 @@ boolean noisy;
             /* prevent slippery bare fingers from transferring to
                gloved fingers */
             if (noisy)
+#if 0 /*JP:T*/
                 Your("%s are too slippery to pull on %s.",
                      fingers_or_gloves(FALSE), gloves_simple_name(otmp));
+#else
+                Your("%sがすべるので%sをひっぱれない．",
+                     fingers_or_gloves(FALSE), gloves_simple_name(otmp));
+#endif
             err++;
         } else
             *mask = W_ARMG;
@@ -2293,9 +2303,15 @@ struct obj *obj;
                 } while (!mask);
             }
             if (uarmg && Glib) {
+#if 0 /*JP:T*/
                 Your(
               "%s are too slippery to remove, so you cannot put on the ring.",
                      gloves_simple_name(uarmg));
+#else
+                Your(
+              "%sがすべって脱げないので、指輪をつけられない．",
+                     gloves_simple_name(uarmg));
+#endif
                 return 1; /* always uses move */
             }
             if (uarmg && uarmg->cursed) {
@@ -2809,9 +2825,14 @@ register struct obj *otmp;
             set_bknown(uwep, 1);
             return 0;
         } else if (Glib) {
+#if 0 /*JP:T*/
             pline("%s %s are too slippery to take off.",
                   uarmg->unpaid ? "The" : "Your", /* simplified Shk_Your() */
                   gloves_simple_name(uarmg));
+#else
+            pline("%sはすべるので脱ぐことができない．",
+                  gloves_simple_name(uarmg));
+#endif
             return 0;
         }
     }

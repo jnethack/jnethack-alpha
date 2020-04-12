@@ -1578,7 +1578,7 @@ dokick()
                               : "Something splashes you in the", buf);
 #else
                 /*JP:TODO:「顔にかかった」の語順調整 */
-                pline("%s%s%s．", !Deaf ? "うわ！" : "",
+                pline("%s%s．", !Deaf ? "うわ！" : "",
                       !Blind
                           ? "排水口からどろどろの廃棄物が出てくる"
                           : !Deaf

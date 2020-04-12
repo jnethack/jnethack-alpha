@@ -876,15 +876,27 @@ genericptr_t p2;
 
     if (p2 == (genericptr_t) 0) { /* That means the player */
         if (!Blind)
+#if 0 /*JP*/
             You("bump into %s.  Ouch!",
                 Hallucination ? "an invisible tree"
                               : "some kind of invisible wall");
+#else
+            You("%sにぶちあたった．いてっ！",
+                Hallucination ? "目に見えない木"
+                              : "なんらかの目に見えない壁");
+#endif
         else
+/*JP
             pline("Ouch!");
+*/
+            pline("いてっ！");
     } else {
         mtmp = (struct monst *) p2;
         if (canseemon(mtmp))
+/*JP
             pline("%s bumps into %s!", Monnam(mtmp), something);
+*/
+            pline("%sは%sにぶちあたった！", Monnam(mtmp), something);
     }
     return FALSE;
 }

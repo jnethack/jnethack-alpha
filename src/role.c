@@ -2053,14 +2053,14 @@ int buflen, rolenum, racenum, gendnum, alignnum;
     if (num_post_attribs) {
         if (pa[BP_RACE]) {
             (void) promptsep(eos(buf), num_post_attribs);
-/*
+/*JP
             Strcat(buf, "race");
 */
             Strcat(buf, "éÌë∞");
         }
         if (pa[BP_ROLE]) {
             (void) promptsep(eos(buf), num_post_attribs);
-/*
+/*JP
             Strcat(buf, "role");
 */
             Strcat(buf, "êEã∆");

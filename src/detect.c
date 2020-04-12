@@ -2335,7 +2335,10 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
         /* allow player to move cursor around and get autodescribe feedback
            based on what is visible now rather than what is on 'real' map */
         which_subset |= TER_MAP; /* guarantee non-zero */
+/*JP
         browse_map(which_subset, "anything of interest");
+*/
+        browse_map(which_subset, "ä÷êSÇÃÇ†ÇÈÇ‡ÇÃ");
 
         reconstrain_map();
         docrt(); /* redraw the screen, restoring regular map */

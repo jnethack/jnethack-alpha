@@ -362,11 +362,7 @@ char *
 fruitname(juice)
 boolean juice; /* whether or not to append " juice" to the name */
 {
-#if 1 /*JP*//*日本語ではそこまでしない*/
-    char *buf = nextobuf();
-    Sprintf(buf, "%s%s", pl_fruit, juice ? "ジュース" : "");
-    return buf;
-#else
+#if 0 /*JP*/
     char *buf = nextobuf();
     const char *fruit_nam = strstri(pl_fruit, " of ");
 
@@ -376,6 +372,11 @@ boolean juice; /* whether or not to append " juice" to the name */
         fruit_nam = pl_fruit; /* use it as is */
 
     Sprintf(buf, "%s%s", makesingular(fruit_nam), juice ? " juice" : "");
+    return buf;
+#else
+    /*日本語ではそこまでしない*/
+    char *buf = nextobuf();
+    Sprintf(buf, "%s%s", pl_fruit, juice ? "ジュース" : "");
     return buf;
 #endif
 }
@@ -1501,8 +1502,14 @@ unsigned doname_flags;
                        /* in case of perm_invent update while Wear/Takeoff
                           is in progress; check doffing() before donning()
                           because donning() returns True for both cases */
+/*JP
                        : doffing(obj) ? " (being doffed)"
+*/
+                       : doffing(obj) ? " (身につけている途中)"
+/*JP
                          : donning(obj) ? " (being donned)"
+*/
+                         : donning(obj) ? " (脱いでいる途中)"
 /*JP
                            : " (being worn)");
 */
@@ -1512,7 +1519,10 @@ unsigned doname_flags;
                are described as slippery when hero has slippery fingers */
             if (obj == uarmg && Glib) /* just appended "(something)",
                                        * change to "(something; slippery)" */
+/*JP
                 Strcpy(rindex(bp, ')'), "; slippery)");
+*/
+                Strcpy(rindex(bp, ')'), "; ぬるぬる)");
         }
         /*FALLTHRU*/
     case WEAPON_CLASS:
@@ -1800,13 +1810,25 @@ unsigned doname_flags;
         long price = get_cost_of_shop_item(obj, &nochrg);
 
         if (price > 0L)
+#if 0 /*JP:T*/
             Sprintf(eos(bp), " (%s, %s%ld %s)",
                     nochrg ? "contents" : "for sale",
                     globwt(obj, globbuf, &weightshown),
                     price, currency(price));
+#else
+            Sprintf(eos(bp), " (%s, %s%ld%s)",
+                    nochrg ? "中身" : "商品",
+                    globwt(obj, globbuf, &weightshown),
+                    price, currency(price));
+#endif
         else if (nochrg > 0)
+#if 0 /*JP:T*/
             Sprintf(eos(bp), " (%sno charge)",
                     globwt(obj, globbuf, &weightshown));
+#else
+            Sprintf(eos(bp), " (%s無料)",
+                    globwt(obj, globbuf, &weightshown));
+#endif
     }
 #if 0 /*JP*//*日本語では不要*/
     if (!strncmp(prefix, "a ", 2)) {

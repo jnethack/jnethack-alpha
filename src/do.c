@@ -1284,9 +1284,15 @@ dodown()
     if (Upolyd && ceiling_hider(&mons[u.umonnum]) && u.uundetected) {
         u.uundetected = 0;
         if (Flying) { /* lurker above */
+/*JP
             You("fly out of hiding.");
+*/
+            You("‰B‚ê‚é‚Ì‚ð‚â‚ß‚Ä”ò‚Ño‚µ‚½D");
         } else { /* piercer */
+/*JP
             You("drop to the %s.", surface(u.ux, u.uy));
+*/
+            You("%s‚É—Ž‚¿‚½D", surface(u.ux, u.uy));
             if (is_pool_or_lava(u.ux, u.uy)) {
                 pooleffects(FALSE);
             } else {
@@ -1361,7 +1367,9 @@ dodown()
     }
 
     if (trap) {
+#if 0 /*JP*/
         const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
+#endif
 #if 0 /*JP*/
         const char *actn = Flying ? "fly" : locomotion(youmonst.data, "jump");
 #else

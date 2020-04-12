@@ -192,8 +192,13 @@ moverock()
                 if (flags.verbose) {
                     char you_or_steed[BUFSZ];
 
+#if 0 /*JP:T*/
                     Strcpy(you_or_steed,
                            u.usteed ? y_monnam(u.usteed) : "you");
+#else
+                    Strcpy(you_or_steed,
+                           u.usteed ? y_monnam(u.usteed) : "あなた");
+#endif
 #if 0 /*JP:T*/
                     pline("%s%s cannot move %s.",
                           deliver_part1
@@ -1847,8 +1852,13 @@ domove_core()
                     else if (isok(u.ux, y))
                         dy = 0;
                 }
+#if 0 /*JP*/
                 You("have already gone as far %s as possible.",
                     directionname(xytod(dx, dy)));
+#else
+                You("すでにできるだけ%sに動いている．",
+                    directionname(xytod(dx, dy)));
+#endif
             }
             nomul(0);
             return;
@@ -2107,7 +2117,7 @@ domove_core()
             !(boulder || solid) ? "" : !explo ? "harmlessly " : "futilely ",
             explo ? "explode at" : "attack", buf);
 #else
-        You("%s%s%s.",
+        You("%s%s%s．",
             !(boulder || solid) ? "" : !explo ? "効果なく" : "むだに",
             buf, explo ? "で爆発した" : "を攻撃した");
 #endif
@@ -2229,8 +2239,13 @@ domove_core()
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
             if (u.usteed)
                 u.usteed->mx = u.ux, u.usteed->my = u.uy;
+#if 0 /*JP:T*/
             You("stop.  %s won't fit into the same spot that you're at.",
                  upstart(y_monnam(mtmp)));
+#else
+            You("止まった．%sはあなたのいるのと同じ場所には収まらない．",
+                 y_monnam(mtmp));
+#endif
         } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
                    && bad_rock(mtmp->data, u.ux0, y)
                    && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
@@ -3220,10 +3235,18 @@ pickup_checks()
 */
             pline("ヒンジを外せない．");
         else if (IS_ALTAR(lev->typ))
+/*JP
             pline("Moving the altar would be a very bad idea.");
+*/
+            pline("祭壇を動かすのはとても悪い考えだ．");
         else if (lev->typ == STAIRS)
+#if 0 /*JP:T*/
             pline_The("stairs are solidly fixed to the %s.",
                       surface(u.ux, u.uy));
+#else
+            pline_The("階段は%sにしっかりと固定されている．",
+                      surface(u.ux, u.uy));
+#endif
         else
 /*JP
             There("is nothing here to pick up.");
@@ -3557,8 +3580,13 @@ const char *msg_override;
            life-saving while turning into green slime but is also a reminder
            if life-saved while poly'd and Unchanging (explore or wizard mode
            declining to die since can't be both Unchanging and Lifesaved) */
+#if 0 /*JP:T*/
         if (Upolyd && !strncmpi(nomovemsg, "You survived that ", 18))
             You("are %s.", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
+#else
+        if (Upolyd && !strncmpi(nomovemsg, "あなたは生きながら", 18))
+            You("%sだ．", mons[u.umonnum].mname); /* (ignore Hallu) */
+#endif
     }
     nomovemsg = 0;
     u.usleep = 0;

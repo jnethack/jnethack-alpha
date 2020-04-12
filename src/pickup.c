@@ -1049,11 +1049,17 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
                 /* this isn't actually possible; fake item representing
                    hero is only included for look here (':'), not pickup,
                    and that's PICK_NONE so we can't get here from there */
+/*JP
                 You_cant("pick yourself up!");
+*/
+                You_cant("Ž©•ªŽ©g‚ÍE‚¦‚È‚¢I");
                 continue;
             }
             if (engulfer_minvent && curr->owornmask != 0L) {
+/*JP
                 You_cant("pick %s up.", ysimple_name(curr));
+*/
+                You_cant("%s‚ðE‚¦‚È‚¢D", ysimple_name(curr));
                 continue;
             }
             if (mi->count == -1L || mi->count > curr->quan)
@@ -1695,7 +1701,10 @@ boolean telekinesis; /* not picking it up directly by hand */
         return 0;
     } else if (obj->where == OBJ_MINVENT && obj->owornmask != 0L
                && u.uswallow && obj->ocarry == u.ustuck) {
+/*JP
         You_cant("pick %s up.", ysimple_name(obj));
+*/
+        You_cant("%s‚ðE‚¦‚È‚¢D", ysimple_name(obj));
         return 0;
     } else if (obj->oartifact && !touch_artifact(obj, &youmonst)) {
         return 0;
@@ -3094,7 +3103,11 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
             if (iflags.cmdassist)
                 /* this unintentionally allows user to answer with 'o' or
                    'r'; fortunately, those are already valid choices here */
+#if 0 /*JP:T*/
                 Strcat(pbuf, " or ?"); /* help */
+#else
+                Strcat(pbuf, "‚Ü‚½‚Í?"); /* help */
+#endif
             else
                 Strcat(xbuf, "?");
             if (*xbuf)

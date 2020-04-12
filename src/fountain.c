@@ -253,6 +253,7 @@ boolean isyou;
 */
                         verbalize("おい，泉を汚すな！");
                     } else {
+#if 0 /*JP:T*/
                         pline("%s earnestly %s %s %s!",
                               Amonnam(mtmp),
                               nolimbs(mtmp->data) ? "shakes" : "waves",
@@ -260,6 +261,13 @@ boolean isyou;
                               nolimbs(mtmp->data)
                                       ? mbodypart(mtmp, HEAD)
                                       : makeplural(mbodypart(mtmp, ARM)));
+#else
+                        pline("%sは真剣に%sを振った！",
+                              Amonnam(mtmp),
+                              nolimbs(mtmp->data)
+                                      ? mbodypart(mtmp, HEAD)
+                                      : makeplural(mbodypart(mtmp, ARM)));
+#endif
                     }
                     break;
                 }

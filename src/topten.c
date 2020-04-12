@@ -964,9 +964,7 @@ boolean so;
             Strcat(action, t1->death);
 #endif
             second_line = FALSE;
-#if 1 /*JP*/
-        }
-#else
+#if 0 /*JP*/
         } else if (!strncmp(t1->death, "died of st", 10)) {
             Strcat(linebuf, "starved to death");
             second_line = FALSE;
@@ -981,6 +979,8 @@ boolean so;
             Strcat(linebuf, "turned to stone");
         } else
             Strcat(linebuf, "died");
+#else
+        }
 #endif /*JP*/
 
         if (t1->deathdnum == astral_level.dnum) {

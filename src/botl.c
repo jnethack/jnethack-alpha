@@ -695,15 +695,27 @@ bot_via_windowport()
     Strcpy(nb = buf, plname);
     nb[0] = highc(nb[0]);
     titl = !Upolyd ? rank() : mons[u.umonnum].mname;
+#if 0 /*JP*/
     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
+#else
+    i = (int) (strlen(buf) + sizeof " " + strlen(titl) - sizeof "");
+#endif
     /* if "Name the Rank/monster" is too long, we truncate the name
        but always keep at least 10 characters of it; when hitpintbar is
        enabled, anything beyond 30 (long monster name) will be truncated */
     if (i > 30) {
+#if 0 /*JP*/
         i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
+#else
+        i = 30 - (int) (sizeof " " + strlen(titl) - sizeof "");
+#endif
         nb[max(i, 10)] = '\0';
     }
+#if 0 /*JP*/
     Strcpy(nb = eos(nb), " the ");
+#else
+    Strcpy(nb = eos(nb), " ");
+#endif
     Strcpy(nb = eos(nb), titl);
     if (Upolyd) { /* when poly'd, capitalize monster name */
         for (i = 0; nb[i]; i++)

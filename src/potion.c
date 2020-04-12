@@ -2761,7 +2761,10 @@ dodip()
                 pline("%sは油の光沢できらりと光った．", Yname2(obj));
 #endif
             else /*if (!uarmg)*/
+/*JP
                 pline("%s %s oily.", Yname2(obj), otense(obj, "feel"));
+*/
+                pline("%sは油っぽい．", Yname2(obj));
         } else {
 #if 0 /*JP:T*/
             pline("%s %s less %s.", Yname2(obj),
@@ -2869,31 +2872,34 @@ dodip()
         } else {
             singlepotion->dknown = !Hallucination;
             *newbuf = '\0';
-#if 0 /*JP*/
             if (mixture == POT_WATER && singlepotion->dknown)
+/*JP
                 Sprintf(newbuf, "clears");
+*/
+                Sprintf(newbuf, "透明");
             else if (!Blind)
+#if 0 /*JP*/
                 Sprintf(newbuf, "turns %s",
                         hcolor(OBJ_DESCR(objects[mixture])));
+#else
+                Sprintf(newbuf, "%s薬",
+                        hcolor(OBJ_DESCR(objects[mixture])));
+#endif
             if (*newbuf)
+#if 0 /*JP:T*/
                 pline_The("%spotion%s %s.", oldbuf,
                           more_than_one ? " that you dipped into" : "",
                           newbuf);
-            else
-                pline("Something happens.");
 #else
-            if (mixture == POT_WATER && singlepotion->dknown)
-                Sprintf(newbuf, "透明");
-            else if (!Blind)
-                Sprintf(newbuf, "%s薬",
-                        hcolor(OBJ_DESCR(objects[mixture])));
-            if (*newbuf)
                 pline_The("%s%s薬は%sになった．.",
                           more_than_one ? "浸した" : "",
                           oldbuf, newbuf);
-            else
-                pline("Something happens.");
 #endif
+            else
+/*JP
+                pline("Something happens.");
+*/
+                pline("何かが起きた．");
 
             if (old_dknown
                 && !objects[old_otyp].oc_name_known

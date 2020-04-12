@@ -304,7 +304,10 @@ char *objnambuf;
 */
             pline("誰かがあなたから盗もうとしたが，盗むものがないことに気がついた．");
         else if (inv_cnt(TRUE) > inv_cnt(FALSE)) /* ('icnt' might be stale) */
+/*JP
             pline("%s tries to rob you, but isn't interested in gold.",
+*/
+            pline("%sはあなたから盗もうとしたが，お金には興味がない．",
                   Monnam(mtmp));
         else
 /*JP
