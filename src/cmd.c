@@ -2478,7 +2478,9 @@ basics_enlightenment(mode, final)
 int mode UNUSED;
 int final;
 {
+#if 0 /*JP*//*unused*/
     static char Power[] = "energy points (spell power)";
+#endif
     char buf[BUFSZ];
     int pw = u.uen, hp = (Upolyd ? u.mh : u.uhp),
         pwmax = u.uenmax, hpmax = (Upolyd ? u.mhmax : u.uhpmax);

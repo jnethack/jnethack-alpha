@@ -3422,13 +3422,21 @@ boolean peaceful, silent;
     char roomno = *in_rooms(x, y, SHOPBASE);
     struct bill_x *bp;
     struct monst *shkp = 0;
+#if 0 /*JP*/
     boolean was_unpaid;
     long c_count = 0L, u_count = 0L;
+#else
+    long u_count = 0L;
+#endif
 
     /* gather information for message(s) prior to manipulating bill */
+#if 0 /*JP*/
     was_unpaid = obj->unpaid ? TRUE : FALSE;
+#endif
     if (Has_contents(obj)) {
+#if 0 /*JP*/
         c_count = count_contents(obj, TRUE, FALSE, TRUE, FALSE);
+#endif
         u_count = count_contents(obj, TRUE, FALSE, FALSE, FALSE);
     }
 

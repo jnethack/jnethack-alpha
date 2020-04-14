@@ -183,8 +183,10 @@ const char *verb;
     struct trap *t;
     struct monst *mtmp;
     struct obj *otmp;
+#if 0 /*JP*//*unused*/
     boolean tseen;
     int ttyp = NO_TRAP;
+#endif
 
     if (obj->where != OBJ_FREE)
         panic("flooreffects: obj not free");
@@ -196,8 +198,10 @@ const char *verb;
         return TRUE;
     } else if (obj->otyp == BOULDER && (t = t_at(x, y)) != 0
                && (is_pit(t->ttyp) || is_hole(t->ttyp))) {
+#if 0 /*JP*/
         ttyp = t->ttyp;
         tseen = t->tseen ? TRUE : FALSE;
+#endif
         if (((mtmp = m_at(x, y)) && mtmp->mtrapped)
             || (u.utrap && u.ux == x && u.uy == y)) {
             if (*verb && (cansee(x, y) || distu(x, y) == 0))

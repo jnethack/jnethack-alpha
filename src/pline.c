@@ -131,7 +131,9 @@ VA_DECL(const char *, line)
     int ln;
     int msgtyp;
 #if !defined(NO_VSNPRINTF)
+#if 0 /*JP*/
     int vlen = 0;
+#endif
 #endif
     boolean no_repeat;
     /* Do NOT use VA_START and VA_END in here... see above */
@@ -147,7 +149,11 @@ VA_DECL(const char *, line)
 
     if (index(line, '%')) {
 #if !defined(NO_VSNPRINTF)
+#if 0 /*JP*/
         vlen = vsnprintf(pbuf, sizeof pbuf, line, VA_ARGS);
+#else
+        vsnprintf(pbuf, sizeof pbuf, line, VA_ARGS);
+#endif
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
         if (vlen >= (int) sizeof pbuf)
             panic("%s: truncation of buffer at %zu of %d bytes",
@@ -670,12 +676,18 @@ VA_DECL(const char *, str)
 #endif /* ?(USE_STDARG || USE_VARARG) */
 {       /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
 #if !defined(NO_VSNPRINTF)
+#if 0 /*JP*/
     int vlen = 0;
+#endif
 #endif
     char buf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
 #if !defined(NO_VSNPRINTF)
+#if 0 /*JP*/
     vlen = vsnprintf(buf, sizeof buf, str, VA_ARGS);
+#else
+    vsnprintf(buf, sizeof buf, str, VA_ARGS);
+#endif
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
     if (vlen >= (int) sizeof buf)
         panic("%s: truncation of buffer at %zu of %d bytes",

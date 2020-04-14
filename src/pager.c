@@ -843,8 +843,10 @@ char *supplemental_name;
        "wet towel"; for "moist towel", we also want to ask about "wet towel".
        (note: strncpy() only terminates output string if the specified
        count is bigger than the length of the substring being copied) */
+#if 0 /*JP*/
     if (!strncmp(dbase_str, "moist towel", 11))
         (void) strncpy(dbase_str += 2, "wet", 3); /* skip "mo" replace "ist" */
+#endif
 
     /* Make sure the name is non-empty. */
     if (*dbase_str) {

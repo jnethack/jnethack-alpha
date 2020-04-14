@@ -2215,7 +2215,11 @@ register struct obj *otmp;
 register boolean nodrop;
 long num;
 {
+#if 0 /*JP*/
     char *optr = 0, obuf[BUFSZ], xbuf[BUFSZ];
+#else
+    char obuf[BUFSZ], xbuf[BUFSZ];
+#endif
 
 #if 0 /*JP*/
     if (otmp->otyp == CORPSE) {

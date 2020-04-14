@@ -2367,7 +2367,9 @@ winid window;
 struct WinDesc *cw;
 {
     int i, n, attr;
+#if 0 /*JP*/
     boolean linestart;
+#endif
     register char *cp;
 
     for (n = 0, i = 0; i < cw->maxrow; i++) {
@@ -2405,7 +2407,11 @@ struct WinDesc *cw;
                 ++ttyDisplay->curx;
             }
             term_start_attr(attr);
+#if 0 /*JP*/
             for (cp = &cw->data[i][1], linestart = TRUE;
+#else
+            for (cp = &cw->data[i][1];
+#endif
 #ifndef WIN32CON
                  *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
                  cp++
@@ -2799,9 +2805,9 @@ const char *str;
 #ifndef STATUS_HILITES
     register const char *nb;
     register long j;
-#endif
 #if 1 /*JP*/
     int kchar2 = 0;             /* if 1, kanji 2nd byte */
+#endif
 #endif
 
     HUPSKIP();

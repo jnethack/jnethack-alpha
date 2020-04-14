@@ -21,7 +21,9 @@
 #define NUMOBUF 12
 
 STATIC_DCL char *FDECL(strprepend, (char *, const char *));
+#if 0 /*JP*/
 STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
+#endif
 STATIC_DCL short FDECL(rnd_otyp_by_namedesc, (const char *, CHAR_P, int));
 STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
@@ -33,8 +35,8 @@ STATIC_DCL char *FDECL(just_an, (char *str, const char *));
 #if 0 /*JP*/
 STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
                                            const char *const *));
-#endif
 STATIC_DCL char *FDECL(singplur_compound, (char *));
+#endif
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
 #if 0 /*JP*/
 STATIC_DCL boolean FDECL(badman, (const char *, BOOLEAN_P));
@@ -2642,8 +2644,8 @@ static const char wrpsym[] = { WAND_CLASS,   RING_CLASS,   POTION_CLASS,
                                ARMOR_CLASS,  TOOL_CLASS,   FOOD_CLASS,
                                FOOD_CLASS };
 
-/* return form of the verb (input plural) if xname(otmp) were the subject */
 #if 0 /*JP*//*日本語には三単現のsはない*/
+/* return form of the verb (input plural) if xname(otmp) were the subject */
 char *
 otense(otmp, verb)
 struct obj *otmp;
@@ -2663,7 +2665,6 @@ const char *verb;
     Strcpy(buf, verb);
     return buf;
 }
-#endif
 
 /* various singular words that vtense would otherwise categorize as plural;
    also used by makesingular() to catch some special cases */
@@ -2678,7 +2679,6 @@ static const char *const special_subjs[] = {
        to accommodate usage by makesingular during wishing */
 };
 
-#if 0 /*JP*//*日本語には三単現のsはない*/
 /* return form of the verb (input plural) for present tense 3rd person subj */
 char *
 vtense(subj, verb)
@@ -3487,7 +3487,6 @@ static const struct alt_spellings {
     { "flintstone", FLINT },
     { (const char *) 0, 0 },
 };
-#endif
 
 STATIC_OVL short
 rnd_otyp_by_wpnskill(skill)
@@ -3512,6 +3511,7 @@ schar skill;
     }
     return otyp;
 }
+#endif
 
 STATIC_OVL short
 rnd_otyp_by_namedesc(name, oclass, xtra_prob)

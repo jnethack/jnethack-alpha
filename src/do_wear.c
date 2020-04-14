@@ -1767,8 +1767,10 @@ struct obj *otmp;
     }
     /* Curses, like chickens, come home to roost. */
     if ((otmp == uwep) ? welded(otmp) : (int) otmp->cursed) {
+#if 0 /*JP*//*unused*/
         boolean use_plural = (is_boots(otmp) || is_gloves(otmp)
                               || otmp->otyp == LENSES || otmp->quan > 1L);
+#endif
 
         /* might be trying again after applying grease to hands */
         if (Glib && otmp->bknown

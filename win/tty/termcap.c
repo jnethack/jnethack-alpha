@@ -583,6 +583,9 @@ int c; /* actually char, but explicitly specify its widened type */
     (void) putchar(c);
 */
     (void) cputchar(c);
+#if 1 /*JP*/
+    return 0;
+#endif
 }
 
 void

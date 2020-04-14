@@ -535,7 +535,9 @@ register struct obj *obj;
             const char *what = "thing";
 */
             const char *what = "•¨‘Ì";
+#if 0 /*JP*//*unused*/
             boolean use_plural = FALSE;
+#endif
             struct obj dummyobj, *odummy;
 
             switch (M_AP_TYPE(mtmp)) {
@@ -554,8 +556,10 @@ register struct obj *obj;
                 } else {
                     what = simple_typename(odummy->otyp);
                 }
+#if 0 /*JP*/
                 use_plural = (is_boots(odummy) || is_gloves(odummy)
                               || odummy->otyp == LENSES);
+#endif
                 break;
             case M_AP_MONSTER: /* ignore Hallucination here */
                 what = mons[mtmp->mappearance].mname;

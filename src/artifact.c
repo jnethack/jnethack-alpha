@@ -1001,7 +1001,11 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
     const char *verb;
     boolean youattack = (magr == &youmonst), youdefend = (mdef == &youmonst),
             resisted = FALSE, do_stun, do_confuse, result;
+#if 0 /*JP*/
     int attack_indx, fakeidx, scare_dieroll = MB_MAX_DIEROLL / 2;
+#else
+    int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;
+#endif
 
     result = FALSE; /* no message given yet */
     /* the most severe effects are less likely at higher enchantment */
@@ -1163,7 +1167,9 @@ char *hittee;              /* target's name: "you" or mon_nam(mdef) */
 
     /* now give message(s) describing side-effects; Use fakename
        so vtense() won't be fooled by assigned name ending in 's' */
+#if 0 /*JP*/
     fakeidx = youdefend ? 1 : 0;
+#endif
     if (youattack || youdefend || vis) {
         (void) upstart(hittee); /* capitalize */
         if (resisted) {
