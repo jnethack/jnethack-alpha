@@ -2643,6 +2643,7 @@ static const char wrpsym[] = { WAND_CLASS,   RING_CLASS,   POTION_CLASS,
                                FOOD_CLASS };
 
 /* return form of the verb (input plural) if xname(otmp) were the subject */
+#if 0 /*JP*//*日本語には三単現のsはない*/
 char *
 otense(otmp, verb)
 struct obj *otmp;
@@ -2655,15 +2656,14 @@ const char *verb;
      * if the result of xname(otmp) would be plural.  Don't bother
      * recomputing xname(otmp) at this time.
      */
-#if 0 /*JP*//*日本語には三単現のsはない*/
     if (!is_plural(otmp))
         return vtense((char *) 0, verb);
-#endif /*JP*/
 
     buf = nextobuf();
     Strcpy(buf, verb);
     return buf;
 }
+#endif
 
 /* various singular words that vtense would otherwise categorize as plural;
    also used by makesingular() to catch some special cases */
@@ -2678,13 +2678,13 @@ static const char *const special_subjs[] = {
        to accommodate usage by makesingular during wishing */
 };
 
+#if 0 /*JP*//*日本語には三単現のsはない*/
 /* return form of the verb (input plural) for present tense 3rd person subj */
 char *
 vtense(subj, verb)
 register const char *subj;
 register const char *verb;
 {
-#if 0 /*JP*//*日本語には三単現のsはない*/
     char *buf = nextobuf(), *bspot;
     int len, ltmp;
     const char *sp, *spot;
@@ -2772,14 +2772,9 @@ register const char *verb;
         Strcasecpy(bspot + 1, "s");
     }
 
-#else /*新しいバッファは必要*/
-    char *buf;
-
-    buf = nextobuf();
-    Strcpy(buf, verb);
-#endif /*JP*/
     return buf;
 }
+#endif
 
 #if 0 /*JP*/
 struct sing_plur {

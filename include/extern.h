@@ -1738,8 +1738,10 @@ E char *FDECL(aobjnam, (struct obj *, const char *));
 E char *FDECL(yobjnam, (struct obj *, const char *));
 E char *FDECL(Yobjnam2, (struct obj *, const char *));
 E char *FDECL(Tobjnam, (struct obj *, const char *));
+#if 0 /*JP*/
 E char *FDECL(otense, (struct obj *, const char *));
 E char *FDECL(vtense, (const char *, const char *));
+#endif
 E char *FDECL(Doname2, (struct obj *));
 E char *FDECL(yname, (struct obj *));
 E char *FDECL(Yname2, (struct obj *));
