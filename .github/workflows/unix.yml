@@ -1,0 +1,33 @@
+name: build on unix-like
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  build:
+
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: linux_prereq
+      if: runner.os == 'Linux'
+      run: sudo apt-get install nkf libncurses5-dev
+
+    - name: macos_prereq
+      if: runner.os == 'macOS'
+      run: brew install nkf
+
+    - name: configure
+      run: ./configure
+
+    - name: make
+      run: make
