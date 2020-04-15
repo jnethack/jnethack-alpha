@@ -5,5 +5,8 @@ extraction:
         - nkf
     configure:    # Customizable step used by all languages.
       command:
-        - find . -type f |xargs nkf -e --overwrite
-        - sh sys/unix/setup.sh sys/unix/hints/linux
+        - ./configure
+queries:
+  - exclude: cpp/use-of-goto
+  - exclude: cpp/fixme-comment
+  - exclude: cpp/potentially-dangerous-function
