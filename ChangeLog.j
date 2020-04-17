@@ -1,3 +1,6 @@
+Sat Apr 18 2020  Kentaro Shirakata  <argrath@ub32.org>
+
+	* NetHack-3.6.6ベース JNetHackテストリリース(3.6.6-0.1)
 	* 次の問題を修正
 	  * HPが0になったときに命の魔除けが効かない (#40316)
 
