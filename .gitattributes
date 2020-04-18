@@ -4,7 +4,6 @@
 *.pl NHSUBST
 Porting NHSUBST
 README NHSUBST
-* text=auto
 *.hqx -text
 *.sln -text
 *.vcxproj -text
