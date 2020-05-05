@@ -2561,7 +2561,7 @@ int final;
 /*JP
             enl_msg(Your_wallet, "is ", "was ", "empty", "");
 */
-            enl_msg(Your_wallet, "である", "でだった", "は空", "");
+            enl_msg(Your_wallet, "である", "だった", "は空", "");
         } else {
 #if 0 /*JP:T*/
             Sprintf(buf, "%ld %s", umoney, currency(umoney));
@@ -2623,7 +2623,7 @@ int final;
 /*JP
     Sprintf(buf, "%s Characteristics:", !final ? "Current" : "Final");
 */
-    Sprintf(buf, "%s属性：", !final ? "現在の" : "最終");
+    Sprintf(buf, "%s特性：", !final ? "現在の" : "最終");
     enlght_out(buf);
 
     /* bottom line order */
@@ -4653,20 +4653,40 @@ struct ext_func_tab extcmdlist[] = {
     { M('A'), "annotate", "現在の階に名前をつける",
 #endif
             donamelevel, IFBURIED | AUTOCOMPLETE },
+#if 0 /*JP*/
     { 'a', "apply", "apply (use) a tool (pick-axe, key, lamp...)",
+#else
+    { 'a', "apply", "道具を使う．(つるはし, 鍵, ランプ…)",
+#endif
             doapply },
     { C('x'), "attributes", "show your attributes",
             doattributes, IFBURIED },
+#if 0 /*JP:T*/
     { '@', "autopickup", "toggle the pickup option on/off",
+#else
+    { '@', "autopickup", "自動拾いオプションを切り替える",
+#endif
             dotogglepickup, IFBURIED },
+#if 0 /*JP:T*/
     { 'C', "call", "call (name) something", docallcmd, IFBURIED },
+#else
+    { 'C', "call", "名前をつける", docallcmd, IFBURIED },
+#endif
+#if 0 /*JP:T*/
     { 'Z', "cast", "zap (cast) a spell", docast, IFBURIED },
+#else
+    { 'Z', "cast", "呪文を唱える", docast, IFBURIED },
+#endif
 #if 0 /*JP:T*/
     { M('c'), "chat", "talk to someone", dotalk, IFBURIED | AUTOCOMPLETE },
 #else
     { M('c'), "chat", "誰かと話す", dotalk, IFBURIED | AUTOCOMPLETE },
 #endif
+#if 0 /*JP:T*/
     { 'c', "close", "close a door", doclose },
+#else
+    { 'c', "close", "ドアを閉める", doclose },
+#endif
 #if 0 /*JP:T*/
     { M('C'), "conduct", "list voluntary challenges you have maintained",
 #else

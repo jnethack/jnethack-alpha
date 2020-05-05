@@ -823,7 +823,10 @@ Widget form;
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
+/*JP
     XtSetArg(args[num_args], nhStr(XtNlabel), "Name"); num_args++;
+*/
+    XtSetArg(args[num_args], nhStr(XtNlabel), "名前"); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
 
     namelabel = XtCreateManagedWidget("name_label",
@@ -879,7 +882,10 @@ X11_player_selection_dialog()
 
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
+/*JP
     XtSetArg(args[num_args], XtNtitle, "Player Selection"); num_args++;
+*/
+    XtSetArg(args[num_args], XtNtitle, "プレイヤー選択"); num_args++;
     popup = XtCreatePopupShell("player_selection_dialog",
                                transientShellWidgetClass,
                                toplevel, args, num_args);
@@ -954,7 +960,10 @@ X11_player_selection_dialog()
     /* race label */
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
+/*JP
     XtSetArg(args[num_args], nhStr(XtNlabel), "Race"); num_args++;
+*/
+    XtSetArg(args[num_args], nhStr(XtNlabel), "種族"); num_args++;
     racelabel = XtCreateManagedWidget("race_label",
                                       labelWidgetClass, race_form,
                                       args, num_args);
@@ -1017,7 +1026,10 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
+/*JP
     XtSetArg(args[num_args], nhStr(XtNlabel), "Role"); num_args++;
+*/
+    XtSetArg(args[num_args], nhStr(XtNlabel), "職業"); num_args++;
     rolelabel = XtCreateManagedWidget("role_label", labelWidgetClass,
                                       role_form, args, num_args);
 
@@ -1079,7 +1091,10 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
+/*JP
     XtSetArg(args[num_args], nhStr(XtNlabel), "Gender"); num_args++;
+*/
+    XtSetArg(args[num_args], nhStr(XtNlabel), "性別"); num_args++;
     gendlabel = XtCreateManagedWidget("gender_label", labelWidgetClass,
                                       gend_form, args, num_args);
 
@@ -1101,7 +1116,10 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 1); num_args++;
     plsel_gend_radios[0] = gend_radio_m
+/*JP
         =  XtCreateManagedWidget("Male", toggleWidgetClass,
+*/
+        =  XtCreateManagedWidget("男性", toggleWidgetClass,
                                  gend_form2, args, num_args);
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), gend_radio_m); num_args++;
@@ -1110,7 +1128,10 @@ X11_player_selection_dialog()
              plsel_gend_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 2); num_args++;
     plsel_gend_radios[1] = gend_radio_f
+/*JP
         =  XtCreateManagedWidget("Female", toggleWidgetClass,
+*/
+        =  XtCreateManagedWidget("女性", toggleWidgetClass,
                                  gend_form2, args, num_args);
 
     XawToggleUnsetCurrent(plsel_gend_radios[0]);
@@ -1138,7 +1159,10 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft); num_args++;
+/*JP
     XtSetArg(args[num_args], nhStr(XtNlabel), "Alignment"); num_args++;
+*/
+    XtSetArg(args[num_args], nhStr(XtNlabel), "属性"); num_args++;
     alignlabel = XtCreateManagedWidget("align_label", labelWidgetClass,
                                        align_form, args, num_args);
 
@@ -1159,7 +1183,10 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 1); num_args++;
     plsel_align_radios[0] = align_radio_l
+/*JP
         =  XtCreateManagedWidget("Lawful", toggleWidgetClass,
+*/
+        =  XtCreateManagedWidget("秩序", toggleWidgetClass,
                                  align_form2, args, num_args);
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), align_radio_l); num_args++;
@@ -1168,7 +1195,10 @@ X11_player_selection_dialog()
              plsel_align_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 2); num_args++;
     plsel_align_radios[1] = align_radio_n
+/*JP
         = XtCreateManagedWidget("Neutral", toggleWidgetClass,
+*/
+        = XtCreateManagedWidget("中立", toggleWidgetClass,
                                 align_form2, args, num_args);
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), align_radio_n); num_args++;
@@ -1177,7 +1207,10 @@ X11_player_selection_dialog()
              plsel_align_radios[0]); num_args++;
     XtSetArg(args[num_args], nhStr(XtNradioData), 3); num_args++;
     plsel_align_radios[2] = align_radio_c
+/*JP
         =  XtCreateManagedWidget("Chaotic", toggleWidgetClass,
+*/
+        =  XtCreateManagedWidget("混沌", toggleWidgetClass,
                                  align_form2, args, num_args);
 
     XawToggleUnsetCurrent(plsel_align_radios[0]);
@@ -1215,7 +1248,10 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
+/*JP
     XtSetArg(args[num_args], nhStr(XtNlabel), "Random"); num_args++;
+*/
+    XtSetArg(args[num_args], nhStr(XtNlabel), "ランダム"); num_args++;
     random_btn = XtCreateManagedWidget("random", commandWidgetClass, btn_form,
                                        args, num_args);
     XtAddCallback(random_btn, XtNcallback, plsel_random_btn_callback, form);
@@ -1227,7 +1263,10 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
+/*JP
     XtSetArg(args[num_args], nhStr(XtNlabel), "Play"); num_args++;
+*/
+    XtSetArg(args[num_args], nhStr(XtNlabel), "プレイ開始"); num_args++;
     plsel_btn_play = play_btn
         = XtCreateManagedWidget("play", commandWidgetClass, btn_form,
                                 args, num_args);
@@ -1241,7 +1280,10 @@ X11_player_selection_dialog()
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
     XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
+/*JP
     XtSetArg(args[num_args], nhStr(XtNlabel), "Quit"); num_args++;
+*/
+    XtSetArg(args[num_args], nhStr(XtNlabel), "終了"); num_args++;
     quit_btn = XtCreateManagedWidget("quit", commandWidgetClass, btn_form,
                                      args, num_args);
     XtAddCallback(quit_btn, XtNcallback, plsel_quit_btn_callback, form);

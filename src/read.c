@@ -211,14 +211,6 @@ char *buf;
         "Hello, I'm War!",
         "It is better to light a candle than to curse the darkness",
         "It is easier to curse the darkness than to light a candle",
-        /* expanded "rock--paper--scissors" featured in TV show "Big Bang
-           Theory" although they didn't create it (and an actual T-shirt
-           with pentagonal diagram showing which choices defeat which) */
-        "rock--paper--scissors--lizard--Spock!",
-        /* "All men must die -- all men must serve" challange and response
-           from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
-           TV show "Game of Thrones" (probably an actual T-shirt too...) */
-        "/Valar morghulis/ -- /Valar dohaeris/",
 #else
         "ゼイ・マイト・ビー・ストーム・ジャイアンツ",
         "武器が人を殺すのではない，私が人を殺すのだ",
@@ -239,15 +231,18 @@ char *buf;
         "やあ，私が『戦争』だ！",
         "暗いと不平を言うよりも，すすんであかりをつけましょう",
         "すすんであかりをつけるより，暗いと不平を言う方が簡単",
+#endif
         /* expanded "rock--paper--scissors" featured in TV show "Big Bang
            Theory" although they didn't create it (and an actual T-shirt
            with pentagonal diagram showing which choices defeat which) */
+/*JP
         "rock--paper--scissors--lizard--Spock!",
+*/
+        "岩--紙--ハサミ--トカゲ--スポック！",
         /* "All men must die -- all men must serve" challange and response
            from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
            TV show "Game of Thrones" (probably an actual T-shirt too...) */
         "/Valar morghulis/ -- /Valar dohaeris/",
-#endif
     };
 
     Strcpy(buf, shirt_msgs[tshirt->o_id % SIZE(shirt_msgs)]);
@@ -260,15 +255,42 @@ struct obj *apron;
 char *buf;
 {
     static const char *apron_msgs[] = {
+/*JP
         "Kiss the cook",
+*/
+        "コックにキスせよ",
+/*JP
         "I'm making SCIENCE!",
+*/
+        "私は*科学*を行っている！",
+/*JP
         "Don't mess with the chef",
+*/
+        "シェフには手を出すな",
+/*JP
         "Don't make me poison you",
+*/
+        "あなたに毒を盛らさせないで",
+/*JP
         "Gehennom's Kitchen",
+*/
+        "ゲヘナキッチン",
+/*JP
         "Rat: The other white meat",
+*/
+        "ネズミ: もう一つの白身肉",
+/*JP
         "If you can't stand the heat, get out of Gehennom!",
+*/
+        "熱に耐えられないなら、ゲヘナから出て行け！",
+/*JP
         "If we weren't meant to eat animals, why are they made out of meat?",
+*/
+        "もし我々が肉を食べる運命ではないのなら，なぜ動物には肉があるの？",
+/*JP
         "If you don't like the food, I'll stab you",
+*/
+        "食べ物が気に入らないなら，刺すよ",
     };
 
     Strcpy(buf, apron_msgs[apron->o_id % SIZE(apron_msgs)]);
@@ -1603,7 +1625,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                                                      : "maniacal laughter",
                      !ct ? "in the distance" : "close by");
 #else
-            You_hear("遠くで%sを聞いた．",
+            You_hear("%sくで%sを聞いた．",
+                     !ct ? "遠" : "近",
                      (confused || sobj->cursed) ? "悲しく泣き叫ぶ声"
                                                 : "狂ったように笑う声");
 #endif
@@ -2194,7 +2217,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         pline("Where do you want to center the %scloud?",
               already_known ? "stinking " : "");
 #else
-        pline("雲の中心をどこにしますか？");
+        pline("%s雲の中心をどこにしますか？",
+              already_known ? "悪臭" : "");
 #endif
         cc.x = u.ux;
         cc.y = u.uy;

@@ -211,17 +211,15 @@ moverock()
                               ? "it"
                               : the(xname(otmp)));
 #else
-                    /*JP:TODO:組み合わせチェック*/
-                    pline("%s%sが%sを動かせない理由だ．",
-                          deliver_part1
-                              ? "たぶんこれが，"
-                              : "",
-                          deliver_part1
-                              ? you_or_steed
-                              : upstart(you_or_steed),
-                          deliver_part1
-                              ? "それ"
-                              : the(xname(otmp)));
+                    /* "Perhaps that's why (you_or_steed) cannot move it."*/
+                    /* "(You_or_steed) cannot move (otmp)."*/
+                    if (deliver_part1) {
+                        pline("たぶんこれが，%sがそれを動かせない理由だ．",
+                              you_or_steed);
+                    } else {
+                        pline("%sは%sを動かせない．",
+                              you_or_steed, xname(otmp));
+                    }
 #endif
                 }
                 goto cannot_push;

@@ -475,7 +475,10 @@ static struct Comp_Opt {
 */
     { "name", "あなたの名前 (例 name:マーリン-W)", PL_NSIZ,
       DISP_IN_GAME },
+/*JP
     { "mouse_support", "game receives click info from mouse", 0, SET_IN_GAME },
+*/
+    { "mouse_support", "ゲームがマウスからのクリック情報を受け取る", 0, SET_IN_GAME },
 /*JP
     { "number_pad", "use the number pad for movement", 1, SET_IN_GAME },
 */
@@ -517,7 +520,10 @@ static struct Comp_Opt {
     { "paranoid_confirmation", "一部の状況で追加の確認をする", 28,
       SET_IN_GAME },
 #endif
+/*JP
     { "petattr",  "attributes for highlighting pets", 88, SET_IN_GAME },
+*/
+    { "petattr",  "ペットをハイライトするための属性", 88, SET_IN_GAME },
 /*JP
     { "pettype", "your preferred initial pet type", 4, DISP_IN_GAME },
 */
@@ -609,10 +615,16 @@ static struct Comp_Opt {
     },
     { "statuslines",
 #ifdef CURSES_GRAPHICS
+/*JP
       "2 or 3 lines for horizontal (bottom or top) status display",
+*/
+      "垂直(下か上)のステータス表示に2,3行使う",
       20, SET_IN_GAME
 #else
+/*JP
       "2 or 3 lines for status display",
+*/
+      "ステータス表示に2,3行使う",
       20, SET_IN_FILE
 #endif
     }, /*WC2*/
@@ -644,8 +656,16 @@ static struct Comp_Opt {
     { "suppress_alert", "バージョン間の違いに関する警告メッセージの無効化", 8,
       SET_IN_GAME },
     /* term_cols,term_rows -> WC2_TERM_SIZE (6: room to format 1..32767) */
+#if 0 /*JP*/
     { "term_cols", "number of columns", 6, SET_IN_FILE }, /*WC2*/
+#else
+    { "term_cols", "桁数", 6, SET_IN_FILE }, /*WC2*/
+#endif
+#if 0 /*JP*/
     { "term_rows", "number of rows", 6, SET_IN_FILE }, /*WC2*/
+#else
+    { "term_rows", "行数", 6, SET_IN_FILE }, /*WC2*/
+#endif
 #if 0 /*JP:T*/
     { "tile_width", "width of tiles", 20, DISP_IN_GAME },   /*WC*/
 #else
@@ -733,7 +753,10 @@ static struct Comp_Opt {
 */
     { "IBMgraphics", "IBMGraphics表示シンボルを読み込む", 70, SET_IN_FILE },
 #ifdef CURSES_GRAPHICS
+/*JP
     { "cursesgraphics", "load curses display symbols", 70, SET_IN_FILE },
+*/
+    { "cursesgraphics", "curses表示シンボルを読み込む", 70, SET_IN_FILE },
 #endif
 #ifdef MAC_GRAPHICS_ENV
 /*JP
@@ -806,18 +829,51 @@ typedef struct {
 } menu_cmd_t;
 
 static const menu_cmd_t default_menu_cmd_info[] = {
+/*JP
  { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
+*/
+ { "menu_first_page", MENU_FIRST_PAGE, "先頭ページに移動" },
+/*JP
  { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
+*/
+ { "menu_last_page", MENU_LAST_PAGE, "最終ページに移動" },
+/*JP
  { "menu_next_page", MENU_NEXT_PAGE, "Go to next page" },
+*/
+ { "menu_next_page", MENU_NEXT_PAGE, "次のページに移動" },
+/*JP
  { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
+*/
+ { "menu_previous_page", MENU_PREVIOUS_PAGE, "前のページに移動" },
+/*JP
  { "menu_select_all", MENU_SELECT_ALL, "Select all items" },
+*/
+ { "menu_select_all", MENU_SELECT_ALL, "全てを選択" },
+/*JP
  { "menu_deselect_all", MENU_UNSELECT_ALL, "Unselect all items" },
+*/
+ { "menu_deselect_all", MENU_UNSELECT_ALL, "全ての選択を解除" },
+/*JP
  { "menu_invert_all", MENU_INVERT_ALL, "Invert selection" },
+*/
+ { "menu_invert_all", MENU_INVERT_ALL, "選択を反転" },
+/*JP
  { "menu_select_page", MENU_SELECT_PAGE, "Select items in current page" },
+*/
+ { "menu_select_page", MENU_SELECT_PAGE, "現在のページのアイテムを選択" },
  { "menu_deselect_page", MENU_UNSELECT_PAGE,
+/*JP
    "Unselect items in current page" },
+*/
+   "Unselect items in current page" },
+/*JP
  { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page selection" },
+*/
+ { "menu_invert_page", MENU_INVERT_PAGE, "現在のページの選択を反転" },
+/*JP
  { "menu_search", MENU_SEARCH, "Search and toggle matching items" },
+*/
+ { "menu_search", MENU_SEARCH, "検索してマッチングしたアイテムをトグル" },
 };
 
 /*
@@ -1662,7 +1718,10 @@ STATIC_VAR const struct paranoia_opts {
 */
       "(a)pplyで杖を折るときにyではなくyes" },
     { PARANOID_EATING, "eat", 1, "continue", 4,
+/*JP
       "yes vs y to continue eating after first bite when satiated" },
+*/
+      "満腹の時に一口食べた後食べ続けるときにyではなくyes" },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
 /*JP
       "yes vs y to change form when lycanthropy is controllable" },

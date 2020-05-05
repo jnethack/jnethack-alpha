@@ -1781,18 +1781,37 @@ register const char *let, *word;
 
             menuquery[0] = qbuf[0] = '\0';
             if (iflags.force_invmenu)
+/*JP
                 Sprintf(menuquery, "What do you want to %s?", word);
+*/
+                Sprintf(menuquery, "%s%s%sÇ©ÅH", what, joshi, jpolite(jword));
             if (!strcmp(word, "grease"))
+/*JP
                 Sprintf(qbuf, "your %s", fingers_or_gloves(FALSE));
+*/
+                Sprintf(qbuf, "Ç†Ç»ÇΩÇÃ%s", fingers_or_gloves(FALSE));
             else if (!strcmp(word, "write with"))
+/*JP
                 Sprintf(qbuf, "your %s", body_part(FINGERTIP));
+*/
+                Sprintf(qbuf, "Ç†Ç»ÇΩÇÃ%s", body_part(FINGERTIP));
             else if (!strcmp(word, "wield"))
+#if 0 /*JP:T*/
                 Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
                         makeplural(body_part(HAND)),
                         !uwep ? " (wielded)" : "");
+#else
+                Sprintf(qbuf, "âΩÇ‡éËÇ…ÇµÇ»Ç¢%s",
+                        !uwep ? "(åªç›)" : "");
+#endif
             else if (!strcmp(word, "ready"))
+#if 0 /*JP*/
                 Sprintf(qbuf, "empty quiver%s",
                         !uquiver ? " (nothing readied)" : "");
+#else
+                Sprintf(qbuf, "ãÛÇÃñÓìõ%s",
+                        !uquiver ? " (âΩÇ‡èÄîıÇµÇƒÇ¢Ç»Ç¢)" : "");
+#endif
 
             if (ilet == '?' && !*lets && *altlets)
                 allowed_choices = altlets;

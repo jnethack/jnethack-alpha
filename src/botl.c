@@ -3134,7 +3134,10 @@ int fld;
         nopts++;
     }
 
+/*JP
     Sprintf(buf, "Select %s field hilite behavior:", initblstats[fld].fldname);
+*/
+    Sprintf(buf, "%sのハイライトの振る舞いを選択:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
 
     if (nopts > 1) {
@@ -3563,14 +3566,26 @@ choose_value:
             else
                 return FALSE;
         }
+/*JP
         Sprintf(colorqry, "Choose a color for when %s is '%s':",
+*/
+        Sprintf(colorqry, "%sが'%s'の時の色を選択:",
                 initblstats[fld].fldname, hilite.textmatch);
+/*JP
         Sprintf(attrqry, "Choose attribute for when %s is '%s':",
+*/
+        Sprintf(attrqry, "%sが'%s'の時の属性を選択:",
                 initblstats[fld].fldname, hilite.textmatch);
     } else if (behavior == BL_TH_ALWAYS_HILITE) {
+/*JP
         Sprintf(colorqry, "Choose a color to always hilite %s:",
+*/
+        Sprintf(colorqry, "常に%sをハイライトする色を選択:",
                 initblstats[fld].fldname);
+/*JP
         Sprintf(attrqry, "Choose attribute to always hilite %s:",
+*/
+        Sprintf(attrqry, "常に%sをハイライトする属性を選択:",
                 initblstats[fld].fldname);
     }
 
@@ -3742,7 +3757,10 @@ int fld;
         any = zeroany;
         any.a_int = -1;
         add_menu(tmpwin, NO_GLYPH, &any, 'X', 0, ATR_NONE,
+/*JP
                  "Remove selected hilites", MENU_UNSELECTED);
+*/
+                 "選択したハイライトを削除", MENU_UNSELECTED);
     }
 
 #ifndef SCORE_ON_BOTL
@@ -3758,10 +3776,16 @@ int fld;
         any = zeroany;
         any.a_int = -2;
         add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
+/*JP
                  "Add a new hilite", MENU_UNSELECTED);
+*/
+                 "新しいハイライトを追加", MENU_UNSELECTED);
     }
 
+/*JP
     Sprintf(buf, "Current %s hilites:", initblstats[fld].fldname);
+*/
+    Sprintf(buf, "現在の%sのハイライト:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
 
     if ((res = select_menu(tmpwin, PICK_ANY, &picks)) > 0) {
@@ -3854,7 +3878,10 @@ shlmenu_redo:
         any = zeroany;
         any.a_int = -1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+/*JP
                  "View all hilites in config format", MENU_UNSELECTED);
+*/
+                 "設定ファイル形式で全てのハイライトを表示", MENU_UNSELECTED);
 
         any = zeroany;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
@@ -3876,12 +3903,18 @@ shlmenu_redo:
         any.a_int = i + 1;
         Sprintf(buf, "%-18s", initblstats[i].fldname);
         if (count)
+/*JP
             Sprintf(eos(buf), " (%d defined)", count);
+*/
+            Sprintf(eos(buf), " (%d個設定中)", count);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
 
+/*JP
     end_menu(tmpwin, "Status hilites:");
+*/
+    end_menu(tmpwin, "ステータスハイライト:");
     if ((res = select_menu(tmpwin, PICK_ONE, &picks)) > 0) {
         i = picks->item.a_int - 1;
         if (i < 0)
@@ -3904,7 +3937,10 @@ shlmenu_redo:
        and also when non-zero it is the flag to enable highlighting */
     if (countall > 0 && !iflags.hilite_delta)
         pline(
+/*JP
  "To have highlights become active, set 'statushilites' option to non-zero.");
+*/
+ "ハイライトを有効にするには，'statushilites'オプションを0以外にしてください．");
 
     return TRUE;
 }

@@ -440,11 +440,16 @@ int force;
                                                            : 0,
                                                          FALSE)
                                               : mon_nam(mtmp));
-#else /*JP:TODO サドル関連は未処理 */
-                                        pline("%s%sは死んだ！",
-                                              mtmp->mtame
-                                              ? "かわいそうな" : "",
-                                              mon_nam(mtmp));
+#else
+                                        pline("%sは死んだ！",
+                                            mtmp->mtame
+                                              ? x_monnam(mtmp, ARTICLE_THE,
+                                                         "かわいそうな",
+                                                         has_mname(mtmp)
+                                                           ? SUPPRESS_SADDLE
+                                                           : 0,
+                                                         FALSE)
+                                              : mon_nam(mtmp));
 #endif
                                     }
                                     xkilled(mtmp, XKILL_NOMSG);

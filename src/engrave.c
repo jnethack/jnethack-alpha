@@ -1260,7 +1260,8 @@ doengrave()
                         : "engraved in",
                     surface(u.ux, u.uy));
 #else
-                You("%sメッセージを拭きとれなかった．",
+                You("%sに%sメッセージを拭きとれなかった．",
+                    surface(u.ux, u.uy),
                     oep->engr_type == BURN
                         ? (is_ice(u.ux, u.uy) ? "刻まれている" : "焼き付けられている")
                         : "刻まれている");
