@@ -124,6 +124,14 @@ boolean incl_helpless;
 #endif
 
     buf[0] = '\0'; /* lint suppression */
+#if 1 /*JP*//*前に持ってくる*/
+    if (incl_helpless && multi) {
+        if (multi_reason)
+            Sprintf(buf, "%s，", multi_reason);
+        else
+            Strcpy(buf, "助けを受けられない間に，");
+    }
+#endif
 #if 1 /*JP*//*先に対象をコピー*/
     strncat(buf, kname, siz - 1);
     siz -= strlen(buf);
@@ -180,7 +188,7 @@ boolean incl_helpless;
     *buf = '\0';
 #endif
 
-#if 0 /*JP*//*JP:TODO:死因の前に持って行かなければならない*/
+#if 0 /*JP*//*前に持って行く*/
     if (incl_helpless && multi) {
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
         if (multi_reason && strlen(multi_reason) + sizeof ", while " <= siz)
