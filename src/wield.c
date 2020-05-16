@@ -497,8 +497,9 @@ dowieldquiver()
             Sprintf(qbuf, "You are wielding %ld %s.  Ready %ld of them?",
                     uwep->quan, simpleonames(uwep), uwep->quan - 1L);
 #else
-            Sprintf(qbuf, "あなたは%ld %sを装備している．そのうち %ld を準備する？",
-                    uwep->quan, simpleonames(uwep), uwep->quan - 1L);
+            Sprintf(qbuf, "あなたは%ld%sの%sを装備している．そのうち%ld%sを準備する？",
+                    uwep->quan, numeral(uwep), simpleonames(uwep),
+                    uwep->quan - 1L, numeral(uwep));
 #endif
             switch (ynq(qbuf)) {
             case 'q':
@@ -551,12 +552,12 @@ dowieldquiver()
                               : "Your alternate weapon is",
                     uswapwep->quan, simpleonames(uswapwep),
                     uswapwep->quan - 1L);
-#else /*TODO:二刀流のときはかなり不自然 */
-            Sprintf(qbuf, "%s %ld %sだ．そのうち%ldを準備する？",
-                    u.twoweap ? "あなたがそれぞれ装備しているのは"
-                              : "あなたの予備の武器は",
-                    uswapwep->quan, simpleonames(uswapwep),
-                    uswapwep->quan - 1L);
+#else
+            Sprintf(qbuf, "あなた%sは%ld%sの%sだ．そのうち%ld%sを準備する？",
+                    u.twoweap ? "が二刀流で装備しているの"
+                              : "の予備の武器",
+                    uswapwep->quan, numeral(uswapwep), simpleonames(uswapwep),
+                    uswapwep->quan - 1L, numeral(uswapwep));
 #endif
             switch (ynq(qbuf)) {
             case 'q':

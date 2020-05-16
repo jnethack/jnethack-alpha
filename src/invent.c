@@ -1880,7 +1880,7 @@ register const char *let, *word;
 /*JP
             You("don't have that many!  You have only %ld.", otmp->quan);
 */
-            pline("そんなにたくさんは持っていない！せいぜい%ld個ってとこだ．", otmp->quan);
+            pline("そんなにたくさんは持っていない！せいぜい%ld%sってとこだ．", otmp->quan, numeral(otmp));
             if (in_doagain)
                 return (struct obj *) 0;
             continue;
