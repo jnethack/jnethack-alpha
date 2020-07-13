@@ -1,3 +1,6 @@
+	* 次の問題を修正
+	  * X11環境で日本語入力ができない (#40562)
+
 Sat Apr 18 2020  Kentaro Shirakata  <argrath@ub32.org>
 
 	* NetHack-3.6.6ベース JNetHackテストリリース(3.6.6-0.1)

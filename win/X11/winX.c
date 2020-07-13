@@ -1985,9 +1985,11 @@ char *input;
         getline_dialog = CreateDialog(getline_popup, nhStr("dialog"),
                                       done_button, abort_button);
 
+#if 0 /*JP*//*•¶š—ñİ’è‚ÌŒã‚ë‚É‰ñ‚·*/
         XtRealizeWidget(getline_popup);
         XSetWMProtocols(XtDisplay(getline_popup), XtWindow(getline_popup),
                         &wm_delete_window, 1);
+#endif
     }
     SetDialogPrompt(getline_dialog, (String) question); /* set prompt */
     /* 60:  make the answer widget be wide enough to hold 60 characters,
@@ -2001,12 +2003,21 @@ char *input;
 #else
     SetDialogResponse(getline_dialog, nhStr(""), 60); /* set default answer */
 #endif
+#if 1 /*JP*//*•¶š—ñİ’è‚ÌŒã‚ë‚É‰ñ‚·*/
+    XtRealizeWidget(getline_popup);
+    XSetWMProtocols(XtDisplay(getline_popup), XtWindow(getline_popup),
+                    &wm_delete_window, 1);
+#endif
     positionpopup(getline_popup, TRUE);           /* center,bottom */
 
     nh_XtPopup(getline_popup, (int) XtGrabExclusive, getline_dialog);
 
     /* The callback will enable the event loop exit. */
     (void) x_event(EXIT_ON_EXIT);
+
+#if 1 /*JP*//*–ˆ‰ñ”jŠü‚·‚é*/
+    release_getline_widgets();
+#endif
 }
 
 /* Display file ----------------------------------------------------------- */
