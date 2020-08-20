@@ -30,8 +30,8 @@
  * God names use a leading underscore to flag goddesses.
  */
 const struct Role roles[] = {
-#if 0 /*JP:T*/
     { { "Archeologist", 0 },
+#if 0 /*JP:T*/
       { { "Digger", 0 },
         { "Field Worker", 0 },
         { "Investigator", 0 },
@@ -43,7 +43,7 @@ const struct Role roles[] = {
         { "Curator", 0 } },
       "Quetzalcoatl", "Camaxtli", "Huhetotl", /* Central American */
 #else
-    { { "lŒÃŠwÒ", 0 },
+      { "lŒÃŠwÒ", 0 },
       { { "zˆõ", 0 },
         { "˜J“­Ò", 0 },
         { "’²¸Ò", 0 },
@@ -91,8 +91,8 @@ const struct Role roles[] = {
       A_INT,
       SPE_MAGIC_MAPPING,
       -4 },
-#if 0 /*JP:T*/
     { { "Barbarian", 0 },
+#if 0 /*JP:T*/
       { { "Plunderer", "Plunderess" },
         { "Pillager", 0 },
         { "Bandit", 0 },
@@ -104,7 +104,7 @@ const struct Role roles[] = {
         { "Conqueror", "Conqueress" } },
       "Mitra", "Crom", "Set", /* Hyborian */
 #else
-    { { "–ì”Øl", 0 },
+      { "–ì”Øl", 0 },
       { { "“‘¯", 0 },
         { "—ª’DÒ", 0 },
         { "ˆ«Š¿", 0 },
@@ -152,8 +152,8 @@ const struct Role roles[] = {
       A_INT,
       SPE_HASTE_SELF,
       -4 },
-#if 0 /*JP:T*/
     { { "Caveman", "Cavewoman" },
+#if 0 /*JP:T*/
       { { "Troglodyte", 0 },
         { "Aborigine", 0 },
         { "Wanderer", 0 },
@@ -165,7 +165,7 @@ const struct Role roles[] = {
         { "Pioneer", 0 } },
       "Anu", "_Ishtar", "Anshar", /* Babylonian */
 #else
-    { { "“´ŒAl", 0 },
+      { "“´ŒAl", 0 },
       { { "ŒŠ‹l", 0 },
         { "Œ´Z–¯", 0 },
         { "•ú˜QÒ", 0 },
@@ -213,8 +213,8 @@ const struct Role roles[] = {
       A_INT,
       SPE_DIG,
       -4 },
-#if 0 /*JP:T*/
     { { "Healer", 0 },
+#if 0 /*JP:T*/
       { { "Rhizotomist", 0 },
         { "Empiric", 0 },
         { "Embalmer", 0 },
@@ -226,7 +226,7 @@ const struct Role roles[] = {
         { "Chirurgeon", 0 } },
       "_Athena", "Hermes", "Poseidon", /* Greek */
 #else
-    { { "–òt", 0 },
+      { "–òt", 0 },
       { { "Œ©K‚¢", 0 },
         { "ˆãtŒ©K‚¢", 0 },
         { "ŠÅŒìt", "ŠÅŒì•w" },
@@ -273,8 +273,8 @@ const struct Role roles[] = {
       A_WIS,
       SPE_CURE_SICKNESS,
       -4 },
-#if 0 /*JP:T*/
     { { "Knight", 0 },
+#if 0 /*JP:T*/
       { { "Gallant", 0 },
         { "Esquire", 0 },
         { "Bachelor", 0 },
@@ -286,7 +286,7 @@ const struct Role roles[] = {
         { "Paladin", 0 } },
       "Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
 #else
-    { { "‹Rm", 0 },
+      { "‹Rm", 0 },
       { { "Œ©K‚¢", 0 },
         { "•à•º", 0 },
         { "ím", 0 },
@@ -333,8 +333,8 @@ const struct Role roles[] = {
       A_WIS,
       SPE_TURN_UNDEAD,
       -4 },
-#if 0 /*JP:T*/
     { { "Monk", 0 },
+#if 0 /*JP:T*/
       { { "Candidate", 0 },
         { "Novice", 0 },
         { "Initiate", 0 },
@@ -346,7 +346,7 @@ const struct Role roles[] = {
         { "Master", 0 } },
       "Shan Lai Ching", "Chih Sung-tzu", "Huan Ti", /* Chinese */
 #else
-    { { "•“¬‰Æ", 0 },
+      { "•“¬‰Æ", 0 },
       { { "“ü–åŠó–]Ò", 0 },
         { "‰SÒ", 0 },
         { "“ü–åÒ“`", 0 },
@@ -394,8 +394,8 @@ const struct Role roles[] = {
       A_WIS,
       SPE_RESTORE_ABILITY,
       -4 },
-#if 0 /*JP:T*/
     { { "Priest", "Priestess" },
+#if 0 /*JP:T*/
       { { "Aspirant", 0 },
         { "Acolyte", 0 },
         { "Adept", 0 },
@@ -407,7 +407,7 @@ const struct Role roles[] = {
         { "High Priest", "High Priestess" } },
       0, 0, 0, /* deities from a randomly chosen other role will be used */
 #else
-    { { "‘m—µ", "“ò‘m" },
+      { "‘m—µ", "“ò‘m" },
       { { "C“¹Ò", "C“¹—" },
         { "˜Ò", 0 },
         { "˜Õ", 0 },
@@ -457,8 +457,8 @@ const struct Role roles[] = {
       -4 },
     /* Note:  Rogue precedes Ranger so that use of `-R' on the command line
        retains its traditional meaning. */
-#if 0 /*JP:T*/
     { { "Rogue", 0 },
+#if 0 /*JP:T*/
       { { "Footpad", 0 },
         { "Cutpurse", 0 },
         { "Rogue", 0 },
@@ -470,7 +470,7 @@ const struct Role roles[] = {
         { "Thief", 0 } },
       "Issek", "Mog", "Kos", /* Nehwon */
 #else
-    { { "“‘¯", 0 },
+      { "“‘¯", 0 },
       { { "’Ç‚¢‚Í‚¬", 0 },
         { "‚Ğ‚Á‚½‚­‚è", 0 },
         { "ƒXƒŠ", 0 },
@@ -517,8 +517,8 @@ const struct Role roles[] = {
       A_INT,
       SPE_DETECT_TREASURE,
       -4 },
-#if 0 /*JP:T*/
     { { "Ranger", 0 },
+#if 0 /*JP:T*/
       {
 #if 0 /* OBSOLETE */
         {"Edhel",   "Elleth"},
@@ -544,7 +544,7 @@ const struct Role roles[] = {
         { "Marksman", "Markswoman" } },
       "Mercury", "_Venus", "Mars", /* Roman/planets */
 #else
-    { { "ƒŒƒ“ƒWƒƒ[", 0 },
+      { "ƒŒƒ“ƒWƒƒ[", 0 },
       { { "V•Ä", 0 },
         { "Œ©’£‚è", 0 },
         { "æ“±", 0 },
@@ -592,8 +592,8 @@ const struct Role roles[] = {
       A_INT,
       SPE_INVISIBILITY,
       -4 },
-#if 0 /*JP:T*/
     { { "Samurai", 0 },
+#if 0 /*JP:T*/
       { { "Hatamoto", 0 },       /* Banner Knight */
         { "Ronin", 0 },          /* no allegiance */
         { "Ninja", "Kunoichi" }, /* secret society */
@@ -605,7 +605,7 @@ const struct Role roles[] = {
         { "Shogun", 0 } },       /* supreme commander, warlord */
       "_Amaterasu Omikami", "Raijin", "Susanowo", /* Japanese */
 #else
-    { { "˜", 0 },
+      { "˜", 0 },
       { { "Šø–{", 0 },       /* Banner Knight */
         { "˜Ql", 0 },          /* no allegiance */
         { "”EÒ", "‚­ƒmˆê" }, /* secret society */
@@ -652,8 +652,8 @@ const struct Role roles[] = {
       A_INT,
       SPE_CLAIRVOYANCE,
       -4 },
-#if 0 /*JP:T*/
     { { "Tourist", 0 },
+#if 0 /*JP:T*/
       { { "Rambler", 0 },
         { "Sightseer", 0 },
         { "Excursionist", 0 },
@@ -665,7 +665,7 @@ const struct Role roles[] = {
         { "Adventurer", 0 } },
       "Blind Io", "_The Lady", "Offler", /* Discworld */
 #else
-    { { "ŠÏŒõ‹q", 0 },
+      { "ŠÏŒõ‹q", 0 },
       { { "ƒv[‘¾˜Y", "ƒv[q" },
         { "ŠÏŒõ‹q", 0 },
         { "ü—V—·sÒ", 0 },
@@ -712,8 +712,8 @@ const struct Role roles[] = {
       A_INT,
       SPE_CHARM_MONSTER,
       -4 },
-#if 0 /*JP:T*/
     { { "Valkyrie", 0 },
+#if 0 /*JP:T*/
       { { "Stripling", 0 },
         { "Skirmisher", 0 },
         { "Fighter", 0 },
@@ -725,7 +725,7 @@ const struct Role roles[] = {
         { "Lord", "Lady" } },
       "Tyr", "Odin", "Loki", /* Norse */
 #else
-    { { "ƒƒ‹ƒLƒ…[ƒŒ", 0 },
+      { "ƒƒ‹ƒLƒ…[ƒŒ", 0 },
       { { "Œ©K‚¢", 0 },
         { "•à•º", 0 },
         { "ím", 0 },
@@ -772,8 +772,8 @@ const struct Role roles[] = {
       A_WIS,
       SPE_CONE_OF_COLD,
       -4 },
-#if 0 /*JP:T*/
     { { "Wizard", 0 },
+#if 0 /*JP:T*/
       { { "Evoker", 0 },
         { "Conjurer", 0 },
         { "Thaumaturge", 0 },
@@ -785,7 +785,7 @@ const struct Role roles[] = {
         { "Mage", 0 } },
       "Ptah", "Thoth", "Anhur", /* Egyptian */
 #else
-    { { "–‚–@g‚¢", 0 },
+      { "–‚–@g‚¢", 0 },
       { { "è•it", 0 },
         { "Šïpt", 0 },
         { "è‚¢t", 0 },
@@ -834,7 +834,11 @@ const struct Role roles[] = {
       SPE_MAGIC_MISSILE,
       -4 },
     /* Array terminator */
+#if 0 /*JP*/
     { { 0, 0 } }
+#else
+    { { 0, 0 }, { 0, 0 } }
+#endif
 };
 
 /* The player's role, created at runtime from initial
@@ -842,6 +846,9 @@ const struct Role roles[] = {
  */
 struct Role urole = {
     { "Undefined", 0 },
+#if 1 /*JP*/
+    { "Undefined", 0 },
+#endif
     { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
       { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
     "L", "N", "C",
@@ -868,8 +875,8 @@ struct Role urole = {
 /* Table of all races */
 const struct Race races[] = {
     {
-#if 0 /*JP:T*/
         "human",
+#if 0 /*JP:T*/
         "human",
         "humanity",
 #else
@@ -900,8 +907,8 @@ const struct Race races[] = {
         { 1, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
-#if 0 /*JP:T*/
         "elf",
+#if 0 /*JP:T*/
         "elven",
         "elvenkind",
 #else
@@ -927,8 +934,8 @@ const struct Race races[] = {
         { 2, 0, 3, 0, 3, 0 }  /* Energy */
     },
     {
-#if 0 /*JP:T*/
         "dwarf",
+#if 0 /*JP:T*/
         "dwarven",
         "dwarvenkind",
 #else
@@ -954,8 +961,8 @@ const struct Race races[] = {
         { 0, 0, 0, 0, 0, 0 }  /* Energy */
     },
     {
-#if 0 /*JP:T*/
         "gnome",
+#if 0 /*JP:T*/
         "gnomish",
         "gnomehood",
 #else
@@ -981,8 +988,8 @@ const struct Race races[] = {
         { 2, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
-#if 0 /*JP:T*/
         "orc",
+#if 0 /*JP:T*/
         "orcish",
         "orcdom",
 #else
@@ -1015,6 +1022,9 @@ const struct Race races[] = {
  * choices.  This may be munged in role_init().
  */
 struct Race urace = {
+#if 1 /*JP*/
+    "something",
+#endif
     "something",
     "undefined",
     "something",
@@ -1047,9 +1057,9 @@ const struct Gender genders[] = {
     { "female", "she", "her", "her", "Fem", ROLE_FEMALE },
     { "neuter", "it", "it", "its", "Ntr", ROLE_NEUTER }
 #else
-    { "’j«", "”Ş", "”Ş", "”Ş‚Ì", "Mal", ROLE_MALE },
-    { "—«", "”Ş—", "”Ş—", "”Ş—‚Ì", "Fem", ROLE_FEMALE },
-    { "’†«", "‚»‚ê", "‚»‚ê", "‚»‚Ì", "Ntr", ROLE_NEUTER }
+    { "’j«", "”Ş", "”Ş", "”Ş‚Ì", "Mal", "male", ROLE_MALE },
+    { "—«", "”Ş—", "”Ş—", "”Ş—‚Ì", "Fem", "female", ROLE_FEMALE },
+    { "’†«", "‚»‚ê", "‚»‚ê", "‚»‚Ì", "Ntr", "neuter", ROLE_NEUTER }
 #endif
 };
 
@@ -1061,10 +1071,10 @@ const struct Align aligns[] = {
     { "chaos", "chaotic", "Cha", ROLE_CHAOTIC, A_CHAOTIC },
     { "evil", "unaligned", "Una", 0, A_NONE }
 #else
-    { "’˜", "’˜‚Ì", "Law", ROLE_LAWFUL, A_LAWFUL },
-    { "’†—§", "’†—§‚Ì", "Neu", ROLE_NEUTRAL, A_NEUTRAL },
-    { "¬“×", "¬“×‚Ì", "Cha", ROLE_CHAOTIC, A_CHAOTIC },
-    { "–³S", "–³S‚Ì", "Una", 0, A_NONE }
+    { "’˜", "’˜‚Ì", "Law", "lawful", ROLE_LAWFUL, A_LAWFUL },
+    { "’†—§", "’†—§‚Ì", "Neu", "neutral", ROLE_NEUTRAL, A_NEUTRAL },
+    { "¬“×", "¬“×‚Ì", "Cha", "chaotic", ROLE_CHAOTIC, A_CHAOTIC },
+    { "–³S", "–³S‚Ì", "Una", "unaligned", 0, A_NONE }
 #endif
 };
 
@@ -1080,10 +1090,10 @@ STATIC_DCL int FDECL(role_gendercount, (int));
 STATIC_DCL int FDECL(race_alignmentcount, (int));
 
 /* used by str2XXX() */
-/*JP
 static char NEARDATA randomstr[] = "random";
-*/
-static char NEARDATA randomstr[] = "ƒ‰ƒ“ƒ_ƒ€";
+#if 1 /*JP*/
+static char NEARDATA randomstrj[] = "ƒ‰ƒ“ƒ_ƒ€";
+#endif
 
 boolean
 validrole(rolenum)
@@ -1140,13 +1150,26 @@ const char *str;
         /* Or the female name? */
         if (roles[i].name.f && !strncmpi(str, roles[i].name.f, len))
             return i;
+#if 1 /*JP*/
+        /* Does it match the male name? */
+        if (!strncmpi(str, roles[i].opt.m, len))
+            return i;
+        /* Or the female name? */
+        if (roles[i].opt.f && !strncmpi(str, roles[i].opt.f, len))
+            return i;
+#endif
         /* Or the filecode? */
         if (!strcmpi(str, roles[i].filecode))
             return i;
     }
 
     if ((len == 1 && (*str == '*' || *str == '@'))
+#if 0 /*JP*/
         || !strncmpi(str, randomstr, len))
+#else
+        || !strncmpi(str, randomstr, len)
+        || !strncmpi(str, randomstrj, len))
+#endif
         return ROLE_RANDOM;
 
     /* Couldn't find anything appropriate */
@@ -1206,13 +1229,23 @@ const char *str;
         /* Does it match the noun? */
         if (!strncmpi(str, races[i].noun, len))
             return i;
+#if 1 /*JP*/
+        /* Does it match the noun? */
+        if (!strncmpi(str, races[i].opt, len))
+            return i;
+#endif
         /* Or the filecode? */
         if (!strcmpi(str, races[i].filecode))
             return i;
     }
 
     if ((len == 1 && (*str == '*' || *str == '@'))
+#if 0 /*JP*/
         || !strncmpi(str, randomstr, len))
+#else
+        || !strncmpi(str, randomstr, len)
+        || !strncmpi(str, randomstrj, len))
+#endif
         return ROLE_RANDOM;
 
     /* Couldn't find anything appropriate */
@@ -1273,12 +1306,22 @@ const char *str;
         /* Does it match the adjective? */
         if (!strncmpi(str, genders[i].adj, len))
             return i;
+#if 1 /*JP*/
+        /* Does it match the adjective? */
+        if (!strncmpi(str, genders[i].opt, len))
+            return i;
+#endif
         /* Or the filecode? */
         if (!strcmpi(str, genders[i].filecode))
             return i;
     }
     if ((len == 1 && (*str == '*' || *str == '@'))
+#if 0 /*JP*/
         || !strncmpi(str, randomstr, len))
+#else
+        || !strncmpi(str, randomstr, len)
+        || !strncmpi(str, randomstrj, len))
+#endif
         return ROLE_RANDOM;
 
     /* Couldn't find anything appropriate */
@@ -1336,15 +1379,28 @@ const char *str;
     /* Match as much of str as is provided */
     len = strlen(str);
     for (i = 0; i < ROLE_ALIGNS; i++) {
+#if 0 /*JP*/
         /* Does it match the adjective? */
         if (!strncmpi(str, aligns[i].adj, len))
             return i;
+#else
+        /* Does it match the adjective? */
+        if (!strncmpi(str, aligns[i].noun, len))
+            return i;
+        if (!strncmpi(str, aligns[i].opt, len))
+            return i;
+#endif
         /* Or the filecode? */
         if (!strcmpi(str, aligns[i].filecode))
             return i;
     }
     if ((len == 1 && (*str == '*' || *str == '@'))
+#if 0 /*JP*/
         || !strncmpi(str, randomstr, len))
+#else
+        || !strncmpi(str, randomstr, len)
+        || !strncmpi(str, randomstrj, len))
+#endif
         return ROLE_RANDOM;
 
     /* Couldn't find anything appropriate */

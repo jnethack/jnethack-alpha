@@ -104,6 +104,9 @@ struct u_roleplay {
 /*** Unified structure containing role information ***/
 struct Role {
     /*** Strings that name various things ***/
+#if 1 /*JP*/
+    struct RoleName opt;     /* オプション指定文字列 */
+#endif
     struct RoleName name;    /* the role's name (from u_init.c) */
     struct RoleName rank[9]; /* names for experience levels (from botl.c) */
     const char *lgod, *ngod, *cgod; /* god names (from pray.c) */
@@ -180,6 +183,9 @@ extern struct Role urole;
 
 struct Race {
     /*** Strings that name various things ***/
+#if 1 /*JP*/
+    const char *opt;      /* オプション指定文字列 */
+#endif
     const char *noun;           /* noun ("human", "elf") */
     const char *adj;            /* adjective ("human", "elven") */
     const char *coll;           /* collective ("humanity", "elvenkind") */
@@ -230,6 +236,9 @@ struct Gender {
     const char *him;      /* him/her/it */
     const char *his;      /* his/her/its */
     const char *filecode; /* file code */
+#if 1 /*JP*/
+    const char *opt;      /* オプション指定文字列 */
+#endif
     short allow;          /* equivalent ROLE_ mask */
 };
 #define ROLE_GENDERS 2    /* number of permitted player genders
@@ -254,6 +263,9 @@ struct Align {
     const char *noun;     /* law/balance/chaos */
     const char *adj;      /* lawful/neutral/chaotic */
     const char *filecode; /* file code */
+#if 1 /*JP*/
+    const char *opt;      /* オプション指定文字列 */
+#endif
     short allow;          /* equivalent ROLE_ mask */
     aligntyp value;       /* equivalent A_ value */
 };
