@@ -654,7 +654,7 @@ outer_break:
 #else
                 pline("%s‚Ì%s‚Í‚µ‚Î‚ç‚­%s‹P‚¢‚½D", Monnam(mon),
                       simpleonames(best),
-                      jconj_adj(hcolor(NH_BLACK)));
+                      hcolor_adv(NH_BLACK));
 #endif
         } /* can see it */
         m_delay += objects[best->otyp].oc_delay;

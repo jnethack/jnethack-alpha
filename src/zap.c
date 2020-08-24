@@ -5617,7 +5617,7 @@ int osym, dmgtyp;
                       The(xname(obj)), hcolor("dark red"));
 #else
                 pline("%sは奇妙に%s輝いたが何も変化しなかった．",
-                      xname(obj), jconj_adj(hcolor("暗褐色の")));
+                      xname(obj), hcolor_adv("暗褐色の"));
 #endif
         }
         quan = obj->quan;
@@ -5877,7 +5877,7 @@ int osym, dmgtyp;
                           The(distant_name(obj, xname)), hcolor("dark red"));
 #else
                     pline("%sは奇妙に%s輝いたが何も変化しなかった．",
-                          The(distant_name(obj, xname)), jconj_adj(hcolor("暗褐色の")));
+                          The(distant_name(obj, xname)), hcolor_adv("暗褐色の"));
 #endif
             }
             quan = obj->quan;

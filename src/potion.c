@@ -2677,8 +2677,8 @@ dodip()
 #else
         pline("%s‚Í‚Ó‚¿‚ª%s‚È‚Á‚½D", The(cxname(obj)),
               Blind ? "‚µ‚í‚µ‚í‚É"
-              : jconj_adj(potion->odiluted ? hcolor(NH_ORANGE)
-                        : hcolor(NH_RED)));
+              : potion->odiluted ? hcolor_adv(NH_ORANGE)
+                        : hcolor_adv(NH_RED));
 #endif
         potion->in_use = FALSE; /* didn't go poof */
         if (potion->dknown

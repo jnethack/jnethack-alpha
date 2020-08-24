@@ -1724,7 +1724,7 @@ unsigned doname_flags;
                             glow_color(obj->oartifact));
 #else
                     Sprintf(eos(bp) - 1, ", %s%s‚¢‚é)",
-                            jconj_adj(glow_color(obj->oartifact)),
+                            glow_color(obj->oartifact),
                             jconj(glow_verb(warn_obj_cnt, TRUE), "‚Ä"));
 #endif
             }

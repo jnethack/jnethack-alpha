@@ -612,7 +612,7 @@ rndcurse()
                   hcolor(otmp->cursed ? NH_BLACK : (const char *) "brown"));
 #else
             pline("%s‚Í%s‹P‚¢‚½D", xname(otmp),
-                  jconj_adj(hcolor(otmp->cursed ? NH_BLACK : (const char *)"’ƒF‚Ì")));
+                  hcolor_adv(otmp->cursed ? NH_BLACK : (const char *)"’ƒF‚Ì"));
 #endif
             otmp->bknown = 1; /* ok to bypass set_bknown() here */
         }

@@ -2130,10 +2130,14 @@ int arti_indx;
 #if 0 /*JP*/
     const char *colorstr = clr2colorname(colornum);
 #else
-    const char *colorstr = jconj_adj(clr2colorname2(colornum));
+    const char *colorstr = clr2colorname2(colornum);
 #endif
 
+#if 0 /*JP*/
     return hcolor(colorstr);
+#else
+    return hcolor_adv(colorstr);
+#endif
 }
 
 /* glow verb; [0] holds the value used when blind */
@@ -2204,7 +2208,7 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
                       (newstr > oldstr) ? '!' : '.');
 #else
                 pline("%s‚Í%s%s%s", bare_artifactname(uwep),
-                      jconj_adj(glow_color(uwep->oartifact)),
+                      glow_color(uwep->oartifact),
                       jconj(glow_verb(orc_count, FALSE), "‚½"),
                       (newstr > oldstr) ? "I" : "D");
 #endif

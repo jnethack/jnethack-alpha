@@ -6445,7 +6445,7 @@ boolean disarm;
 #else
             pline("%sƒKƒX‰_‚ª%s‚Ì’ê‚Å‰Q‚Ü‚¢‚½D",
                   Blind ? blindgas[rn2(SIZE(blindgas))] :
-                  jconj_adj(rndcolor()), xname(obj));
+                  rndcolor(), xname(obj));
 #endif
             if (!Stunned) {
                 if (Hallucination)
@@ -6870,7 +6870,7 @@ lava_effects()
                           The(xname(obj)), hcolor("dark red"));
 #else
                     pline("%s‚Í•sŽv‹c‚É%s‹P‚¢‚½‚ªC–³‚Ì‚æ‚¤‚¾D",
-                          xname(obj), jconj_adj(hcolor("ˆÃÔF‚Ì")));
+                          xname(obj), hcolor_adv("ˆÃÔF‚Ì"));
 #endif
             } else if (obj->in_use) {
                 if (obj->owornmask) {

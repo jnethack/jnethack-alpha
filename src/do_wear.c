@@ -517,7 +517,7 @@ Helmet_on(VOID_ARGS)
                       hcolor(NH_BLACK));
 #else
                 pline("%sÇÕàÍèu%sãPÇ¢ÇΩÅD",
-                      xname(uarmh), jconj_adj(hcolor(NH_BLACK)));
+                      xname(uarmh), hcolor_adv(NH_BLACK));
 #endif
             curse(uarmh);
         }

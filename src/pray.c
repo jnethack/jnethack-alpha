@@ -568,7 +568,7 @@ int trouble;
 #else
             Your("%s‚Í%s‚â‚í‚ç‚©‚­‹P‚¢‚½D",
                  what ? what : (const char *)xname(otmp),
-                 jconj_adj(hcolor(NH_AMBER)));
+                 hcolor_adv(NH_AMBER));
 #endif
             iflags.last_msg = PLNMSG_OBJ_GLOWS;
             otmp->bknown = !Hallucination; /* ok to skip set_bknown() */
@@ -657,7 +657,7 @@ int trouble;
 /*JP
             pline("%s %s.", Yobjnam2(otmp, "softly glow"), hcolor(NH_AMBER));
 */
-            pline("%s‚Í%s‚â‚í‚ç‚©‚­‹P‚¢‚½D", y_monnam(u.usteed), hcolor(NH_AMBER));
+            pline("%s‚Í%s‚â‚í‚ç‚©‚­‹P‚¢‚½D", y_monnam(u.usteed), hcolor_adv(NH_AMBER));
             set_bknown(otmp, 1);
         }
         uncurse(otmp);
@@ -1274,7 +1274,7 @@ aligntyp g_align;
                               hcolor(NH_AMBER), repair_buf);
 #else
                         Your("%s‚Í%s‚â‚í‚ç‚©‚­‹P‚¢‚½D%s", xname(uwep), 
-                             jconj_adj(hcolor(NH_AMBER)), repair_buf);
+                              hcolor_adv(NH_AMBER), repair_buf);
 #endif
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                     } else
@@ -1431,7 +1431,7 @@ aligntyp g_align;
                               hcolor(NH_AMBER));
 #else
                         Your("%s‚Í%s‚â‚í‚ç‚©‚­‹P‚¢‚½D", xname(otmp),
-                             jconj_adj(hcolor(NH_AMBER)));
+                              hcolor_adv(NH_AMBER));
 #endif
                         iflags.last_msg = PLNMSG_OBJ_GLOWS;
                         otmp->bknown = 1; /* ok to bypass set_bknown() */
@@ -1581,7 +1581,7 @@ boolean bless_water;
         pline("%sÕ’d‚Ì–ò‚Íˆêu%s‹P‚¢‚½D",
               (other && changed > 1L) ? "‚¢‚­‚Â‚©‚Ì"
                                       : "",
-              jconj_adj(bless_water ? hcolor(NH_LIGHT_BLUE) : hcolor(NH_BLACK)));
+              (bless_water ? hcolor_adv(NH_LIGHT_BLUE) : hcolor_adv(NH_BLACK)));
 #endif
     }
     return (boolean) (changed > 0L);
@@ -2179,11 +2179,11 @@ dosacrifice()
                                                : (const char *) "gray"));
 #else
                         pline("Õ’d‚Í%s‹P‚¢‚½D",
-                              jconj_adj(hcolor((u.ualign.type == A_LAWFUL)
+                                  hcolor_adv((u.ualign.type == A_LAWFUL)
                                             ? NH_WHITE
                                             : u.ualign.type
                                                ? NH_BLACK
-                                               : (const char *)"ŠDF‚Ì")));
+                                               : (const char *)"ŠDF‚Ì"));
 #endif
 
                     if (rnl(u.ulevel) > 6 && u.ualign.record > 0

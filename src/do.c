@@ -383,7 +383,7 @@ register struct obj *obj;
 #else
         pline("%s‚ªÕ’d‚ÉG‚ê‚é‚Æ%sŒõ‚Á‚½D",
               doname(obj),
-              jconj_adj(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)));
+              hcolor_adv(obj->blessed ? NH_AMBER : NH_BLACK));
 #endif
         if (!Hallucination)
             obj->bknown = 1; /* ok to bypass set_bknown() */
@@ -728,14 +728,14 @@ register struct obj *obj;
                       hcolor((obj->spe < 0) ? NH_BLACK : NH_SILVER));
 #else
             pline("—¬‚µ‘ä‚Íˆêu%s‹P‚¢‚½D",
-                      jconj_adj(hcolor((obj->spe < 0) ? NH_BLACK : NH_SILVER)));
+                      hcolor_adv((obj->spe < 0) ? NH_BLACK : NH_SILVER));
 #endif
             break;
         case RIN_WARNING:
 /*JP
             pline_The("sink glows %s for a moment.", hcolor(NH_WHITE));
 */
-            pline("—¬‚µ‘ä‚Íˆêu%s‹P‚¢‚½D", jconj_adj(hcolor(NH_WHITE)));
+            pline("—¬‚µ‘ä‚Íˆêu%s‹P‚¢‚½D", hcolor_adv(NH_WHITE));
             break;
         case RIN_TELEPORT_CONTROL:
 /*JP: "beam aboard" ‚ÍƒXƒ^[ƒgƒŒƒbƒN‚Ìu“]‘—v*/

@@ -473,6 +473,9 @@ struct trans_verb {
     const char *particle;
     const char *jp;
 };
+
+/* hcolor()‚ÍŒ`—eŽŒ‚ð•Ô‚·‚Ì‚Å•›ŽŒ‚É•ÏŠ·‚·‚é */
+#define hcolor_adv(x) jconj_adj(hcolor((x)))
 #endif
 
 #undef E

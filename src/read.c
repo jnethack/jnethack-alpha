@@ -660,7 +660,7 @@ register const char *color;
           Blind ? "" : " ", Blind ? "" : hcolor(color));
 #else
     Your("%s‚Íˆêu%s%sD", xname(otmp),
-         Blind ? "" : jconj_adj(hcolor(color)),
+         Blind ? "" : hcolor_adv(color),
          Blind ? "U“®‚µ‚½" : "‹P‚¢‚½");
 #endif
 }
@@ -1325,7 +1325,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                               : (is_shield(otmp) ? "layer" : "shield"));
 #else
                 Your("%s‚Í%s%s%s‚Å•¢‚í‚ê‚½I", xname(otmp),
-                     jconj_adj(hcolor(scursed ? NH_BLACK : NH_GOLDEN)),
+                     hcolor_adv(scursed ? NH_BLACK : NH_GOLDEN),
                      scursed ? "Œõ‚é‚Ü‚¾‚ç‚Ì" : "‚ä‚ç‚ß‚­",
                      scursed ? "‹P‚«"
                              : "ƒoƒŠƒA");
@@ -1375,7 +1375,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                   otense(otmp, "evaporate"));
 #else
             Your("%s‚Í‚µ‚Î‚ç‚­‚ÌŠÔŒƒ‚µ‚­%s%sCö”­‚µ‚½D", xname(otmp),
-                 (Blind || same_color) ? "" : jconj_adj(hcolor(scursed ? NH_BLACK : NH_SILVER)),
+                 (Blind || same_color) ? "" : hcolor_adv(scursed ? NH_BLACK : NH_SILVER),
                  Blind ? "U“®‚µ" : "‹P‚«");
 #endif
             remove_worn_item(otmp, FALSE);
@@ -1422,7 +1422,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
              (s * s > 1) ? "‚µ‚Î‚ç‚­‚ÌŠÔ" : "ˆêu",
              s == 0 ? "Œƒ‚µ‚­" : "",
              (Blind || same_color) ? ""
-                                   : jconj_adj(hcolor(sobj->cursed ? NH_BLACK : NH_SILVER)),
+                                   : hcolor_adv(sobj->cursed ? NH_BLACK : NH_SILVER),
              Blind ? "U“®‚µ‚½" : "‹P‚¢‚½");
 #endif
         /* [this cost handling will need updating if shop pricing is
@@ -1521,7 +1521,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                      Blind ? "" : hcolor(NH_PURPLE));
 #else
                 Your("%s‚Í%s%s‚Í‚¶‚ß‚½D", makeplural(body_part(HAND)),
-                     Blind ? "" : jconj_adj(hcolor(NH_PURPLE)),
+                     Blind ? "" : hcolor_adv(NH_PURPLE),
                      Blind ? "ƒqƒŠƒqƒŠ‚µ" : "‹P‚«");
 #endif
                 make_confused(HConfusion + rnd(100), FALSE);
@@ -1532,7 +1532,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                       Blind ? "faint buzz" : " glow", body_part(HEAD));
 #else
                 pline("%s%s‚ª‚ ‚È‚½‚Ì%s‚ğæ‚èŠª‚¢‚½D",
-                      Blind ? "" : jconj_adj(hcolor(NH_RED)),
+                      Blind ? "" : hcolor_adv(NH_RED),
                       Blind ? "‚©‚·‚©‚Éƒu[ƒ“‚Æ–Â‚é‚à‚Ì" : "‹P‚­‚à‚Ì",
                       body_part(HEAD));
 #endif
@@ -1548,7 +1548,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #else
                 Your("%s‚Í%s%s%sD", makeplural(body_part(HAND)),
                      u.umconf ? "­‚µ" : "",
-                     Blind ? (const char *) "ƒqƒŠƒqƒŠ‚µ‚½" : jconj_adj(hcolor(NH_RED)),
+                     Blind ? (const char *) "ƒqƒŠƒqƒŠ‚µ‚½" : hcolor_adv(NH_RED),
                      Blind ? "" : "‹P‚«‚Í‚¶‚ß‚½");
 #endif
                 u.umconf++;
@@ -1569,7 +1569,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #else
                     Your("%s‚Í%s%s–¾‚é‚­‹P‚¢‚½D",
                          makeplural(body_part(HAND)),
-                         u.umconf ? "­‚µ" : "", jconj_adj(hcolor(NH_RED)));
+                         u.umconf ? "­‚µ" : "", hcolor_adv(NH_RED));
 #endif
                 /* after a while, repeated uses become less effective */
                 if (u.umconf >= 40)
@@ -1753,7 +1753,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                       scursed ? "glow" : "shield");
 #else
                 Your("%s‚Í%s%s%s‚Å•¢‚í‚ê‚½I", xname(uwep),
-                     jconj_adj(hcolor(scursed ? NH_PURPLE : NH_GOLDEN)),
+                     hcolor_adv(scursed ? NH_PURPLE : NH_GOLDEN),
                      scursed ? "Œõ‚é‚Ü‚¾‚ç‚Ì" : "‚ä‚ç‚ß‚­",
                      scursed ? "‹P‚«" : "ƒoƒŠƒA");
 #endif

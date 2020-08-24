@@ -318,7 +318,7 @@ choke_dialogue()
 /*JP
                 pline(str, hcolor(NH_BLUE));
 */
-                pline(str, jconj_adj(hcolor(NH_BLUE)));
+                pline(str, hcolor_adv(NH_BLUE));
             else
                 pline1(str);
         }
@@ -411,7 +411,7 @@ slime_dialogue()
 /*JP
                     pline(buf, hcolor(NH_GREEN));
 */
-                    pline(buf, jconj_adj(hcolor(NH_GREEN)));
+                    pline(buf, hcolor_adv(NH_GREEN));
             } else
                 pline(buf,
 /*JP

@@ -916,7 +916,7 @@ chwepon(otmp, amount)
 register struct obj *otmp;
 register int amount;
 {
-    const char *color = hcolor((amount < 0) ? NH_BLACK : NH_BLUE);
+    const char *color = hcolor_adv((amount < 0) ? NH_BLACK : NH_BLUE);
     const char *xtime, *wepname = "";
     boolean multiple;
     int otyp = STRANGE_OBJECT;
@@ -1017,7 +1017,7 @@ register int amount;
 /*JP
             pline("%s %s.", Yobjnam2(uwep, "faintly glow"), color);
 */
-            Your("%s‚Í‚í‚¸‚©‚É%s‹P‚¢‚½D", xname(uwep),jconj_adj(color));
+            Your("%s‚Í‚í‚¸‚©‚É%s‹P‚¢‚½D", xname(uwep), color);
         return 1;
     }
     /* there is a (soft) upper and lower limit to uwep->spe */
@@ -1030,7 +1030,7 @@ register int amount;
                   otense(uwep, "evaporate"));
 #else
             Your("%s‚Í‚µ‚Î‚ç‚­Œƒ‚µ‚­%s‹P‚«Cö”­‚µ‚½D",
-                 xname(uwep), jconj_adj(color));
+                 xname(uwep), color);
 #endif
         else
 /*JP
@@ -1052,7 +1052,7 @@ register int amount;
               xtime);
 #else
         Your("%s‚Í%s%s%s‹P‚¢‚½D",
-             xname(uwep), xtime, jconj_adj(color), 
+             xname(uwep), xtime, color, 
              amount == 0 ? "Œƒ‚µ‚­" : "");
 #endif
         if (otyp != STRANGE_OBJECT && uwep->known

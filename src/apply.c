@@ -4844,7 +4844,7 @@ doapply()
 /*JP
                     pline("%s %s.", Yobjnam2(obj, "glow"), hcolor("brown"));
 */
-                    pline("%sは%s輝いた．", xname(obj), jconj_adj(hcolor("茶色の")));
+                    pline("%sは%s輝いた．", xname(obj), hcolor_adv("茶色の"));
                     set_bknown(obj, 1);
                 }
                 unbless(obj);
