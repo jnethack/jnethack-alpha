@@ -2,6 +2,7 @@
 	  * X11環境で日本語入力ができない (#40562)
 	  * 一部のオプションで英語のフルネームを使えない (#40657)
 	* X11LARGETILEを削除(#40681)
+	* JNetHack.adを最新に更新(#40531)
 
 Sat Apr 18 2020  Kentaro Shirakata  <argrath@ub32.org>
 

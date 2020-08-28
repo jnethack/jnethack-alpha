@@ -1,20 +1,33 @@
+! $NHDT-Date: 1542244983 2018/11/15 01:23:03 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.20 $
+! Copyright (c) 2017 by Pasi Kallinen
+! NetHack may be freely redistributed.  See license for details.
+
+#define NETHACK_FONT       -*-fixed-medium-*-*-*-15-*-*-*-*-*-*-*
+#define NETHACK_CLR_FG     grey
+#define NETHACK_CLR_BG     black
+#define NETHACK_CLR_QUIT   red
+#define NETHACK_CLR_RANDOM yellow
+#define NETHACK_CLR_PLAY   green
+#define NETHACK_CLR_HELP   green
+#define NETHACK_BTN_SHAPE  roundedRectangle
+#define NETHACK_BTN_ROUND  20
+#define NETHACK_CMD_BORDER 0
+
 ! The display_file, tombstone, and menu windows are all formatted assuming
 ! a fixed width font.  Text windows may or may not be formatted as above.
 ! The rip window applies if the GRAPHIC_TOMBSTONE option is turned on, and
 ! requires a 12 pixel font for correct appearance.
 !
-JNetHack*colormap:			install
-!
-JNetHack*font:				variable
-JNetHack*display_file*font:		fixed
-JNetHack*tombstone*font:		fixed
-JNetHack*rip*font:			-*-times-medium-r-*-*-12-*-*-*-*-*-*-*
-JNetHack*menu*font:			fixed
-JNetHack*text*font:			fixed
-!JNetHack*map*font:			nh10
-JNetHack*map*font:			fixed
+JNetHack*font:              NETHACK_FONT
+JNetHack*display_file*font: NETHACK_FONT
+JNetHack*map*font:          NETHACK_FONT
+JNetHack*text*font:         NETHACK_FONT
+JNetHack*menu*font:         NETHACK_FONT
+JNetHack*tombstone*font:    NETHACK_FONT
+JNetHack*text*rip*font:     -*-times-medium-r-*-*-12-*-*-*-*-*-*-*
+JNetHack*text*borderWidth:  0
 
-! To use full-color tiles for the map, uncomment the tile file name.
+! tile_file names a file containing full-color tiles for the map.
 ! If you use a 100dpi (or greater) monitor you may wish to double the
 ! tile size so you can see the figures.  If JNetHack was compiled to
 ! use XPM (USE_XPM in config.h), the tile_file is a standard XPM file.
@@ -23,20 +36,20 @@ JNetHack*map*font:			fixed
 ! such as XV or preferably PBMplus.
 !
 JNetHack.tile_file: x11tiles
-!JNetHack.tile_file: t32-1024.xpm
-JNetHack.tile_width: 16
-JNetHack.tile_height: 16
 !JNetHack.double_tile_size: True
-!
+
 ! The annotation of pets.
-JNetHack.pet_mark_bitmap: pet_mark.xbm
-JNetHack.pet_mark_color: Red
+!JNetHack.pet_mark_bitmap: pet_mark.xbm
+!JNetHack.pet_mark_color: Red
+! The annotation of item piles.
+!JNetHack.pilemark_bitmap: pilemark.xbm
+!JNetHack.pilemark_color: Green
 
 ! Tombstone
 ! The image file
-JNetHack.tombstone: rip.xpm
+!JNetHack.tombstone: rip.xpm
 ! Text starts at (tombtext_x, tombtext_y) and subsequent lines
-! are displaced by (tombtext_dx, tombtext_dy) pixels.  If you
+! are displaced by (tombtext_dx, tombtext_dy) pixels.
 !JNetHack.tombtext_x: 155
 !JNetHack.tombtext_y: 78
 !JNetHack.tombtext_dx: 0
@@ -44,142 +57,275 @@ JNetHack.tombstone: rip.xpm
 ! The color to use for the text on the hero's tombstone
 JNetHack*rip*foreground: black
 
+! The icon to use; supported values are nh72, nh56, and nh32; nh72 is the
+! default.  Some window managers may not support the larger icon sizes.
+! It is not guaranteed that the window manager will honor the icon selection.
+!JNetHack*icon: nh56
+
+! If True, the default, a popup for single character prompts such as y/n
+! questions is _not_ used.  Single-character prompts appear in a fixed
+! position between the top of the map and the bottom of the messages.
+! If False, popups appear near where the pointer is positioned so tend to
+! meander around the screen depending upon where the last click ocurred.
+! (The name 'slow' is misleading; this feature was originally necessitated
+! by window managers which were slow putting up popup windows, but the
+! fixed-position prompting can be just as useful for quick popups.)
+!JNetHack*slow: False
+
+! If True, force keyboard to attach to popup windows.  Some window managers
+! enforce a click-to-focus-keyboard policy (e.g. the DECwindows wm).  JNetHack
+! has a lot of popups and is almost unplayable without some kind of autofocus.
+!JNetHack*autofocus: True
+
+! If 'slow' is True, setting 'highlight_prompt' to True will cause the line
+! between map and message display that's used for prompting to be "hidden"
+! as part of the map when no prompt is active, then invert foreground and
+! background to stand out when a prompt is issued and waiting for a response.
+! If 'slow' is False, 'highlight_prompt' will have no effect.
+JNetHack*highlight_prompt: False
+
+! The number of lines the message window will show without scrolling.
+!JNetHack*message_lines: 12
+
+! If True, the message window has a line that seperates old and new messages.
+!JNetHack*message_line: True
+
+! If True, the default, use a "fancy" style status area below the map.
+! Fancy status has some highlighting but does not honor HILITE_STATUS.
+! If False, use TTY-style status lines (two text lines below the map).
+! TTY status honors HILITE_STATUS thresholds and colors, but for
+! attributes only supports inverse (not bold, dim, blink, or underline).
+! (As of this writing, fancy status looks better with a tiles map and
+! tty-style status looks good with a text map but not with a tiles one.)
+!JNetHack*fancy_status: False
+
 ! Translation tables.  There are currently several actions in JNetHack, but
 ! the only one you should be using is "input()", which, with no parameters,
-! uses XLookupString to translate your keypress into a command.  You
-! can optionally give it parameters to change the behavior, see the example
-! below.  Note that you have to specify the translations in every appropriate
-! window.
+! uses XLookupString to translate your keypress into a command.  You can
+! optionally give it parameters to change the behavior, see the example below.
+! Note that you have to specify the translations in every appropriate window.
 JNetHack*message*translations:	<KeyPress>: input()
 !
 ! Example extra translations for the map window.
-!
 !JNetHack*map*translations:	#override \
 !				!<Key>Left: input(h) \n\
 !				!<Key>Right: input(l) \n\
 !				!<Key>Up: input(k) \n\
 !				!<Key>Down: input(j)
-!
-! The icon to use; supported values are nh72, nh56, and nh32; nh72 is the
-! default.  Some window managers may not support the larger icon sizes.
-! It is not guaranteed that the window manager will honor the icon selection.
-!JNetHack*icon: nh56
-!
-! If True, the default, a popup for single character prompts such as y/n
-! questions is _not_ used.
-JNetHack*slow: True
-!
-! The number of lines the message window will show without scrolling.
-!JNetHack*message_lines: 12
-!
-! If True, the message window has a line that seperates old and new messages.
-!JNetHack*message_line: True
-!
-! If True, force keyboard to attach to popup windows.  Some window managers
-! enforce a click-to-focus-keyboard policy (e.g. the DECwindows wm).  JNetHack
-! has a lot of popups and is almost unplayable without some kind of autofocus.
-!JNetHack*autofocus: True
-!
+
 ! Specify the number of rows and columns of the map window.  The default
 ! is the standard 80x21 window.  Note: this _does_not_ change JNetHack's
 ! level size, only what you see of it.
 !JNetHack*map*rows:	21
 !JNetHack*map*columns:	80
 
-! Parts of the fancy status display.
-!
-JNetHack*status_condition.borderWidth:	0
-JNetHack*status_info*borderWidth:	0
+JNetHack*background: NETHACK_CLR_BG
+JNetHack*foreground: NETHACK_CLR_FG
 
-!
-! Sample color screen entries.
-!
-JNetHack*jnethack.background: 	wheat
-JNetHack*map*yellow:		gold
-JNetHack*map*brown:		tan
-JNetHack*map*gray:		grey85
-JNetHack*map*foreground:		wheat
-JNetHack*map*background:		grey40
+JNetHack*yn_prompt*borderWidth: 0
 
-JNetHack*fancy_status.skipAdjust:        True
-JNetHack*fancy_status.background:	wheat
-JNetHack*status_info*foreground:		Sienna
-JNetHack*status_info*background:		wheat
-JNetHack*status_info.background:		wheat
-JNetHack*status_attributes*foreground:	black
-JNetHack*status_attributes*background:	white
-JNetHack*status_condition*foreground:	red
-JNetHack*status_condition*background:	wheat
-JNetHack*Scrollbar*foreground:		Sienna
-JNetHack*Scrollbar*background:		wheat
-JNetHack*status_info*showGrip:		False
-JNetHack*status_attributes*showGrip:	False
+JNetHack*Scrollbar*foreground: gray40
+JNetHack*Scrollbar*background: gray10
 
-JNetHack*player_selection*random.borderColor:	blue
-JNetHack*player_selection*random.borderWidth:    2
-JNetHack*player_selection*random.foreground:	blue
-JNetHack*player_selection*random.accelerators: #override\n\
-				<Key>Return:	set() notify() unset()
-JNetHack*player_selection*quit.borderColor:	blue
-JNetHack*player_selection*quit.foreground:	blue
-JNetHack*player_selection*Command.borderColor:	red
-JNetHack*player_selection*Command.foreground:	red
-JNetHack*player_selection*quit.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
+JNetHack*fancy_status*background: NETHACK_CLR_BG
+JNetHack*fancy_status*foreground: NETHACK_CLR_FG
+JNetHack*fancy_status.skipAdjust: True
 
-JNetHack*race_selection*random.borderColor:	blue
-JNetHack*race_selection*random.borderWidth:	2
-JNetHack*race_selection*random.foreground:	blue
-JNetHack*race_selection*random.accelerators: #override\n\
-				<Key>Return:	set() notify() unset()
-JNetHack*race_selection*quit.borderColor:	blue
-JNetHack*race_selection*quit.foreground:		blue
-JNetHack*race_selection*Command.borderColor:	red
-JNetHack*race_selection*Command.foreground:	red
-JNetHack*race_selection*quit.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
+JNetHack*showGrip: False
 
-JNetHack*gender_selection*random.borderColor:	blue
-JNetHack*gender_selection*random.borderWidth:	2
-JNetHack*gender_selection*random.foreground:	blue
-JNetHack*gender_selection*random.accelerators: #override\n\
-				<Key>Return:	set() notify() unset()
-JNetHack*gender_selection*quit.borderColor:	blue
-JNetHack*gender_selection*quit.foreground:	blue
-JNetHack*gender_selection*Command.borderColor:	red
-JNetHack*gender_selection*Command.foreground:	red
-JNetHack*gender_selection*quit.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
+! text input prompt window
+JNetHack*response*textSink*cursorColor: red
+JNetHack*textSink*cursorColor: red
 
-JNetHack*alignment_selection*random.borderColor:	blue
-JNetHack*alignment_selection*random.borderWidth:	2
-JNetHack*alignment_selection*random.foreground:	blue
-JNetHack*alignment_selection*random.accelerators: #override\n\
-				<Key>Return:	set() notify() unset()
-JNetHack*alignment_selection*quit.borderColor:	blue
-JNetHack*alignment_selection*quit.foreground:	blue
-JNetHack*alignment_selection*Command.borderColor: red
-JNetHack*alignment_selection*Command.foreground:	red
-JNetHack*alignment_selection*quit.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
+JNetHack*response*foreground:  NETHACK_CLR_FG
+JNetHack*response*background:  NETHACK_CLR_BG
+JNetHack*response*borderColor: NETHACK_CLR_FG
+JNetHack*response*borderWidth: 1
 
-JNetHack*extended_commands*dismiss.borderColor:	blue
-JNetHack*extended_commands*dismiss.foreground:	blue
-JNetHack*extended_commands*help.borderColor:	blue
-JNetHack*extended_commands*help.foreground:	blue
-JNetHack*extended_commands*Command.borderColor:	red
-JNetHack*extended_commands*Command.foreground:	red
-JNetHack*extended_commands*help.accelerators: #override\n\
-				:<Key>?:	set() notify() unset()
-JNetHack*extended_commands*dismiss.accelerators: #override\n\
-				<Key>Escape:	set() notify() unset()
-!
+! player selection dialog (OPTIONS=player_selection:dialog)
+!JNetHack*player_selection_dialog.height:   420
+!JNetHack*player_selection_dialog.width:   403
+
+!JNetHack*player_selection_dialog*foreground:   black
+!JNetHack*player_selection_dialog*background:   white
+JNetHack*player_selection_dialog*name_label.borderWidth:   0
+JNetHack*player_selection_dialog*race_label.borderWidth:   0
+JNetHack*player_selection_dialog*role_label.borderWidth:   0
+JNetHack*player_selection_dialog*gender_label.borderWidth: 0
+JNetHack*player_selection_dialog*align_label.borderWidth:  0
+JNetHack*player_selection_dialog*button_vp.borderWidth:    0
+
+JNetHack*player_selection_dialog*name_input.borderWidth:   1
+JNetHack*player_selection_dialog*name_input.borderColor:   NETHACK_CLR_FG
+
+JNetHack*player_selection_dialog*role_vp.borderColor:   NETHACK_CLR_FG
+JNetHack*player_selection_dialog*race_vp.borderColor:   NETHACK_CLR_FG
+JNetHack*player_selection_dialog*gender_vp.borderColor: NETHACK_CLR_FG
+JNetHack*player_selection_dialog*align_vp.borderColor:  NETHACK_CLR_FG
+
+JNetHack*player_selection_dialog*random.foreground:   NETHACK_CLR_RANDOM
+JNetHack*player_selection_dialog*random.borderColor:  NETHACK_CLR_RANDOM
+JNetHack*player_selection_dialog*random.borderWidth:  1
+JNetHack*player_selection_dialog*random.shapeStyle:   NETHACK_BTN_SHAPE
+JNetHack*player_selection_dialog*random.cornerRoundPercent: NETHACK_BTN_ROUND
+
+JNetHack*player_selection_dialog*quit.foreground:     NETHACK_CLR_QUIT
+JNetHack*player_selection_dialog*quit.borderColor:    NETHACK_CLR_QUIT
+JNetHack*player_selection_dialog*quit.borderWidth:    1
+JNetHack*player_selection_dialog*quit.shapeStyle:     NETHACK_BTN_SHAPE
+JNetHack*player_selection_dialog*quit.cornerRoundPercent: NETHACK_BTN_ROUND
+
+JNetHack*player_selection_dialog*play.foreground:     NETHACK_CLR_PLAY
+JNetHack*player_selection_dialog*play.borderColor:    NETHACK_CLR_PLAY
+JNetHack*player_selection_dialog*play.borderWidth:    1
+JNetHack*player_selection_dialog*play.shapeStyle:     NETHACK_BTN_SHAPE
+JNetHack*player_selection_dialog*play.cornerRoundPercent: NETHACK_BTN_ROUND
+
+
+! role selection window  (OPTIONS=player_selection:prompts)
+JNetHack*player_selection*btn_random.foreground:   NETHACK_CLR_RANDOM
+JNetHack*player_selection*btn_random.background:   black
+JNetHack*player_selection*btn_random.borderColor:  NETHACK_CLR_RANDOM
+JNetHack*player_selection*btn_random.borderWidth:  1
+JNetHack*player_selection*btn_random.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*player_selection*btn_random.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*player_selection*btn_quit.foreground:     NETHACK_CLR_QUIT
+JNetHack*player_selection*btn_quit.borderColor:    NETHACK_CLR_QUIT
+JNetHack*player_selection*btn_quit.borderWidth:    1
+JNetHack*player_selection*btn_quit.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*player_selection*btn_quit.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*player_selection*Command.foreground:  NETHACK_CLR_FG
+JNetHack*player_selection*Command.borderColor: NETHACK_CLR_FG
+JNetHack*player_selection*Command.borderWidth: NETHACK_CMD_BORDER
+
+! race selection window
+JNetHack*race_selection*btn_random.foreground:   NETHACK_CLR_RANDOM
+JNetHack*race_selection*btn_random.background:   black
+JNetHack*race_selection*btn_random.borderColor:  NETHACK_CLR_RANDOM
+JNetHack*race_selection*btn_random.borderWidth:  1
+JNetHack*race_selection*btn_random.shapeStyle:   NETHACK_BTN_SHAPE
+JNetHack*race_selection*btn_random.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*race_selection*btn_quit.foreground:     NETHACK_CLR_QUIT
+JNetHack*race_selection*btn_quit.borderColor:    NETHACK_CLR_QUIT
+JNetHack*race_selection*btn_quit.borderWidth:    1
+JNetHack*race_selection*btn_quit.shapeStyle:     NETHACK_BTN_SHAPE
+JNetHack*race_selection*btn_quit.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*race_selection*Command.foreground:  NETHACK_CLR_FG
+JNetHack*race_selection*Command.borderColor: NETHACK_CLR_FG
+JNetHack*race_selection*Command.borderWidth: NETHACK_CMD_BORDER
+
+! gender selection window
+JNetHack*gender_selection*btn_random.foreground:   NETHACK_CLR_RANDOM
+JNetHack*gender_selection*btn_random.background:   black
+JNetHack*gender_selection*btn_random.borderColor:  NETHACK_CLR_RANDOM
+JNetHack*gender_selection*btn_random.borderWidth:  1
+JNetHack*gender_selection*btn_random.shapeStyle:   NETHACK_BTN_SHAPE
+JNetHack*gender_selection*btn_random.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*gender_selection*btn_quit.foreground:     NETHACK_CLR_QUIT
+JNetHack*gender_selection*btn_quit.borderColor:    NETHACK_CLR_QUIT
+JNetHack*gender_selection*btn_quit.borderWidth:    1
+JNetHack*gender_selection*btn_quit.shapeStyle:     NETHACK_BTN_SHAPE
+JNetHack*gender_selection*btn_quit.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*gender_selection*Command.foreground:  NETHACK_CLR_FG
+JNetHack*gender_selection*Command.borderColor: NETHACK_CLR_FG
+JNetHack*gender_selection*Command.borderWidth: NETHACK_CMD_BORDER
+
+! alignment selection window
+JNetHack*alignment_selection*btn_random.foreground:   NETHACK_CLR_RANDOM
+JNetHack*alignment_selection*btn_random.background:   black
+JNetHack*alignment_selection*btn_random.borderColor:  NETHACK_CLR_RANDOM
+JNetHack*alignment_selection*btn_random.borderWidth:  1
+JNetHack*alignment_selection*btn_random.shapeStyle:   NETHACK_BTN_SHAPE
+JNetHack*alignment_selection*btn_random.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*alignment_selection*btn_quit.foreground:     NETHACK_CLR_QUIT
+JNetHack*alignment_selection*btn_quit.borderColor:    NETHACK_CLR_QUIT
+JNetHack*alignment_selection*btn_quit.borderWidth:    1
+JNetHack*alignment_selection*btn_quit.shapeStyle:     NETHACK_BTN_SHAPE
+JNetHack*alignment_selection*btn_quit.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*alignment_selection*Command.foreground:  NETHACK_CLR_FG
+JNetHack*alignment_selection*Command.borderColor: NETHACK_CLR_FG
+JNetHack*alignment_selection*Command.borderWidth: NETHACK_CMD_BORDER
+
+! extended commands window
+JNetHack*extended_commands*btn_dismiss.foreground:  NETHACK_CLR_QUIT
+JNetHack*extended_commands*btn_dismiss.borderColor: NETHACK_CLR_QUIT
+JNetHack*extended_commands*btn_dismiss.borderWidth: 1
+JNetHack*extended_commands*btn_dismiss.shapeStyle:  NETHACK_BTN_SHAPE
+JNetHack*extended_commands*btn_dismiss.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*extended_commands*btn_help.foreground:     NETHACK_CLR_HELP
+JNetHack*extended_commands*btn_help.borderColor:    NETHACK_CLR_HELP
+JNetHack*extended_commands*btn_help.borderWidth:    1
+JNetHack*extended_commands*btn_help.shapeStyle:     NETHACK_BTN_SHAPE
+JNetHack*extended_commands*btn_help.cornerRoundPercent: NETHACK_BTN_ROUND
+JNetHack*extended_commands*Command.foreground:  NETHACK_CLR_FG
+JNetHack*extended_commands*Command.borderColor: NETHACK_CLR_FG
+JNetHack*extended_commands*Command.borderWidth: NETHACK_CMD_BORDER
+! The extended command menu may be too big to fit on the screen so need
+! a vertical scroll bar.  When truncated, its height will be as tall as
+! possible unless height_delta is non-zero, in which case there will be
+! that many pixels of margin left unused.  On OSX, this can be used to
+! avoid overlapping with the desktop docking tray to prevent that from
+! obscuring the bottom of the menu.
+JNetHack*extcmd_height_delta: 75
+
+! menu buttons
+JNetHack*OK.foreground:  green
+JNetHack*OK.borderColor: green
+JNetHack*OK.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*OK.cornerRoundPercent: NETHACK_BTN_ROUND
+
+JNetHack*okay.foreground:  green
+JNetHack*okay.borderColor: green
+JNetHack*okay.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*okay.cornerRoundPercent: NETHACK_BTN_ROUND
+
+JNetHack*cancel.foreground:  red
+JNetHack*cancel.borderColor: red
+JNetHack*cancel.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*cancel.cornerRoundPercent: NETHACK_BTN_ROUND
+
+JNetHack*all.foreground:  green
+JNetHack*all.borderColor: green
+JNetHack*all.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*all.cornerRoundPercent: NETHACK_BTN_ROUND
+
+JNetHack*none.foreground:  green
+JNetHack*none.borderColor: green
+JNetHack*none.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*none.cornerRoundPercent: NETHACK_BTN_ROUND
+
+JNetHack*invert.foreground:  green
+JNetHack*invert.borderColor: green
+JNetHack*invert.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*invert.cornerRoundPercent: NETHACK_BTN_ROUND
+
+JNetHack*search.foreground:  green
+JNetHack*search.borderColor: green
+JNetHack*search.shapeStyle: NETHACK_BTN_SHAPE
+JNetHack*search.cornerRoundPercent: NETHACK_BTN_ROUND
+
+! map colors
+! The foreground color is used as "no color".
+JNetHack*map*foreground: NETHACK_CLR_FG
+JNetHack*map*background: NETHACK_CLR_BG
+
+JNetHack*map*black:          grey15
+JNetHack*map*red:            red3
+JNetHack*map*green:          green3
+JNetHack*map*brown:          DarkOrange3
+JNetHack*map*blue:           blue3
+JNetHack*map*magenta:        magenta3
+JNetHack*map*cyan:           Dark cyan
+JNetHack*map*gray:           gray50
+JNetHack*map*orange:         orange
+JNetHack*map*bright_green:   green
+JNetHack*map*yellow:         yellow
+JNetHack*map*bright_blue:    Royal blue
+JNetHack*map*bright_magenta: Fuchsia
+JNetHack*map*bright_cyan:    cyan
+JNetHack*map*white:          white
 !
 ! The following are the default 15 colors that the JNetHack map uses.
-! If they don't look good on your screen, change them.
-!
-! The foreground color is used as "no color".
-!
 !JNetHack*map*black:		black
 !JNetHack*map*red:		red
 !JNetHack*map*green:		pale green
@@ -202,5 +348,7 @@ JNetHack*extended_commands*dismiss.accelerators: #override\n\
 !                  -*-fixed-medium-r-normal--14-*-iso8859-1,\
 !                  -*-fixed-medium-r-*--14-*-jisx0208.1983-*
 !                  -*-fixed-medium-r-*--14-*-jisx0208.1983-*
-JNetHack*fontSet:	*--14-*
-JNetHack*international:	True
+JNetHack*fontSet:      *--14-*
+JNetHack*text*rip*fontSet:     -*-*-medium-r-*--12-*
+JNetHack*international:        True
+JNetHack*colormap:          install
