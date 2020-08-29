@@ -247,7 +247,7 @@ void
 post_process_tiles()
 {
     Display *dpy = XtDisplay(toplevel);
-#if 0 /*JP*/
+#ifndef X11LARGETILE
     unsigned int width, height;
 
     if (tile_image == 0)
@@ -309,7 +309,7 @@ post_process_tiles()
       XpmFreeXpmImage(&tile_image);
     }
 # endif
-#endif /*JP*/
+#endif
 
     init_annotation(&pet_annotation, appResources.pet_mark_bitmap,
                     appResources.pet_mark_color);
@@ -369,7 +369,7 @@ struct xwindow *wp;
     attributes.valuemask = XpmCloseness;
     attributes.closeness = 25000;
 
-# if 0 /*JP*/
+# ifndef X11LARGETILE
     errorcode = XpmReadFileToImage(dpy, appResources.tile_file, &tile_image,
                                    0, &attributes);
 # else
@@ -377,7 +377,7 @@ struct xwindow *wp;
                     NULL);
 # endif
 
-# if 0 /*JP*/
+# ifndef X11LARGETILE
     if (errorcode == XpmColorFailed) {
         Sprintf(buf, "Insufficient colors available to load %s.",
                 appResources.tile_file);
