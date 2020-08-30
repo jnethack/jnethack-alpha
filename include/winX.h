@@ -285,10 +285,6 @@ typedef struct {
     Boolean highlight_prompt; /* if 'slow', highlight yn prompts */
     Boolean double_tile_size; /* double tile size */
     String tile_file;         /* name of file to open for tiles */
-#ifdef X11LARGETILE
-    int     tile_width;
-    int	    tile_height;
-#endif
     String icon;              /* name of desired icon */
     int message_lines;        /* number of lines to attempt to show */
     int extcmd_height_delta;  /* bottom margin for extended command menu */
