@@ -539,13 +539,18 @@ struct xwindow *wp;
                     mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
                     curr->line, curr->str_length);
 #else
+        /* GCを使い回さずにコピーしたものを使う */
+        GC gc = XCreateGC(XtDisplay(wp->w), XtWindow(wp->w), 0, NULL );
+        XtGCMask mask = GCFunction | GCForeground | GCBackground | GCFont;
+        XCopyGC(XtDisplay(wp->w), mesg_info->gc, mask, gc);
         XmbDrawString(XtDisplay(wp->w), XtWindow(wp->w),
                       mesg_info->fontset,
-                      mesg_info->gc,
+                      gc,
                       mesg_info->char_lbearing,
                       mesg_info->char_ascent + y_base,
                       curr->line,
                       curr->str_length);
+        XFreeGC(XtDisplay(wp->w), gc);
 #endif
         /*
          * This draws a line at the _top_ of the line of text pointed to by
