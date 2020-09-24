@@ -336,12 +336,24 @@ struct xwindow *wp;
     rDB = XrmGetDatabase(dpy);
 
     for (color = 0; color < CLR_MAX; color++) {
+/*JP
         Sprintf(clr_name, "nethack.%s.%s", wtn, mapCLR_to_res[color]);
+*/
+        Sprintf(clr_name, "jnethack.%s.%s", wtn, mapCLR_to_res[color]);
+/*JP
         Sprintf(clrclass, "NetHack.%s.%s", wtn_up, mapCLR_to_res[color]);
+*/
+        Sprintf(clrclass, "JNetHack.%s.%s", wtn_up, mapCLR_to_res[color]);
 
         if (!XrmGetResource(rDB, clr_name, clrclass, ret_type, &value)) {
+/*JP
             Sprintf(clr_name, "nethack.map.%s", mapCLR_to_res[color]);
+*/
+            Sprintf(clr_name, "jnethack.map.%s", mapCLR_to_res[color]);
+/*JP
             Sprintf(clrclass, "NetHack.Map.%s", mapCLR_to_res[color]);
+*/
+            Sprintf(clrclass, "JNetHack.Map.%s", mapCLR_to_res[color]);
         }
 
         if (!XrmGetResource(rDB, clr_name, clrclass, ret_type, &value)) {
