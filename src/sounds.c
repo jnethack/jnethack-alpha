@@ -365,7 +365,11 @@ dosounds()
                     continue;
                 break; /* msg is acceptable */
             } while (++trycount < 50);
+#if 0 /*JP*/
             while (!letter(*msg))
+#else
+            while (*msg == '*' || *msg == '#')
+#endif
                 ++msg; /* skip control flags */
             if (index(msg, '%'))
                 You_hear(msg, halu_gname(EPRI(mtmp)->shralign));
