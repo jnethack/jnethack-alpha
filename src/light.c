@@ -3,7 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details.       */
 
 /* JNetHack Copyright */
-/* For 3.6-, Copyright (c) SHIRAKATA Kentaro, 2002-2019            */
+/* For 3.6-, Copyright (c) SHIRAKATA Kentaro, 2002-2021            */
 /* JNetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
