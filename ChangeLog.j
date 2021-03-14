@@ -1,5 +1,6 @@
 	* 次の問題を修正
 	  * rumorsの末尾にゴミが表示される (#41899)
+	* X11のロケールを内部でja_JP.EUC-JPに固定する (#40804)
 
 Sat Mar 13 2021  Kentaro Shirakata  <argrath@ub32.org>
 

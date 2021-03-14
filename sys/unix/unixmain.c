@@ -69,6 +69,8 @@ char *argv[];
 #endif
 
 #ifdef XI18N
+    /* ƒtƒHƒ“ƒgİ’è‚Ì‚½‚ß‚ÉLANG•Ï”‚ğŒÅ’è‚·‚é */
+    putenv("LANG=ja_JP.eucJP");
     setlocale(LC_ALL, "");
 #endif
 #if defined(__APPLE__)
