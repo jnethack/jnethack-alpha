@@ -237,8 +237,9 @@ static void back_buffer_flip()
             if (back->iskanji == 1) {
                 cell_t * back2 = back + 1;
                 cell_t * front2 = front + 1;
+                /* pos.x == 0 の条件は不要のはずだが #42072 対策で追加。 */
                 if (back->attribute != front->attribute ||
-                    back2->attribute != front2->attribute) {
+                    back2->attribute != front2->attribute || pos.X == 0) {
                     WORD attrs[2];
                     attrs[0] = attrs[1] = back->attribute;
                     WriteConsoleOutputAttribute(console.hConOut, attrs,
@@ -246,8 +247,9 @@ static void back_buffer_flip()
                     front->attribute = back->attribute;
                     front2->attribute = back2->attribute;
                 }
+                /* pos.x == 0 の条件は不要のはずだが #42072 対策で追加。 */
                 if (back->character != front->character ||
-                    back2->character != front2->character) {
+                    back2->character != front2->character || pos.X == 0) {
                     unsigned char buf[2];
                     buf[0] = (unsigned char)(back->character);
                     buf[1] = (unsigned char)(back2->character);
