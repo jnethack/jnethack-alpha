@@ -63,14 +63,15 @@ Timo Hakulinenは NetHack 3.1を OS/2に移植した． Eric Smithは NetHack 3.1
 移植した．
 
 Dean Luickは David Cohrsの手を借り，X11のNetHack 3.1を開発した．
-\fBWarwick Allison\fP は Atari 用に NetHack のタイルバージョンを作成した．
-彼は後にタイルを開発チームに寄贈し，タイルサポートは他のプラットフォームにも追加された．
+Warwick Allison は Atari 用に NetHack のタイルバージョンを作成した．
+彼は後にタイルを開発チームに寄贈し，タイルサポートは他の
+プラットフォームにも追加された．
 
                            - - - - - - - - - -
 
 時々，堕落した人物が彼らのネットランドからゲームの手助けとなるような興
 味をそそる改良案を送ってくる．ダンジョンの神はこれら堕ちるところまで堕
-ちた人間たちの名前をきまぐれでひかえている．そのダンジョンナーたちは以
+ちた人間たちの名前をきまぐれでひかえている．そのダンジョナーたちは以
 下である:
 
     Adam Aronow               Izchak Miller             Mike Stephenson
