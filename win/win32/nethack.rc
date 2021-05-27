@@ -74,20 +74,20 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904b0"
+        BLOCK "041103a4"
         BEGIN
-            VALUE "FileDescription", "NetHack for Windows - TTY Interface"
+            VALUE "FileDescription", "JNetHack for Windows - TTY Interface"
             VALUE "FileVersion", "3.6.6"
-            VALUE "InternalName", "NetHack"
+            VALUE "InternalName", "JNetHack"
             VALUE "LegalCopyright", "Copyright (C) 1985 - 2020.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details."
-            VALUE "OriginalFilename", "NetHack.exe"
-            VALUE "ProductName", "NetHack"
+            VALUE "OriginalFilename", "JNetHack.exe"
+            VALUE "ProductName", "JNetHack"
             VALUE "ProductVersion", "3.6.6"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x411, 932
     END
 END
 
