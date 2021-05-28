@@ -330,9 +330,10 @@ struct obj *otmp, *mwep;
               m_shot.s ? "shoots" : "throws", onm,
               mtarg ? " at " : "", trgbuf);
 #else
-        pline("%s‚Í%s‚ð%s‚É%sI", Monnam(mtmp),
+        pline("%s‚Í%s‚ð%s%s%sI", Monnam(mtmp),
               onm,
               trgbuf,
+              mtarg ? "‚É" : "",
               m_shot.s ? "Œ‚‚Á‚½" : "“Š‚°‚½");
 #endif
         m_shot.o = otmp->otyp;

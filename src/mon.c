@@ -2517,9 +2517,9 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
         u.uconduct.killer++;
 
     if (!nomsg) {
-#if 0 /*JP*/
         boolean namedpet = has_mname(mtmp) && !Hallucination;
 
+#if 0 /*JP*/
         You("%s %s!",
             nonliving(mtmp->data) ? "destroy" : "kill",
             !(wasinside || canspotmon(mtmp)) ? "it"
@@ -2527,10 +2527,11 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
                 : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
                            "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
 #else
-        You("%s%s‚ð“|‚µ‚½I",
-            !(wasinside || canspotmon(mtmp)) ? "‚»‚ê"
-              : mtmp->mtame ? "‚©‚í‚¢‚»‚¤‚È" : "",
-                mon_nam(mtmp));
+        You("%s‚ð“|‚µ‚½I",
+            !(wasinside || canspotmon(mtmp)) ? "‰½ŽÒ‚©"
+              : !mtmp->mtame ? mon_nam(mtmp)
+                : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
+                           "‚©‚í‚¢‚»‚¤‚È", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
 #endif
     }
 
