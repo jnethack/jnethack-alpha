@@ -5234,11 +5234,17 @@ dokeylist(VOID_ARGS)
 
     datawin = create_nhwindow(NHW_TEXT);
     putstr(datawin, 0, "");
+/*JP
     putstr(datawin, 0, "            Full Current Key Bindings List");
+*/
+    putstr(datawin, 0, "             現在の完全なキー割り当て一覧");
 
     /* directional keys */
     putstr(datawin, 0, "");
+/*JP
     putstr(datawin, 0, "Directional keys:");
+*/
+    putstr(datawin, 0, "方向キー:");
     show_direction_keys(datawin, '.', FALSE); /* '.'==self in direction grid */
 
     keys_used[(uchar) Cmd.move_NW] = keys_used[(uchar) Cmd.move_N]
@@ -5265,16 +5271,31 @@ dokeylist(VOID_ARGS)
             = keys_used[(uchar) C(Cmd.move_S)]
             = keys_used[(uchar) C(Cmd.move_SE)] = TRUE;
         putstr(datawin, 0, "");
+#if 0 /*JP:T*/
         putstr(datawin, 0,
           "Shift-<direction> will move in specified direction until you hit");
         putstr(datawin, 0, "        a wall or run into something.");
+#else
+        putstr(datawin, 0,
+          "Shift-<方向> は、壁にぶつかるか何かがあるまで指定された方向に");
+        putstr(datawin, 0, "        移動する．");
+#endif
+#if 0 /*JP:T*/
         putstr(datawin, 0,
           "Ctrl-<direction> will run in specified direction until something");
         putstr(datawin, 0, "        very interesting is seen.");
+#else
+        putstr(datawin, 0,
+          "Ctrl-<方向> は、何か興味深いものが見えるまで指定された方向に");
+        putstr(datawin, 0, "        移動する．");
+#endif
     }
 
     putstr(datawin, 0, "");
+/*JP
     putstr(datawin, 0, "Miscellaneous keys:");
+*/
+    putstr(datawin, 0, "様々なキー:");
     for (i = 0; misc_keys[i].desc; i++) {
         key = Cmd.spkeys[misc_keys[i].nhkf];
         if (key && ((misc_keys[i].numpad && iflags.num_pad)
@@ -5294,21 +5315,30 @@ dokeylist(VOID_ARGS)
 
     if (dokeylist_putcmds(datawin, TRUE, GENERALCMD, WIZMODECMD, keys_used)) {
         putstr(datawin, 0, "");
+/*JP
         putstr(datawin, 0, "General commands:");
+*/
+        putstr(datawin, 0, "一般コマンド:");
         (void) dokeylist_putcmds(datawin, FALSE, GENERALCMD, WIZMODECMD,
                                  keys_used);
     }
 
     if (dokeylist_putcmds(datawin, TRUE, 0, WIZMODECMD, keys_used)) {
         putstr(datawin, 0, "");
+/*JP
         putstr(datawin, 0, "Game commands:");
+*/
+        putstr(datawin, 0, "ゲームコマンド:");
         (void) dokeylist_putcmds(datawin, FALSE, 0, WIZMODECMD, keys_used);
     }
 
     if (wizard
         && dokeylist_putcmds(datawin, TRUE, WIZMODECMD, 0, keys_used)) {
         putstr(datawin, 0, "");
+/*JP
         putstr(datawin, 0, "Wizard-mode commands:");
+*/
+        putstr(datawin, 0, "ウィザードモードコマンド:");
         (void) dokeylist_putcmds(datawin, FALSE, WIZMODECMD, 0, keys_used);
     }
 
@@ -6663,13 +6693,25 @@ const char *msg;
      * general message if it's on.
      */
     dothat = "do that";
+#if 0 /*JP*/
     how = " at"; /* for "<action> at yourself"; not used for up/down */
+#else
+    how = "";
+#endif
     switch (spkey) {
     case NHKF_NOPICKUP:
+#if 0 /*JP*/
         dothat = "move";
+#else
+        dothat = "移動する";
+#endif
         break;
     case NHKF_RUSH:
+#if 0 /*JP*/
         dothat = "rush";
+#else
+        dothat = "突進する";
+#endif
         break;
     case NHKF_RUN2:
         if (!Cmd.num_pad)
@@ -6677,14 +6719,22 @@ const char *msg;
         /*FALLTHRU*/
     case NHKF_RUN:
     case NHKF_RUN_NOPICKUP:
+#if 0 /*JP*/
         dothat = "run";
+#else
+        dothat = "走る";
+#endif
         break;
     case NHKF_FIGHT2:
         if (!Cmd.num_pad)
             break;
         /*FALLTHRU*/
     case NHKF_FIGHT:
+#if 0 /*JP*/
         dothat = "fight";
+#else
+        dothat = "戦う";
+#endif
         how = ""; /* avoid "fight at yourself" */
         break;
     default:
@@ -6698,13 +6748,21 @@ const char *msg;
     if (prefixhandling
         && (sym == Cmd.spkeys[NHKF_GETDIR_SELF]
             || (Cmd.num_pad && sym == Cmd.spkeys[NHKF_GETDIR_SELF2]))) {
+/*JP
         Sprintf(buf, "You can't %s%s yourself.", dothat, how);
+*/
+        Sprintf(buf, "自分自身に%s%sことはできない．", dothat, how);
     /* for movement prefix followed by up or down */
     } else if (prefixhandling && (sym == '<' || sym == '>')) {
+#if 0 /*JP*/
         Sprintf(buf, "You can't %s %s.", dothat,
                 /* was "upwards" and "downwards", but they're considered
                    to be variants of canonical "upward" and "downward" */
                 (sym == '<') ? "upward" : "downward");
+#else
+        Sprintf(buf, "%s%sことはできない．",
+                (sym == '<') ? "上方向に" : "下方向に", dothat);
+#endif
     }
 
     /* if '!cmdassist', display via pline() and we're done (note: asking
@@ -6712,8 +6770,13 @@ const char *msg;
     if (!viawindow) {
         if (prefixhandling) {
             if (!*buf)
+#if 0 /*JP*/
                 Sprintf(buf, "Invalid direction for '%s' prefix.",
                         visctrl(Cmd.spkeys[spkey]));
+#else
+                Sprintf(buf, "'%s'接頭辞には不正な方向．",
+                        visctrl(Cmd.spkeys[spkey]));
+#endif
             pline("%s", buf);
             return TRUE;
         }
@@ -6774,13 +6837,24 @@ const char *msg;
            given but we include up and down for 'm'+invalid_direction;
            self is excluded as a viable direction for every prefix */
         putstr(win, 0, "");
+/*JP
         putstr(win, 0, "          <  up");
+*/
+        putstr(win, 0, "          <  上");
+/*JP
         putstr(win, 0, "          >  down");
+*/
+        putstr(win, 0, "          >  下");
         if (!prefixhandling) {
             int selfi = Cmd.num_pad ? NHKF_GETDIR_SELF2 : NHKF_GETDIR_SELF;
 
+#if 0 /*JP:T*/
             Sprintf(buf,   "       %4s  direct at yourself",
                     visctrl(Cmd.spkeys[selfi]));
+#else
+            Sprintf(buf,   "       %4s  自分に向ける",
+                    visctrl(Cmd.spkeys[selfi]));
+#endif
             putstr(win, 0, buf);
         }
     }

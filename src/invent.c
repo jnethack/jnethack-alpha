@@ -2045,12 +2045,12 @@ static NEARDATA const char removeables[] = { ARMOR_CLASS, WEAPON_CLASS,
 /* Interactive version of getobj - used for Drop, Identify, and Takeoff (A).
    Return the number of times fn was called successfully.
    If combo is TRUE, we just use this to get a category list. */
-/*JP CHECK: 3.6.0 ÇÃåƒÇ—èoÇµå≥
-do.c:962:        || (result = ggetobj("drop", drop, 0, FALSE, (unsigned *) 0)) < -1)
-do.c:1009:        i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
-do_wear.c:2955:        || (result = ggetobj("take off", select_off, 0, FALSE,
-do_wear.c:3007:        if (ggetobj("take off", select_off, 0, TRUE, (unsigned *) 0) == -2)
-invent.c:2014:                n = ggetobj("identify", identify, id_limit, FALSE,
+/*JP CHECK: 3.6.6 ÇÃåƒÇ—èoÇµå≥
+do.c:1068:        || (result = ggetobj("drop", drop, 0, FALSE, (unsigned *) 0)) < -1)
+do.c:1117:        i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
+do_wear.c:3153:        || (result = ggetobj("take off", select_off, 0, FALSE,
+do_wear.c:3207:        i = ggetobj("take off", select_off, 0, TRUE, &ggofeedback);
+invent.c:2564:                n = ggetobj("identify", identify, id_limit, FALSE,
 */
 int
 ggetobj(word, fn, mx, combo, resultflags)

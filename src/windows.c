@@ -978,31 +978,70 @@ unsigned long *colormasks UNUSED;
             nb = status_vals[idx];
             *nb = '\0';
             if (cond & BL_MASK_STONE)
+/*JP
                 Strcpy(nb = eos(nb), " Stone");
+*/
+                Strcpy(nb = eos(nb), " êŒâª");
             if (cond & BL_MASK_SLIME)
+/*JP
                 Strcpy(nb = eos(nb), " Slime");
+*/
+                Strcpy(nb = eos(nb), " Ç«ÇÎÇ«ÇÎ");
             if (cond & BL_MASK_STRNGL)
+/*JP
                 Strcpy(nb = eos(nb), " Strngl");
+*/
+                Strcpy(nb = eos(nb), " íÇëß");
             if (cond & BL_MASK_FOODPOIS)
+/*JP
                 Strcpy(nb = eos(nb), " FoodPois");
+*/
+                Strcpy(nb = eos(nb), " êHì≈");
             if (cond & BL_MASK_TERMILL)
+/*JP
                 Strcpy(nb = eos(nb), " TermIll");
+*/
+                Strcpy(nb = eos(nb), " ïaãC");
             if (cond & BL_MASK_BLIND)
+/*JP
                 Strcpy(nb = eos(nb), " Blind");
+*/
+                Strcpy(nb = eos(nb), " ñ”ñ⁄");
             if (cond & BL_MASK_DEAF)
+/*JP
                 Strcpy(nb = eos(nb), " Deaf");
+*/
+                Strcpy(nb = eos(nb), " é®òW");
             if (cond & BL_MASK_STUN)
+/*JP
                 Strcpy(nb = eos(nb), " Stun");
+*/
+                Strcpy(nb = eos(nb), " ·øùÚ");
             if (cond & BL_MASK_CONF)
+/*JP
                 Strcpy(nb = eos(nb), " Conf");
+*/
+                Strcpy(nb = eos(nb), " ç¨óê");
             if (cond & BL_MASK_HALLU)
+/*JP
                 Strcpy(nb = eos(nb), " Hallu");
+*/
+                Strcpy(nb = eos(nb), " å∂äo");
             if (cond & BL_MASK_LEV)
+/*JP
                 Strcpy(nb = eos(nb), " Lev");
+*/
+                Strcpy(nb = eos(nb), " ïÇóV");
             if (cond & BL_MASK_FLY)
+/*JP
                 Strcpy(nb = eos(nb), " Fly");
+*/
+                Strcpy(nb = eos(nb), " îÚçs");
             if (cond & BL_MASK_RIDE)
+/*JP
                 Strcpy(nb = eos(nb), " Ride");
+*/
+                Strcpy(nb = eos(nb), " ãRèÊ");
             break;
         default:
             Sprintf(status_vals[idx],

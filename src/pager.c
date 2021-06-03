@@ -2415,7 +2415,7 @@ static struct {
 /*JP
     { domenucontrols, "List menu control keys" },
 */
-    { domenucontrols, "メニュー制御キー一覧s" },
+    { domenucontrols, "メニュー制御キー一覧" },
 /*JP
     { dispfile_license, "The NetHack license." },
 */

@@ -4763,7 +4763,10 @@ boolean dolist;
 {
     char buf[BUFSZ];
 
+/*JP
     putstr(win, 0, "Menu control keys:");
+*/
+    putstr(win, 0, "メニュー制御キー:");
     if (dolist) {
         int i;
 
@@ -4781,48 +4784,93 @@ boolean dolist;
             fmt0[] = " %14s  %s";
 
         putstr(win, 0, "");
+/*JP
         putstr(win, 0, "Selection:       On page   Full menu");
+*/
+        putstr(win, 0, "選択:             ページ  完全メニュー");
+/*JP
         Sprintf(buf, fmt2, "Select all",
+*/
+        Sprintf(buf, fmt2, "全て選択",
                 visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)),
                 visctrl(get_menu_cmd_key(MENU_SELECT_ALL)));
         putstr(win, 0, buf);
+/*JP
         Sprintf(buf, fmt2, "Deselect all",
+*/
+        Sprintf(buf, fmt2, "全て選択解除",
                 visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)),
                 visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)));
         putstr(win, 0, buf);
+/*JP
         Sprintf(buf, fmt2, "Invert all",
+*/
+        Sprintf(buf, fmt2, "全て反転",
                 visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)),
                 visctrl(get_menu_cmd_key(MENU_INVERT_ALL)));
         putstr(win, 0, buf);
+/*JP
         Sprintf(buf, fmt3, "Text match", "",
+*/
+        Sprintf(buf, fmt3, "テキストマッチ", "",
                 visctrl(get_menu_cmd_key(MENU_SEARCH)),
+/*JP
                 "Search and toggle matching entries");
+*/
+                "検索してマッチしたエントリをトグル");
         putstr(win, 0, buf);
         putstr(win, 0, "");
+/*JP
         putstr(win, 0, "Navigation:");
+*/
+        putstr(win, 0, "操作:");
+/*JP
         Sprintf(buf, fmt1, "Go to     ",
+*/
+        Sprintf(buf, fmt1, "移動      ",
                 visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)),
+/*JP
                 "Next page");
+*/
+                "次のページ");
         putstr(win, 0, buf);
         Sprintf(buf, fmt1, "",
                 visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)),
+/*JP
                 "Previous page");
+*/
+                "前のページ");
         putstr(win, 0, buf);
         Sprintf(buf, fmt1, "",
                 visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)),
+/*JP
                 "First page");
+*/
+                "先頭ページ");
         putstr(win, 0, buf);
         Sprintf(buf, fmt1, "",
                 visctrl(get_menu_cmd_key(MENU_LAST_PAGE)),
+/*JP
                 "Last page");
+*/
+                "最終ページ");
         putstr(win, 0, buf);
+/*JP
         Sprintf(buf, fmt0, "SPACE", "Next page, if any, otherwise RETURN");
+*/
+        Sprintf(buf, fmt0, "SPACE", "あれば次のページ、なければRETURN");
         putstr(win, 0, buf);
         Sprintf(buf, fmt0, "RETURN/ENTER",
+/*JP
                 "Finish menu with any selection(s) made");
+*/
+                "選択してメニュー終了");
         putstr(win, 0, buf);
         Sprintf(buf, fmt0, "ESCAPE",
+/*JP
                 "Cancel menu without selecting anything");
+*/
+                "何も選択せずにメニューをキャンセル");
         putstr(win, 0, buf);
     }
 }

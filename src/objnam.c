@@ -5158,7 +5158,10 @@ const char *
 gloves_simple_name(gloves)
 struct obj *gloves;
 {
+/*JP
     static const char gauntlets[] = "gauntlets";
+*/
+    static const char gauntlets[] = "¬è";
 
     if (gloves && gloves->dknown) {
         int otyp = gloves->otyp;
@@ -5170,7 +5173,10 @@ struct obj *gloves;
                     gauntlets))
             return gauntlets;
     }
+/*JP
     return "gloves";
+*/
+    return "è‘Ü";
 }
 
 const char *

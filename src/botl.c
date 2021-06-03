@@ -2244,7 +2244,12 @@ boolean from_configfile;
         } else if (fld == BL_HUNGER
                    && is_fld_arrayvalues(s[sidx], hutxt,
                                          SATIATED, STARVED + 1, &kidx)) {
+#if 0 /*JP*/
             txt = hu_stat[kidx];   /* store hu_stat[] val, not hutxt[] */
+#else
+            /*JP hu_stat‚Í–|–ó‚³‚ê‚Ä‚¢‚é‚Ì‚Åhutxt‚ðŽg‚¤ */
+            txt = hutxt[kidx];
+#endif
             txtval = TRUE;
         } else if (!strcmpi(s[sidx], "changed")) {
             changed = TRUE;
