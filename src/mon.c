@@ -2696,12 +2696,12 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
 /*JP
             pline("That was probably a bad idea...");
 */
-            pline("よくない行為だった．．．");
+            pline("たぶんよくない行為だった．．．");
         else
 /*JP
             pline("Whoopsie-daisy!");
 */
-            pline("シンジマッター！");
+            pline("ヤッチマッター！");
     } else if (mtmp->ispriest) {
         adjalign((p_coaligned(mtmp)) ? -2 : 2);
         /* cancel divine protection for killing your priest */
@@ -2721,7 +2721,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
 /*JP
             You_hear("the studio audience applaud!");
 */
-            pline("聴衆の喝采を浴びた！");
+            pline("観客の喝采を浴びた！");
     } else if (mtmp->mpeaceful)
         adjalign(-5);
 

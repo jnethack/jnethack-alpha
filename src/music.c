@@ -1063,7 +1063,7 @@ struct obj *instr;
                                      tumblers, plur(tumblers), gears,
                                      plur(gears));
 #else
-                            You_hear("%dの金具がカチっとなり，%dの歯車がまわる音を聞いた．",
+                            You_hear("%d個の金具がカチっとなり，%d個の歯車がまわる音を聞いた．",
                                 tumblers, gears);
 #endif
                         else
@@ -1071,14 +1071,14 @@ struct obj *instr;
                             You_hear("%d tumbler%s click.", tumblers,
                                      plur(tumblers));
 #else
-                            You_hear("%dの金具がカチっとなる音を聞いた．",
+                            You_hear("%d個の金具がカチっとなる音を聞いた．",
                                      tumblers);
 #endif
                     } else if (gears) {
 /*JP
                         You_hear("%d gear%s turn.", gears, plur(gears));
 */
-                        You_hear("%dの歯車が回る音を聞いた．", gears);
+                        You_hear("%d個の歯車が回る音を聞いた．", gears);
                         /* could only get `gears == 5' by playing five
                            correct notes followed by excess; otherwise,
                            tune would have matched above */

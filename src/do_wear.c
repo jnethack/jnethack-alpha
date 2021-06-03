@@ -2655,6 +2655,7 @@ glibr()
         thiswep = is_sword(otmp) ? c_sword : weapon_descr(otmp);
         if (otherwep && strcmp(thiswep, makesingular(otherwep)))
             otherwep = 0;
+#if 0 /*JP*//*“ú–{Œê‚Å‚Í•s—v*/
         if (otmp->quan > 1L) {
             /* most class names for unconventional wielded items
                are ok, but if wielding multiple apples or rations
@@ -2666,6 +2667,7 @@ glibr()
             else
                 thiswep = makeplural(thiswep);
         }
+#endif
         hand = body_part(HAND);
         which = "";
         if (bimanual(otmp))

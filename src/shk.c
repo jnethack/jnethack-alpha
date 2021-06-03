@@ -6053,10 +6053,15 @@ struct obj *obj_absorber, *obj_absorbed;
                || (floor_absorber && !costly_spot(x, y)))) {
         amount = bp->price;
         bill_dummy_object(obj_absorbed);
+#if 0 /*JP*/
         verbalize("You owe me %ld %s for my %s that you %s with your%s",
                   amount, currency(amount), obj_typename(obj_absorbed->otyp),
                   ANGRY(shkp) ? "had the audacity to mix" : "just mixed",
                   ANGRY(shkp) ? " stinking batch!" : "s.");
+#else /*JP:TODO “{‚Á‚Ä‚¢‚é‚Æ‚«‚Í–¢‘Î‰ž */
+        verbalize("Ž„‚Ì%s‚ð‚ ‚È‚½‚Ì‚à‚Ì‚Æ¬‚º‚½‚±‚Æ‚Å‚ ‚È‚½‚ÍŽ„‚É%ld%s‚ÌŽØ‚è‚ª‚ ‚éD",
+                  obj_typename(obj_absorbed->otyp), amount, currency(amount));
+#endif
         return;
     }
     /**************************************************************
