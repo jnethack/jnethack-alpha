@@ -69,8 +69,8 @@ char *argv[];
 #endif
 
 #ifdef XI18N
-    /* フォント設定のためにLANG変数を固定する */
-    putenv("LANG=ja_JP.eucJP");
+    /* フォント設定のためにLC_ALL変数を固定する */
+    putenv("LC_ALL=ja_JP.eucJP");
     setlocale(LC_ALL, "");
 #endif
 #if defined(__APPLE__)
