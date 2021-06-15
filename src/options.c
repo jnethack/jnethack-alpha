@@ -6936,7 +6936,7 @@ option_help()
 /*JP
     Sprintf(buf, "Set options as OPTIONS=<options> in %s", configfile);
 */
-    Sprintf(buf, "オプションは%sの中でOPTIONS=<options>と設定します", configfile);
+    Sprintf(buf, "オプションは %s の中でOPTIONS=<options>と設定します", configfile);
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
         putstr(datawin, 0, opt_intro[i]);
