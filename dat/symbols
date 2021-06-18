@@ -633,7 +633,4 @@ start: MACgraphics
 	S_pool: \xe0
 finish
 
-start: default
-finish
-
 # symbols EOF
