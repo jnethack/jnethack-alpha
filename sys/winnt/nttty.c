@@ -255,8 +255,8 @@ static void back_buffer_flip()
                     buf[1] = (unsigned char)(back2->character);
                     WriteConsoleOutputCharacter(console.hConOut, buf, 2, pos,
                                                     &unused);
-                    front->character = back->character;
-                    front2->character = back2->character;
+                    *front = *back;
+                    *front2 = *back2;
                 }
                 pos.X++;
                 back += 2;
@@ -278,6 +278,13 @@ static void back_buffer_flip()
                     WriteConsoleOutputCharacterA(console.hConOut, &ch, 1, pos,
                                                     &unused);
                 }
+#if 1 /*JP*/
+                /* 漢字の1バイト目だった場合、
+                   2バイト目をクリアして確実に更新する */
+                if (front->iskanji == 1) {
+                    (front + 1)->character = '\0';
+                }
+#endif
                 *front = *back;
             }
             back++;
