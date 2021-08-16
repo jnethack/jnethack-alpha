@@ -1,3 +1,5 @@
+Tue Aug 17 2021  Kentaro Shirakata  <argrath@ub32.org>
+
 	* 次の問題を修正
 	  * rumorsの末尾にゴミが表示される (#41899)
 	  * Win10で画面左端の文字が乱れる (#42072)
@@ -6,6 +8,7 @@
 	  * 「ゲームのオプション一覧(長文)」で表示が乱れる (#42547)
 	  * ローグレベルで表示が乱れる (#42549)
 	* X11のロケールを内部でja_JP.EUC-JPに固定する (#40804)
+	* 翻訳追加修正
 
 Sat Mar 13 2021  Kentaro Shirakata  <argrath@ub32.org>
 
