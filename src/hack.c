@@ -3582,7 +3582,7 @@ const char *msg_override;
         if (Upolyd && !strncmpi(nomovemsg, "You survived that ", 18))
             You("are %s.", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
 #else
-        if (Upolyd && !strncmpi(nomovemsg, "‚ ‚È‚½‚Í¶‚«‚È‚ª‚ç", 18))
+        if (Upolyd && !STRNCMP2(nomovemsg, "‚ ‚È‚½‚Í¶‚«‚È‚ª‚ç"))
             You("%s‚¾D", mons[u.umonnum].mname); /* (ignore Hallu) */
 #endif
     }

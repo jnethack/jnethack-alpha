@@ -52,6 +52,9 @@ struct Jitem {
 #define BSTRNCMPI(base, ptr, str, num) \
     ((ptr) < base || strncmpi((ptr), str, num))
 #define Strcasecpy(dst, src) (void) strcasecpy(dst, src)
+#if 1 /*JP*/
+#define STRNCMPEX(x, y) strncmp(x, y, l = strlen(y))
+#endif
 
 /* true for gems/rocks that should have " stone" appended to their names */
 #define GemStone(typ)                                                  \
@@ -1077,6 +1080,9 @@ struct obj *obj;
     struct obj bareobj;
     struct objclass saveobcls;
     int otyp = obj->otyp;
+#if 1 /*JP*/
+    int l = 0;
+#endif
 
     /* suppress user-supplied name */
     saveobcls.oc_uname = objects[otyp].oc_uname;
@@ -1105,12 +1111,12 @@ struct obj *obj;
         bareobj.spe = obj->spe;
 
     bufp = distant_name(&bareobj, xname); /* xname(&bareobj) */
-#if 0 /*JP:T*/
+#if 0 /*JP*/
     if (!strncmp(bufp, "uncursed ", 9))
         bufp += 9; /* Role_if(PM_PRIEST) */
 #else
-    if (!strncmp(bufp, "Žô‚í‚ê‚Ä‚¢‚È‚¢", 14))
-        bufp += 14; /* Role_if(PM_PRIEST) */
+    if (!STRNCMPEX(bufp, "Žô‚í‚ê‚Ä‚¢‚È‚¢"))
+        bufp += l; /* Role_if(PM_PRIEST) */
 #endif
 
     objects[otyp].oc_uname = saveobcls.oc_uname;
@@ -1308,8 +1314,9 @@ unsigned doname_flags;
                                 end (Strcat is used on the end) */
 #endif
     register char *bp = xname(obj);
-#if 1 /*JP*//*‡˜“ü‚ê‘Ö‚¦‚ÉŽg‚¤*/
-    char preprefix[PREFIX];
+#if 1 /*JP*/
+    char preprefix[PREFIX]; /*‡˜“ü‚ê‘Ö‚¦‚ÉŽg‚¤*/
+    int l = 0;
 #endif
 
     if (iflags.override_ID) {
@@ -1334,8 +1341,8 @@ unsigned doname_flags;
         ispoisoned = TRUE;
     }
 #else
-    if (!strncmp(bp, "“Å‚Ì“h‚ç‚ê‚½", 12) && obj->opoisoned) {
-        bp += 12;
+    if (!STRNCMPEX(bp, "“Å‚Ì“h‚ç‚ê‚½") && obj->opoisoned) {
+        bp += l;
         ispoisoned = TRUE;
     }
 #endif
@@ -3679,13 +3686,13 @@ struct obj *no_wish;
                 bp++;
             l = 0;
 #if 1 /*JP*//* Œã‚É”ŽŒ‚ª‚ ‚é‚Æ‚«‚Ííœ */
-            if(!strncmp(bp, "û‚Ì", l = 4) ||
-               !strncmp(bp, "–{‚Ì", l = 4) ||
-               !strncmp(bp, "’…‚Ì", l = 4) ||
-               !strncmp(bp, "ŒÂ‚Ì", l = 4) ||
-               !strncmp(bp, "–‡‚Ì", l = 4) ||
-               !strncmp(bp, "‚Â‚Ì", l = 4) ||
-               !strncmp(bp, "‚Ì", l = 2))
+            if(!STRNCMPEX(bp, "û‚Ì") ||
+               !STRNCMPEX(bp, "–{‚Ì") ||
+               !STRNCMPEX(bp, "’…‚Ì") ||
+               !STRNCMPEX(bp, "ŒÂ‚Ì") ||
+               !STRNCMPEX(bp, "–‡‚Ì") ||
+               !STRNCMPEX(bp, "‚Â‚Ì") ||
+               !STRNCMPEX(bp, "‚Ì"))
               ;
             else
               l = 0;
@@ -3702,20 +3709,20 @@ struct obj *no_wish;
         } else if (!strncmpi(bp, "blessed ", l = 8)
                    || !strncmpi(bp, "holy ", l = 5)) {
 #else
-        } else if (!strncmpi(bp, "j•Ÿ‚³‚ê‚½", l = 10)) {
+        } else if (!STRNCMPEX(bp, "j•Ÿ‚³‚ê‚½")) {
 #endif
             blessed = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "moist ", l = 6)
                    || !strncmpi(bp, "wet ", l = 4)) {
 #else
-        } else if (!strncmpi(bp, "Ž¼‚Á‚½", l = 6)
-                   || !strncmpi(bp, "”G‚ê‚½", l = 6)) {
+        } else if (!STRNCMPEX(bp, "Ž¼‚Á‚½")
+                   || !STRNCMPEX(bp, "”G‚ê‚½")) {
 #endif
 #if 0 /*JP:T*/
             if (!strncmpi(bp, "wet ", 4))
 #else
-            if (!strncmpi(bp, "”G‚ê‚½", 6))
+            if (!STRNCMP2(bp, "”G‚ê‚½"))
 #endif
                 wetness = rn2(3) + 3;
             else
@@ -3724,13 +3731,13 @@ struct obj *no_wish;
         } else if (!strncmpi(bp, "cursed ", l = 7)
                    || !strncmpi(bp, "unholy ", l = 7)) {
 #else
-        } else if (!strncmpi(bp, "Žô‚í‚ê‚½", l = 8)) {
+        } else if (!STRNCMPEX(bp, "Žô‚í‚ê‚½")) {
 #endif
             iscursed = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "uncursed ", l = 9)) {
 #else
-        } else if (!strncmpi(bp, "Žô‚í‚ê‚Ä‚¢‚È‚¢", l = 14)) {
+        } else if (!STRNCMPEX(bp, "Žô‚í‚ê‚Ä‚¢‚È‚¢")) {
 #endif
             uncursed = 1;
 #if 0 /*JP:T*/
@@ -3741,25 +3748,25 @@ struct obj *no_wish;
                    || !strncmpi(bp, "fireproof ", l = 10)
                    || !strncmpi(bp, "rotproof ", l = 9)) {
 #else
-        } else if (!strncmpi(bp, "ŽK‚Ñ‚È‚¢", l = 8)
-                   || !strncmpi(bp, "•…H‚µ‚È‚¢", l = 10)
-                   || !strncmpi(bp, "ˆÀ’è‚µ‚½", l = 8)
-                   || !strncmpi(bp, "”R‚¦‚È‚¢", l = 8)) {
+        } else if (!STRNCMPEX(bp, "ŽK‚Ñ‚È‚¢")
+                   || !STRNCMPEX(bp, "•…H‚µ‚È‚¢")
+                   || !STRNCMPEX(bp, "ˆÀ’è‚µ‚½")
+                   || !STRNCMPEX(bp, "”R‚¦‚È‚¢")) {
 #endif
             erodeproof = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "lit ", l = 4)
                    || !strncmpi(bp, "burning ", l = 8)) {
 #else
-        } else if (!strncmpi(bp, "Œõ‚Á‚Ä‚¢‚é", l = 10)
-                   || !strncmpi(bp, "”R‚¦‚Ä‚¢‚é", l = 10)) {
+        } else if (!STRNCMPEX(bp, "Œõ‚Á‚Ä‚¢‚é")
+                   || !STRNCMPEX(bp, "”R‚¦‚Ä‚¢‚é")) {
 #endif
             islit = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "unlit ", l = 6)
                    || !strncmpi(bp, "extinguished ", l = 13)) {
 #else
-        } else if (!strncmpi(bp, "Á‚¦‚Ä‚¢‚é", l = 10)) {
+        } else if (!STRNCMPEX(bp, "Á‚¦‚Ä‚¢‚é")) {
 #endif
             islit = 0;
             /* "unlabeled" and "blank" are synonymous */
@@ -3768,14 +3775,14 @@ struct obj *no_wish;
                    || !strncmpi(bp, "unlabelled ", l = 11)
                    || !strncmpi(bp, "blank ", l = 6)) {
 #else
-        } else if (!strncmpi(bp, "ƒ‰ƒxƒ‹‚Ì‚È‚¢", l = 12)
-                   || !strncmpi(bp, "^‚Á”’‚È", l = 8)) {
+        } else if (!STRNCMPEX(bp, "ƒ‰ƒxƒ‹‚Ì‚È‚¢")
+                   || !STRNCMPEX(bp, "^‚Á”’‚È")) {
 #endif
             unlabeled = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "poisoned ", l = 9)) {
 #else
-        } else if (!strncmpi(bp, "“Å‚Ì“h‚ç‚ê‚½", l = 12)) {
+        } else if (!STRNCMPEX(bp, "“Å‚Ì“h‚ç‚ê‚½")) {
 #endif
             ispoisoned = 1;
             /* "trapped" recognized but not honored outside wizard mode */
@@ -3789,39 +3796,39 @@ struct obj *no_wish;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "locked ", l = 7)) {
 #else
-        } else if (!strncmpi(bp, "Œ®‚ÌŠ|‚©‚Á‚½", l = 12)) {
+        } else if (!STRNCMPEX(bp, "Œ®‚ÌŠ|‚©‚Á‚½")) {
 #endif
             locked = 1, unlocked = broken = 0;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "unlocked ", l = 9)) {
 #else
-        } else if (!strncmpi(bp, "Œ®‚ÌŠ|‚©‚Á‚Ä‚¢‚È‚¢", l = 18)) {
+        } else if (!STRNCMPEX(bp, "Œ®‚ÌŠ|‚©‚Á‚Ä‚¢‚È‚¢")) {
 #endif
             unlocked = 1, locked = broken = 0;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "broken ", l = 7)) {
 #else
-        } else if (!strncmpi(bp, "Œ®‚Ì‰ó‚ê‚½", l = 10)) {
+        } else if (!STRNCMPEX(bp, "Œ®‚Ì‰ó‚ê‚½")) {
 #endif
             broken = 1, locked = unlocked = 0;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "greased ", l = 8)) {
 #else
-        } else if (!strncmpi(bp, "–û‚Ì“h‚ç‚ê‚½", l = 12)
-                   || !strncmpi(bp, "Ž‰‚Ì“h‚ç‚ê‚½", l = 12)) {
+        } else if (!STRNCMPEX(bp, "–û‚Ì“h‚ç‚ê‚½")
+                   || !STRNCMPEX(bp, "Ž‰‚Ì“h‚ç‚ê‚½")) {
 #endif
             isgreased = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "very ", l = 5)) {
 #else
-        } else if (!strncmpi(bp, "‚Æ‚Ä‚à", l = 6)) {
+        } else if (!STRNCMPEX(bp, "‚Æ‚Ä‚à")) {
 #endif
             /* very rusted very heavy iron ball */
             very = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "thoroughly ", l = 11)) {
 #else
-        } else if (!strncmpi(bp, "‚©‚È‚è", l = 6)) {
+        } else if (!STRNCMPEX(bp, "‚©‚È‚è")) {
 #endif
             very = 2;
 #if 0 /*JP:T*/
@@ -3830,8 +3837,8 @@ struct obj *no_wish;
                    || !strncmpi(bp, "burnt ", l = 6)
                    || !strncmpi(bp, "burned ", l = 7)) {
 #else
-        } else if (!strncmpi(bp, "ŽK‚Ñ‚½", l = 6)
-                   || !strncmpi(bp, "”R‚¦‚½", l = 6)) {
+        } else if (!STRNCMPEX(bp, "ŽK‚Ñ‚½")
+                   || !STRNCMPEX(bp, "”R‚¦‚½")) {
 #endif
             eroded = 1 + very;
             very = 0;
@@ -3839,8 +3846,8 @@ struct obj *no_wish;
         } else if (!strncmpi(bp, "corroded ", l = 9)
                    || !strncmpi(bp, "rotted ", l = 7)) {
 #else
-        } else if (!strncmpi(bp, "•…H‚µ‚½", l = 8)
-                   || !strncmpi(bp, "•…‚Á‚½", l = 6)) {
+        } else if (!STRNCMPEX(bp, "•…H‚µ‚½")
+                   || !STRNCMPEX(bp, "•…‚Á‚½")) {
 #endif
             eroded2 = 1 + very;
             very = 0;
@@ -3848,31 +3855,31 @@ struct obj *no_wish;
         } else if (!strncmpi(bp, "partly eaten ", l = 13)
                    || !strncmpi(bp, "partially eaten ", l = 16)) {
 #else
-        } else if (!strncmpi(bp, "H‚×‚©‚¯‚Ì", l = 10)) {
+        } else if (!STRNCMPEX(bp, "H‚×‚©‚¯‚Ì")) {
 #endif
             halfeaten = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "historic ", l = 9)) {
 #else
-        } else if (!strncmpi(bp, "—ðŽj“I‚È", l = 8)) {
+        } else if (!STRNCMPEX(bp, "—ðŽj“I‚È")) {
 #endif
             ishistoric = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "diluted ", l = 8)) {
 #else
-        } else if (!strncmpi(bp, "”–‚Ü‚Á‚½", l = 8)) {
+        } else if (!STRNCMPEX(bp, "”–‚Ü‚Á‚½")) {
 #endif
             isdiluted = 1;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "empty ", l = 6)) {
 #else
-        } else if (!strncmpi(bp, "‹ó‚Á‚Û‚Ì", l = 8)) {
+        } else if (!STRNCMPEX(bp, "‹ó‚Á‚Û‚Ì")) {
 #endif
             contents = EMPTY;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "small ", l = 6)) { /* glob sizes */
 #else
-        } else if (!strncmpi(bp, "¬‚³‚¢", l = 6)) { /* glob sizes */
+        } else if (!STRNCMPEX(bp, "¬‚³‚¢")) { /* glob sizes */
 #endif
             /* "small" might be part of monster name (mimic, if wishing
                for its corpse) rather than prefix for glob size; when
@@ -3885,7 +3892,7 @@ struct obj *no_wish;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "medium ", l = 7)) {
 #else
-        } else if (!strncmpi(bp, "’†‚­‚ç‚¢‚Ì", l = 10)) {
+        } else if (!STRNCMPEX(bp, "’†‚­‚ç‚¢‚Ì")) {
 #endif
             /* xname() doesn't display "medium" but without this
                there'd be no way to ask for the intermediate size
@@ -3894,7 +3901,7 @@ struct obj *no_wish;
 #if 0 /*JP:T*/
         } else if (!strncmpi(bp, "large ", l = 6)) {
 #else
-        } else if (!strncmpi(bp, "‘å‚«‚¢", l = 6)) {
+        } else if (!STRNCMPEX(bp, "‘å‚«‚¢")) {
 #endif
             /* "large" might be part of monster name (dog, cat, koboold,
                mimic) or object name (box, round shield) rather than
@@ -4113,7 +4120,8 @@ struct obj *no_wish;
     {
         /*JP u(‰ö•¨–¼)‚Ì‰òv‚ÍŒÂX‚ÉID‚ª‚ ‚é‚Ì‚Å•Êˆµ‚¢ */
         int l = strlen(bp);
-        if (l > 4 && strncmp(bp + l - 4, "‚Ì‰ò", 4) == 0) {
+        int l2 = strlen("‚Ì‰ò");
+        if (l > 4 && strncmp(bp + l - l2, "‚Ì‰ò", l2) == 0) {
             if ((mntmp = name_to_mon(bp)) >= PM_GRAY_OOZE
                 && mntmp <= PM_BLACK_PUDDING) {
                 mntmp = NON_PM; /* lie to ourselves */

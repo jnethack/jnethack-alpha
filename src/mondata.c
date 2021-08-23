@@ -810,7 +810,7 @@ const char *in_str;
                            || !strcmpi(&str[m_i_len], "es")
                            || !strncmpi(&str[m_i_len], "es ", 3))) {
 #else
-                       && !strncmp(&str[m_i_len], "‚Ì", 2)) {
+                       && !STRNCMP2(&str[m_i_len], "‚Ì")) {
 #endif
                 mntmp = i;
                 len = m_i_len;

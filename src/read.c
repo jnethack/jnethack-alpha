@@ -3180,7 +3180,7 @@ struct _create_particular_data *d;
     if (!strncmpi(bufp, "tame ", 5)) {
         bufp += 5;
 #else
-    if (!strncmpi(bufp, "Žè‚È‚¸‚¯‚ç‚ê‚½", 14)) {
+    if (!STRNCMP2(bufp, "Žè‚È‚¸‚¯‚ç‚ê‚½")) {
         bufp += 14;
 #endif
         d->maketame = TRUE;
@@ -3188,7 +3188,7 @@ struct _create_particular_data *d;
     } else if (!strncmpi(bufp, "peaceful ", 9)) {
         bufp += 9;
 #else
-    } else if (!strncmpi(bufp, "—FD“I‚È", 8)) {
+    } else if (!STRNCMP2(bufp, "—FD“I‚È")) {
         bufp += 8;
 #endif
         d->makepeaceful = TRUE;
@@ -3196,7 +3196,7 @@ struct _create_particular_data *d;
     } else if (!strncmpi(bufp, "hostile ", 8)) {
         bufp += 8;
 #else
-    } else if (!strncmpi(bufp, "“G‘Î“I‚È", 8)) {
+    } else if (!STRNCMP2(bufp, "“G‘Î“I‚È")) {
         bufp += 8;
 #endif
         d->makehostile = TRUE;

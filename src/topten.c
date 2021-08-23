@@ -919,17 +919,17 @@ boolean so;
         Strcat(linebuf, "‚Í");
 /*JP: “ú–{Œê‚Å‚Íu››‚ðŽè‚Év‚ðæ‚É’Ç‰Á‚µ‚È‚¢‚Æ•sŽ©‘R */
         jdeath = t1->death;
-        if (!strncmp(jdeath, "–‚œ‚¯‚ðŽè‚É", 12))
+        if (!STRNCMP2(jdeath, "–‚œ‚¯‚ðŽè‚É"))
             jdeath += 12;
-        else if (!strncmp(jdeath, "“Vã‚Å’pJ‚ðŽó‚¯", 16))
+        else if (!STRNCMP2(jdeath, "“Vã‚Å’pJ‚ðŽó‚¯"))
             jdeath += 16;
-        else if (!strncmp(jdeath, "‹U•¨‚Ì–‚œ‚¯‚ð’Í‚Ü‚³‚ê", 24))
+        else if (!STRNCMP2(jdeath, "‹U•¨‚Ì–‚œ‚¯‚ð’Í‚Ü‚³‚ê"))
             jdeath += 24;
 #endif
 #if 0 /*JP*/
     if (!strncmp("escaped", t1->death, 7)) {
 #else
-    if (!strncmp("’Eo‚µ‚½", jdeath, 8)
+    if (!STRNCMP2("’Eo‚µ‚½", jdeath)
         || !strncmp("escaped", jdeath, 7)) {
 #endif
 #if 0 /*JP*/
@@ -950,7 +950,7 @@ boolean so;
 #if 0 /*JP*/
     } else if (!strncmp("ascended", t1->death, 8)) {
 #else
-    } else if (!strncmp("¸“V‚µ‚½", jdeath, 8)
+    } else if (!STRNCMP2("¸“V‚µ‚½", jdeath)
                || !strncmp("ascended", jdeath, 8)) {
 #endif
 #if 0 /*JP:T*/
@@ -965,7 +965,7 @@ boolean so;
 /*JP
         if (!strncmp(t1->death, "quit", 4)) {
 */
-        if (!strncmp(jdeath, "”²‚¯‚½", 4)) {
+        if (!STRNCMP2(jdeath, "”²‚¯‚½")) {
 #if 0 /*JP*/
             Strcat(linebuf, "quit");
 #else

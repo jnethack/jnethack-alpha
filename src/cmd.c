@@ -3550,9 +3550,9 @@ int final;
         enl_msg(You_, "could be", "could have been", " clairvoyant", buf);
 #else
         /*JP:「…によって」*/
-        if (!strncmp(buf, "によって", 8))
+        if (!STRNCMP2(buf, "によって"))
             /*JP:「…がなければ」に書き換える*/
-            strcpy(eos(buf) - 8, "がなければ");
+            strcpy(eos(buf) - strlen("によって"), "がなければ");
         you_have("千里眼能力", buf);
 #endif
     }

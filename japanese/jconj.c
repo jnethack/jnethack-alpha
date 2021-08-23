@@ -184,7 +184,7 @@ jconjsub( tab, jverb, sfx )
     len = strlen(jverb);
     strcpy((char *)tmp, jverb );
 
-    if(!strncmp(sfx, "‚Æ", 2)){
+    if(!STRNCMP2(sfx, "‚Æ")){
         strcat((char *)tmp, sfx);
         return (char *)tmp;
     }
@@ -192,7 +192,7 @@ jconjsub( tab, jverb, sfx )
     switch( tab->katsuyo_type ){
       case FIFTH:
         p = tmp + (len - 2);
-        if(!strncmp(sfx, "‚È", 2)){
+        if(!STRNCMP2(sfx, "‚È")){
             if(!IC){
                 p[0] = 0xa4;
                 p[1] = hira_tab[tab->column][1];
@@ -203,7 +203,7 @@ jconjsub( tab, jverb, sfx )
             strcpy((char *)p + 2, sfx);
             break;
         }
-        else if(!strncmp(sfx, "‚½", 2) || !strncmp(sfx, "‚Ä", 2)){
+        else if(!STRNCMP2(sfx, "‚½") || !STRNCMP2(sfx, "‚Ä")){
             switch( tab->onbin_type ){
               case NORMAL:
                 if(!IC){
@@ -246,7 +246,7 @@ jconjsub( tab, jverb, sfx )
             }
             break;
         }
-        else if(!strncmp(sfx, "‚Î", 2)){
+        else if(!STRNCMP2(sfx, "‚Î")){
             if(!IC){
                 p[1] = hira_tab[tab->column + 3][1];
             } else {
@@ -254,7 +254,7 @@ jconjsub( tab, jverb, sfx )
             }
             strcpy((char *)p + 2, sfx);
         }
-        else if(!strncmp(sfx, "‚ê", 2)){
+        else if(!STRNCMP2(sfx, "‚ê")){
             if(!IC){
                 p[1]=hira_tab[tab->column + 3][1];
             } else {
@@ -262,7 +262,7 @@ jconjsub( tab, jverb, sfx )
             }
             strcpy((char *)p + 2, sfx + 2);
         }
-        else if(!strncmp(sfx, "‚Ü", 2)) {
+        else if(!STRNCMP2(sfx, "‚Ü")) {
             if(!IC){
                 p[1] = hira_tab[tab->column + 1][1];
             } else {
@@ -271,7 +271,7 @@ jconjsub( tab, jverb, sfx )
             strcpy((char *)p + 2, sfx);
             break;
         }
-        else if(!strncmp(sfx, "‚æ", 2)) {
+        else if(!STRNCMP2(sfx, "‚æ")) {
             if(!IC){
                 p[1] = hira_tab[tab->column + 4][1];
             } else {
@@ -285,11 +285,11 @@ jconjsub( tab, jverb, sfx )
       case UPPER:
       case KAHEN:
         p = tmp + (len - 2);
-        if(!strncmp(sfx, "‚Î", 2)){
+        if(!STRNCMP2(sfx, "‚Î")){
             strcpy((char *)p, "‚ê");
             strcpy((char *)p + 2, sfx);
         }
-        else if(!strncmp(sfx, "‚ê", 2) && tab->katsuyo_type == LOWER){
+        else if(!STRNCMP2(sfx, "‚ê") && tab->katsuyo_type == LOWER){
             strcpy((char *)p, "‚ç");
             strcpy((char *)p + 2, sfx);
         }
@@ -298,15 +298,15 @@ jconjsub( tab, jverb, sfx )
         break;
       case SAHEN:
         p = tmp + (len - 4);
-        if(!strncmp(sfx, "‚È", 2) ||
-           !strncmp(sfx, "‚Ü", 2) ||
-           !strncmp(sfx, "‚½", 2) ||
-           !strncmp(sfx, "‚Ä", 2) ||
-           !strncmp(sfx, "‚æ", 2)){
+        if(!STRNCMP2(sfx, "‚È") ||
+           !STRNCMP2(sfx, "‚Ü") ||
+           !STRNCMP2(sfx, "‚½") ||
+           !STRNCMP2(sfx, "‚Ä") ||
+           !STRNCMP2(sfx, "‚æ")){
             strcpy((char *)p, "‚µ");
             strcpy((char *)p + 2, sfx);
         }
-        else if(!strncmp(sfx, "‚Î", 2) || !strncmp(sfx, "‚ê‚Î", 4)){
+        else if(!STRNCMP2(sfx, "‚Î") || !STRNCMP2(sfx, "‚ê‚Î")){
             strcpy((char *)p, "‚·‚ê‚Î");
         }
         break;

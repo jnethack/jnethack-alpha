@@ -1694,7 +1694,7 @@ register const char *let, *word;
 /*JP
         You("don't have anything %sto %s.", foox ? "else " : "", word);
 */
-        You("%s%s‚à‚Ì‚ğ‚Á‚Ä‚¢‚È‚¢D", foox ? "‘¼‚É" : "", jconj(jword, "‚ê‚é"));
+        You("%s%s‚à‚Ì‚ğ‚Á‚Ä‚¢‚È‚¢D", foox ? "‘¼‚É" : "", jcan(jword));
         return (struct obj *) 0;
     } else if (!strcmp(word, "write on")) { /* ugly check for magic marker */
         /* we wanted all scrolls and books in altlets[], but that came with
@@ -3768,7 +3768,7 @@ boolean picked_some;
 /*JP
         if (dfeature && !strncmp(dfeature, "altar ", 6)) {
 */
-        if (dfeature && !strncmp(dfeature, "Õ’d", 4)) {
+        if (dfeature && !STRNCMP2(dfeature, "Õ’d")) {
             /* don't say "altar" twice, dfeature has more info */
 /*JP
             You("try to feel what is here.");

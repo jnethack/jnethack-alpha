@@ -6774,9 +6774,9 @@ unconscious()
 */
     return (boolean) (u.usleep
                       || (nomovemsg
-                          && (!strncmp(nomovemsg, "目がさめたが頭痛", 18)
-                              || !strncmp(nomovemsg, "あなたは正気づいた", 18)
-                              || !strncmp(nomovemsg, "あなたはまた正気づ", 18))));
+                          && (!STRNCMP2(nomovemsg, "目がさめたが頭痛")
+                              || !STRNCMP2(nomovemsg, "あなたは正気づいた")
+                              || !STRNCMP2(nomovemsg, "あなたはまた正気づ"))));
 #endif
 }
 

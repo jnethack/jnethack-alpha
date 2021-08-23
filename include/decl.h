@@ -476,6 +476,8 @@ struct trans_verb {
 
 /* hcolor()‚ÍŒ`—eŽŒ‚ð•Ô‚·‚Ì‚Å•›ŽŒ‚É•ÏŠ·‚·‚é */
 #define hcolor_adv(x) jconj_adj(hcolor((x)))
+/* ŒÅ’è•¶Žš—ñ—pstrncmp */
+#define STRNCMP2(x, y) strncmp(x, y, strlen(y))
 #endif
 
 #undef E

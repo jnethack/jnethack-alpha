@@ -150,14 +150,14 @@ struct obj *otmp;
 /*JP
              && !strncmp(s, "riding ", 7))
 */
-             && !strncmp(s, "乗馬用の", 8))
+             && !STRNCMP2(s, "乗馬用の"))
         /* Bonus for wearing "riding" (but not fumbling) gloves */
         chance += 10;
     else if (uarmf && (s = OBJ_DESCR(objects[uarmf->otyp])) != (char *) 0
 /*JP
              && !strncmp(s, "riding ", 7))
 */
-             && !strncmp(s, "乗馬用の", 8))
+             && !STRNCMP2(s, "乗馬用の"))
         /* ... or for "riding boots" */
         chance += 10;
     if (otmp->cursed)
