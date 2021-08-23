@@ -1123,6 +1123,7 @@ initoptions_init()
         flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
     switch_symbols(FALSE); /* set default characters */
     init_rogue_symbols();
+#if 0 /*JP*//*シンボルの自動設定は害が大きいのでコメントアウト*/
 #if defined(UNIX) && defined(TTY_GRAPHICS)
     /*
      * Set defaults for some options depending on what we can
@@ -1169,6 +1170,7 @@ initoptions_init()
         load_symset("MACGraphics", PRIMARY);
     switch_symbols(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
+#endif
     flags.menu_style = MENU_FULL;
 
     iflags.wc_align_message = ALIGN_TOP;
