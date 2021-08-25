@@ -1902,12 +1902,12 @@ struct obj *otmp;
 #if 1 /*JP*/
     const char *j;
     const char *m;
-    m = jconj(jonmsg(otmp, &j), "ている");
+    m = jconj(jonmsg(otmp, &j), "て");
 #endif
 /*JP
     You("are already wearing %s%c", cc, (cc == c_that_) ? '!' : '.');
 */
-    You("もう%s%s%s%s", cc, j,  m, (cc == c_that_) ? "！" : "．");
+    You("もう%s%s%sいる%s", cc, j,  m, (cc == c_that_) ? "！" : "．");
 }
 
 STATIC_OVL void
@@ -2029,8 +2029,8 @@ boolean noisy;
                                                    : c_weapon);
 #else
                 {
-                    m = jconj(jonmsg(uwep, &j), "ている");
-                    You("両手持ちの%s%s%sので盾で身を守れない．",
+                    m = jconj(jonmsg(uwep, &j), "て");
+                    You("両手持ちの%s%s%sいるので盾で身を守れない．",
                         is_sword(uwep) ? c_sword :
                         uwep->otyp == BATTLE_AXE ? c_axe : c_weapon,
                         j, m);

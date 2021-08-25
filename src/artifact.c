@@ -2209,7 +2209,7 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
 #else
                 pline("%s‚Í%s%s%s", bare_artifactname(uwep),
                       glow_color(uwep->oartifact),
-                      jconj(glow_verb(orc_count, FALSE), "‚½"),
+                      jpast(glow_verb(orc_count, FALSE)),
                       (newstr > oldstr) ? "I" : "D");
 #endif
             else if (oldstr == 0) /* quivers */

@@ -1235,7 +1235,7 @@ struct obj *obj;
               !res ? "Unfortunately," : "But", verb);
 #else
         pline("%s‚­‚à‚Ì‘ƒ‚É‚Ğ‚Á‚©‚©‚Á‚Ä‚¢‚éŠÔ‚Í%sD",
-              !res ? "c”O‚È‚ª‚ç" : "‚µ‚©‚µ", jconj(verb, "‚È‚¢"));
+              !res ? "c”O‚È‚ª‚ç" : "‚µ‚©‚µ", jcannot(verb));
 #endif
         return res;
     }
