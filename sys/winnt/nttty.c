@@ -250,10 +250,9 @@ static void back_buffer_flip()
                 /* pos.x == 0 の条件は不要のはずだが #42072 対策で追加。 */
                 if (back->character != front->character ||
                     back2->character != front2->character || pos.X == 0) {
-                    unsigned char buf[2];
-                    buf[0] = (unsigned char)(back->character);
-                    buf[1] = (unsigned char)(back2->character);
-                    WriteConsoleOutputCharacter(console.hConOut, buf, 2, pos,
+                    wchar_t wbuf[1];
+                    wbuf[0] = back->character;
+                    WriteConsoleOutputCharacterW(console.hConOut, wbuf, 1, pos,
                                                     &unused);
                     *front = *back;
                     *front2 = *back2;
@@ -627,6 +626,8 @@ unsigned int ch2;
 
     boolean inverse = FALSE;
     cell_t cell;
+    unsigned char buf[2];
+    wchar_t wbuf[1];
 
     /* xputc_core()からのコピー */
     inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
@@ -656,12 +657,24 @@ unsigned int ch2;
         }
     }
 
-    cell.character = ch1;
+    buf[0] = (unsigned char)(ch1);
+    buf[1] = (unsigned char)(ch2);
+    int ret = MultiByteToWideChar(
+        CP_ACP,
+        MB_PRECOMPOSED,
+        buf,
+        2,
+        wbuf,
+        1);
+
+    /* 左側にワイド文字情報を詰める */
+    cell.character = wbuf[0];
     cell.iskanji = 1;
     buffer_write(console.back_buffer, &cell, console.cursor);
     console.cursor.X++;
 
-    cell.character = ch2;
+    /* 右側はダミー */
+    cell.character = 255;
     cell.iskanji = 2;
     buffer_write(console.back_buffer, &cell, console.cursor);
 
