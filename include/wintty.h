@@ -116,7 +116,7 @@ E void NDECL(tty_shutdown);
 #endif
 E int FDECL(xputc, (int));
 # if 1 /*JP*/
-E void FDECL(xputc2, (int, int));
+E void FDECL(xputc2, (unsigned char *));
 # endif
 E void FDECL(xputs, (const char *));
 #if defined(SCREEN_VGA) || defined(SCREEN_8514)

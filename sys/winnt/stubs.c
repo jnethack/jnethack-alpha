@@ -91,9 +91,8 @@ int ch;
 
 #if 1 /*JP*/
 void
-xputc2(ch1, ch2)
-int ch1;
-int ch2;
+xputc2(str)
+unsigned char *str;
 {
     return;
 }

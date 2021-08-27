@@ -82,7 +82,7 @@ cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
 static BOOL FDECL(CtrlHandler, (DWORD));
 static void FDECL(xputc_core, (char));
 #if 1 /*JP*/
-static void FDECL(xputc2_core, (unsigned int, unsigned int));
+static void FDECL(xputc2_core, (unsigned char *));
 #endif
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
@@ -617,16 +617,14 @@ int ch;
 
 #if 1 /*JP*/
 void
-xputc2_core(ch1, ch2)
-unsigned int ch1;
-unsigned int ch2;
+xputc2_core(str)
+unsigned char *str;
 {
     nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
     nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 
     boolean inverse = FALSE;
     cell_t cell;
-    unsigned char buf[2];
     wchar_t wbuf[1];
 
     /* xputc_core()からのコピー */
@@ -657,13 +655,11 @@ unsigned int ch2;
         }
     }
 
-    buf[0] = (unsigned char)(ch1);
-    buf[1] = (unsigned char)(ch2);
     int ret = MultiByteToWideChar(
         CP_ACP,
         MB_PRECOMPOSED,
-        buf,
-        2,
+        str,
+        strlen(str),
         wbuf,
         1);
 
@@ -692,17 +688,16 @@ unsigned int ch2;
 }
 
 void
-xputc2(ch1, ch2)
-int ch1;
-int ch2;
+xputc2(str)
+unsigned char *str;
 {
     /* wintty.c では 1 バイト毎に curx を加算するが、ここは
-       2 バイトたまってから呼び出されるので、1 文字分先に進んで
-      しまっている。従って 1 を引く。 */
-    console.cursor.X = ttyDisplay->curx - 1;
+       n バイトたまってから呼び出されるので、n-1 文字分先に進んで
+      しまっている。従って n-1 を引く。 */
+    console.cursor.X = ttyDisplay->curx - (strlen(str) - 1);
     console.cursor.Y = ttyDisplay->cury;
 
-    xputc2_core(ch1, ch2);
+    xputc2_core(str);
 }
 #endif
 

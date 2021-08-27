@@ -11,7 +11,7 @@
 #endif
 
 int xputc(CHAR_P);
-int xputc2(int, int);
+int xputc2(unsigned char *);
 
 
 #define EUC     0
@@ -304,13 +304,14 @@ tty_cputc(unsigned int c)
 
 /* print out 2 bytes character to tty (no conversion) */
 static void
-tty_cputc2(unsigned int c, unsigned int c2)
+tty_cputc2(unsigned char *str)
 {
 #if defined(NO_TERMS) && (defined(MSDOS) || defined(WIN32CON))
-    xputc2(c, c2);
+    xputc2(str);
 #else
-    putchar(c);
-    putchar(c2);
+    while(*str){
+      putchar(*str++);
+    }
 #endif
 } 
 
@@ -327,13 +328,14 @@ tty_jputc(unsigned int c)
 
 /* print out 2 bytes character to tty (IC->output_kcode) */
 static void
-tty_jputc2(unsigned int c, unsigned int c2)
+tty_jputc2(unsigned char *str)
 {
 #if defined(NO_TERMS) && (defined(MSDOS) || defined(WIN32CON))
-    xputc2(c, c2);
+    xputc2(str);
 #else
-    putchar(c);
-    putchar(c2);
+    while(*str){
+      putchar(*str++);
+    }
 #endif
 }
 
@@ -346,7 +348,7 @@ jbuffer(
      unsigned int c,
      unsigned int *buf,
      void (*f1)(unsigned int),
-     void (*f2)(unsigned int, unsigned int))
+     void (*f2)(unsigned char *))
 {
     static unsigned int ibuf[2];
     unsigned int c1, c2;
@@ -354,6 +356,7 @@ jbuffer(
     unsigned char uc[2];
     unsigned char *p;
 #endif
+    unsigned char f2buf[16];
 
     if(!buf) buf = ibuf;
     if(!f1) f1 = tty_jputc;
@@ -372,7 +375,12 @@ jbuffer(
 
         if(IC == output_kcode)
 #ifdef POSIX_ICONV
-            f2(c1, c2);
+        {
+            f2buf[0] = c1;
+            f2buf[1] = c2;
+            f2buf[2] = '\0';
+            f2(f2buf);
+        }
         else if (output_dsc) {
             char buf_in[2], buf_out[16];
             char *src = buf_in, *dst=buf_out;
@@ -381,7 +389,10 @@ jbuffer(
             *(buf_in + 1) = c2;
             if (iconv(output_dsc, &src,
                       &src_len, &dst, &dst_len) == (size_t)-1) {
-                f2(c1, c2);
+                f2buf[0] = c1;
+                f2buf[1] = c2;
+                f2buf[2] = '\0';
+                f2(f2buf);
             } else {
                 *dst = '\0';
                 dst = buf_out;
@@ -416,7 +427,10 @@ jbuffer(
                 break;
             }
         }
-        f2(c1, c2);
+        f2buf[0] = c1;
+        f2buf[1] = c2;
+        f2buf[2] = '\0';
+        f2(f2buf);
 #endif
         buf[0] = 0;
         return 2;
@@ -437,9 +451,10 @@ cbuffer(
      unsigned int c,
      unsigned int *buf,
      void (*f1)(unsigned int),
-     void (*f2)(unsigned int, unsigned int))
+     void (*f2)(unsigned char *))
 {
     static unsigned int ibuf[2];
+    unsigned char f2buf[16];
 
     if(!buf) buf = ibuf;
     if(!f1) f1 = tty_cputc;
@@ -460,7 +475,10 @@ cbuffer(
         return 0;
     }
     else if(buf[0]){
-        f2(buf[1], c);
+        f2buf[0] = buf[1];
+        f2buf[1] = c;
+        f2buf[2] = '\0';
+        f2(f2buf);
         buf[0] = 0;
         return 2;
     }
