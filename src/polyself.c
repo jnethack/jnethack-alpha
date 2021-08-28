@@ -1337,7 +1337,7 @@ rehumanize()
 /*JP
     polyman("return to %s form!", urace.adj);
 */
-    polyman("%sÇ…ñﬂÇ¡ÇΩÅI", urace.adj);
+    polyman("%sépÇ…ñﬂÇ¡ÇΩÅI", urace.adj);
 
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp
