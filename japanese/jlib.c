@@ -34,7 +34,8 @@ static const char* ccode_alt[]={
 /* internal kcode */
 /* IC=0 EUC */
 /* IC=1 SJIS */
-#define IC ((unsigned char)("Š¿"[0])==0x8a)
+/* IC=2 UTF8 */
+#define IC ((((unsigned char)("Š¿"[0])==0xe6) ? 2 : ((unsigned char)("Š¿"[0])==0x8a)))
 
 /* default input kcode */
 #ifndef INPUT_KCODE
