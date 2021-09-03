@@ -1,3 +1,6 @@
+	* 次の問題を修正
+	  * win32/ttyで「あなたは誰?」に日本語を使うと文字化け (#42760)
+
 Tue Aug 17 2021  Kentaro Shirakata  <argrath@ub32.org>
 
 	* 次の問題を修正
