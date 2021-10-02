@@ -379,7 +379,7 @@ int x, y;
                     : "",
             name,
             (mtmp->mx != x || mtmp->my != y)
-                ? ((mtmp->isshk && accurate) ? "‚ÌK”ö" : "‚ÌK”ö")
+                ? "‚ÌK”ö"
                 : "");
 #endif
     if (u.ustuck == mtmp) {

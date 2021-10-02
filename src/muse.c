@@ -2180,7 +2180,7 @@ struct monst *mtmp;
 /*JP
             const char *The_whip = vismon ? "The bullwhip" : "A whip";
 */
-            const char *The_whip = vismon ? "•Ú" : "•Ú";
+            const char *The_whip = "•Ú";
             int where_to = rn2(4);
             struct obj *obj = uwep;
             const char *hand;
