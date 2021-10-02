@@ -2656,6 +2656,9 @@ E void FDECL(vault_gd_watching, (unsigned int));
 /* ### version.c ### */
 
 E char *FDECL(version_string, (char *));
+#if 1 /*JP*/
+E char *FDECL(version_string_j, (char *));
+#endif
 E char *FDECL(getversionstring, (char *));
 E int NDECL(doversion);
 E int NDECL(doextversion);

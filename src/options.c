@@ -5451,7 +5451,10 @@ boolean setinitial, setfromfile;
                 if (*disclosure_names[i] == 'v') {
                     any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
                     add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+/*JP
                              "Always disclose, pick sort order from menu",
+*/
+                             "メニューからソート順を選んで常に出力する",
                              (c == any.a_char) ? MENU_SELECTED
                                                : MENU_UNSELECTED);
                 }
@@ -5472,7 +5475,10 @@ boolean setinitial, setfromfile;
                 if (*disclosure_names[i] == 'v') {
                     any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
                     add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+/*JP
                 "Prompt, with default answer of \"Ask\" to request sort menu",
+*/
+                "確認する，ソートメニューを要求する標準の答えは \"Ask\"",
                              (c == any.a_char) ? MENU_SELECTED
                                                : MENU_UNSELECTED);
                 }

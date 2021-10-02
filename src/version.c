@@ -40,6 +40,15 @@ char *buf;
     return strcpy(buf, VERSION_STRING);
 }
 
+#if 1 /*JP*/
+char *
+version_string_j(buf)
+char *buf;
+{
+    return strcpy(buf, JVERSION_ID);
+}
+#endif
+
 /* fill and return the given buffer with the long nethack version string */
 char *
 getversionstring(buf)
@@ -96,7 +105,7 @@ doversion()
 
     pline("%s", getversionstring(buf));
 #if 1 /*JP*/
-    pline("%s", JVERSION_ID);
+    pline("%s", version_string_j(buf));
 #endif
     return 0;
 }
@@ -125,6 +134,11 @@ doextversion()
         *--p = ' ';
         putstr(win, 0, p);
     }
+
+#if 1 /*JP*/
+    (void) version_string_j(buf);
+    putstr(win, 0, buf);
+#endif
 
     f = dlb_fopen(OPTIONS_USED, "r");
     if (!f) {

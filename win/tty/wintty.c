@@ -3931,6 +3931,7 @@ static struct condition_t {
     const char *text[3]; /* 3: potential display vals, progressively shorter */
 } conditions[] = {
     /* The sequence order of these matters */
+#if 0 /*JP*/
     { BL_MASK_STONE,    { "Stone",    "Ston",  "Sto" } },
     { BL_MASK_SLIME,    { "Slime",    "Slim",  "Slm" } },
     { BL_MASK_STRNGL,   { "Strngl",   "Stngl", "Str" } },
@@ -3944,11 +3945,32 @@ static struct condition_t {
     { BL_MASK_LEV,      { "Lev",      "Lev",   "Lv"  } },
     { BL_MASK_FLY,      { "Fly",      "Fly",   "Fl"  } },
     { BL_MASK_RIDE,     { "Ride",     "Rid",   "Rd"  } },
+#else
+    { BL_MASK_STONE,    { "石化",     "石化", "石" } },
+    { BL_MASK_SLIME,    { "どろどろ", "どろ", "ど" } },
+    { BL_MASK_STRNGL,   { "窒息",     "窒息", "窒" } },
+    { BL_MASK_FOODPOIS, { "食毒",     "食毒", "毒" } },
+    { BL_MASK_TERMILL,  { "病気",     "病気", "病" } },
+    { BL_MASK_BLIND,    { "盲目",     "盲目", "盲" } },
+    { BL_MASK_DEAF,     { "耳聾",     "耳聾", "聾" } },
+    { BL_MASK_STUN,     { "眩暈",     "眩暈", "眩" } },
+    { BL_MASK_CONF,     { "混乱",     "混乱", "混" } },
+    { BL_MASK_HALLU,    { "幻覚",     "幻覚", "幻" } },
+    { BL_MASK_LEV,      { "浮遊",     "浮遊", "浮" } },
+    { BL_MASK_FLY,      { "飛行",     "飛行", "飛" } },
+    { BL_MASK_RIDE,     { "騎乗",     "騎乗", "騎" } },
+#endif
 };
 static const char *encvals[3][6] = {
+#if 0 /*JP*/
     { "", "Burdened", "Stressed", "Strained", "Overtaxed", "Overloaded" },
     { "", "Burden",   "Stress",   "Strain",   "Overtax",   "Overload"   },
     { "", "Brd",      "Strs",     "Strn",     "Ovtx",      "Ovld"       }
+#else
+    { "", "よろめき", "圧迫", "限界", "荷重", "超過" },
+    { "", "よろ",     "圧迫", "限界", "荷重", "超過" },
+    { "", "よ",       "圧",   "限",   "重",   "超"   },
+#endif
 };
 #define blPAD BL_FLUSH
 #define MAX_PER_ROW 15

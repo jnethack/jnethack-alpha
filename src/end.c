@@ -802,7 +802,10 @@ dump_plines()
     extern unsigned saved_pline_index;
 
     Strcpy(buf, " "); /* one space for indentation */
+/*JP
     putstr(0, 0, "Latest messages:");
+*/
+    putstr(0, 0, "ÅŒã‚ÌƒƒbƒZ[ƒW:");
     for (i = 0, j = (int) saved_pline_index; i < DUMPLOG_MSG_COUNT;
          ++i, j = (j + 1) % DUMPLOG_MSG_COUNT) {
         strp = &saved_plines[j];
@@ -837,17 +840,32 @@ time_t when; /* date+time at end of game */
        build date+time or even with an older nethack version,
        but we only have access to the one it finished under */
     putstr(0, 0, getversionstring(pbuf));
+#if 1 /*JP*/
+    putstr(0, 0, version_string_j(pbuf));
+#endif
     putstr(0, 0, "");
 
     /* game start and end date+time to disambiguate version date+time */
     Strcpy(datetimebuf, yyyymmddhhmmss(ubirthday));
+#if 0 /*JP:T*/
     Sprintf(pbuf, "Game began %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s",
             &datetimebuf[0], &datetimebuf[4], &datetimebuf[6],
             &datetimebuf[8], &datetimebuf[10], &datetimebuf[12]);
+#else
+    Sprintf(pbuf, "ƒQ[ƒ€ŠJn %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s",
+            &datetimebuf[0], &datetimebuf[4], &datetimebuf[6],
+            &datetimebuf[8], &datetimebuf[10], &datetimebuf[12]);
+#endif
     Strcpy(datetimebuf, yyyymmddhhmmss(when));
+#if 0 /*JP*/
     Sprintf(eos(pbuf), ", ended %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s.",
             &datetimebuf[0], &datetimebuf[4], &datetimebuf[6],
             &datetimebuf[8], &datetimebuf[10], &datetimebuf[12]);
+#else
+    Sprintf(eos(pbuf), ", I—¹ %4.4s-%2.2s-%2.2s %2.2s:%2.2s:%2.2s.",
+            &datetimebuf[0], &datetimebuf[4], &datetimebuf[6],
+            &datetimebuf[8], &datetimebuf[10], &datetimebuf[12]);
+#endif
     putstr(0, 0, pbuf);
     putstr(0, 0, "");
 
@@ -867,7 +885,10 @@ time_t when; /* date+time at end of game */
 
     dump_plines();
     putstr(0, 0, "");
+/*JP
     putstr(0, 0, "Inventory:");
+*/
+    putstr(0, 0, "‚¿•¨:");
     (void) display_inventory((char *) 0, TRUE);
     container_contents(invent, TRUE, TRUE, FALSE);
     enlightenment((BASICENLIGHTENMENT | MAGICENLIGHTENMENT),
@@ -2330,7 +2351,11 @@ boolean ask;
         pline("“|‚µ‚½“G‚Í‚¢‚È‚©‚Á‚½D");
 #ifdef DUMPLOG
     } else if (dumping) {
+#if 0 /*JP:T*/
         putstr(0, 0, "No creatures were vanquished."); /* not pline() */
+#else
+        putstr(0, 0, "“|‚µ‚½“G‚Í‚¢‚È‚©‚Á‚½D"); /* not pline() */
+#endif
 #endif
     }
 }
@@ -2459,7 +2484,10 @@ boolean ask;
         }
 #ifdef DUMPLOG
     } else if (dumping) {
+/*JP
         putstr(0, 0, "No species were genocided or became extinct.");
+*/
+        putstr(0, 0, "‹sE‚µ‚½‚èâ–Å‚³‚¹‚½‚è‚µ‚½í‚Í‚¢‚È‚©‚Á‚½D");
 #endif
     }
 }

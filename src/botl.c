@@ -618,25 +618,58 @@ STATIC_DCL boolean FDECL(status_hilite_menu_add, (int));
    involved isn't a direct 100*current/maximum calculation. */
 STATIC_VAR struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("title", "%s", ANY_STR, MAXVALWIDTH, BL_TITLE),
+/*JP
     INIT_BLSTAT("strength", " St:%s", ANY_INT, 10, BL_STR),
+*/
+    INIT_BLSTAT("strength", " 強:%s", ANY_INT, 10, BL_STR),
+/*JP
     INIT_BLSTAT("dexterity", " Dx:%s", ANY_INT,  10, BL_DX),
+*/
+    INIT_BLSTAT("dexterity", " 早:%s", ANY_INT,  10, BL_DX),
+/*JP
     INIT_BLSTAT("constitution", " Co:%s", ANY_INT, 10, BL_CO),
+*/
+    INIT_BLSTAT("constitution", " 耐:%s", ANY_INT, 10, BL_CO),
+/*JP
     INIT_BLSTAT("intelligence", " In:%s", ANY_INT, 10, BL_IN),
+*/
+    INIT_BLSTAT("intelligence", " 知:%s", ANY_INT, 10, BL_IN),
+/*JP
     INIT_BLSTAT("wisdom", " Wi:%s", ANY_INT, 10, BL_WI),
+*/
+    INIT_BLSTAT("wisdom", " 賢:%s", ANY_INT, 10, BL_WI),
+/*JP
     INIT_BLSTAT("charisma", " Ch:%s", ANY_INT, 10, BL_CH),
+*/
+    INIT_BLSTAT("charisma", " 魅:%s", ANY_INT, 10, BL_CH),
     INIT_BLSTAT("alignment", " %s", ANY_STR, 40, BL_ALIGN),
     INIT_BLSTAT("score", " S:%s", ANY_LONG, 20, BL_SCORE),
     INIT_BLSTAT("carrying-capacity", " %s", ANY_INT, 20, BL_CAP),
     INIT_BLSTAT("gold", " %s", ANY_LONG, 30, BL_GOLD),
+/*JP
     INIT_BLSTATP("power", " Pw:%s", ANY_INT, 10, BL_ENEMAX, BL_ENE),
+*/
+    INIT_BLSTATP("power", " 魔:%s", ANY_INT, 10, BL_ENEMAX, BL_ENE),
     INIT_BLSTAT("power-max", "(%s)", ANY_INT, 10, BL_ENEMAX),
+/*JP
     INIT_BLSTATP("experience-level", " Xp:%s", ANY_INT, 10, BL_EXP, BL_XP),
+*/
+    INIT_BLSTATP("experience-level", " 経験:%s", ANY_INT, 10, BL_EXP, BL_XP),
+/*JP
     INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
+*/
+    INIT_BLSTAT("armor-class", " 鎧:%s", ANY_INT, 10, BL_AC),
     INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
+/*JP
     INIT_BLSTAT("time", " T:%s", ANY_LONG, 20, BL_TIME),
+*/
+    INIT_BLSTAT("time", " 歩:%s", ANY_LONG, 20, BL_TIME),
     /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
     INIT_BLSTAT("hunger", " %s", ANY_INT, 40, BL_HUNGER),
+/*JP
     INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
+*/
+    INIT_BLSTATP("hitpoints", " 体:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
     INIT_BLSTAT("hitpoints-max", "(%s)", ANY_INT, 10, BL_HPMAX),
     INIT_BLSTAT("dungeon-level", "%s", ANY_STR, MAXVALWIDTH, BL_LEVELDESC),
     INIT_BLSTATP("experience", "/%s", ANY_LONG, 20, BL_EXP, BL_EXP),
@@ -3089,7 +3122,10 @@ int fld;
     if (fld != BL_CONDITION) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_ALWAYS_HILITE;
+/*JP
         Sprintf(buf, "Always highlight %s", initblstats[fld].fldname);
+*/
+        Sprintf(buf, "%sを常にハイライト", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 'a', 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
         nopts++;
@@ -3099,14 +3135,20 @@ int fld;
         any = zeroany;
         any.a_int = onlybeh = BL_TH_CONDITION;
         add_menu(tmpwin, NO_GLYPH, &any, 'b', 0, ATR_NONE,
+/*JP
                  "Bitmask of conditions", MENU_UNSELECTED);
+*/
+                 "条件のビットマスク", MENU_UNSELECTED);
         nopts++;
     }
 
     if (fld != BL_CONDITION) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_UPDOWN;
+/*JP
         Sprintf(buf, "%s value changes", initblstats[fld].fldname);
+*/
+        Sprintf(buf, "%sの値の変更", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
         nopts++;
@@ -3117,7 +3159,10 @@ int fld;
         any = zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
         add_menu(tmpwin, NO_GLYPH, &any, 'n', 0, ATR_NONE,
+/*JP
                  "Number threshold", MENU_UNSELECTED);
+*/
+                 "数値の閾値", MENU_UNSELECTED);
         nopts++;
     }
 
@@ -3125,7 +3170,10 @@ int fld;
         any = zeroany;
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
         add_menu(tmpwin, NO_GLYPH, &any, 'p', 0, ATR_NONE,
+/*JP
                  "Percentage threshold", MENU_UNSELECTED);
+*/
+                 "割合の閾値", MENU_UNSELECTED);
         nopts++;
     }
 
@@ -3133,7 +3181,10 @@ int fld;
         || fld == BL_CAP || fld == BL_HUNGER) {
         any = zeroany;
         any.a_int = onlybeh = BL_TH_TEXTMATCH;
+/*JP
         Sprintf(buf, "%s text match", initblstats[fld].fldname);
+*/
+        Sprintf(buf, "%sのテキストのマッチング", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
         nopts++;
@@ -3178,18 +3229,31 @@ boolean ltok, gtok;
 
     if (ltok) {
         if (str)
+#if 0 /*JP*/
             Sprintf(buf, "%s than %s",
                     (fld == BL_AC) ? "Better (lower)" : "Less", str);
+#else
+            Sprintf(buf, "%sより%s",
+                    str, (fld == BL_AC) ? "良い(小さい)" : "小さい");
+#endif
         else
+/*JP
             Sprintf(buf, "Value goes down");
+*/
+            Sprintf(buf, "値の低下");
         any = zeroany;
         any.a_int = 10 + LT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
 
         if (str) {
+#if 0 /*JP*/
             Sprintf(buf, "%s or %s",
                     str, (fld == BL_AC) ? "better (lower)" : "less");
+#else
+            Sprintf(buf, "%s%s",
+                    str, (fld == BL_AC) ? "より良い(以下)" : "以下");
+#endif
             any = zeroany;
             any.a_int = 10 + LE_VALUE;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -3198,9 +3262,15 @@ boolean ltok, gtok;
     }
 
     if (str)
+/*JP
         Sprintf(buf, "Exactly %s", str);
+*/
+        Sprintf(buf, "ちょうど%s", str);
     else
+/*JP
         Sprintf(buf, "Value changes");
+*/
+        Sprintf(buf, "値の変更");
     any = zeroany;
     any.a_int = 10 + EQ_VALUE;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -3208,8 +3278,13 @@ boolean ltok, gtok;
 
     if (gtok) {
         if (str) {
+#if 0 /*JP*/
             Sprintf(buf, "%s or %s",
                     str, (fld == BL_AC) ? "worse (higher)" : "more");
+#else
+            Sprintf(buf, "%s%s",
+                    str, (fld == BL_AC) ? "より悪い(以上)" : "以上");
+#endif
             any = zeroany;
             any.a_int = 10 + GE_VALUE;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -3217,16 +3292,27 @@ boolean ltok, gtok;
         }
 
         if (str)
+#if 0 /*JP*/
             Sprintf(buf, "%s than %s",
                     (fld == BL_AC) ? "Worse (higher)" : "More", str);
+#else
+            Sprintf(buf, "%sより%s",
+                    str, (fld == BL_AC) ? "悪い(高い)" : "大きい");
+#endif
         else
+/*JP
             Sprintf(buf, "Value goes up");
+*/
+            Sprintf(buf, "値の上昇");
         any = zeroany;
         any.a_int = 10 + GT_VALUE;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
              buf, MENU_UNSELECTED);
     }
+/*JP
     Sprintf(buf, "Select field %s value:", initblstats[fld].fldname);
+*/
+    Sprintf(buf, "フィールド%sの値:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
 
     res = select_menu(tmpwin, PICK_ONE, &picks);
@@ -3297,9 +3383,15 @@ choose_value:
 
         lt_gt_eq = NO_LTEQGT; /* not set up yet */
         inbuf[0] = '\0';
+#if 0 /*JP*/
         Sprintf(buf, "Enter %svalue for %s threshold:",
                 percent ? "percentage " : "",
                 initblstats[fld].fldname);
+#else
+        Sprintf(buf, "%sの%sの閾値を入力してください:",
+                initblstats[fld].fldname,
+                percent ? "割合" : "値");
+#endif
         getlin(buf, inbuf);
         if (inbuf[0] == '\0' || inbuf[0] == '\033')
             goto choose_behavior;
@@ -3333,17 +3425,26 @@ choose_value:
         }
         if (*inp == '%') {
             if (!percent) {
+/*JP
                 pline("Not expecting a percentage.");
+*/
+                pline("割合を想定していません．");
                 goto choose_behavior;
             }
             *inp = '\0'; /* strip '%' [this accepts trailing junk!] */
         } else if (*inp) {
             /* some random characters */
+/*JP
             pline("\"%s\" is not a recognized number.", inp);
+*/
+            pline("\"%s\"は数値として認識できません．", inp);
             goto choose_value;
         }
         if (!gotnum) {
+/*JP
             pline("Is that an invisible number?");
+*/
+            pline("これは見えない数字？");
             goto choose_value;
         }
         op = (lt_gt_eq == LT_VALUE) ? "<"
@@ -3360,7 +3461,10 @@ choose_value:
         if (percent) {
             val = aval.a_int;
             if (initblstats[fld].idxmax == -1) {
+/*JP
                 pline("Field '%s' does not support percentage values.",
+*/
+                pline("フィールド'%s'は割合の値に対応していません．",
                       initblstats[fld].fldname);
                 behavior = BL_TH_VAL_ABSOLUTE;
                 goto choose_value;
@@ -3374,7 +3478,10 @@ choose_value:
                 || (val == 0 && lt_gt_eq == LT_VALUE)
                 || (val == 100 && lt_gt_eq == GT_VALUE)
                 || (val > 100 && (val != 101 || lt_gt_eq != LT_VALUE))) {
+/*JP
                 pline("'%s%d%%' is not a valid percent value.", op, val);
+*/
+                pline("'%s%d%%'は有効な割合の値ではありません．", op, val);
                 goto choose_value;
             }
             /* restore suffix for use in color and attribute prompts */
@@ -3409,6 +3516,7 @@ choose_value:
                 goto choose_value;
         }
 
+#if 0 /*JP*/
         Sprintf(colorqry, "Choose a color for when %s is %s%s%s:",
                 initblstats[fld].fldname,
                 (lt_gt_eq == LT_VALUE) ? "less than "
@@ -3418,6 +3526,17 @@ choose_value:
                 (lt_gt_eq == LE_VALUE) ? " or less"
                   : (lt_gt_eq == GE_VALUE) ? " or more"
                     : "");
+#else
+        Sprintf(colorqry, "%sが%s%s場合の色を選んでください:",
+                initblstats[fld].fldname,
+                numstart,
+                (lt_gt_eq == LT_VALUE) ? "より小さい"
+                  : (lt_gt_eq == GT_VALUE) ? "より大きい"
+                  : (lt_gt_eq == LE_VALUE) ? "以下"
+                  : (lt_gt_eq == GE_VALUE) ? "以上"
+                  : "の");
+#endif
+#if 0 /*JP*/
         Sprintf(attrqry, "Choose attribute for when %s is %s%s%s:",
                 initblstats[fld].fldname,
                 (lt_gt_eq == LT_VALUE) ? "less than "
@@ -3427,6 +3546,16 @@ choose_value:
                 (lt_gt_eq == LE_VALUE) ? " or less"
                   : (lt_gt_eq == GE_VALUE) ? " or more"
                     : "");
+#else
+        Sprintf(attrqry, "%sが%s%s場合の属性を選んでください:",
+                initblstats[fld].fldname,
+                numstart,
+                (lt_gt_eq == LT_VALUE) ? "より小さい"
+                  : (lt_gt_eq == GT_VALUE) ? "より大きい"
+                  : (lt_gt_eq == LE_VALUE) ? "以下"
+                  : (lt_gt_eq == GE_VALUE) ? "以上"
+                  : "の");
+#endif
 
         hilite.rel = lt_gt_eq;
         hilite.value = aval;
@@ -3447,16 +3576,32 @@ choose_value:
                single choice, skip it altogether and just use 'changed' */
             lt_gt_eq = EQ_VALUE;
         }
+#if 0 /*JP:T*/
         Sprintf(colorqry, "Choose a color for when %s %s:",
                 initblstats[fld].fldname,
                 (lt_gt_eq == EQ_VALUE) ? "changes"
                   : (lt_gt_eq == LT_VALUE) ? "decreases"
                     : "increases");
+#else
+        Sprintf(colorqry, "%sが%sたときの色を選んでください:",
+                initblstats[fld].fldname,
+                (lt_gt_eq == EQ_VALUE) ? "変わっ"
+                  : (lt_gt_eq == LT_VALUE) ? "減っ"
+                    : "増え");
+#endif
+#if 0 /*JP*/
         Sprintf(attrqry, "Choose attribute for when %s %s:",
                 initblstats[fld].fldname,
                 (lt_gt_eq == EQ_VALUE) ? "changes"
                   : (lt_gt_eq == LT_VALUE) ? "decreases"
                     : "increases");
+#else
+        Sprintf(attrqry, "%sが%sたときの属性を選んでください:",
+                initblstats[fld].fldname,
+                (lt_gt_eq == EQ_VALUE) ? "変わっ"
+                  : (lt_gt_eq == LT_VALUE) ? "減っ"
+                    : "増え");
+#endif
         hilite.rel = lt_gt_eq;
     } else if (behavior == BL_TH_CONDITION) {
         cond = query_conditions();
@@ -3465,19 +3610,34 @@ choose_value:
                 goto choose_field;
             return FALSE;
         }
+/*JP
         Sprintf(colorqry, "Choose a color for conditions %s:",
+*/
+        Sprintf(colorqry, "条件%sのときの色を選んでください:",
                 conditionbitmask2str(cond));
+/*JP
         Sprintf(attrqry, "Choose attribute for conditions %s:",
+*/
+        Sprintf(attrqry, "条件%sのときの属性を選んでください:",
                 conditionbitmask2str(cond));
     } else if (behavior == BL_TH_TEXTMATCH) {
         char qry_buf[BUFSZ];
 
+#if 0 /*JP:T*/
         Sprintf(qry_buf, "%s %s text value to match:",
                 (fld == BL_CAP
                  || fld == BL_ALIGN
                  || fld == BL_HUNGER
                  || fld == BL_TITLE) ? "Choose" : "Enter",
                 initblstats[fld].fldname);
+#else
+        Sprintf(qry_buf, "%sのテキスト値にマッチングする値を%sください:",
+                initblstats[fld].fldname,
+                (fld == BL_CAP
+                 || fld == BL_ALIGN
+                 || fld == BL_HUNGER
+                 || fld == BL_TITLE) ? "選んで" : "入力して");
+#endif
         if (fld == BL_CAP) {
 #if 0 /*JP*/
             int rv = query_arrayvalue(qry_buf,
@@ -3546,7 +3706,10 @@ choose_value:
                         rolelist[j++] = dupstr(obuf);
                 }
             }
+/*JP
             rolelist[j++] = dupstr("\"none of the above (polymorphed)\"");
+*/
+            rolelist[j++] = dupstr("\"上のどれでもない(変化中)\"");
 
             rv = query_arrayvalue(qry_buf, rolelist, 0, j);
             if (rv >= 0) {
@@ -3633,7 +3796,10 @@ choose_color:
         tmpattr = hlattr2attrname(atr, attrbuf, BUFSZ);
         if (tmpattr)
             Sprintf(eos(clrbuf), "&%s", tmpattr);
+/*JP
         pline("Added hilite condition/%s/%s",
+*/
+        pline("ハイライト条件/%s/%sを追加した．",
               conditionbitmask2str(cond), clrbuf);
     } else {
         char *p, *q;
@@ -3647,7 +3813,10 @@ choose_color:
             *p = '\0'; /* chop off " or female-rank" */
             /* new rule for male-rank */
             status_hilite_add_threshold(fld, &hilite);
+/*JP
             pline("Added hilite %s", status_hilite2str(&hilite));
+*/
+            pline("ハイライト%sを追加した．", status_hilite2str(&hilite));
             /* transfer female-rank to start of hilite.textmatch buffer */
             p += sizeof " or " - sizeof "";
             q = hilite.textmatch;
@@ -3656,7 +3825,10 @@ choose_color:
             /* proceed with normal addition of new rule */
         }
         status_hilite_add_threshold(fld, &hilite);
+/*JP
         pline("Added hilite %s", status_hilite2str(&hilite));
+*/
+        pline("ハイライト%sを追加した．", status_hilite2str(&hilite));
     }
     reset_status_hilites();
     return TRUE;
@@ -3750,7 +3922,10 @@ int fld;
         }
     } else {
         any = zeroany;
+/*JP
         Sprintf(buf, "No current hilites for %s", initblstats[fld].fldname);
+*/
+        Sprintf(buf, "%sの現在のハイライトはありません", initblstats[fld].fldname);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
     }
 
