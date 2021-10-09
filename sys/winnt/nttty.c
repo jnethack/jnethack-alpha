@@ -224,6 +224,18 @@ keyboard_handler_t keyboard_handler;
 
 /* Console buffer flipping support */
 
+static void back_buffer_clear_cell(COORD pos)
+{
+    DWORD unused;
+    static WORD attr[1] = {CONSOLE_CLEAR_ATTRIBUTE};
+    static char buf[1] = {CONSOLE_CLEAR_CHARACTER};
+
+    WriteConsoleOutputAttribute(console.hConOut, attr,
+                                1, pos, &unused);
+    WriteConsoleOutputCharacterA(console.hConOut, buf,
+                                1, pos, &unused);
+}
+
 static void back_buffer_flip()
 {
     cell_t * back = console.back_buffer;
@@ -237,6 +249,14 @@ static void back_buffer_flip()
             if (back->iskanji == 1) {
                 cell_t * back2 = back + 1;
                 cell_t * front2 = front + 1;
+                if(back2->iskanji != 2){
+                    /* 完全なマルチバイト文字でないので空白 */
+                    back_buffer_clear_cell(pos);
+                    *front = *back;
+                    back++;
+                    front++;
+                    continue;
+                }
                 /* pos.x == 0 の条件は不要のはずだが #42072 対策で追加。 */
                 if (back->attribute != front->attribute ||
                     back2->attribute != front2->attribute || pos.X == 0) {
@@ -260,6 +280,14 @@ static void back_buffer_flip()
                 pos.X++;
                 back += 2;
                 front += 2;
+                continue;
+            }
+            if (back->iskanji == 2) {
+                /* 完全なマルチバイト文字でないので空白 */
+                back_buffer_clear_cell(pos);
+                *front = *back;
+                back++;
+                front++;
                 continue;
             }
 #endif
