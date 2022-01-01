@@ -3,11 +3,9 @@
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/*
-**	Japanese version Copyright
-**	For 3.4+, Copyright (c) Kentaro Shirakata, 2002-2015
-**	JNetHack may be freely redistributed.  See license for details. 
-*/
+/* JNetHack Copyright */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2022            */
+/* JNetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 

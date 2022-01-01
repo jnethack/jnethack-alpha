@@ -6,7 +6,7 @@
 
 /* JNetHack Copyright */
 /* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
-/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2021            */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2022            */
 /* JNetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h" /* for config.h+extern.h */
@@ -124,7 +124,7 @@ char *s;
     register char *p;
 
     for (p = s; *p; p++)
-#if 1 /*JP*//*Š¿š‚Í¬•¶š‰»‚µ‚È‚¢*/
+#if 1 /*JP*//*Š¿š‚Í¬•¶š‰»‚µ‚È‚¢*/
         if (is_kanji(*(unsigned char *)p)) p++; else
 #endif
         if ('A' <= *p && *p <= 'Z')
