@@ -1,3 +1,6 @@
+	* 次の問題を修正
+	  * unix系でビルド・プレイできない (#43519)
+
 Sat Jan  1 2022  SHIRAKATA Kentaro  <argrath@ub32.org>
 
 	* 次の問題を修正
