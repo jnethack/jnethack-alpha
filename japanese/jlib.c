@@ -448,29 +448,21 @@ jbuffer(
  *  漢字コード変換は行わない
  */
 int
-cbuffer(
-     unsigned int c,
-     unsigned int *buf,
-     void (*f1)(unsigned int),
-     void (*f2)(unsigned char *))
+cbuffer(unsigned int c)
 {
     static unsigned int ibuf[2];
     unsigned char f2buf[16];
+    unsigned int *buf = ibuf;
+    void (*f1)(unsigned int) = tty_cputc;
+    void (*f2)(unsigned char *) = tty_cputc2;
 
-    if(!buf) buf = ibuf;
-    if(!f1) f1 = tty_cputc;
-    if(!f2) f2 = tty_cputc2;
-
-#ifdef POSIX_ICONV
     if (output_kcode == UTF8) {
         if (c) {
             f1(c);
             return 1;
         }
     }
-    else
-#endif
-    if(!(buf[0]) && is_kanji(c)){
+    else if(!(buf[0]) && is_kanji(c)){
         buf[1] = c;
         ++buf[0];
         return 0;
@@ -498,7 +490,7 @@ jputchar(int c)
 void
 cputchar(int c)
 {
-    cbuffer((unsigned int)(c & 0xff), NULL, NULL, NULL);
+    cbuffer((unsigned int)(c & 0xff));
 }
 
 void

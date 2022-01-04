@@ -3029,7 +3029,7 @@ E const char *FDECL(str2ic, (const char *));
 E const char *FDECL(ic2str, (const char *));
 #endif
 E int FDECL(jbuffer, (unsigned int, unsigned int *, void (*)(unsigned int), void (*)(unsigned char *)));
-E int FDECL(cbuffer, (unsigned int, unsigned int *, void (*)(unsigned int), void (*)(unsigned char *)));
+E int FDECL(cbuffer, (unsigned int));
 E void FDECL(cputchar,(int));
 E void FDECL(jputchar,(int));
 E void FDECL(jputs,(const char *));
