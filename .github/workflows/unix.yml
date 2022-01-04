@@ -30,4 +30,4 @@ jobs:
       run: ./configure
 
     - name: make
-      run: make
+      run: make install
