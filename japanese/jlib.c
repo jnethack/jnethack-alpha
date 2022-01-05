@@ -316,30 +316,6 @@ tty_cputc2(unsigned char *str)
 #endif
 } 
 
-/* print out 1 byte character to tty (IC->output_kcode) */
-static void
-tty_jputc(unsigned int c)
-{
-#if defined(NO_TERMS) && (defined(MSDOS) || defined(WIN32CON))
-    xputc(c);
-#else
-    putchar(c);
-#endif
-}
-
-/* print out 2 bytes character to tty (IC->output_kcode) */
-static void
-tty_jputc2(unsigned char *str)
-{
-#if defined(NO_TERMS) && (defined(MSDOS) || defined(WIN32CON))
-    xputc2(str);
-#else
-    while(*str){
-      putchar(*str++);
-    }
-#endif
-}
-
 /*#define ICUTF8/**/
 /*
   1•¶Žš‚Ì’·‚³‚ð•Ô‚·
@@ -379,8 +355,8 @@ jbuffer(
     int cnt;
 
     if(!buf) buf = ibuf;
-    if(!f1) f1 = tty_jputc;
-    if(!f2) f2 = tty_jputc2;
+    if(!f1) f1 = tty_cputc;
+    if(!f2) f2 = tty_cputc2;
 
     c = c & 0xff;
 
@@ -421,8 +397,8 @@ jbuffer(
     unsigned char f2buf[16];
 
     if(!buf) buf = ibuf;
-    if(!f1) f1 = tty_jputc;
-    if(!f2) f2 = tty_jputc2;
+    if(!f1) f1 = tty_cputc;
+    if(!f2) f2 = tty_cputc2;
 
     c = c & 0xff;
 
