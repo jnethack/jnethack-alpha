@@ -340,10 +340,71 @@ tty_jputc2(unsigned char *str)
 #endif
 }
 
+/*#define ICUTF8/**/
+/*
+  1文字の長さを返す
+  */
+static int
+charlen(unsigned int c)
+{
+#ifdef ICUTF8
+    if(c >= 0xf0){
+      return 4;
+    }
+    if(c >= 0xc0){
+      return 3;
+    }
+#endif
+    if(c >= 0x80){
+      return 2;
+    }
+    return 1;
+}
+
 /*
  *  2バイト文字をバッファリングしながら出力する
  *  漢字コード変換も行う
  */
+#ifdef ICUTF8
+int
+jbuffer(
+     unsigned int c,
+     unsigned int *buf,
+     void (*f1)(unsigned int),
+     void (*f2)(unsigned char *))
+{
+    static unsigned char ibuf[8];
+    static int bufcnt = 0;
+    static int buflen;
+    int cnt;
+
+    if(!buf) buf = ibuf;
+    if(!f1) f1 = tty_jputc;
+    if(!f2) f2 = tty_jputc2;
+
+    c = c & 0xff;
+
+    if(bufcnt == 0){
+        cnt = charlen(c);
+        if(cnt == 1){
+            f1(c);
+            return 1;
+        }
+        buflen = cnt;
+        ibuf[bufcnt++] = c;
+        return 0;
+    }
+
+    ibuf[bufcnt++] = c;
+    if(bufcnt < buflen){
+        return 0;
+    }
+
+    ibuf[bufcnt] = '\0';
+    f2(ibuf);
+    bufcnt = 0;
+}
+#else
 int
 jbuffer(
      unsigned int c,
@@ -442,6 +503,7 @@ jbuffer(
     }
     return -1;
 }
+#endif
 
 /*
  *  2バイト文字をバッファリングしながら出力する
