@@ -232,63 +232,6 @@ noconvert:
 }
 
 /*
-**      translate string to output kcode
-*/
-const char *
-ic2str(s)
-     const char *s;
-{
-    static unsigned char buf[1024];
-    const unsigned char *up;
-    unsigned char *p;
-#ifndef POSIX_ICONV
-    unsigned char *pp;
-#endif
-
-    if(!s)
-      return s;
-
-    buf[0] = '\0';
-
-    p = buf;
-#ifdef POSIX_ICONV
-    if(output_dsc){
-        size_t src_len, dst_len;
-        up = (unsigned char *)s;
-        src_len = strlen(s);
-        dst_len = sizeof(buf);
-        if(iconv(output_dsc, (char**)&up, &src_len,
-                (char**)&p, &dst_len) == (size_t)-1)
-            goto noconvert;
-    }
-#else
-    if( IC==EUC && output_kcode == SJIS ){
-        while(*s){
-            up = (unsigned char *)s;
-            if( *up & 0x80 ){
-                pp = e2sj((unsigned char *)s);
-                *(p++) = pp[0];
-                *(p++) = pp[1];
-                s += 2;
-            }
-            else
-              *(p++) = (unsigned char)*(s++);
-        }
-    }
-#endif
-    else{
-#ifdef POSIX_ICONV
-noconvert:
-#endif
-        strcpy((char *)buf, s);
-        return (char *)buf;
-    }
-
-    *(p++) = '\0';
-    return (char *)buf;
-}
-
-/*
 **      primitive function
 */
 
