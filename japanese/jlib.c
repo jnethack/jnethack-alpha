@@ -201,8 +201,15 @@ str2ic(s)
         src_len = strlen(s);
         dst_len = sizeof(buf);
         if (iconv(input_dsc, (char**)&up, &src_len,
-                (char**)&p, &dst_len) == (size_t)-1)
-            goto noconvert;
+                (char**)&p, &dst_len) == (size_t)-1){
+            strcpy((char *)buf, s);
+            return (char *)buf;
+        }
+        *(p++) = '\0';
+        return (char *)buf;
+    } else {
+        strcpy((char *)buf, s);
+        return (char *)buf;
     }
 #else
     if( IC==EUC && input_kcode == SJIS ){
@@ -217,18 +224,14 @@ str2ic(s)
             else
               *(p++) = (unsigned char)*(s++);
         }
-    }
-#endif
-    else{
-#ifdef POSIX_ICONV
-noconvert:
-#endif
+        *(p++) = '\0';
+        return (char *)buf;
+    } else {
         strcpy((char *)buf, s);
         return (char *)buf;
     }
+#endif
 
-    *(p++) = '\0';
-    return (char *)buf;
 }
 
 /*
