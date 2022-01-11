@@ -4633,12 +4633,16 @@ int final;
 
 /* ordered by command name */
 struct ext_func_tab extcmdlist[] = {
+#if 0 /*JP:T*/
     { '#', "#", "perform an extended command",
+#else
+    { '#', "#", "拡張コマンドを実行する",
+#endif
             doextcmd, IFBURIED | GENERALCMD },
 #if 0 /*JP:T*/
     { M('?'), "?", "list all extended commands",
 #else
-    { M('?'), "?", "この拡張コマンド一覧を表示する",
+    { M('?'), "?", "拡張コマンド一覧を表示する",
 #endif
             doextlist, IFBURIED | AUTOCOMPLETE | GENERALCMD },
 #if 0 /*JP:T*/
@@ -4653,13 +4657,17 @@ struct ext_func_tab extcmdlist[] = {
     { M('A'), "annotate", "現在の階に名前をつける",
 #endif
             donamelevel, IFBURIED | AUTOCOMPLETE },
-#if 0 /*JP*/
+#if 0 /*JP:T*/
     { 'a', "apply", "apply (use) a tool (pick-axe, key, lamp...)",
 #else
     { 'a', "apply", "道具を使う．(つるはし, 鍵, ランプ…)",
 #endif
             doapply },
+#if 0 /*JP:T*/
     { C('x'), "attributes", "show your attributes",
+#else
+    { C('x'), "attributes", "属性を表示する",
+#endif
             doattributes, IFBURIED },
 #if 0 /*JP:T*/
     { '@', "autopickup", "toggle the pickup option on/off",
@@ -4698,11 +4706,31 @@ struct ext_func_tab extcmdlist[] = {
 #else
     { M('d'), "dip", "何かに物を浸す", dodip, AUTOCOMPLETE },
 #endif
+#if 0 /*JP:T*/
     { '>', "down", "go down a staircase", dodown },
+#else
+    { '>', "down", "階段を降りるe", dodown },
+#endif
+#if 0 /*JP:T*/
     { 'd', "drop", "drop an item", dodrop },
+#else
+    { 'd', "drop", "物を置く", dodrop },
+#endif
+#if 0 /*JP:T*/
     { 'D', "droptype", "drop specific item types", doddrop },
+#else
+    { 'D', "droptype", "指定した種類の物を置く", doddrop },
+#endif
+#if 0 /*JP:T*/
     { 'e', "eat", "eat something", doeat },
+#else
+    { 'e', "eat", "何かを食べる", doeat },
+#endif
+#if 0 /*JP:T*/
     { 'E', "engrave", "engrave writing on the floor", doengrave },
+#else
+    { 'E', "engrave", "床に文字を書く", doengrave },
+#endif
 #if 0 /*JP:T*/
     { M('e'), "enhance", "advance or check weapon and spell skills",
 #else
@@ -4715,21 +4743,49 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "exploremode", "探検(発見)モードに入る",
 #endif
             enter_explore_mode, IFBURIED },
+#if 0 /*JP:T*/
     { 'f', "fire", "fire ammunition from quiver", dofire },
+#else
+    { 'f', "fire", "装填された物を射る", dofire },
+#endif
 #if 0 /*JP:T*/
     { M('f'), "force", "force a lock", doforce, AUTOCOMPLETE },
 #else
     { M('f'), "force", "鍵をこじあける", doforce, AUTOCOMPLETE },
 #endif
+#if 0 /*JP:T*/
     { ';', "glance", "show what type of thing a map symbol corresponds to",
+#else
+    { ';', "glance", "地図上のシンボルが何に対応するかを見る",
+#endif
             doquickwhatis, IFBURIED | GENERALCMD },
+#if 0 /*JP:T*/
     { '?', "help", "give a help message", dohelp, IFBURIED | GENERALCMD },
+#else
+    { '?', "help", "ヘルプメッセージを表示する", dohelp, IFBURIED | GENERALCMD },
+#endif
+#if 0 /*JP:T*/
     { '\0', "herecmdmenu", "show menu of commands you can do here",
+#else
+    { '\0', "herecmdmenu", "ここで出来るコマンドのメニューを表示する",
+#endif
             doherecmdmenu, IFBURIED },
+#if 0 /*JP:T*/
     { 'V', "history", "show long version and game history",
+#else
+    { 'V', "history", "長いバージョンとゲームの歴史を表示する",
+#endif
             dohistory, IFBURIED | GENERALCMD },
+#if 0 /*JP:T*/
     { 'i', "inventory", "show your inventory", ddoinv, IFBURIED },
+#else
+    { 'i', "inventory", "持物を表示する", ddoinv, IFBURIED },
+#endif
+#if 0 /*JP:T*/
     { 'I', "inventtype", "inventory specific item types",
+#else
+    { 'I', "inventtype", "指定した種類の持物を見る",
+#endif
             dotypeinv, IFBURIED },
 #if 0 /*JP:T*/
     { M('i'), "invoke", "invoke an object's special powers",
@@ -4742,10 +4798,22 @@ struct ext_func_tab extcmdlist[] = {
 #else
     { M('j'), "jump", "他の位置に飛びうつる", dojump, AUTOCOMPLETE },
 #endif
+#if 0 /*JP:T*/
     { C('d'), "kick", "kick something", dokick },
+#else
+    { C('d'), "kick", "何かを蹴る", dokick },
+#endif
+#if 0 /*JP:T*/
     { '\\', "known", "show what object types have been discovered",
+#else
+    { '\\', "known", "発見した物の種類を表示する",
+#endif
             dodiscovered, IFBURIED | GENERALCMD },
+#if 0 /*JP:T*/
     { '`', "knownclass", "show discovered types for one class of objects",
+#else
+    { '`', "knownclass", "一つの種類の中で発見した物を表示する",
+#endif
             doclassdisco, IFBURIED | GENERALCMD },
 #if 0 /*JP:T*/
     { '\0', "levelchange", "change experience level",
@@ -4759,7 +4827,11 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "lightsources", "移動光源を見る",
 #endif
             wiz_light_sources, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+#if 0 /*JP:T*/
     { ':', "look", "look at what is here", dolook, IFBURIED },
+#else
+    { ':', "look", "ここに何があるのか見る", dolook, IFBURIED },
+#endif
 #if 0 /*JP:T*/
     { M('l'), "loot", "loot a box on the floor", doloot, AUTOCOMPLETE },
 #else
@@ -4791,8 +4863,16 @@ struct ext_func_tab extcmdlist[] = {
     { M('o'), "offer", "神に供物を捧げる",
 #endif
             dosacrifice, AUTOCOMPLETE },
+#if 0 /*JP:T*/
     { 'o', "open", "open a door", doopen },
+#else
+    { 'o', "open", "扉を開ける", doopen },
+#endif
+#if 0 /*JP:T*/
     { 'O', "options", "show option settings, possibly change them",
+#else
+    { 'O', "options", "現在のオプション設定を表示し可能なら変更する",
+#endif
             doset, IFBURIED | GENERALCMD },
 #if 0 /*JP:T*/
     { C('o'), "overview", "show a summary of the explored dungeon",
@@ -4806,8 +4886,16 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "panic", "パニックルーチンをテストする(致命的)",
 #endif
             wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+#if 0 /*JP:T*/
     { 'p', "pay", "pay your shopping bill", dopay },
+#else
+    { 'p', "pay", "買い物の勘定を払う", dopay },
+#endif
+#if 0 /*JP:T*/
     { ',', "pickup", "pick up things at the current location", dopickup },
+#else
+    { ',', "pickup", "現在の位置にある物を拾う", dopickup },
+#endif
 #if 0 /*JP:T*/
     { '\0', "polyself", "polymorph self",
 #else
@@ -4820,20 +4908,48 @@ struct ext_func_tab extcmdlist[] = {
     { M('p'), "pray", "神に祈る",
 #endif
             dopray, IFBURIED | AUTOCOMPLETE },
+#if 0 /*JP:T*/
     { C('p'), "prevmsg", "view recent game messages",
+#else
+    { C('p'), "prevmsg", "最近のメッセージを見る",
+#endif
             doprev_message, IFBURIED | GENERALCMD },
+#if 0 /*JP:T*/
     { 'P', "puton", "put on an accessory (ring, amulet, etc)", doputon },
+#else
+    { 'P', "puton", "アクセサリをつける (指輪，魔除けなど)", doputon },
+#endif
+#if 0 /*JP:T*/
     { 'q', "quaff", "quaff (drink) something", dodrink },
+#else
+    { 'q', "quaff", "何かを飲む", dodrink },
+#endif
 #if 0 /*JP:T*/
     { M('q'), "quit", "exit without saving current game",
 #else
     { M('q'), "quit", "セーブしないで終了",
 #endif
             done2, IFBURIED | AUTOCOMPLETE | GENERALCMD },
+#if 0 /*JP:T*/
     { 'Q', "quiver", "select ammunition for quiver", dowieldquiver },
+#else
+    { 'Q', "quiver", "装填する物を選択する", dowieldquiver },
+#endif
+#if 0 /*JP:T*/
     { 'r', "read", "read a scroll or spellbook", doread },
+#else
+    { 'r', "read", "巻物や魔法書を読む", doread },
+#endif
+#if 0 /*JP:T*/
     { C('r'), "redraw", "redraw screen", doredraw, IFBURIED | GENERALCMD },
+#else
+    { C('r'), "redraw", "画面を再表示する", doredraw, IFBURIED | GENERALCMD },
+#endif
+#if 0 /*JP:T*/
     { 'R', "remove", "remove an accessory (ring, amulet, etc)", doremring },
+#else
+    { 'R', "remove", "アクセサリをはずす (指輪，魔除けなど)", doremring },
+#endif
 #if 0 /*JP:T*/
     { M('R'), "ride", "mount or dismount a saddled steed",
 #else
@@ -4845,7 +4961,11 @@ struct ext_func_tab extcmdlist[] = {
 #else
     { M('r'), "rub", "ランプをこする", dorub, AUTOCOMPLETE },
 #endif
+#if 0 /*JP:T*/
     { 'S', "save", "save the game and exit", dosave, IFBURIED | GENERALCMD },
+#else
+    { 'S', "save", "ゲームを保存して終了する", dosave, IFBURIED | GENERALCMD },
+#endif
 #if 0 /*JP:T*/
     { 's', "search", "search for traps and secret doors",
             dosearch, IFBURIED, "searching" },
@@ -4853,28 +4973,67 @@ struct ext_func_tab extcmdlist[] = {
     { 's', "search", "罠や隠し扉を探す",
             dosearch, IFBURIED, "探す" },
 #endif
+#if 0 /*JP:T*/
     { '*', "seeall", "show all equipment in use", doprinuse, IFBURIED },
+#else
+    { '*', "seeall", "使用している全ての装備類を表示する", doprinuse, IFBURIED },
+#endif
+#if 0 /*JP:T*/
     { AMULET_SYM, "seeamulet", "show the amulet currently worn",
+#else
+    { AMULET_SYM, "seeamulet", "身につけている魔除けを表示する",
+#endif
             dopramulet, IFBURIED },
-    { ARMOR_SYM, "seearmor", "show the armor currently worn",
+#if 0 /*JP:T*/
+#else
+#endif
+    { ARMOR_SYM, "seearmor", "使っている防具を表示する",
             doprarm, IFBURIED },
+#if 0 /*JP:T*/
     { GOLD_SYM, "seegold", "count your gold", doprgold, IFBURIED },
+#else
+    { GOLD_SYM, "seegold", "持っている金貨の数を数える", doprgold, IFBURIED },
+#endif
 #if 0 /*JP:T*/
     { '\0', "seenv", "show seen vectors",
 #else
     { '\0', "seenv", "視線ベクトルを見る",
 #endif
             wiz_show_seenv, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+#if 0 /*JP:T*/
     { RING_SYM, "seerings", "show the ring(s) currently worn",
+#else
+    { RING_SYM, "seerings", "はめている指輪を表示する",
+#endif
             doprring, IFBURIED },
+#if 0 /*JP:T*/
     { SPBOOK_SYM, "seespells", "list and reorder known spells",
+#else
+    { SPBOOK_SYM, "seespells", "知っている呪文を表示して並べ替える",
+#endif
             dovspell, IFBURIED },
+#if 0 /*JP:T*/
     { TOOL_SYM, "seetools", "show the tools currently in use",
+#else
+    { TOOL_SYM, "seetools", "使っている道具を表示する",
+#endif
             doprtool, IFBURIED },
+#if 0 /*JP:T*/
     { '^', "seetrap", "show the type of adjacent trap", doidtrap, IFBURIED },
+#else
+    { '^', "seetrap", "隣にある罠の種類を表示する", doidtrap, IFBURIED },
+#endif
+#if 0 /*JP:T*/
     { WEAPON_SYM, "seeweapon", "show the weapon currently wielded",
+#else
+    { WEAPON_SYM, "seeweapon", "使っている武器を表示する",
+#endif
             doprwep, IFBURIED },
+#if 0 /*JP:T*/
     { '!', "shell", "do a shell escape",
+#else
+    { '!', "shell", "シェルに抜ける",
+#endif
             dosh_core, IFBURIED | GENERALCMD
 #ifndef SHELL
                        | CMD_NOT_AVAILABLE
@@ -4891,26 +5050,55 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "stats", "メモリ状態を見る",
 #endif
             wiz_show_stats, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+#if 0 /*JP:T*/
     { C('z'), "suspend", "suspend the game",
+#else
+    { C('z'), "suspend", "ゲームを中断する",
+#endif
             dosuspend_core, IFBURIED | GENERALCMD
 #ifndef SUSPEND
                             | CMD_NOT_AVAILABLE
 #endif /* SUSPEND */
     },
+#if 0 /*JP:T*/
     { 'x', "swap", "swap wielded and secondary weapons", doswapweapon },
+#else
+    { 'x', "swap", "左右の武器を交換する", doswapweapon },
+#endif
+#if 0 /*JP:T*/
     { 'T', "takeoff", "take off one piece of armor", dotakeoff },
+#else
+    { 'T', "takeoff", "防具を一つ外す", dotakeoff },
+#endif
+#if 0 /*JP:T*/
     { 'A', "takeoffall", "remove all armor", doddoremarm },
+#else
+    { 'A', "takeoffall", "全ての防具を外す", doddoremarm },
+#endif
+#if 0 /*JP:T*/
     { C('t'), "teleport", "teleport around the level", dotelecmd, IFBURIED },
+#else
+    { C('t'), "teleport", "同じ階の中で瞬間移動する", dotelecmd, IFBURIED },
+#endif
 #if 0 /*JP:T*/
     { '\0', "terrain", "show map without obstructions",
 #else
     { '\0', "terrain", "邪魔されずに地図を見る",
 #endif
             doterrain, IFBURIED | AUTOCOMPLETE },
+#if 0 /*JP:T*/
     { '\0', "therecmdmenu",
             "menu of commands you can do from here to adjacent spot",
+#else
+    { '\0', "therecmdmenu",
+            "ここから隣のマスに対して出来るコマンドのメニュー",
+#endif
             dotherecmdmenu },
+#if 0 /*JP:T*/
     { 't', "throw", "throw something", dothrow },
+#else
+    { 't', "throw", "何かを投げる", dothrow },
+#endif
 #if 0 /*JP:T*/
     { '\0', "timeout", "look at timeout queue and hero's timed intrinsics",
 #else
@@ -4922,7 +5110,11 @@ struct ext_func_tab extcmdlist[] = {
 #else
     { M('T'), "tip", "入れ物を空にする", dotip, AUTOCOMPLETE },
 #endif
+#if 0 /*JP:T*/
     { '_', "travel", "travel to a specific location on the map", dotravel },
+#else
+    { '_', "travel", "地図で指定された位置まで移動する", dotravel },
+#endif
 #if 0 /*JP:T*/
     { M('t'), "turn", "turn undead away", doturn, IFBURIED | AUTOCOMPLETE },
 #else
@@ -4939,7 +5131,11 @@ struct ext_func_tab extcmdlist[] = {
 #else
     { M('u'), "untrap", "罠をはずす", dountrap, AUTOCOMPLETE },
 #endif
+#if 0 /*JP:T*/
     { '<', "up", "go up a staircase", doup },
+#else
+    { '<', "up", "階段を上る", doup },
+#endif
 #if 0 /*JP:T*/
     { '\0', "vanquished", "list vanquished monsters",
 #else
@@ -4953,7 +5149,11 @@ struct ext_func_tab extcmdlist[] = {
             "コンパイル時のオプションを表示する",
 #endif
             doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD },
+#if 0 /*JP:T*/
     { 'v', "versionshort", "show version", doversion, IFBURIED | GENERALCMD },
+#else
+    { 'v', "versionshort", "バージョンを表示する", doversion, IFBURIED | GENERALCMD },
+#endif
 #if 0 /*JP:T*/
     { '\0', "vision", "show vision array",
 #else
@@ -4967,11 +5167,27 @@ struct ext_func_tab extcmdlist[] = {
     { '.', "wait", "一歩分何もしない",
             donull, IFBURIED, "休憩する" },
 #endif
+#if 0 /*JP:T*/
     { 'W', "wear", "wear a piece of armor", dowear },
+#else
+    { 'W', "wear", "防具を一つつける", dowear },
+#endif
+#if 0 /*JP:T*/
     { '&', "whatdoes", "tell what a command does", dowhatdoes, IFBURIED },
+#else
+    { '&', "whatdoes", "コマンドの意味を表示する", dowhatdoes, IFBURIED },
+#endif
+#if 0 /*JP:T*/
     { '/', "whatis", "show what type of thing a symbol corresponds to",
+#else
+    { '/', "whatis", "シンボルが何を表しているかを表示する",
+#endif
             dowhatis, IFBURIED | GENERALCMD },
+#if 0 /*JP:T*/
     { 'w', "wield", "wield (put in use) a weapon", dowield },
+#else
+    { 'w', "wield", "武器を身につける", dowield },
+#endif
 #if 0 /*JP:T*/
     { M('w'), "wipe", "wipe off your face", dowipe, AUTOCOMPLETE },
 #else
@@ -5021,7 +5237,11 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "wmode", "壁モードを見る",
 #endif
             wiz_show_wmodes, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+#if 0 /*JP:T*/
     { 'z', "zap", "zap a wand", dozap },
+#else
+    { 'z', "zap", "杖を振る", dozap },
+#endif
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 
@@ -5205,29 +5425,65 @@ dokeylist(VOID_ARGS)
     winid datawin;
     int i;
     static const char
+#if 0 /*JP:T*/
         run_desc[] = "Prefix: run until something very interesting is seen",
+#else
+        run_desc[] = "接頭辞: 何かとても興味深いものが見えるまで走る",
+#endif
         forcefight_desc[] =
+#if 0 /*JP:T*/
                      "Prefix: force fight even if you don't see a monster";
+#else
+                     "接頭辞: たとえ怪物が見えていなくても戦う";
+#endif
     static const struct {
         int nhkf;
         const char *desc;
         boolean numpad;
     } misc_keys[] = {
+#if 0 /*JP:T*/
         { NHKF_ESC, "escape from the current query/action", FALSE },
+#else
+        { NHKF_ESC, "現在の行動を中断する", FALSE },
+#endif
         { NHKF_RUSH,
+#if 0 /*JP:T*/
           "Prefix: rush until something interesting is seen", FALSE },
+#else
+          "接頭辞: 何か興味深いものが見えるまで走る", FALSE },
+#endif
         { NHKF_RUN, run_desc, FALSE },
         { NHKF_RUN2, run_desc, TRUE },
         { NHKF_FIGHT, forcefight_desc, FALSE },
         { NHKF_FIGHT2, forcefight_desc, TRUE } ,
         { NHKF_NOPICKUP,
+#if 0 /*JP:T*/
           "Prefix: move without picking up objects/fighting", FALSE },
+#else
+          "接頭辞: 物を拾ったり戦ったりせずに移動する", FALSE },
+#endif
         { NHKF_RUN_NOPICKUP,
+#if 0 /*JP:T*/
           "Prefix: run without picking up objects/fighting", FALSE },
+#else
+          "接頭辞: 物を拾ったり戦ったりせずに走る", FALSE },
+#endif
+#if 0 /*JP:T*/
         { NHKF_DOINV, "view inventory", TRUE },
+#else
+        { NHKF_DOINV, "持物を表示する", TRUE },
+#endif
+#if 0 /*JP:T*/
         { NHKF_REQMENU, "Prefix: request a menu", FALSE },
+#else
+        { NHKF_REQMENU, "接頭辞: メニューを要求する", FALSE },
+#endif
 #ifdef REDO
+#if 0 /*JP:T*/
         { NHKF_DOAGAIN , "re-do: perform the previous command again", FALSE },
+#else
+        { NHKF_DOAGAIN , "再実行: 前回のコマンドをもう一度実行する", FALSE },
+#endif
 #endif
         { 0, (const char *) 0, FALSE }
     };

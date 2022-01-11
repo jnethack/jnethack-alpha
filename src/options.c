@@ -848,11 +848,11 @@ static const menu_cmd_t default_menu_cmd_info[] = {
 /*JP
  { "menu_select_all", MENU_SELECT_ALL, "Select all items" },
 */
- { "menu_select_all", MENU_SELECT_ALL, "全てを選択" },
+ { "menu_select_all", MENU_SELECT_ALL, "全ての項目を選択" },
 /*JP
  { "menu_deselect_all", MENU_UNSELECT_ALL, "Unselect all items" },
 */
- { "menu_deselect_all", MENU_UNSELECT_ALL, "全ての選択を解除" },
+ { "menu_deselect_all", MENU_UNSELECT_ALL, "全ての項目を選択解除" },
 /*JP
  { "menu_invert_all", MENU_INVERT_ALL, "Invert selection" },
 */
@@ -860,12 +860,12 @@ static const menu_cmd_t default_menu_cmd_info[] = {
 /*JP
  { "menu_select_page", MENU_SELECT_PAGE, "Select items in current page" },
 */
- { "menu_select_page", MENU_SELECT_PAGE, "現在のページのアイテムを選択" },
+ { "menu_select_page", MENU_SELECT_PAGE, "現在のページの項目を選択" },
  { "menu_deselect_page", MENU_UNSELECT_PAGE,
 /*JP
    "Unselect items in current page" },
 */
-   "Unselect items in current page" },
+   "現在のページの項目を選択解除" },
 /*JP
  { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page selection" },
 */
@@ -873,7 +873,7 @@ static const menu_cmd_t default_menu_cmd_info[] = {
 /*JP
  { "menu_search", MENU_SEARCH, "Search and toggle matching items" },
 */
- { "menu_search", MENU_SEARCH, "検索してマッチングしたアイテムをトグル" },
+ { "menu_search", MENU_SEARCH, "検索してマッチングした項目をトグル" },
 };
 
 /*
