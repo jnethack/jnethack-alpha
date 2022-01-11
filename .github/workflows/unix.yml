@@ -31,3 +31,10 @@ jobs:
 
     - name: make
       run: make install
+
+    - uses: sarisia/actions-status-discord@v1
+      if: always()
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        status: ${{ job.status }}
