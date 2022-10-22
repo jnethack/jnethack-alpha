@@ -2598,7 +2598,7 @@ int final;
 */
             Strcat(buf, "(—áŠO‚ ‚è)");
 #if 1 /*JP*/
-        Strcpy(buf, "‚É‘Î‚µ‚ÄƒIƒ“");
+        Strcat(buf, "‚É‘Î‚µ‚ÄƒIƒ“");
 #endif
     } else
 /*JP
