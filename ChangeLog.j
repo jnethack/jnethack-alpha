@@ -1,3 +1,6 @@
+	* Ÿ‚Ì–â‘è‚ğC³
+	  * ubuntu 22.04‚Åƒrƒ‹ƒh‚ª¸”s‚·‚é (#45951)
+
 Mon Jan  3 2022  SHIRAKATA Kentaro  <argrath@ub32.org>
 
 	* Ÿ‚Ì–â‘è‚ğC³
