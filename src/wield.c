@@ -916,7 +916,11 @@ chwepon(otmp, amount)
 register struct obj *otmp;
 register int amount;
 {
+#if 0 /*JP*/
+    const char *color = hcolor((amount < 0) ? NH_BLACK : NH_BLUE);
+#else
     const char *color = hcolor_adv((amount < 0) ? NH_BLACK : NH_BLUE);
+#endif
     const char *xtime, *wepname = "";
     boolean multiple;
     int otyp = STRANGE_OBJECT;

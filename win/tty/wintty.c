@@ -1412,7 +1412,11 @@ tty_askname()
 */
                     (void) putchar(c);
 #else
+#if 0 /*JP*/
+                (void) putchar(c);
+#else
                 (void) jputchar(c);
+#endif
 #endif
 #if 0 /*JP*/
                 plname[ct++] = c;

@@ -4985,9 +4985,10 @@ struct ext_func_tab extcmdlist[] = {
 #endif
             dopramulet, IFBURIED },
 #if 0 /*JP:T*/
+    { ARMOR_SYM, "seearmor", "show the armor currently worn",
 #else
-#endif
     { ARMOR_SYM, "seearmor", "Žg‚Á‚Ä‚¢‚é–h‹ï‚ð•\Ž¦‚·‚é",
+#endif
             doprarm, IFBURIED },
 #if 0 /*JP:T*/
     { GOLD_SYM, "seegold", "count your gold", doprgold, IFBURIED },

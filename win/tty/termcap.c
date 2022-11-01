@@ -579,11 +579,10 @@ int c; /* actually char, but explicitly specify its widened type */
      * Matching putchar()'s declaration and using explicit casts where
      * warranted is more robust, so we're just a jacket around that.
      */
-/*JP
-    (void) putchar(c);
-*/
+#if 0 /*JP*/
+    return putchar(c);
+#else
     (void) cputchar(c);
-#if 1 /*JP*/
     return 0;
 #endif
 }
