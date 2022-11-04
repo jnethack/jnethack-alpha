@@ -539,7 +539,7 @@ struct xwindow *wp;
                     mesg_info->char_lbearing, mesg_info->char_ascent + y_base,
                     curr->line, curr->str_length);
 #else
-        /* GCã‚’ä½¿ã„å›žã•ãšã«ã‚³ãƒ”ãƒ¼ã—ãŸã‚‚ã®ã‚’ä½¿ã† */
+        /* GC‚ðŽg‚¢‰ñ‚³‚¸‚ÉƒRƒs[‚µ‚½‚à‚Ì‚ðŽg‚¤ */
         GC gc = XCreateGC(XtDisplay(wp->w), XtWindow(wp->w), 0, NULL );
         XtGCMask mask = GCFunction | GCForeground | GCBackground | GCFont;
         XCopyGC(XtDisplay(wp->w), mesg_info->gc, mask, gc);
