@@ -784,7 +784,7 @@ register struct monst *priest;
                        || (u.ublessed < 20
                            && (u.ublessed < 9 || !rn2(u.ublessed))))) {
 /*JP
-            verbalize("Thy devotion has been rewarded.");
+            verbalize("Thou hast been rewarded for thy devotion.");
 */
             verbalize("“ğ‚ªŒ£g‚É•ñ‚í‚ñD");
             if (!(HProtection & INTRINSIC)) {

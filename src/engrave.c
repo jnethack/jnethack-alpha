@@ -1517,7 +1517,7 @@ doengrave()
     /* Chop engraving down to size if necessary */
     if (len > maxelen) {
         for (sp = ebuf; maxelen && *sp; sp++)
-            if (*sp == ' ')
+            if (!(*sp == ' '))
                 maxelen--;
         if (!maxelen && *sp) {
 #if 1 /*JP*//*漢字の1バイト目だけが残らないように*/

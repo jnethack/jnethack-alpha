@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1583315888 2020/03/04 09:58:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.293 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1674864732 2023/01/28 00:12:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.259 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,6 +28,7 @@ STATIC_DCL short FDECL(rnd_otyp_by_namedesc, (const char *, CHAR_P, int));
 STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
+STATIC_DCL void FDECL(xcalled, (char *, int, const char *, const char *));
 STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 STATIC_DCL char *FDECL(doname_base, (struct obj *obj, unsigned));
@@ -151,9 +152,14 @@ register int otyp;
 
     if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
         actualn = Japanese_item_name(otyp);
+    buf[0] = '\0';
 #if 1 /*JP*/
-    if(un)
-        Sprintf(buf, "%sと呼ばれる", un);
+    if (un) {
+        /* 英語では厳密にサイズを算出しているが日本語は語順の都合で
+           正確に算出するのが大変なので余裕を持った値にする */
+        xcalled(buf,
+                BUFSZ - PREFIX - (dn ? (int) strlen(dn) + 3 : 0), "", un);
+    }
 #endif
     switch (ocl->oc_class) {
     case COIN_CLASS:
@@ -207,7 +213,7 @@ register int otyp;
         else
             Strcpy(buf, "amulet");
         if (un)
-            Sprintf(eos(buf), " called %s", un);
+            xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
         if (dn)
             Sprintf(eos(buf), " (%s)", dn);
         return buf;
@@ -232,8 +238,8 @@ register int otyp;
             Strcpy(buf, actualn);
             if (GemStone(otyp))
                 Strcat(buf, " stone");
-            if (un)
-                Sprintf(eos(buf), " called %s", un);
+            if (un) /* 3: length of " (" + ")" which will enclose 'dn' */
+                xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
             if (dn)
                 Sprintf(eos(buf), " (%s)", dn);
 #else
@@ -246,7 +252,7 @@ register int otyp;
                 Strcat(buf,
                        (ocl->oc_material == MINERAL) ? " stone" : " gem");
             if (un)
-                Sprintf(eos(buf), " called %s", un);
+                xcalled(buf, BUFSZ, "", un);
 #else
             Strcat(buf, dn ? dn : actualn);
 #endif
@@ -269,8 +275,8 @@ register int otyp;
 #endif
     }
 #if 0 /*JP*/
-    if (un)
-        Sprintf(eos(buf), " called %s", un);
+    if (un) /* 3: length of " (" + ")" which will enclose 'dn' */
+        xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
 #endif
     if (dn)
 #if 0 /*JP*/
@@ -515,6 +521,37 @@ boolean forward;
     }
 }
 
+/* add "<pfx> called <sfx>" to end of buf, truncating if necessary */
+STATIC_OVL void
+xcalled(buf, siz, pfx, sfx)
+char *buf;       /* eos(obuf) or eos(&obuf[PREFIX]) */
+int siz;         /* BUFSZ or BUFSZ-PREFIX */
+const char *pfx; /* usually class string, sometimes more specific */
+const char *sfx; /* user assigned type name */
+{
+    int bufsiz = siz - 1 - (int) strlen(buf),
+/*JP
+        pfxlen = (int) (strlen(pfx) + sizeof " called " - sizeof "");
+*/
+        pfxlen = (int) (strlen(pfx) + sizeof "と呼ばれる" - sizeof "");
+
+    if (pfxlen > bufsiz)
+        panic("xcalled: not enough room for prefix (%d > %d)",
+              pfxlen, bufsiz);
+
+#if 0 /*JP*/
+    Sprintf(eos(buf), "%s called %.*s", pfx, bufsiz - pfxlen, sfx);
+#else
+    {
+        int sfxlen = bufsiz - pfxlen;
+        /* 全角の途中で切れそうなときにはその字の先頭まで戻る */
+        sfxlen = sfxlen - offset_in_kanji(sfx, sfxlen);
+        /* 変数名を変えることはしないが、sfxが前、pfxが後ろになる */
+        Sprintf(eos(buf), "%.*sと呼ばれる%s", sfxlen, sfx, pfx);
+    }
+#endif
+}
+
 char *
 xname(obj)
 struct obj *obj;
@@ -540,7 +577,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
     if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
         actualn = Japanese_item_name(typ);
-    /* As of 3.6.2: this used to be part of 'dn's initialization, but it
+    /* 3.6.2: this used to be part of 'dn's initialization, but it
        needs to come after possibly overriding 'actualn' */
     if (!dn)
         dn = actualn;
@@ -600,9 +637,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcpy(buf, actualn);
         else if (un)
 /*JP
-            Sprintf(buf, "amulet called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "amulet", un);
 */
-            Sprintf(eos(buf), "%sと呼ばれる魔除け", un);
+            xcalled(buf, BUFSZ - PREFIX, "魔除け", un);
         else
 /*JP
             Sprintf(buf, "%s amulet", dn);
@@ -637,17 +674,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcat(buf, dn);
         else if (nn)
             Strcat(buf, actualn);
-        else if (un) {
-#if 0 /*JP*/
-            Strcat(buf, dn);
-            Strcat(buf, " called ");
-            Strcat(buf, un);
-#else
-            Strcat(buf, un);
-            Strcat(buf, "と呼ばれる");
-            Strcat(buf, dn);
-#endif
-        } else
+        else if (un)
+            xcalled(buf, BUFSZ - PREFIX, dn, un);
+        else
             Strcat(buf, dn);
 
 #if 0 /*JP*/ /*これは語順の関係から上の方で定義*/
@@ -863,11 +892,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
                 Strcat(buf, actualn);
             } else {
 #if 0 /*JP*/
-                Strcat(buf, " called ");
-                Strcat(buf, un);
+                xcalled(buf, BUFSZ - PREFIX, "", un);
 #else
-                Strcat(buf, un);
-                Strcat(buf, "と呼ばれる薬");
+                xcalled(buf, BUFSZ - PREFIX, "薬", un);
 #endif
             }
         } else {
@@ -895,11 +922,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcat(buf, actualn);
         } else if (un) {
 #if 0 /*JP*/
-            Strcat(buf, " called ");
-            Strcat(buf, un);
+            xcalled(buf, BUFSZ - PREFIX, "", un);
 #else
-            Strcat(buf, un);
-            Strcat(buf, "と呼ばれる巻物");
+            xcalled(buf, BUFSZ - PREFIX, "巻物", un);
 #endif
         } else if (ocl->oc_magic) {
 #if 0 /*JP*/
@@ -928,9 +953,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcat(buf, actualn);
         else if (un)
 /*JP
-            Sprintf(buf, "wand called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "wand", un);
 */
-            Sprintf(eos(buf), "%sと呼ばれる杖", un);
+            xcalled(buf, BUFSZ - PREFIX, "杖", un);
         else
 /*JP
             Sprintf(buf, "%s wand", dn);
@@ -948,9 +973,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
                 Strcpy(buf, actualn);
             else if (un)
 /*JP
-                Sprintf(buf, "novel called %s", un);
+                xcalled(buf, BUFSZ - PREFIX, "novel", un);
 */
-                Sprintf(buf, "%sという小説", un);
+                xcalled(buf, BUFSZ - PREFIX, "小説", un);
             else
 /*JP
                 Sprintf(buf, "%s book", dn);
@@ -971,9 +996,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcat(buf, actualn);
         } else if (un) {
 /*JP
-            Sprintf(buf, "spellbook called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "spellbook", un);
 */
-            Sprintf(eos(buf), "%sと呼ばれる魔法書", un);
+            xcalled(buf, BUFSZ - PREFIX, "魔法書", un);
         } else
 /*JP
             Sprintf(buf, "%s spellbook", dn);
@@ -993,9 +1018,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcat(buf, actualn);
         else if (un)
 /*JP
-            Sprintf(buf, "ring called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "ring", un);
 */
-            Sprintf(eos(buf), "%sと呼ばれる指輪", un);
+            xcalled(buf, BUFSZ - PREFIX, "指輪", un);
         else
 /*JP
             Sprintf(buf, "%s ring", dn);
@@ -1016,10 +1041,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
 #endif
         } else if (!nn) {
             if (un)
-/*JP
-                Sprintf(buf, "%s called %s", rock, un);
-*/
-                Sprintf(eos(buf), "%sと呼ばれる%s", un, rock);
+                xcalled(buf, BUFSZ - PREFIX, rock, un);
             else
 /*JP
                 Sprintf(buf, "%s %s", dn, rock);
@@ -1055,7 +1077,8 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     if (has_oname(obj) && dknown) {
         Strcat(buf, " named ");
  nameit:
-        Strcat(buf, ONAME(obj));
+        (void) strncat(buf, ONAME(obj),
+                       BUFSZ - 1 - PREFIX - (unsigned) strlen(buf));
     }
 
     if (!strncmpi(buf, "the ", 4))
@@ -2295,7 +2318,7 @@ const char *str;
         return strcpy(buf, "an []");
     }
     (void) just_an(buf, str);
-    return strcat(buf, str);
+    return strncat(buf, str, BUFSZ - 1 - (unsigned) strlen(buf));
 }
 
 char *
@@ -2366,12 +2389,11 @@ const char *str;
         Strcpy(buf, "the ");
     else
         buf[0] = '\0';
-    Strcat(buf, str);
-
+    return strncat(buf, str, BUFSZ - 1 - (unsigned) strlen(buf));
 #else /*単にコピー*/
     Strcpy(buf, str);
-#endif /*JP*/
     return buf;
+#endif /*JP*/
 }
 
 char *
@@ -3981,10 +4003,12 @@ struct obj *no_wish;
      */
     if ((p = strstri(bp, " named ")) != 0) {
         *p = 0;
+        /* note: if 'name' is too long, oname() will truncate it */
         name = p + 7;
     }
     if ((p = strstri(bp, " called ")) != 0) {
         *p = 0;
+        /* note: if 'un' is too long, obj lookup just won't match anything */
         un = p + 8;
 #if 0 /*JP*//*タイプ別はとりあえずしない*/
         /* "helmet called telepathy" is not "helmet" (a specific type)
