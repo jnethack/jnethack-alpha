@@ -1,3 +1,8 @@
+Sat Feb 23 2023  Kentaro Shirakata  <argrath@ub32.org>
+
+	* NetHack-3.6.7ベース JNetHackテストリリース(3.6.7-0.1)
+	* 翻訳追加修正
+
 Sun Oct 23 2022  SHIRAKATA Kentaro  <argrath@ub32.org>
 
 	* 次の問題を修正
