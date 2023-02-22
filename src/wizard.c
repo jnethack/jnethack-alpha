@@ -5,7 +5,7 @@
 
 /* JNetHack Copyright */
 /* (c) Issei Numata, Naoki Hamada, Shigehiro Miyashita, 1994-2000  */
-/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2022            */
+/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-2023            */
 /* JNetHack may be freely redistributed.  See license for details. */
 
 /* wizard code - inspired by rogue code from Merlyn Leroy (digi-g!brian) */
