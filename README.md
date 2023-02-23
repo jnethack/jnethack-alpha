@@ -6,7 +6,8 @@ JNetHackはNetHackを日本語化したものです。
 
 ## 今回のリリースノート
 
-最近のglibc以降でビルドできない英語版由来の問題を修正しました。
+ベースをNetHack 3.6.7に更新しました。
+十分なテストはできていませんので問題があればぜひ報告して下さい。
 
 詳細についてはChangeLog.jを参照してください。
 
@@ -37,4 +38,4 @@ JNetHack では二つのレポジトリを使っています。
 ### 開発レポジトリ https://github.com/jnethack/jnethack-alpha
 
 開発中のソースが登録されます。頻繁にrebaseされます。
-TravisCIとAppVeyorでビルドの確認をしています。
+TravisCI、AppVeyor、GitHub Actionsでビルドの確認をしています。
