@@ -128,7 +128,10 @@ build_known_folder_path(
     if(!get_known_folder_path(folder_id, path, path_size))
         return FALSE;
 
+/*JP
     strcat(path, "\\NetHack\\");
+*/
+    strcat(path, "\\JNetHack\\");
     create_directory(path);
     if (versioned) {
         Sprintf(eos(path), "%d.%d\\", 
