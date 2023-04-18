@@ -1,5 +1,6 @@
 	* 次の問題を修正
 	  * 厄介者の召喚で怪物が召喚されない (#47879)
+	  * Windows版のデフォルトのデータ保存位置が"NetHack"のまま (#48255)
 
 Sat Feb 23 2023  Kentaro Shirakata  <argrath@ub32.org>
 
