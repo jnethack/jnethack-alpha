@@ -497,6 +497,8 @@ int spellnum;
         int count;
 
         count = nasty(mtmp); /* summon something nasty */
+#else
+        nasty(mtmp); /* summon something nasty */
 #endif
         if (mtmp->iswiz) {
 /*JP
