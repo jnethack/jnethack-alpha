@@ -1,3 +1,6 @@
+	* 次の問題を修正
+	  * 厄介者の召喚で怪物が召喚されない (#47879)
+
 Sat Feb 23 2023  Kentaro Shirakata  <argrath@ub32.org>
 
 	* NetHack-3.6.7ベース JNetHackテストリリース(3.6.7-0.1)
