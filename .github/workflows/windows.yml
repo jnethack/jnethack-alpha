@@ -38,7 +38,7 @@ jobs:
           name: "latest"
           allowUpdates: true
           tag: latest
-          commit: jnh
+          commit: develop
           replacesArtifacts: true
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
