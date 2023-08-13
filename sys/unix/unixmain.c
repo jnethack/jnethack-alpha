@@ -19,6 +19,9 @@
 #ifdef XI18N
 #include <X11/Xlocale.h>
 #endif
+#if defined(__APPLE__)
+#include <locale.h>
+#endif
 
 #if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
 #if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
@@ -75,6 +78,7 @@ char *argv[];
 #endif
 #if defined(__APPLE__)
     {
+        setlocale(LC_ALL, "");
 /* special hack to change working directory to a resource fork when
    running from finder --sam */
 #define MAC_PATH_VALUE ".app/Contents/MacOS/"

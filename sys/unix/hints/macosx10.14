@@ -21,7 +21,7 @@
 WANT_WIN_TTY=1
 #WANT_WIN_X11=1
 #WANT_WIN_QT=1
-#WANT_WIN_CURSES=1
+WANT_WIN_CURSES=1
 
 # 1a. What is the default window system?
 WANT_DEFAULT=tty
@@ -93,7 +93,7 @@ ifdef WANT_WIN_TTY
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)
 WINLIB = $(WINTTYLIB)
-WINTTYLIB=-lncurses
+WINTTYLIB=-lncurses -liconv
 else	# !WANT_WIN_TTY
 CFLAGS += -DNOTTYGRAPHICS
 endif	# !WANT_WIN_TTY
