@@ -48,6 +48,39 @@ static int max_messages;
 static int num_messages = 0;
 static int last_messages = 0;
 
+int _bytesize(unsigned char code) {
+    int size = 1;
+    if (0x80 & code) {
+        for (int ii = 2; ii <= 8; ii++) {
+            code <<= 1;
+            if (!(0x80 & code)) {
+                break;
+            }
+            size++;
+        }
+    }
+    return size;
+}
+
+int getUtf8MessagWidth(char *cp) {
+    int tail = strlen(cp);
+    int width = current = 0;
+
+    while (current < tail) {
+        unsigned char code;
+        code = *(cp + current);
+        int bytelen = _bytesize(code);
+        current += bytelen;
+        if (0x21 <= code && code <= 0x7e) {
+            width++;
+        } else {
+            width += 2;
+        }
+    }
+
+    return width;
+}
+
 /* Write string to the message window.  Attributes set by calling function. */
 
 void
@@ -57,7 +90,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     char *tmpstr;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     boolean bold, border = curses_window_has_border(MESSAGE_WIN);
-    int message_length = (int) strlen(message);
+    int message_length = getUtf8MessagWidth(message);
 
 #if 0
     /*
