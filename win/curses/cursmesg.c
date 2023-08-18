@@ -71,7 +71,7 @@ int getUtf8MessagWidth(char *cp) {
         code = *(cp + current);
         int bytelen = _bytesize(code);
         current += bytelen;
-        if (0x21 <= code && code <= 0x7e) {
+        if (0x20 <= code && code <= 0x7e) {
             width++;
         } else {
             width += 2;
