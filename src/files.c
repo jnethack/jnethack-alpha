@@ -4065,7 +4065,10 @@ reveal_paths(VOID_ARGS)
 #if defined(SYSCF) || !defined(UNIX) || defined(DLB)
     const char *filep;
 #ifdef SYSCF
+/*JP
     const char *gamename = (hname && *hname) ? hname : "NetHack";
+*/
+    const char *gamename = (hname && *hname) ? hname : "JNetHack";
 #endif
 #endif
 #ifdef UNIX
@@ -4075,7 +4078,10 @@ reveal_paths(VOID_ARGS)
     const char *strp;
     int i, maxlen = 0;
 
+/*JP
     raw_print("Variable playground locations:");
+*/
+    raw_print("変更可能なファイル位置:");
     for (i = 0; i < PREFIX_COUNT; i++)
         raw_printf("    [%-10s]=\"%s\"", fqn_prefix_names[i],
                    fqn_prefix[i] ? fqn_prefix[i] : "not set");
@@ -4092,7 +4098,10 @@ reveal_paths(VOID_ARGS)
 #else
     buf[0] = '\0';
 #endif
+/*JP
     raw_printf("%s system configuration file%s:", s_suffix(gamename), buf);
+*/
+    raw_printf("%sシステム設定ファイル%s:", s_suffix(gamename), buf);
 #ifdef SYSCF_FILE
     filep = SYSCF_FILE;
 #else
@@ -4105,7 +4114,10 @@ reveal_paths(VOID_ARGS)
     }
     raw_printf("    \"%s\"", filep);
 #else /* !SYSCF */
+/*JP
     raw_printf("No system configuration file.");
+*/
+    raw_printf("システム設定ファイルなし．");
 #endif /* ?SYSCF */
 
     /* symbols file */
@@ -4118,17 +4130,31 @@ reveal_paths(VOID_ARGS)
 #else
     strp = fqn_prefix_names[HACKPREFIX];
 #endif /* WIN32 */
+#if 0 /*JP*/
     maxlen = BUFSZ - sizeof " (in )";
+#else
+    maxlen = BUFSZ - sizeof "(内)";
+#endif
     if (strp && (int) strlen(strp) < maxlen)
+#if 0 /*JP*/
         Sprintf(buf, " (in %s)", strp);
+#else
+        Sprintf(buf, "(%s内)", strp);
+#endif
 #endif /* PREFIXES_IN_USE */
+/*JP
     raw_printf("The loadable symbols file%s:", buf);
+*/
+    raw_printf("読み込み可能シンボルファイル%s:", buf);
 #endif /* UNIX */
 
 #ifdef UNIX
     envp = getcwd(cwdbuf, PATH_MAX);
     if (envp) {
+/*JP
         raw_print("The loadable symbols file:");
+*/
+        raw_print("読み込み可能シンボルファイル:");
         raw_printf("    \"%s/%s\"", envp, SYMBOLS);
     }
 #else /* UNIX */
@@ -4150,12 +4176,23 @@ reveal_paths(VOID_ARGS)
     buf[0] = '\0';
 #ifdef PREFIXES_IN_USE
     strp = fqn_prefix_names[DATAPREFIX];
+#if 0 /*JP*/
     maxlen = BUFSZ - sizeof " (in )";
+#else
+    maxlen = BUFSZ - sizeof "(内)";
+#endif
     if (strp && (int) strlen(strp) < maxlen)
+#if 0 /*JP*/
         Sprintf(buf, " (in %s)", strp);
+#else
+        Sprintf(buf, "(%s内)", strp);
+#endif
 #endif
 #ifdef DLB
+/*JP
     raw_printf("Basic data files%s are collected inside:", buf);
+*/
+    raw_printf("基本データファイル%sは集められているファイル:", buf);
     filep = DLBFILE;
 #ifdef VERSION_IN_DLB_FILENAME
     Strcpy(buf, build_dlb_filename((const char *) 0));
@@ -4171,15 +4208,24 @@ reveal_paths(VOID_ARGS)
     raw_printf("    \"%s\"", filep);
 #endif
 #else /* !DLB */
+/*JP
     raw_printf("Basic data files%s are in many separate files.", buf);
+*/
+    raw_printf("基本データファイル%s は複数のファイルに分かれている．", buf);
 #endif /* ?DLB */
 
     /* dumplog */
 
 #ifndef DUMPLOG
+/*JP
     nodumpreason = "not supported";
+*/
+    nodumpreason = "非対応";
 #else
+/*JP
     nodumpreason = "disabled";
+*/
+    nodumpreason = "無効";
 #ifdef SYSCF
     fqn = sysopt.dumplogfile;
 #else  /* !SYSCF */
@@ -4190,13 +4236,19 @@ reveal_paths(VOID_ARGS)
 #endif
 #endif /* ?SYSCF */
     if (fqn && *fqn) {
+/*JP
         raw_print("Your end-of-game disclosure file:");
+*/
+        raw_print("ゲーム終了時情報ファイル:");
         (void) dump_fmtstr(fqn, buf, FALSE);
         buf[sizeof buf - sizeof "    \"\""] = '\0';
         raw_printf("    \"%s\"", buf);
     } else
 #endif /* ?DUMPLOG */
+/*JP
         raw_printf("No end-of-game disclosure file (%s).", nodumpreason);
+*/
+        raw_printf("ゲーム終了時情報ファイルなし(%s)．", nodumpreason);
 
 #ifdef WIN32
     if (sysopt.portable_device_paths) {
@@ -4217,11 +4269,22 @@ reveal_paths(VOID_ARGS)
     buf[0] = '\0';
 #ifdef PREFIXES_IN_USE
     strp = fqn_prefix_names[CONFIGPREFIX];
+#if 0 /*JP*/
     maxlen = BUFSZ - sizeof " (in )";
+#else
+    maxlen = BUFSZ - sizeof "(内)";
+#endif
     if (strp && (int) strlen(strp) < maxlen)
+#if 0 /*JP*/
         Sprintf(buf, " (in %s)", strp);
+#else
+        Sprintf(buf, "(%s内)", strp);
+#endif
 #endif /* PREFIXES_IN_USE */
+/*JP
     raw_printf("Your personal configuration file%s:", buf);
+*/
+    raw_printf("個人用設定ファイル%s:", buf);
 
 #ifdef UNIX
     buf[0] = '\0';
