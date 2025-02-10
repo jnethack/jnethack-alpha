@@ -2629,7 +2629,7 @@ doturn()
 /*JP
     pline("Calling upon %s, you chant an arcane formula.", Gname);
 */
-    pline("%sに祈りを求めると，あなたは不可思議な言葉の聖歌を聞いた．", Gname);
+    pline("あなたは%sを呼び出し，秘密の言葉を唱えた．", Gname);
     exercise(A_WIS, TRUE);
 
     /* note: does not perform unturn_dead() on victims' inventories */
