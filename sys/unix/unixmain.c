@@ -16,8 +16,10 @@
 #include <fcntl.h>
 #endif
 
-#ifdef XI18N
+#if defined(XI18N)
 #include <X11/Xlocale.h>
+#elif defined(CURSES_GRAPHICS)
+#include <locale.h>
 #endif
 
 #if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
@@ -68,7 +70,7 @@ char *argv[];
     setkcode('U');
 #endif
 
-#ifdef XI18N
+#if defined(XI18N) || defined(CURSES_GRAPHICS)
     /* ƒtƒHƒ“ƒgİ’è‚Ì‚½‚ß‚ÉLC_ALL•Ï”‚ğŒÅ’è‚·‚é */
     putenv("LC_ALL=ja_JP.eucJP");
     setlocale(LC_ALL, "");
