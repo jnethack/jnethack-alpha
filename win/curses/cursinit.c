@@ -418,6 +418,9 @@ curses_choose_character()
     int count = 0;
     int cur_character = 0;
     const char **choices;
+#if 1 /*JP*/
+    const char **choices_en;
+#endif
     int *pickmap;
     char *prompt;
     char pbuf[QBUFSZ];
@@ -447,7 +450,11 @@ curses_choose_character()
     tmpchoice[count - count_off] = '\0';
     lcase(tmpchoice);
 
+#if 0 /*JP*/
     while (!isspace(prompt[count_off])) {
+#else
+    while (prompt[count_off] != '[') {
+#endif
         count_off--;
     }
 
@@ -492,6 +499,9 @@ curses_choose_character()
         for (n = 0; roles[n].name.m; n++)
             continue;
         choices = (const char **) alloc(sizeof (char *) * (n + 1));
+#if 1 /*JP*/
+        choices_en = (const char **) alloc(sizeof (char *) * (n + 1));
+#endif
         pickmap = (int *) alloc(sizeof (int) * (n + 1));
         for (;;) {
             for (n = 0, i = 0; roles[i].name.m; i++) {
@@ -501,6 +511,9 @@ curses_choose_character()
                         choices[n] = roles[i].name.f;
                     else
                         choices[n] = roles[i].name.m;
+#if 1 /*JP*/
+                    choices_en[n] = roles[i].filecode;
+#endif
                     pickmap[n++] = i;
                 }
             }
@@ -516,8 +529,15 @@ curses_choose_character()
                 panic("no available ROLE+race+gender+alignment combinations");
         }
         choices[n] = (const char *) 0;
+#if 1 /*JP*/
+        choices_en[n] = (const char *) 0;
+#endif
         if (n > 1)
+#if 0 /*JP*/
             sel = curses_character_dialog(choices,
+#else
+            sel = curses_character_dialog(choices, choices_en,
+#endif
                                         "Choose one of the following roles:");
         else
             sel = 0;
@@ -528,6 +548,9 @@ curses_choose_character()
             curses_bail(0);
         }
         free((genericptr_t) choices);
+#if 1 /*JP*/
+        free((genericptr_t) choices_en);
+#endif
         free((genericptr_t) pickmap);
     } else if (flags.initrole < 0)
         sel = ROLE_RANDOM;
@@ -568,18 +591,31 @@ curses_choose_character()
             }
 
             choices = (const char **) alloc(sizeof (char *) * (n + 1));
+#if 1 /*JP*/
+            choices_en = (const char **) alloc(sizeof (char *) * (n + 1));
+#endif
             pickmap = (int *) alloc(sizeof (int) * (n + 1));
             for (n = 0, i = 0; races[i].noun; i++) {
                 if (ok_race(flags.initrole, i,
                             flags.initgend, flags.initalign)) {
                     choices[n] = races[i].noun;
+#if 1 /*JP*/
+                    choices_en[n] = races[i].filecode;
+#endif
                     pickmap[n++] = i;
                 }
             }
             choices[n] = (const char *) 0;
+#if 1 /*JP*/
+            choices_en[n] = (const char *) 0;
+#endif
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
+#if 0 /*JP*/
                 sel = curses_character_dialog(choices,
+#else
+                sel = curses_character_dialog(choices, choices_en,
+#endif
                                         "Choose one of the following races:");
             else
                 sel = 0;
@@ -591,6 +627,9 @@ curses_choose_character()
             }
             flags.initrace = sel;
             free((genericptr_t) choices);
+#if 1 /*JP*/
+            free((genericptr_t) choices_en);
+#endif
             free((genericptr_t) pickmap);
         }
         if (flags.initrace == ROLE_RANDOM) {    /* Random role */
@@ -628,18 +667,31 @@ curses_choose_character()
             }
 
             choices = (const char **) alloc(sizeof (char *) * (n + 1));
+#if 1 /*JP*/
+            choices_en = (const char **) alloc(sizeof (char *) * (n + 1));
+#endif
             pickmap = (int *) alloc(sizeof (int) * (n + 1));
             for (n = 0, i = 0; i < ROLE_GENDERS; i++) {
                 if (ok_gend(flags.initrole, flags.initrace,
                             i, flags.initalign)) {
                     choices[n] = genders[i].adj;
+#if 1 /*JP*/
+                    choices_en[n] = genders[i].filecode;
+#endif
                     pickmap[n++] = i;
                 }
             }
             choices[n] = (const char *) 0;
+#if 1 /*JP*/
+            choices_en[n] = (const char *) 0;
+#endif
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
+#if 0 /*JP*/
                 sel = curses_character_dialog(choices,
+#else
+                sel = curses_character_dialog(choices, choices_en,
+#endif
                                       "Choose one of the following genders:");
             else
                 sel = 0;
@@ -651,6 +703,9 @@ curses_choose_character()
             }
             flags.initgend = sel;
             free((genericptr_t) choices);
+#if 1 /*JP*/
+            free((genericptr_t) choices_en);
+#endif
             free((genericptr_t) pickmap);
         }
         if (flags.initgend == ROLE_RANDOM) {    /* Random gender */
@@ -686,18 +741,31 @@ curses_choose_character()
             }
 
             choices = (const char **) alloc(sizeof (char *) * (n + 1));
+#if 1 /*JP*/
+            choices_en = (const char **) alloc(sizeof (char *) * (n + 1));
+#endif
             pickmap = (int *) alloc(sizeof (int) * (n + 1));
             for (n = 0, i = 0; i < ROLE_ALIGNS; i++) {
                 if (ok_align(flags.initrole, flags.initrace,
                              flags.initgend, i)) {
                     choices[n] = aligns[i].adj;
+#if 1 /*JP*/
+                    choices_en[n] = aligns[i].filecode;
+#endif
                     pickmap[n++] = i;
                 }
             }
             choices[n] = (const char *) 0;
+#if 1 /*JP*/
+            choices_en[n] = (const char *) 0;
+#endif
             /* Permit the user to pick, if there is more than one */
             if (n > 1)
+#if 0 /*JP*/
                 sel = curses_character_dialog(choices,
+#else
+                sel = curses_character_dialog(choices, choices_en,
+#endif
                                    "Choose one of the following alignments:");
             else
                 sel = 0;
@@ -709,6 +777,9 @@ curses_choose_character()
             }
             flags.initalign = sel;
             free((genericptr_t) choices);
+#if 1 /*JP*/
+            free((genericptr_t) choices_en);
+#endif
             free((genericptr_t) pickmap);
         }
         if (flags.initalign == ROLE_RANDOM) {
@@ -723,7 +794,11 @@ curses_choose_character()
 
 /* Prompt user for character race, role, alignment, or gender */
 int
+#if 0 /*JP*/
 curses_character_dialog(const char **choices, const char *prompt)
+#else
+curses_character_dialog(const char **choices, const char **choices_en, const char *prompt)
+#endif
 {
     int count, count2, ret, curletter;
     char used_letters[52];
@@ -735,7 +810,11 @@ curses_character_dialog(const char **choices, const char *prompt)
     curses_start_menu(wid);
 
     for (count = 0; choices[count]; count++) {
+#if 0 /*JP*/
         curletter = tolower(choices[count][0]);
+#else
+        curletter = tolower(choices_en[count][0]);
+#endif
         for (count2 = 0; count2 < count; count2++) {
             if (curletter == used_letters[count2]) {
                 curletter = toupper(curletter);

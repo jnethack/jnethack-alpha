@@ -201,7 +201,11 @@ extern void curses_add_inv(int, int, CHAR_P, attr_t, const char *);
 extern void curses_create_main_windows(void);
 extern void curses_init_nhcolors(void);
 extern void curses_choose_character(void);
+#if 0 /*JP*/
 extern int curses_character_dialog(const char **choices, const char *prompt);
+#else
+extern int curses_character_dialog(const char **choices, const char **choices_en, const char *prompt);
+#endif
 extern void curses_init_options(void);
 extern void curses_display_splash_window(void);
 extern void curses_cleanup(void);
