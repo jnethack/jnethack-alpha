@@ -3,7 +3,6 @@ name: build on windows
 on:
   push:
     branches: [develop]
-  pull_request:
 
 jobs:
   build:
@@ -38,5 +37,4 @@ jobs:
           commit: develop
           replacesArtifacts: true
           prerelease: true
-          token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: ./latest.zip
