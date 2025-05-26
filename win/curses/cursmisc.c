@@ -691,7 +691,11 @@ curses_rtrim(char *str)
     char *s;
 
     for (s = str; *s != '\0'; ++s);
+#if 0 /*JP*/
     for (--s; isspace(*s) && s > str; --s);
+#else
+    for (--s; isspace_8(*s) && s > str; --s);
+#endif
     if (s == str)
         *s = '\0';
     else
