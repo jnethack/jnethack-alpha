@@ -2519,7 +2519,11 @@ query_conditions()
                  valid_conditions[i].id, MENU_UNSELECTED);
     }
 
+#if 0 /*JP*/
     end_menu(tmpwin, "Choose status conditions");
+#else
+    end_menu(tmpwin, "ステータス状態を選んでください");
+#endif
 
     res = select_menu(tmpwin, PICK_ANY, &picks);
     destroy_nhwindow(tmpwin);
@@ -3737,23 +3741,23 @@ choose_value:
 /*JP
         Sprintf(colorqry, "Choose a color for when %s is '%s':",
 */
-        Sprintf(colorqry, "%sが'%s'の時の色を選択:",
+        Sprintf(colorqry, "%sが'%s'の時の色を選んでください:",
                 initblstats[fld].fldname, hilite.textmatch);
 /*JP
         Sprintf(attrqry, "Choose attribute for when %s is '%s':",
 */
-        Sprintf(attrqry, "%sが'%s'の時の属性を選択:",
+        Sprintf(attrqry, "%sが'%s'の時の属性を選んでください:",
                 initblstats[fld].fldname, hilite.textmatch);
     } else if (behavior == BL_TH_ALWAYS_HILITE) {
 /*JP
         Sprintf(colorqry, "Choose a color to always hilite %s:",
 */
-        Sprintf(colorqry, "常に%sをハイライトする色を選択:",
+        Sprintf(colorqry, "常に%sをハイライトする色を選んでください:",
                 initblstats[fld].fldname);
 /*JP
         Sprintf(attrqry, "Choose attribute to always hilite %s:",
 */
-        Sprintf(attrqry, "常に%sをハイライトする属性を選択:",
+        Sprintf(attrqry, "常に%sをハイライトする属性を選んでください:",
                 initblstats[fld].fldname);
     }
 
