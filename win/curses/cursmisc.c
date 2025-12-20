@@ -307,6 +307,9 @@ curses_break_str(const char *str, int width, int line_num)
     char substr[strsize];
     char curstr[strsize];
     char tmpstr[strsize];
+#if 1 /*JP*/
+    int prefix_space;
+#endif
 
     strcpy(substr, str);
 #else
@@ -334,6 +337,10 @@ curses_break_str(const char *str, int width, int line_num)
         for (count = 0; count <= width; count++) {
             if (substr[count] == ' ') {
                 last_space = count;
+#if 1 /*JP*/
+            } else if (is_kanji1(substr, count)) {
+                last_space = count;
+#endif
             } else if (substr[count] == '\0') {
                 last_space = count;
                 break;
@@ -349,10 +356,23 @@ curses_break_str(const char *str, int width, int line_num)
         if (substr[count] == '\0') {
             break;
         }
+#if 0 /*JP*/
         for (count = (last_space + 1); count < (int) strlen(substr); count++) {
             tmpstr[count - (last_space + 1)] = substr[count];
         }
         tmpstr[count - (last_space + 1)] = '\0';
+#else
+        if (substr[last_space] == ' ') {
+            prefix_space = 1;
+        } else {
+            prefix_space = 0;
+        }
+
+        for (count = (last_space + prefix_space); count < (int) strlen(substr); count++) {
+            tmpstr[count - (last_space + prefix_space)] = substr[count];
+        }
+        tmpstr[count - (last_space + prefix_space)] = '\0';
+#endif
         strcpy(substr, tmpstr);
     }
 
@@ -378,6 +398,9 @@ curses_str_remainder(const char *str, int width, int line_num)
 #if __STDC_VERSION__ >= 199901L
     char substr[strsize];
     char tmpstr[strsize];
+#if 1 /*JP*/
+    int prefix_space;
+#endif
 
     strcpy(substr, str);
 #else
@@ -404,6 +427,10 @@ curses_str_remainder(const char *str, int width, int line_num)
         for (count = 0; count <= width; count++) {
             if (substr[count] == ' ') {
                 last_space = count;
+#if 1 /*JP*/
+            } else if (is_kanji1(substr, count)) {
+                last_space = count;
+#endif
             } else if (substr[count] == '\0') {
                 last_space = count;
                 break;
@@ -415,10 +442,23 @@ curses_str_remainder(const char *str, int width, int line_num)
         if (substr[last_space] == '\0') {
             break;
         }
+#if 0 /*JP*/
         for (count = (last_space + 1); count < (int) strlen(substr); count++) {
             tmpstr[count - (last_space + 1)] = substr[count];
         }
         tmpstr[count - (last_space + 1)] = '\0';
+#else
+        if (substr[last_space] == ' ') {
+            prefix_space = 1;
+        } else {
+            prefix_space = 0;
+        }
+
+        for (count = (last_space + prefix_space); count < (int) strlen(substr); count++) {
+            tmpstr[count - (last_space + prefix_space)] = substr[count];
+        }
+        tmpstr[count - (last_space + prefix_space)] = '\0';
+#endif
         strcpy(substr, tmpstr);
     }
 
