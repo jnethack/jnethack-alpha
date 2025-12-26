@@ -1915,10 +1915,18 @@ const char *prompt;
     anything any;
     int i, pick_cnt;
     menu_item *picks = (menu_item *) 0;
+#if 0 /*JP*/
     boolean allow_many = (prompt && !strncmpi(prompt, "Choose", 6));
+#else
+    boolean allow_many = (prompt && strstri(prompt, "選んでください"));
+#endif
     int default_attr = ATR_NONE;
 
+#if 0 /*JP*/
     if (prompt && strstri(prompt, "menu headings"))
+#else
+    if (prompt && strstri(prompt, "メニューヘッダ"))
+#endif
         default_attr = iflags.menu_headings;
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
