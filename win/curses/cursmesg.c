@@ -140,6 +140,10 @@ curses_message_win_puts(const char *message, boolean recursed)
         curses_toggle_color_attr(win, NONE, A_BOLD, ON);
 
     /* will this message fit as-is or do we need to split it? */
+#if 1 /*JP*/
+    /* +1 safety mergin for trailing ">>_".  see curses_block() */
+    width--;
+#endif
     if (mx == border_space && message_length > width - 2) {
         /* split needed */
         tmpstr = curses_break_str(message, (width - 2), 1);
