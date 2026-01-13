@@ -472,6 +472,9 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
     char *tmpstr; /* for free() */
     int maxy, maxx; /* linewrap / scroll */
     int ch;
+#if 1 /*JP*/
+    int tmpch = 0;
+#endif
     int border_space = 0;
     int ltmp, len; /* of answer string */
     boolean border = curses_window_has_border(MESSAGE_WIN);
@@ -687,12 +690,42 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
             }
             break;
         default:
+#if 0 /*JP*/
             p_answer[len++] = ch;
             if (len >= buffer)
                 len = buffer - 1;
             else
                 mvwaddch(win, my, mx, ch);
             p_answer[len] = '\0';
+#else
+            if (tmpch == 0) {
+                if (is_kanji(ch)) {
+                    tmpch = ch;
+                } else {
+                    p_answer[len++] = ch;
+                    if (len >= buffer)
+                        len = buffer - 1;
+                    else
+                        mvwaddch(win, my, mx, ch);
+                    p_answer[len] = '\0';
+                }
+            } else {
+                p_answer[len++] = tmpch;
+                if (len >= buffer)
+                    len = buffer - 1;
+                else
+                    mvwaddch(win, my, mx, tmpch);
+
+                p_answer[len++] = ch;
+                if (len >= buffer)
+                    len = buffer - 1;
+                else
+                    mvwaddch(win, my, mx, ch);
+                p_answer[len] = '\0';
+
+                tmpch = 0;
+            }
+#endif
         }
     }
 
