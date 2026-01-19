@@ -976,6 +976,25 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
    we can use it for condition names and mask bits, avoiding duplication */
 extern const struct condmap valid_conditions[]; /* botl.c */
 
+#if 1 /*JP*/
+/*英語版はルールのパースに必要*/
+static const char *valid_conditions_jp[] = {
+    "石化",     /* BL_MASK_STONE */
+    "どろどろ", /* BL_MASK_SLIME */
+    "窒息",     /* BL_MASK_STRNGL */
+    "食毒",     /* BL_MASK_FOODPOIS */
+    "病気",     /* BL_MASK_TERMILL */
+    "盲目",     /* BL_MASK_BLIND */
+    "耳聾",     /* BL_MASK_DEAF */
+    "眩暈",     /* BL_MASK_STUN */
+    "混乱",     /* BL_MASK_CONF */
+    "幻覚",     /* BL_MASK_HALLU */
+    "浮遊",     /* BL_MASK_LEV */
+    "飛行",     /* BL_MASK_FLY */
+    "騎乗",     /* BL_MASK_RIDE */
+};
+#endif
+
 static void
 curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
                 int *x, int *y,  /* real for vertical, ignored otherwise */
@@ -998,7 +1017,11 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         for (i = 0; i < BL_MASK_BITS; ++i) {
             bitmsk = valid_conditions[i].bitmask;
             if (curses_condition_bits & bitmsk) {
+#if 0 /*JP*/
                 Strcpy(condnam, valid_conditions[i].id);
+#else
+                Strcpy(condnam, valid_conditions_jp[i]);
+#endif
                 Strcat(strcat(condbuf, " "), upstart(condnam));
 #ifdef STATUS_HILITES
                 if (nohilite && *nohilite
@@ -1026,7 +1049,11 @@ curs_stat_conds(int vert_cond, /* 0 => horizontal, 1 => vertical */
         for (i = 0; i < BL_MASK_BITS; ++i) {
             bitmsk = valid_conditions[i].bitmask;
             if (cond_bits & bitmsk) {
+#if 0 /*JP*/
                 Strcpy(condnam, valid_conditions[i].id);
+#else
+                Strcpy(condnam, valid_conditions_jp[i]);
+#endif
                 cndlen = 1 + (int) strlen(condnam); /* count leading space */
                 if (!do_vert) {
                     getyx(win, cy, cx);
