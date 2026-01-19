@@ -976,8 +976,8 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
    we can use it for condition names and mask bits, avoiding duplication */
 extern const struct condmap valid_conditions[]; /* botl.c */
 
-/*英語版はルールのパースに必要*/
 #if 1 /*JP*/
+/*英語版はルールのパースに必要*/
 static const char *valid_conditions_jp[] = {
     "石化",     /* BL_MASK_STONE */
     "どろどろ", /* BL_MASK_SLIME */
