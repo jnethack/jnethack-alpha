@@ -153,11 +153,13 @@ moverock()
             if (Sokoban && u.dx && u.dy) {
                 if (Blind)
                     feel_location(sx, sy);
-/*JP
+#if 0 /*JP:T*/
                 pline("%s won't roll diagonally on this %s.",
-*/
-                pline("%s‚Ìã‚Å‚Í%s‚ÍÎ‚ß‚É‰Ÿ‚¹‚È‚¢D",
                       The(xname(otmp)), surface(sx, sy));
+#else
+                pline("‚±‚±‚Å‚Í%s‚ğÎ‚ß‚É‰Ÿ‚¹‚È‚¢D",
+                      xname(otmp));
+#endif
                 goto cannot_push;
             }
 
