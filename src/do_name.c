@@ -1338,13 +1338,14 @@ const char *name;
     /* dogname & catname are PL_PSIZ arrays; object names have same limit */
     lth = (name && *name) ? ((int) strlen(name) + 1) : 0;
     if (lth > PL_PSIZ) {
-#if 1 /*JP*/
-        if (is_kanji2(buf, lth - 1))
-            --lth;
-#endif
         lth = PL_PSIZ;
         name = strncpy(buf, name, PL_PSIZ - 1);
+#if 0 /*JP*/
         buf[PL_PSIZ - 1] = '\0';
+#else
+        lth -= offset_in_kanji(buf, lth - 1);
+        buf[lth - 1] = '\0';
+#endif
     }
     new_mname(mtmp, lth); /* removes old name if one is present */
     if (lth)
