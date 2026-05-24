@@ -132,7 +132,7 @@ char *buf;        /* input: filtered broadcast text */
         !strncmpi(q = buf, "mail ", 5)) {   /* unexpected alternative */
         typ = MSG_MAIL;
         p = strstri(q, " from");
-        txt = p ? strcat(strcpy(txt_buf, "Mail for you"), p) : (char *) 0;
+        txt = p ? (snprintf(txt_buf, sizeof txt_buf, "Mail for you%s", p), txt_buf) : (char *) 0;
 
         if (!strncmpi(buf, "new mail", 8)) {
             /*
@@ -164,7 +164,8 @@ char *buf;        /* input: filtered broadcast text */
             nam = "STmail";
             cmd = "MSG";
             if (txt && (p = strstri(p, " in ")) != 0) /* specific folder */
-                cmd = strcat(strcpy(cmd_buf, "MSG +"), p + 4);
+                snprintf(cmd_buf, sizeof cmd_buf, "MSG +%s", p + 4);
+                cmd = cmd_buf;
         } else if (q - 2 >= buf && !strncmpi(q - 2, "mm", 2)) {
             /*
              * {MultiNet\ |PMDF\/}MM mail has arrived on FOO from BAR\n
@@ -192,7 +193,8 @@ char *buf;        /* input: filtered broadcast text */
         }
 
         if (!txt)
-            txt = strcat(strcpy(txt_buf, "Mail for you: "), buf);
+            snprintf(txt_buf, sizeof txt_buf, "Mail for you: %s", buf);
+            txt = txt_buf;
 
     /*
      * end of mail recognition; now check for call-type interruptions...
@@ -206,7 +208,8 @@ char *buf;        /* input: filtered broadcast text */
         cmd = "PHONE ANSWER";
         if (!strncmpi(q + 8, " you", 4))
             q += (8 + 4), *q = '\0';
-        txt = strcat(strcpy(txt_buf, "Do you hear ringing?  "), buf);
+        snprintf(txt_buf, sizeof txt_buf, "Do you hear ringing?  %s", buf);
+        txt = txt_buf;
     } else if ((q = strstri(buf, " talk-daemon")) != 0
                || (q = strstri(buf, " talk_daemon")) != 0) {
         /*
