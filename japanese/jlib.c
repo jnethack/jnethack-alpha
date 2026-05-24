@@ -538,8 +538,8 @@ is_kanji1(s, pos)
  * 漢字の先頭位置まで何バイト戻る必要があるかを計算する
  */
 int
-offset_in_kanji(s, pos)
-     const unsigned char *s;
+offset_in_kanji(str, pos)
+     const char *str;
      int pos;
 {
     static int mask[7] = {
@@ -551,6 +551,7 @@ offset_in_kanji(s, pos)
         0xfc,
         0xfe,
     };
+    const unsigned char *s = (unsigned char *)str;
     if (output_kcode == UTF8) {
         int c = 1;
         int i;
