@@ -1321,7 +1321,15 @@ const char *defres; /* only used if EDIT_GETLIN is enabled; only useful
     /* strip leading and trailing spaces, condense internal sequences */
     (void) mungspaces(outbuf);
     if (strlen(outbuf) >= PL_PSIZ)
+#if 0 /*JP*/
         outbuf[PL_PSIZ - 1] = '\0';
+#else
+    {
+        int i = PL_PSIZ - 1;
+        i -= offset_in_kanji(outbuf, i);
+        outbuf[i] = '\0';
+    }
+#endif
     return outbuf;
 }
 
