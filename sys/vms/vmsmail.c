@@ -132,7 +132,16 @@ char *buf;        /* input: filtered broadcast text */
         !strncmpi(q = buf, "mail ", 5)) {   /* unexpected alternative */
         typ = MSG_MAIL;
         p = strstri(q, " from");
-        txt = p ? (snprintf(txt_buf, sizeof txt_buf, "Mail for you%s", p), txt_buf) : (char *) 0;
+#if 0 /*JP*/
+        txt = p ? strcat(strcpy(txt_buf, "Mail for you"), p) : (char *) 0;
+#else
+        if (p) {
+            snprintf(txt_buf, sizeof txt_buf, "Mail for you%s", p);
+            txt = txt_buf;
+        } else {
+            txt = (char *) 0;
+        }
+#endif
 
         if (!strncmpi(buf, "new mail", 8)) {
             /*
@@ -163,9 +172,14 @@ char *buf;        /* input: filtered broadcast text */
              */
             nam = "STmail";
             cmd = "MSG";
-            if (txt && (p = strstri(p, " in ")) != 0) /* specific folder */
+#if 0 /*JP*/
+                cmd = strcat(strcpy(cmd_buf, "MSG +"), p + 4);
+#else
+            if (txt && (p = strstri(p, " in ")) != 0) { /* specific folder */
                 snprintf(cmd_buf, sizeof cmd_buf, "MSG +%s", p + 4);
                 cmd = cmd_buf;
+            }
+#endif
         } else if (q - 2 >= buf && !strncmpi(q - 2, "mm", 2)) {
             /*
              * {MultiNet\ |PMDF\/}MM mail has arrived on FOO from BAR\n
@@ -192,9 +206,14 @@ char *buf;        /* input: filtered broadcast text */
             txt = (char *) 0; /* don't rely on "from" info here */
         }
 
-        if (!txt)
+        if (!txt) {
+#if 0 /*JP*/
+            txt = strcat(strcpy(txt_buf, "Mail for you: "), buf);
+#else
             snprintf(txt_buf, sizeof txt_buf, "Mail for you: %s", buf);
             txt = txt_buf;
+#endif
+        }
 
     /*
      * end of mail recognition; now check for call-type interruptions...
@@ -208,8 +227,12 @@ char *buf;        /* input: filtered broadcast text */
         cmd = "PHONE ANSWER";
         if (!strncmpi(q + 8, " you", 4))
             q += (8 + 4), *q = '\0';
+#if 0 /*JP*/
+        txt = strcat(strcpy(txt_buf, "Do you hear ringing?  "), buf);
+#else
         snprintf(txt_buf, sizeof txt_buf, "Do you hear ringing?  %s", buf);
         txt = txt_buf;
+#endif
     } else if ((q = strstri(buf, " talk-daemon")) != 0
                || (q = strstri(buf, " talk_daemon")) != 0) {
         /*

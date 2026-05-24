@@ -7,7 +7,7 @@ import re
 # regardless of input size or content
 
 MAX_TXT_BUF = 256  # typical fixed stack buffer size
-MAX_CMD_BUF = 256  # typical fixed stack buffer size
+MAX_CMD_BUF = 99  # matches cmd_buf[99] in sys/vms/vmsmail.c
 MAX_USER_LEN = 64
 MAX_NODE_LEN = 64
 
