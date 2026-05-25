@@ -173,11 +173,12 @@ char *buf;        /* input: filtered broadcast text */
             nam = "STmail";
             cmd = "MSG";
 #if 0 /*JP*/
-                cmd = strcat(strcpy(cmd_buf, "MSG +"), p + 4);
+                if (txt && (p = strstri(p, " in ")) != 0) /* specific folder */
+                    cmd = strcat(strcpy(cmd_buf, "MSG +"), p + 4);
 #else
             if (txt && (p = strstri(p, " in ")) != 0) { /* specific folder */
-                snprintf(cmd_buf, sizeof cmd_buf, "MSG +%s", p + 4);
-                cmd = cmd_buf;
+                    snprintf(cmd_buf, sizeof cmd_buf, "MSG +%s", p + 4);
+                    cmd = cmd_buf;
             }
 #endif
         } else if (q - 2 >= buf && !strncmpi(q - 2, "mm", 2)) {
