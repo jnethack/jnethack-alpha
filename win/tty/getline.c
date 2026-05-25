@@ -171,7 +171,7 @@ getlin_hook_proc hook;
 #if 1 /*JP*/
             {
                 int n;
-                n = offset_in_kanji((unsigned char *)tmp, bufp - tmp);
+                n = offset_in_kanji(tmp, bufp - tmp);
                 if (n > 0) {
                     /* Œã‚Å1ƒoƒCƒgˆø‚©‚ê‚é‚Ì‚Å‚»‚Ì•ª‚Í‚±‚±‚Å‚Íˆø‚©‚È‚¢ */
                     bufp = bufp - (n - 1);
