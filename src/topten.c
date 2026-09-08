@@ -1100,7 +1100,7 @@ boolean so;
         } else
             topten_print(car);
         
-            Sprintf(linebuf, "%15s %s", "", cdr);
+        Sprintf(linebuf, "%15s %s", "", cdr);
         lngr = (int)strlen(linebuf);
     }
 /*JP: 日本語が入ると文字列を後から見ていくことはできないためコメントアウト*/
