@@ -1037,8 +1037,10 @@ initoptions()
 void
 initoptions_init()
 {
+#if 0 /*JP*/
 #if (defined(UNIX) || defined(VMS)) && defined(TTY_GRAPHICS)
     char *opts;
+#endif
 #endif
     int i;
 
