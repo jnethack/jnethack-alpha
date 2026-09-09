@@ -1,7 +1,10 @@
+Mon Sep 10 2026  Kentaro Shirakata  <argrath@ub32.org>
+
 	* 次の問題を修正
 	  * 厄介者の召喚で怪物が召喚されない (OSDN:47879)
 	  * Windows版のデフォルトのデータ保存位置が"NetHack"のまま (OSDN:48255)
 	* 配布物からポータブル設定を削除	  
+	* 翻訳追加修正
 
 Sat Feb 23 2023  Kentaro Shirakata  <argrath@ub32.org>
 
