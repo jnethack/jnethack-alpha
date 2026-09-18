@@ -1,4 +1,4 @@
-/* NetHack 3.6	were.c	$NHDT-Date: 1550524568 2019/02/18 21:16:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 5.0	were.c	$NHDT-Date: 1766588485 2025/12/24 07:01:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,23 +11,29 @@
 #include "hack.h"
 
 #if 1 /*JP*/
-STATIC_DCL char *FDECL(beastname, (const char *));
+staticfn char *beastname(const char *);
 
-/*JP uƒWƒƒƒbƒJƒ‹lŠÔv‚©‚çuƒWƒƒƒbƒJƒ‹v‚ğæ‚èo‚· */
-STATIC_OVL char *
-beastname(name)
-const char *name;
+/*JP
+ *ã€Œã‚¸ãƒ£ãƒƒã‚«ãƒ«äººé–“ã€ã‹ã‚‰ã€Œã‚¸ãƒ£ãƒƒã‚«ãƒ«ã€ã‚’å–ã‚Šå‡ºã™ 
+ * å¼•æ•°ã«ã¯å¿…ãšã€Œäººé–“ã€ãŒæœ«å°¾ã«å«ã¾ã‚Œã¦ã„ã‚‹
+ */
+staticfn char *
+beastname(const char *name)
 {
     static char werebuf[BUFSZ];
-    strcpy(werebuf, name);
-    werebuf[strlen(werebuf) - 4] = '\0';
+    int len;
+    int pos;
+    Strcpy(werebuf, name);
+    len = strlen(werebuf);
+    pos = len - strlen("äººé–“");
+    if (pos >= 0)
+        werebuf[pos] = '\0';
     return werebuf;
 }
 #endif
 
 void
-were_change(mon)
-register struct monst *mon;
+were_change(struct monst *mon)
 {
     if (!is_were(mon->data))
         return;
@@ -37,6 +43,7 @@ register struct monst *mon;
             && !rn2(night() ? (flags.moonphase == FULL_MOON ? 3 : 30)
                             : (flags.moonphase == FULL_MOON ? 10 : 50))) {
             new_were(mon); /* change into animal form */
+            gw.were_changes++;
             if (!Deaf && !canseemon(mon)) {
                 const char *howler;
 
@@ -45,35 +52,36 @@ register struct monst *mon;
 /*JP
                     howler = "wolf";
 */
-                    howler = "˜T";
+                    howler = "ç‹¼";
                     break;
                 case PM_WEREJACKAL:
 /*JP
                     howler = "jackal";
 */
-                    howler = "ƒWƒƒƒbƒJƒ‹";
+                    howler = "ã‚¸ãƒ£ãƒƒã‚«ãƒ«";
                     break;
                 default:
                     howler = (char *) 0;
                     break;
                 }
-                if (howler)
+                if (howler) {
+                    Soundeffect(se_canine_howl, 50);
 /*JP
                     You_hear("a %s howling at the moon.", howler);
 */
-                    You_hear("Œ–é‚É%s‚ª–i‚¦‚éº‚ğ•·‚¢‚½D", howler);
+                    You_hear("æœˆå¤œã«%sãŒå ãˆã‚‹å£°ã‚’èã„ãŸï¼", howler);
+                    wake_nearto(mon->mx, mon->my, 4 * 4);
+                }
             }
         }
     } else if (!rn2(30) || Protection_from_shape_changers) {
         new_were(mon); /* change back into human form */
+        gw.were_changes++;
     }
-    /* update innate intrinsics (mainly Drain_resistance) */
-    set_uasmon(); /* new_were() doesn't do this */
 }
 
 int
-counter_were(pm)
-int pm;
+counter_were(int pm)
 {
     switch (pm) {
     case PM_WEREWOLF:
@@ -95,8 +103,7 @@ int pm;
 
 /* convert monsters similar to werecritters into appropriate werebeast */
 int
-were_beastie(pm)
-int pm;
+were_beastie(int pm)
 {
     switch (pm) {
     case PM_WERERAT:
@@ -113,6 +120,7 @@ int pm;
     case PM_WOLF:
     case PM_WARG:
     case PM_WINTER_WOLF:
+    case PM_WINTER_WOLF_CUB:
         return PM_WEREWOLF;
     default:
         break;
@@ -121,47 +129,63 @@ int pm;
 }
 
 void
-new_were(mon)
-register struct monst *mon;
+new_were(struct monst *mon)
 {
-    register int pm;
+    int pm;
+
+    /* neither hero nor werecreature can change from human form to
+       critter form if hero has Protection_from_shape_changers extrinsic;
+       if already in critter form, always change to human form for that */
+    if (Protection_from_shape_changers && is_human(mon->data))
+        return;
 
     pm = counter_were(monsndx(mon->data));
     if (pm < LOW_PM) {
-        impossible("unknown lycanthrope %s.", mon->data->mname);
+        impossible("unknown lycanthrope %s.",
+                    mon->data->pmnames[NEUTRAL]);
         return;
     }
 
     if (canseemon(mon) && !Hallucination)
 #if 0 /*JP:T*/
         pline("%s changes into a %s.", Monnam(mon),
-              is_human(&mons[pm]) ? "human" : mons[pm].mname + 4);
+              is_human(&mons[pm]) ? "human"
+                                  /* pmname()+4: skip past "were" prefix */
+                                  : pmname(&mons[pm], Mgender(mon)) + 4);
 #else
-        pline("%s‚Í%s‚Ìp‚É‚È‚Á‚½D", Monnam(mon),
-              is_human(&mons[pm]) ? "lŠÔ" : beastname(mons[pm].mname));
+        pline("%sã¯%sã®å§¿ã«ãªã£ãŸï¼", Monnam(mon),
+              is_human(&mons[pm]) ? "äººé–“"
+                                 : beastname(pmname(&mons[pm], Mgender(mon))));
 #endif
 
     set_mon_data(mon, &mons[pm]);
-    if (mon->msleeping || !mon->mcanmove) {
+    if (helpless(mon)) {
         /* transformation wakens and/or revitalizes */
         mon->msleeping = 0;
         mon->mfrozen = 0; /* not asleep or paralyzed */
         mon->mcanmove = 1;
     }
     /* regenerate by 1/4 of the lost hit points */
-    mon->mhp += (mon->mhpmax - mon->mhp) / 4;
+    healmon(mon, (mon->mhpmax - mon->mhp) / 4, 0);
     newsym(mon->mx, mon->my);
     mon_break_armor(mon, FALSE);
     possibly_unwield(mon, FALSE);
+
+    /* vision capability isn't changing so we don't call set_apparxy() to
+       update mon's idea of where hero is; peaceful check is redundant */
+    if (svc.context.mon_moving && !mon->mpeaceful
+        && onscary(mon->mux, mon->muy, mon)
+        && monnear(mon, mon->mux, mon->muy))
+        monflee(mon, rn1(9, 2), TRUE, TRUE); /* 2..10 turns */
 }
 
 /* were-creature (even you) summons a horde */
 int
-were_summon(ptr, yours, visible, genbuf)
-struct permonst *ptr;
-boolean yours;
-int *visible; /* number of visible helpers created */
-char *genbuf;
+were_summon(
+    struct permonst *ptr,
+    boolean yours,
+    int *visible, /* number of visible helpers created */
+    char *genbuf)
 {
     int i, typ, pm = monsndx(ptr);
     struct monst *mtmp;
@@ -180,7 +204,7 @@ char *genbuf;
 /*JP
                 Strcpy(genbuf, "rat");
 */
-                Strcpy(genbuf, "ƒlƒYƒ~");
+                Strcpy(genbuf, "ãƒã‚ºãƒŸ");
             break;
         case PM_WEREJACKAL:
         case PM_HUMAN_WEREJACKAL:
@@ -189,7 +213,7 @@ char *genbuf;
 /*JP
                 Strcpy(genbuf, "jackal");
 */
-                Strcpy(genbuf, "ƒWƒƒƒbƒJƒ‹");
+                Strcpy(genbuf, "ã‚¸ãƒ£ãƒƒã‚«ãƒ«");
             break;
         case PM_WEREWOLF:
         case PM_HUMAN_WEREWOLF:
@@ -198,7 +222,7 @@ char *genbuf;
 /*JP
                 Strcpy(genbuf, "wolf");
 */
-                Strcpy(genbuf, "˜T");
+                Strcpy(genbuf, "ç‹¼");
             break;
         default:
             continue;
@@ -210,13 +234,13 @@ char *genbuf;
                 *visible += 1;
         }
         if (yours && mtmp)
-            (void) tamedog(mtmp, (struct obj *) 0);
+            (void) tamedog(mtmp, (struct obj *) 0, FALSE);
     }
     return total;
 }
 
 void
-you_were()
+you_were(void)
 {
     char qbuf[QBUFSZ];
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
@@ -227,20 +251,22 @@ you_were()
 #if 0 /*JP*/
         /* `+4' => skip "were" prefix to get name of beast */
         Sprintf(qbuf, "Do you want to change into %s?",
-                an(mons[u.ulycn].mname + 4));
-#else /* “ú–{Œê‚Å‚Íê—pŠÖ”‚ğg‚¤ */
-        Sprintf(qbuf, "%s‚É•Ï‰»‚µ‚Ü‚·‚©H",
-                beastname(mons[u.ulycn].mname));
+                an(mons[u.ulycn].pmnames[NEUTRAL] + 4));
+#else /* æ—¥æœ¬èªã§ã¯å°‚ç”¨é–¢æ•°ã‚’ä½¿ã† */
+        Sprintf(qbuf, "%sã«å¤‰åŒ–ã—ã¾ã™ã‹ï¼Ÿ",
+                beastname(mons[u.ulycn].pmnames[NEUTRAL]));
 #endif
         if (!paranoid_query(ParanoidWerechange, qbuf))
             return;
+    } else if (monster_nearby()) {
+        return;
     }
+    gw.were_changes++;
     (void) polymon(u.ulycn);
 }
 
 void
-you_unwere(purify)
-boolean purify;
+you_unwere(boolean purify)
 {
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
@@ -248,24 +274,24 @@ boolean purify;
 /*JP
         You_feel("purified.");
 */
-        You("ò‚ß‚ç‚ê‚½‚æ‚¤‚È‹C‚ª‚µ‚½D");
+        You("æµ„ã‚ã‚‰ã‚ŒãŸã‚ˆã†ãªæ°—ãŒã—ãŸï¼");
         set_ulycn(NON_PM); /* cure lycanthropy */
     }
-    if (!Unchanging && is_were(youmonst.data)
+    if (!Unchanging && is_were(gy.youmonst.data)
+        && !monster_nearby()
         && (!controllable_poly
 /*JP
             || !paranoid_query(ParanoidWerechange, "Remain in beast form?")))
 */
-            || !paranoid_query(ParanoidWerechange, "b‚Ìp‚Ì‚Ü‚Ü‚Å‚¢‚éH")))
+            || !paranoid_query(ParanoidWerechange, "ç£ã®å§¿ã®ã¾ã¾ã§ã„ã‚‹ï¼Ÿ")))
         rehumanize();
-    else if (is_were(youmonst.data) && !u.mtimedone)
+    else if (is_were(gy.youmonst.data) && !u.mtimedone)
         u.mtimedone = rn1(200, 200); /* 40% of initial were change */
 }
 
 /* lycanthropy is being caught or cured, but no shape change is involved */
 void
-set_ulycn(which)
-int which;
+set_ulycn(int which)
 {
     u.ulycn = which;
     /* add or remove lycanthrope's innate intrinsics (Drain_resistance) */

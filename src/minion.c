@@ -1,4 +1,4 @@
-/* NetHack 3.6	minion.c	$NHDT-Date: 1575245071 2019/12/02 00:04:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 5.0	minion.c	$NHDT-Date: 1762727599 2025/11/09 14:33:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,21 +10,28 @@
 
 #include "hack.h"
 
+/* used to pick among the four basic elementals without worrying whether
+   they've been reordered (difficulty reassessment?) or any new ones have
+   been introduced (hybrid types added to 'E'-class?) */
+static const int elementals[4] = {
+    PM_AIR_ELEMENTAL, PM_FIRE_ELEMENTAL,
+    PM_EARTH_ELEMENTAL, PM_WATER_ELEMENTAL
+};
+
 void
-newemin(mtmp)
-struct monst *mtmp;
+newemin(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
     if (!EMIN(mtmp)) {
         EMIN(mtmp) = (struct emin *) alloc(sizeof(struct emin));
         (void) memset((genericptr_t) EMIN(mtmp), 0, sizeof(struct emin));
+        EMIN(mtmp)->parentmid = mtmp->m_id;
     }
 }
 
 void
-free_emin(mtmp)
-struct monst *mtmp;
+free_emin(struct monst *mtmp)
 {
     if (mtmp->mextra && EMIN(mtmp)) {
         free((genericptr_t) EMIN(mtmp));
@@ -35,14 +42,15 @@ struct monst *mtmp;
 
 /* count the number of monsters on the level */
 int
-monster_census(spotted)
-boolean spotted; /* seen|sensed vs all */
+monster_census(boolean spotted) /* seen|sensed vs all */
 {
     struct monst *mtmp;
     int count = 0;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
+            continue;
+        if (mtmp->isgd && mtmp->mx == 0)
             continue;
         if (spotted && !canspotmon(mtmp))
             continue;
@@ -53,31 +61,30 @@ boolean spotted; /* seen|sensed vs all */
 
 /* mon summons a monster */
 int
-msummon(mon)
-struct monst *mon;
+msummon(struct monst *mon)
 {
     struct permonst *ptr;
     int dtype = NON_PM, cnt = 0, result = 0, census;
+    boolean xlight;
     aligntyp atyp;
     struct monst *mtmp;
 
     if (mon) {
         ptr = mon->data;
 
-        if (uwep && uwep->oartifact == ART_DEMONBANE && is_demon(ptr)) {
+        if (u_wield_art(ART_DEMONBANE) && is_demon(ptr)) {
             if (canseemon(mon))
 /*JP
                 pline("%s looks puzzled for a moment.", Monnam(mon));
 */
-                pline("%s‚Í­‚µ¢˜f‚µ‚Ä‚¢‚é‚æ‚¤‚¾D", Monnam(mon));
+                pline("%sã¯å°‘ã—å›°æƒ‘ã—ã¦ã„ã‚‹ã‚ˆã†ã ï¼Ž", Monnam(mon));
             return 0;
         }
 
         atyp = mon->ispriest ? EPRI(mon)->shralign
-                             : mon->isminion ? EMIN(mon)->min_align
-                                             : (ptr->maligntyp == A_NONE)
-                                                   ? A_NONE
-                                                   : sgn(ptr->maligntyp);
+               : mon->isminion ? EMIN(mon)->min_align
+                 : (ptr->maligntyp == A_NONE) ? A_NONE
+                   : sgn(ptr->maligntyp);
     } else {
         ptr = &mons[PM_WIZARD_OF_YENDOR];
         atyp = (ptr->maligntyp == A_NONE) ? A_NONE : sgn(ptr->maligntyp);
@@ -93,6 +100,9 @@ struct monst *mon;
                                                         : ndemon(atyp);
         cnt = ((dtype != NON_PM)
                && !rn2(4) && is_ndemon(&mons[dtype])) ? 2 : 1;
+    } else if (ptr == &mons[PM_BONE_DEVIL]) {
+        dtype = PM_SKELETON;
+        cnt = 1;
     } else if (is_ndemon(ptr)) {
         dtype = (!rn2(20)) ? dlord(atyp) : (!rn2(6)) ? ndemon(atyp)
                                                      : monsndx(ptr);
@@ -108,7 +118,7 @@ struct monst *mon;
         if (!rn2(6)) {
             switch (atyp) { /* see summon_minion */
             case A_NEUTRAL:
-                dtype = PM_AIR_ELEMENTAL + rn2(4);
+                dtype = ROLL_FROM(elementals);
                 break;
             case A_CHAOTIC:
             case A_NONE:
@@ -126,13 +136,13 @@ struct monst *mon;
         return 0;
 
     /* sanity checks */
-    if (cnt > 1 && (mons[dtype].geno & G_UNIQ))
+    if (cnt > 1 && (mons[dtype].geno & G_UNIQ) != 0)
         cnt = 1;
     /*
      * If this daemon is unique and being re-summoned (the only way we
      * could get this far with an extinct dtype), try another.
      */
-    if (mvitals[dtype].mvflags & G_GONE) {
+    if ((svm.mvitals[dtype].mvflags & G_GONE) != 0) {
         dtype = ndemon(atyp);
         if (dtype == NON_PM)
             return 0;
@@ -141,9 +151,10 @@ struct monst *mon;
     /* some candidates can generate a group of monsters, so simple
        count of non-null makemon() result is not sufficient */
     census = monster_census(FALSE);
+    xlight = FALSE;
 
     while (cnt > 0) {
-        mtmp = makemon(&mons[dtype], u.ux, u.uy, MM_EMIN);
+        mtmp = makemon(&mons[dtype], u.ux, u.uy, MM_EMIN|MM_NOMSG);
         if (mtmp) {
             result++;
             /* an angel's alignment should match the summoner */
@@ -155,13 +166,38 @@ struct monst *mon;
                 EMIN(mtmp)->renegade =
                     (atyp != u.ualign.type) ^ !mtmp->mpeaceful;
             }
-            if (is_demon(ptr) && canseemon(mtmp))
-/*JP
-                pline("%s appears in a cloud of smoke!", Amonnam(mtmp));
-*/
-                pline("%s‚ª‰Œ‚Ì’†‚©‚çŒ»‚ê‚½I", Amonnam(mtmp));
+
+            if (mtmp->data->mlet == S_ANGEL && !Blind) {
+                /* for any 'A', 'cloud of smoke' will be 'flash of light';
+                   if more than one monster is being created, that message
+                   might be skipped for this monster but show 'mtmp' anyway */
+                show_transient_light((struct obj *) 0, mtmp->mx, mtmp->my);
+                xlight = TRUE;
+                /* we don't do this for 'burst of flame' (fire elemental)
+                   because those monsters become their own light source */
+            }
+
+            if (cnt == 1 && canseemon(mtmp)) {
+                const char *cloud = 0,
+                           *what = msummon_environ(mtmp->data, &cloud);
+
+#if 0 /*JP:T*/
+                pline("%s appears in a %s of %s!", Amonnam(mtmp),
+                      cloud, what);
+#else
+                pline("%sãŒ%sã®ä¸­ã‹ã‚‰ç¾ã‚ŒãŸï¼", Amonnam(mtmp),
+                      what);
+#endif
+            }
         }
         cnt--;
+    }
+
+    if (xlight) {
+        /* Note: if we forced --More-- here, the 'A's would be visible for
+           long enough to be seen, but like with clairvoyance, some players
+           would be annoyed at the disruption of having to acknowledge it */
+        transient_light_cleanup();
     }
 
     /* how many monsters exist now compared to before? */
@@ -172,11 +208,9 @@ struct monst *mon;
 }
 
 void
-summon_minion(alignment, talk)
-aligntyp alignment;
-boolean talk;
+summon_minion(aligntyp alignment, boolean talk)
 {
-    register struct monst *mon;
+    struct monst *mon;
     int mnum;
 
     switch ((int) alignment) {
@@ -184,7 +218,7 @@ boolean talk;
         mnum = lminion();
         break;
     case A_NEUTRAL:
-        mnum = PM_AIR_ELEMENTAL + rn2(4);
+        mnum = ROLL_FROM(elementals);
         break;
     case A_CHAOTIC:
     case A_NONE:
@@ -198,24 +232,24 @@ boolean talk;
     if (mnum == NON_PM) {
         mon = 0;
     } else if (mnum == PM_ANGEL) {
-        mon = makemon(&mons[mnum], u.ux, u.uy, MM_EMIN);
+        mon = makemon(&mons[mnum], u.ux, u.uy, MM_EMIN|MM_NOMSG);
         if (mon) {
             mon->isminion = 1;
             EMIN(mon)->min_align = alignment;
             EMIN(mon)->renegade = FALSE;
         }
     } else if (mnum != PM_SHOPKEEPER && mnum != PM_GUARD
-               && mnum != PM_ALIGNED_PRIEST && mnum != PM_HIGH_PRIEST) {
+               && mnum != PM_ALIGNED_CLERIC && mnum != PM_HIGH_CLERIC) {
         /* This was mons[mnum].pxlth == 0 but is this restriction
            appropriate or necessary now that the structures are separate? */
-        mon = makemon(&mons[mnum], u.ux, u.uy, MM_EMIN);
+        mon = makemon(&mons[mnum], u.ux, u.uy, MM_EMIN|MM_NOMSG);
         if (mon) {
             mon->isminion = 1;
             EMIN(mon)->min_align = alignment;
             EMIN(mon)->renegade = FALSE;
         }
     } else {
-        mon = makemon(&mons[mnum], u.ux, u.uy, NO_MM_FLAGS);
+        mon = makemon(&mons[mnum], u.ux, u.uy, MM_NOMSG);
     }
     if (mon) {
         if (talk) {
@@ -223,24 +257,25 @@ boolean talk;
 /*JP
                 pline_The("voice of %s booms:", align_gname(alignment));
 */
-                pline("%s‚Ìº‚ª‹¿‚¢‚½:", align_gname(alignment));
+                pline("%sã®å£°ãŒéŸ¿ã„ãŸ:", align_gname(alignment));
             else
 #if 0 /*JP:T*/
                 You_feel("%s booming voice:",
                          s_suffix(align_gname(alignment)));
 #else
-                You_feel("%s‚Ì‹¿‚­º‚ðŠ´‚¶‚½:",
-                         s_suffix(align_gname(alignment)));
+                You_feel("%sã®éŸ¿ãå£°ã‚’æ„Ÿã˜ãŸ:",
+                         align_gname(alignment));
 #endif
+            SetVoice(mon, 0, 80, 0);
 /*JP
             verbalize("Thou shalt pay for thine indiscretion!");
 */
-            verbalize("“ðC–³•ª•Ê‚È‚és‚¢‚Ì”±‚ðŽó‚¯‚é‚×‚µI");
+            verbalize("æ±ï¼Œç„¡åˆ†åˆ¥ãªã‚‹è¡Œã„ã®ç½°ã‚’å—ã‘ã‚‹ã¹ã—ï¼");
             if (canspotmon(mon))
 /*JP
                 pline("%s appears before you.", Amonnam(mon));
 */
-                pline("%s‚ª‚ ‚È‚½‚Ì‘O‚ÉŒ»‚í‚ê‚½D", Amonnam(mon));
+                pline("%sãŒã‚ãªãŸã®å‰ã«ç¾ã‚ã‚ŒãŸï¼Ž", Amonnam(mon));
             mon->mstrategy &= ~STRAT_APPEARMSG;
         }
         mon->mpeaceful = FALSE;
@@ -252,16 +287,18 @@ boolean talk;
 
 /* returns 1 if it won't attack. */
 int
-demon_talk(mtmp)
-register struct monst *mtmp;
+demon_talk(struct monst *mtmp)
 {
     long cash, demand, offer;
 
-    if (uwep && uwep->oartifact == ART_EXCALIBUR) {
+    if (u_wield_art(ART_EXCALIBUR) || u_wield_art(ART_DEMONBANE)) {
+        if (canspotmon(mtmp))
 /*JP
-        pline("%s looks very angry.", Amonnam(mtmp));
+            pline("%s looks very angry.", Amonnam(mtmp));
 */
-        pline("%s‚Í‚Æ‚Ä‚à“{‚Á‚Ä‚¢‚é‚æ‚¤‚ÉŒ©‚¦‚éD", Amonnam(mtmp));
+            pline("%sã¯ã¨ã¦ã‚‚æ€’ã£ã¦ã„ã‚‹ã‚ˆã†ã«è¦‹ãˆã‚‹ï¼Ž", Amonnam(mtmp));
+        else
+            You_feel("tension building.");
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);
         newsym(mtmp->mx, mtmp->my);
@@ -272,7 +309,7 @@ register struct monst *mtmp;
         reset_faint(); /* if fainted - wake up */
     } else {
         stop_occupation();
-        if (multi > 0) {
+        if (gm.multi > 0) {
             nomul(0);
             unmul((char *) 0);
         }
@@ -287,34 +324,34 @@ register struct monst *mtmp;
 /*JP
             pline("%s appears before you.", Amonnam(mtmp));
 */
-            pline("%s‚ª–Ú‚Ì‘O‚ÉŒ»‚í‚ê‚½D", Amonnam(mtmp));
+            pline("%sãŒç›®ã®å‰ã«ç¾ã‚ã‚ŒãŸï¼Ž", Amonnam(mtmp));
             mtmp->mstrategy &= ~STRAT_APPEARMSG;
         }
         newsym(mtmp->mx, mtmp->my);
     }
-    if (youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
+    if (gy.youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
         if (!Deaf)
 #if 0 /*JP:T*/
             pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
                   flags.female ? "Sister" : "Brother");
 #else
-        pline("%s‚ÍŒ¾‚Á‚½u‚æ‚¤ŒZ%sIvD‚»‚µ‚ÄÁ‚¦‚½D", Amonnam(mtmp),
-              flags.female ? "–…" : "’í");
+            pline("%sã¯è¨€ã£ãŸã€Œã‚ˆã†å…„%sï¼ã€ï¼Ž", Amonnam(mtmp),
+                  flags.female ? "å¦¹" : "å¼Ÿ");
 #endif
         else if (canseemon(mtmp))
 /*JP
             pline("%s says something.", Amonnam(mtmp));
 */
-            pline("%s‚Í‰½‚©‚ðŒ¾‚Á‚½D", Amonnam(mtmp));
+            pline("%sã¯ä½•ã‹ã‚’è¨€ã£ãŸï¼Ž", Amonnam(mtmp));
         if (!tele_restrict(mtmp))
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
         return 1;
     }
-    cash = money_cnt(invent);
+    cash = money_cnt(gi.invent);
     demand = (cash * (rnd(80) + 20 * Athome))
            / (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
 
-    if (!demand || multi < 0) { /* you have no gold or can't move */
+    if (!demand || gm.multi < 0) { /* you have no gold or can't move */
         mtmp->mpeaceful = 0;
         set_malign(mtmp);
         return 0;
@@ -335,55 +372,60 @@ register struct monst *mtmp;
             pline("%s demands %ld %s for safe passage.",
                   Amonnam(mtmp), demand, currency(demand));
 #else
-            pline("%s‚Í’Ês—¿‚Æ‚µ‚Ä%ld%s—v‹‚µ‚½D",
+            pline("%sã¯é€šè¡Œæ–™ã¨ã—ã¦%ld%sè¦æ±‚ã—ãŸï¼Ž",
                   Amonnam(mtmp), demand, currency(demand));
 #endif
         else if (canseemon(mtmp))
 /*JP
             pline("%s seems to be demanding something.", Amonnam(mtmp));
 */
-            pline("%s‚Í‰½‚©‚ð—v‹‚µ‚Ä‚¢‚é‚æ‚¤‚¾D", Amonnam(mtmp));
-
+            pline("%sã¯ä½•ã‹ã‚’è¦æ±‚ã—ã¦ã„ã‚‹ã‚ˆã†ã ï¼Ž", Amonnam(mtmp));
         offer = 0L;
-        if (!Deaf && ((offer = bribe(mtmp)) >= demand)) {
+        if (!Deaf &&
+/*JP
+            ((offer = bribe(mtmp, "How much will you offer?")) >= demand)) {
+*/
+            ((offer = bribe(mtmp, "ãŠé‡‘ã‚’ã„ãã‚‰ä¸Žãˆã‚‹ï¼Ÿ")) >= demand)) {
 /*JP
             pline("%s vanishes, laughing about cowardly mortals.",
 */
-            pline("‰°•a‚È’è–½‚Ì‚à‚Ì‚ðÎ‚¢‚È‚ª‚çC%s‚ÍÁ‚¦‚½D",
+            pline("è‡†ç—…ãªå®šå‘½ã®ã‚‚ã®ã‚’ç¬‘ã„ãªãŒã‚‰ï¼Œ%sã¯æ¶ˆãˆãŸï¼Ž",
                   Amonnam(mtmp));
         } else if (offer > 0L
                    && (long) rnd(5 * ACURR(A_CHA)) > (demand - offer)) {
 /*JP
             pline("%s scowls at you menacingly, then vanishes.",
 */
-            pline("%s‚Í‚ ‚È‚½‚ðˆÐŠd‚µCÁ‚¦‚½D",
+            pline("%sã¯ã‚ãªãŸã‚’å¨åš‡ã—ï¼Œæ¶ˆãˆãŸï¼Ž",
                   Amonnam(mtmp));
         } else {
 /*JP
             pline("%s gets angry...", Amonnam(mtmp));
 */
-            pline("%s‚Í“{‚Á‚½DDD", Amonnam(mtmp));
+            pline("%sã¯æ€’ã£ãŸï¼Žï¼Žï¼Ž", Amonnam(mtmp));
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             return 0;
         }
     }
+    /* if 'mtmp' is unrecognizable due to hero's hallucination,
+       #chronicle will reveal its true identity -- just live with that;
+       also, avoid random hallucinatory currency() units */
+    livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
+                   x_monnam(mtmp, ARTICLE_A, (char *) 0, EXACT_NAME, FALSE),
+                   offer, (offer == 1L) ? "zorkmid" : "zorkmids");
     mongone(mtmp);
     return 1;
 }
 
 long
-bribe(mtmp)
-struct monst *mtmp;
+bribe(struct monst *mtmp, const char *prompt)
 {
     char buf[BUFSZ] = DUMMY;
     long offer;
-    long umoney = money_cnt(invent);
+    long umoney = money_cnt(gi.invent);
 
-/*JP
-    getlin("How much will you offer?", buf);
-*/
-    getlin("‚¨‹à‚ð‚¢‚­‚ç—^‚¦‚éH", buf);
+    getlin(prompt, buf);
     if (sscanf(buf, "%ld", &offer) != 1)
         offer = 0L;
 
@@ -393,40 +435,39 @@ struct monst *mtmp;
 /*JP
         You("try to shortchange %s, but fumble.", mon_nam(mtmp));
 */
-        You("%s‚ð‚¾‚Ü‚»‚¤‚Æ‚µ‚½‚ªCŽ¸”s‚µ‚½D", mon_nam(mtmp));
+        You("%sã‚’ã ã¾ãã†ã¨ã—ãŸãŒï¼Œå¤±æ•—ã—ãŸï¼Ž", mon_nam(mtmp));
         return 0L;
     } else if (offer == 0L) {
 /*JP
         You("refuse.");
 */
-        You("‹‘‚ñ‚¾D");
+        You("æ‹’ã‚“ã ï¼Ž");
         return 0L;
     } else if (offer >= umoney) {
 /*JP
         You("give %s all your gold.", mon_nam(mtmp));
 */
-        You("%s‚É‚¨‹à‚ð‘S‚Ä—^‚¦‚½D", mon_nam(mtmp));
+        You("%sã«ãŠé‡‘ã‚’å…¨ã¦ä¸ŽãˆãŸï¼Ž", mon_nam(mtmp));
         offer = umoney;
     } else {
 /*JP
         You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
 */
-        You("%s‚É%ld%s—^‚¦‚½D", mon_nam(mtmp), offer, currency(offer));
+        You("%sã«%ld%sä¸ŽãˆãŸï¼Ž", mon_nam(mtmp), offer, currency(offer));
     }
     (void) money2mon(mtmp, offer);
-    context.botl = 1;
+    disp.botl = TRUE;
     return offer;
 }
 
 int
-dprince(atyp)
-aligntyp atyp;
+dprince(aligntyp atyp)
 {
     int tryct, pm;
 
     for (tryct = !In_endgame(&u.uz) ? 20 : 0; tryct > 0; --tryct) {
         pm = rn1(PM_DEMOGORGON + 1 - PM_ORCUS, PM_ORCUS);
-        if (!(mvitals[pm].mvflags & G_GONE)
+        if (!(svm.mvitals[pm].mvflags & G_GONE)
             && (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
             return pm;
     }
@@ -434,14 +475,13 @@ aligntyp atyp;
 }
 
 int
-dlord(atyp)
-aligntyp atyp;
+dlord(aligntyp atyp)
 {
     int tryct, pm;
 
     for (tryct = !In_endgame(&u.uz) ? 20 : 0; tryct > 0; --tryct) {
         pm = rn1(PM_YEENOGHU + 1 - PM_JUIBLEX, PM_JUIBLEX);
-        if (!(mvitals[pm].mvflags & G_GONE)
+        if (!(svm.mvitals[pm].mvflags & G_GONE)
             && (atyp == A_NONE || sgn(mons[pm].maligntyp) == sgn(atyp)))
             return pm;
     }
@@ -450,16 +490,16 @@ aligntyp atyp;
 
 /* create lawful (good) lord */
 int
-llord()
+llord(void)
 {
-    if (!(mvitals[PM_ARCHON].mvflags & G_GONE))
+    if (!(svm.mvitals[PM_ARCHON].mvflags & G_GONE))
         return PM_ARCHON;
 
     return lminion(); /* approximate */
 }
 
 int
-lminion()
+lminion(void)
 {
     int tryct;
     struct permonst *ptr;
@@ -474,8 +514,7 @@ lminion()
 }
 
 int
-ndemon(atyp)
-aligntyp atyp; /* A_NONE is used for 'any alignment' */
+ndemon(aligntyp atyp) /* A_NONE is used for 'any alignment' */
 {
     struct permonst *ptr;
 
@@ -499,8 +538,8 @@ aligntyp atyp; /* A_NONE is used for 'any alignment' */
 
 /* guardian angel has been affected by conflict so is abandoning hero */
 void
-lose_guardian_angel(mon)
-struct monst *mon; /* if null, angel hasn't been created yet */
+lose_guardian_angel(
+    struct monst *mon) /* if Null, angel hasn't been created yet */
 {
     coord mm;
     int i;
@@ -511,16 +550,17 @@ struct monst *mon; /* if null, angel hasn't been created yet */
 /*JP
                 pline("%s rebukes you, saying:", Monnam(mon));
 */
-                pline("%s‚Í‚ ‚È‚½‚ð”ñ“ï‚µ‚½F", Monnam(mon));
+                pline("%sã¯ã‚ãªãŸã‚’éžé›£ã—ãŸï¼š", Monnam(mon));
+                SetVoice(mon, 0, 80, 0);
 /*JP
                 verbalize("Since you desire conflict, have some more!");
 */
-                verbalize("“¬‘ˆ‚ð–]‚ñ‚Å‚¢‚é‚æ‚¤‚¾‚©‚çC‚à‚Á‚Æ—^‚¦‚Ä‚â‚ë‚¤I");
+                verbalize("é—˜äº‰ã‚’æœ›ã‚“ã§ã„ã‚‹ã‚ˆã†ã ã‹ã‚‰ï¼Œã‚‚ã£ã¨ä¸Žãˆã¦ã‚„ã‚ã†ï¼");
             } else {
 /*JP
                 pline("%s vanishes!", Monnam(mon));
 */
-                pline("%s‚ÍÁ‚¦‚½I", Monnam(mon));
+                pline("%sã¯æ¶ˆãˆãŸï¼", Monnam(mon));
             }
         }
         mongone(mon);
@@ -537,7 +577,7 @@ struct monst *mon; /* if null, angel hasn't been created yet */
 
 /* just entered the Astral Plane; receive tame guardian angel if worthy */
 void
-gain_guardian_angel()
+gain_guardian_angel(void)
 {
     struct monst *mtmp;
     struct obj *otmp;
@@ -546,20 +586,21 @@ gain_guardian_angel()
     Hear_again(); /* attempt to cure any deafness now (divine
                      message will be heard even if that fails) */
     if (Conflict) {
-        if (!Deaf)
+       if (!Deaf)
 /*JP
             pline("A voice booms:");
 */
-            pline("º‚ª‹¿‚¢‚½:");
+            pline("å£°ãŒéŸ¿ã„ãŸ:");
         else
 /*JP
             You_feel("a booming voice:");
 */
-            You_feel("‹¿‚­º‚ðŠ´‚¶‚½:");
+            You_feel("éŸ¿ãå£°ã‚’æ„Ÿã˜ãŸ:");
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
 /*JP
         verbalize("Thy desire for conflict shall be fulfilled!");
 */
-        verbalize("u“ð‚Ì“¬‘ˆ‚Ö‚Ì–]‚ÝC‚©‚È‚¦‚ç‚ê‚é‚×‚µIv");
+        verbalize("æ±ã®é—˜äº‰ã¸ã®æœ›ã¿ï¼Œã‹ãªãˆã‚‰ã‚Œã‚‹ã¹ã—ï¼");
         /* send in some hostile angels instead */
         lose_guardian_angel((struct monst *) 0);
     } else if (u.ualign.record > 8) { /* fervent */
@@ -567,16 +608,17 @@ gain_guardian_angel()
 /*JP
             pline("A voice whispers:");
 */
-            pline("‚³‚³‚â‚«º‚ª•·‚±‚¦‚½:");
+            pline("ã•ã•ã‚„ãå£°ãŒèžã“ãˆãŸ:");
         else
 /*JP
             You_feel("a soft voice:");
 */
-            You_feel("‚â‚í‚ç‚©‚¢º‚ðŠ´‚¶‚½:");
+            You_feel("ã‚„ã‚ã‚‰ã‹ã„å£°ã‚’æ„Ÿã˜ãŸ:");
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
 /*JP
         verbalize("Thou hast been worthy of me!");
 */
-        verbalize("u“ðC‰ä‚ª•]‰¿‚ð“¾‚½‚èIv");
+        verbalize("æ±ï¼Œæˆ‘ãŒè©•ä¾¡ã‚’å¾—ãŸã‚Šï¼");
         mm.x = u.ux;
         mm.y = u.uy;
         if (enexto(&mm, mm.x, mm.y, &mons[PM_ANGEL])
@@ -588,19 +630,25 @@ gain_guardian_angel()
              * [Note: this predates mon->mextra which allows a monster
              * to have both emin and edog at the same time.]
              */
-            mtmp->mtame = 10;
+            /* Too nasty for the game to unexpectedly break petless conduct on
+             * the final level of the game. The angel will still appear, but
+             * won't be tamed. */
+            if (u.uconduct.pets) {
+                mtmp->mtame = 10;
+                u.uconduct.pets++;
+            }
             /* for 'hilite_pet'; after making tame, before next message */
             newsym(mtmp->mx, mtmp->my);
             if (!Blind)
 /*JP
                 pline("An angel appears near you.");
 */
-                pline("“VŽg‚ª‚ ‚È‚½‚Ì‚»‚Î‚ÉŒ»‚í‚ê‚½D");
+                pline("å¤©ä½¿ãŒã‚ãªãŸã®ãã°ã«ç¾ã‚ã‚ŒãŸï¼Ž");
             else
 /*JP
                 You_feel("the presence of a friendly angel near you.");
 */
-                You("‹ß‚­‚É—FD“I‚È“VŽg‚Ì‘¶Ý‚ðŠ´‚¶‚½D");
+                You_feel("è¿‘ãã«å‹å¥½çš„ãªå¤©ä½¿ã®å­˜åœ¨ã‚’æ„Ÿã˜ãŸï¼Ž");
             /* make him strong enough vs. endgame foes */
             mtmp->m_lev = rn1(8, 15);
             mtmp->mhp = mtmp->mhpmax =

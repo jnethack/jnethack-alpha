@@ -1,7 +1,0 @@
-#! /bin/sh
-
-if [ `uname` = "Darwin" ]; then
-    sh japanese/set_mac.sh
-elif [ `uname` = "Linux" ]; then
-    sh japanese/set_lnx.sh
-fi

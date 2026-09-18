@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1575245065 2019/12/02 00:04:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.168 $ */
+/* NetHack 5.0	mhitu.c	$NHDT-Date: 1775259433 2026/04/03 15:37:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,223 +11,294 @@
 #include "hack.h"
 #include "artifact.h"
 
-STATIC_VAR NEARDATA struct obj *mon_currwep = (struct obj *) 0;
+static NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 
-STATIC_DCL boolean FDECL(u_slip_free, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(passiveum, (struct permonst *, struct monst *,
-                                 struct attack *));
-STATIC_DCL void FDECL(mayberem, (struct monst *, const char *,
-                                 struct obj *, const char *));
-STATIC_DCL boolean FDECL(diseasemu, (struct permonst *));
-STATIC_DCL int FDECL(hitmu, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(gulpmu, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(explmu, (struct monst *, struct attack *, BOOLEAN_P));
-STATIC_DCL void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
-STATIC_DCL void FDECL(mswings, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(wildmiss, (struct monst *, struct attack *));
-STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
+staticfn void missmu(struct monst *, boolean, struct attack *);
+staticfn void mswings(struct monst *, struct obj *, boolean);
+staticfn void wildmiss(struct monst *, struct attack *);
+staticfn void calc_mattacku_vars(struct monst *, boolean *, boolean *,
+                                 boolean *, boolean *);
+staticfn void summonmu(struct monst *, boolean);
+staticfn int hitmu(struct monst *, struct attack *);
+staticfn int gulpmu(struct monst *, struct attack *);
+staticfn int explmu(struct monst *, struct attack *, boolean);
+staticfn void mayberem(struct monst *, const char *, struct obj *,
+                       const char *);
+staticfn int assess_dmg(struct monst *, int);
+staticfn int passiveum(struct permonst *, struct monst *, struct attack *);
 
-/* See comment in mhitm.c.  If we use this a lot it probably should be */
-/* changed to a parameter to mhitu. */
-static int dieroll;
+#define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
 
-STATIC_OVL void
-hitmsg(mtmp, mattk)
-struct monst *mtmp;
-struct attack *mattk;
+/* monster hits hero (most callers have been moved to uthim.c) */
+void
+hitmsg(struct monst *mtmp, struct attack *mattk)
 {
     int compat;
-    const char *pfmt = 0;
+#if 0 /*JP:T*/
+    const char *verb = 0, *again, *punct = "!";
+#else
+    const char *verb = 0, *again, *punct = "ï¼";
+#endif
     char *Monst_name = Monnam(mtmp);
 
-    /* Note: if opposite gender, "seductively" */
-    /* If same gender, "engagingly" for nymph, normal msg for others */
-    if ((compat = could_seduce(mtmp, &youmonst, mattk)) != 0
+    /* Note: if opposite gender, "seductively";
+       if same gender, "engagingly" for nymph, normal msg for others. */
+    if ((compat = could_seduce(mtmp, &gy.youmonst, mattk)) != 0
         && !mtmp->mcan && !mtmp->mspec_used) {
 #if 0 /*JP:T*/
-        pline("%s %s you %s.", Monst_name,
+        pline_mon(mtmp, "%s %s you %s.", Monst_name,
               !Blind ? "smiles at" : !Deaf ? "talks to" : "touches",
               (compat == 2) ? "engagingly" : "seductively");
 #else
-        pline("%s‚Í‚ ‚È‚½%s%sD", Monst_name,
-              (compat == 2) ? "‚ğˆø‚«‚Â‚¯‚é‚æ‚¤‚É" : "‚ÉDˆÓ‚ğ‚æ‚¹‚é‚æ‚¤‚É",
-              !Blind ? "”÷Î‚ñ‚¾" : !Deaf ? "˜b‚µ‚©‚¯‚½" : "G‚ê‚½");
+        pline_mon(mtmp, "%sã¯ã‚ãªãŸ%s%sï¼", Monst_name,
+              (compat == 2) ? "ã‚’å¼•ãã¤ã‘ã‚‹ã‚ˆã†ã«" : "ã«å¥½æ„ã‚’ã‚ˆã›ã‚‹ã‚ˆã†ã«",
+              !Blind ? "å¾®ç¬‘ã‚“ã " : !Deaf ? "è©±ã—ã‹ã‘ãŸ" : "è§¦ã‚ŒãŸ");
 #endif
     } else {
         switch (mattk->aatyp) {
         case AT_BITE:
-/*JP
-            pfmt = "%s bites!";
-*/
-            pfmt = "%s‚ÍŠš‚İ‚Â‚¢‚½I";
+#if 0 /*JP:T*/
+            verb = "bites";
+#else
+            verb = "ã¯å™›ã¿ã¤ã„ãŸ";
+#endif
             break;
         case AT_KICK:
+            if (thick_skinned(gy.youmonst.data))
 #if 0 /*JP:T*/
-            pline("%s kicks%c", Monst_name,
-                  thick_skinned(youmonst.data) ? '.' : '!');
+                punct = ".";
 #else
-            pline("%s‚ÍR‚Æ‚Î‚µ‚½%s",Monnam(mtmp), 
-                  thick_skinned(youmonst.data) ? "D" : "I");
+                punct = "ï¼";
+#endif
+#if 0 /*JP:T*/
+            verb = "kicks";
+#else
+            verb = "ã¯è¹´ã¨ã°ã—ãŸ";
 #endif
             break;
         case AT_STNG:
-/*JP
-            pfmt = "%s stings!";
-*/
-            pfmt = "%s‚Í“Ë‚«‚³‚µ‚½I";
+#if 0 /*JP:T*/
+            verb = "stings";
+#else
+            verb = "ã¯çªãã•ã—ãŸ";
+#endif
             break;
         case AT_BUTT:
-/*JP
-            pfmt = "%s butts!";
-*/
-            pfmt = "%s‚Í“ª“Ë‚«‚ğ‚­‚ç‚í‚µ‚½I";
+#if 0 /*JP:T*/
+            verb = "butts";
+#else
+            verb = "ã¯é ­çªãã‚’ãã‚‰ã‚ã—ãŸ";
+#endif
             break;
         case AT_TUCH:
-/*JP
-            pfmt = "%s touches you!";
-*/
-            pfmt = "%s‚Í‚ ‚È‚½‚ÉG‚ê‚½I";
+#if 0 /*JP:T*/
+            verb = "touches you";
+#else
+            verb = "ã¯ã‚ãªãŸã«è§¦ã‚ŒãŸ";
+#endif
             break;
         case AT_TENT:
-/*JP
-            pfmt = "%s tentacles suck you!";
-*/
-            pfmt = "%s‚ÌGè‚ª‚ ‚È‚½‚Ì‘Ì‰t‚ğ‹z‚¢‚Æ‚Á‚½I";
-#if 0 /*JP*/
+#if 0 /*JP:T*/
+            verb = "tentacles suck your brain";
             Monst_name = s_suffix(Monst_name);
+#else
+            verb = "ã®è§¦æ‰‹ãŒã‚ãªãŸã®ä½“æ¶²ã‚’å¸ã„ã¨ã£ãŸ";
 #endif
             break;
         case AT_EXPL:
         case AT_BOOM:
-/*JP
-            pfmt = "%s explodes!";
-*/
-            pfmt = "%s‚Í”š”­‚µ‚½I";
+#if 0 /*JP:T*/
+            verb = "explodes";
+#else
+            verb = "ã¯çˆ†ç™ºã—ãŸ";
+#endif
             break;
         default:
-/*JP
-            pfmt = "%s hits!";
-*/
-            pfmt = "%s‚ÌUŒ‚‚Í–½’†‚µ‚½I";
+#if 0 /*JP:T*/
+            verb = "hits";
+#else
+            verb = "ã®æ”»æ’ƒã¯å‘½ä¸­ã—ãŸ";
+#endif
         }
-        if (pfmt)
-            pline(pfmt, Monst_name);
+        /* if a monster hits more than once with similar attack, say so */
+#if 0 /*JP*//*æ—¥æœ¬èªã§ã¯ã‚„ã‚‰ãªãã¦ã‚ˆã•ãã†*/
+        again = (mtmp->m_id == gh.hitmsg_mid
+                 && gh.hitmsg_prev != NULL
+                 && mattk == gh.hitmsg_prev + 1
+                 && mattk->aatyp == gh.hitmsg_prev->aatyp) ? " again" : "";
+#endif
+#if 0 /*JP:T*/
+        pline_mon(mtmp, "%s %s%s%s", Monst_name, verb, again, punct);
+#else
+        pline_mon(mtmp, "%s%s%s", Monst_name, verb, punct);
+#endif
     }
+    gh.hitmsg_mid = mtmp->m_id;
+    gh.hitmsg_prev = mattk;
 }
 
 /* monster missed you */
-STATIC_OVL void
-missmu(mtmp, nearmiss, mattk)
-struct monst *mtmp;
-boolean nearmiss;
-struct attack *mattk;
+staticfn void
+missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 {
+    gh.hitmsg_mid = 0;
+    gh.hitmsg_prev = NULL;
+
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
 
-    if (could_seduce(mtmp, &youmonst, mattk) && !mtmp->mcan)
+    if (could_seduce(mtmp, &gy.youmonst, mattk) && !mtmp->mcan)
 /*JP
-        pline("%s pretends to be friendly.", Monnam(mtmp));
+        pline_mon(mtmp, "%s pretends to be friendly.", Monnam(mtmp));
 */
-        pline("%s‚Í—FD“I‚È‚Ó‚è‚ğ‚µ‚Ä‚¢‚éD",Monnam(mtmp));
+        pline_mon(mtmp, "%sã¯å‹å¥½çš„ãªãµã‚Šã‚’ã—ã¦ã„ã‚‹ï¼",Monnam(mtmp));
     else
 #if 0 /*JP:T*/
-        pline("%s %smisses!", Monnam(mtmp),
-              (nearmiss && flags.verbose) ? "just " : "");
+        pline_mon(mtmp, "%s %smisses!", Monnam(mtmp),
+                  (nearmiss && flags.verbose) ? "just " : "");
 #else
-        pline("%s‚ÌUŒ‚‚Í%s‚½D", Monnam(mtmp),
-              (nearmiss && flags.verbose) ? "‹ó‚ğØ‚Á" : "‚Í‚¸‚ê");
+        pline_mon(mtmp, "%sã®æ”»æ’ƒã¯%sãŸï¼", Monnam(mtmp),
+                  (nearmiss && flags.verbose) ? "ç©ºã‚’åˆ‡ã£" : "ã¯ãšã‚Œ");
 #endif
 
     stop_occupation();
 }
 
+/* strike types P|S|B: Pierce (pointed: stab) => "thrusts",
+   Slash (edged: slice) or whack (blunt: Bash) => "swings" */
+const char *
+mswings_verb(
+    struct obj *mwep, /* attacker's weapon */
+    boolean bash)     /* True: using polearm while too close */
+{
+    const char *verb;
+    int otyp = mwep->otyp,
+        /* (monsters don't actually wield towels, wet or otherwise) */
+        lash = (objects[otyp].oc_skill == P_WHIP || is_wet_towel(mwep)),
+        /* some weapons can have more than one strike type; for those,
+           give a mix of thrust and swing (caller doesn't care either way) */
+        thrust = ((objects[otyp].oc_dir & PIERCE) != 0
+                  && ((objects[otyp].oc_dir & ~PIERCE) == 0 || !rn2(2)));
+
+#if 0 /*JP:T*/
+    verb = bash ? "bashes with" /*sigh*/
+           : lash ? "lashes"
+             : thrust ? "thrusts"
+               : "swings";
+#else
+    verb = bash ? "ã‚’ãªãã‚Šã¤ã‘ãŸ" /*sigh*/
+           : lash ? "ã‚’å©ã„ãŸ"
+             : thrust ? "ã‚’çªã„ãŸ"
+               : "ã‚’æŒ¯ã‚Šã¾ã‚ã—ãŸ";
+#endif
+    /* (might have caller also pass attacker's formatted name so that
+       if hallucination makes that be plural, we could use vtense() to
+       adjust the result to match) */
+    return verb;
+}
+
 /* monster swings obj */
-STATIC_OVL void
-mswings(mtmp, otemp)
-struct monst *mtmp;
-struct obj *otemp;
+staticfn void
+mswings(
+    struct monst *mtmp, /* attacker */
+    struct obj *otemp,  /* attacker's weapon */
+    boolean bash)       /* True: polearm used at too close range */
 {
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
 #if 0 /*JP*/
-        pline("%s %s %s%s %s.", Monnam(mtmp),
-              (objects[otemp->otyp].oc_dir & PIERCE) ? "thrusts" : "swings",
-              (otemp->quan > 1L) ? "one of " : "", mhis(mtmp), xname(otemp));
+        pline_mon(mtmp, "%s %s %s%s %s.", Monnam(mtmp),
+                  mswings_verb(otemp, bash),
+                  (otemp->quan > 1L) ? "one of " : "",
+                  mhis(mtmp), xname(otemp));
 #else
-        pline("%s‚Í%s%sD", Monnam(mtmp),
-              xname(otemp),
-              (objects[otemp->otyp].oc_dir & PIERCE) ? "‚ğ“Ë‚¢‚½" : "‚ğU‚è‚Ü‚í‚µ‚½");
+        pline_mon(mtmp, "%sã¯%s%s%sï¼", Monnam(mtmp),
+                  xname(otemp), 
+                  (otemp->quan > 1L) ? "ã®ã²ã¨ã¤" : "",
+                  mswings_verb(otemp, bash));
 #endif
     }
 }
 
 /* return how a poison attack was delivered */
 const char *
-mpoisons_subj(mtmp, mattk)
-struct monst *mtmp;
-struct attack *mattk;
+mpoisons_subj(
+    struct monst *mtmp,
+    struct attack *mattk)
 {
     if (mattk->aatyp == AT_WEAP) {
-        struct obj *mwep = (mtmp == &youmonst) ? uwep : MON_WEP(mtmp);
+        struct obj *mwep = (mtmp == &gy.youmonst) ? uwep : MON_WEP(mtmp);
         /* "Foo's attack was poisoned." is pretty lame, but at least
            it's better than "sting" when not a stinging attack... */
 /*JP
         return (!mwep || !mwep->opoisoned) ? "attack" : "weapon";
 */
-        return (!mwep || !mwep->opoisoned) ? "UŒ‚" : "•Ší";
+        return (!mwep || !mwep->opoisoned) ? "æ”»æ’ƒ" : "æ­¦å™¨";
     } else {
 #if 0 /*JP:T*/
         return (mattk->aatyp == AT_TUCH) ? "contact"
                   : (mattk->aatyp == AT_GAZE) ? "gaze"
                        : (mattk->aatyp == AT_BITE) ? "bite" : "sting";
 #else
-        return (mattk->aatyp == AT_TUCH) ? "ÚG"
-                  : (mattk->aatyp == AT_GAZE) ? "‚É‚ç‚İ"
-                       : (mattk->aatyp == AT_BITE) ? "Šš‚İ‚Â‚«" : "“Ë‚«‚³‚µ";
+        return (mattk->aatyp == AT_TUCH) ? "æ¥è§¦"
+                  : (mattk->aatyp == AT_GAZE) ? "ã«ã‚‰ã¿"
+                       : (mattk->aatyp == AT_BITE) ? "å™›ã¿ã¤ã" : "çªãã•ã—";
 #endif
     }
 }
 
 /* called when your intrinsic speed is taken away */
 void
-u_slow_down()
+u_slow_down(void)
 {
     HFast = 0L;
     if (!Fast)
 /*JP
         You("slow down.");
 */
-        You("“®‚«‚ª’x‚­‚È‚Á‚½D");
+        You("å‹•ããŒé…ããªã£ãŸï¼");
     else /* speed boots */
 /*JP
         Your("quickness feels less natural.");
 */
-        You("‘¬‚³‚É‚Â‚¢‚Ä‚¢‚¯‚È‚­‚È‚Á‚½D");
+        You("é€Ÿã•ã«ã¤ã„ã¦ã„ã‘ãªããªã£ãŸï¼");
     exercise(A_DEX, FALSE);
 }
 
-/* monster attacked your displaced image */
-STATIC_OVL void
-wildmiss(mtmp, mattk)
-struct monst *mtmp;
-struct attack *mattk;
+/* monster attacked wrong location due to monster blindness, hero
+   invisibility, hero displacement, or hero being underwater */
+staticfn void
+wildmiss(struct monst *mtmp, struct attack *mattk)
 {
     int compat;
-    const char *Monst_name; /* Monnam(mtmp) */
+    const char *Monst_name; /* Monnam(), deferred until after early returns */
+    /* expected reasons for wildmiss() */
+    boolean unotseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data))),
+            unotthere = (Displaced != 0), usubmerged = (Underwater != 0);
+
+    /* the reasons for wildmiss end up getting checked twice so that the
+       impossible can be given, if warranted, before the early returns */
+    if (!unotseen && !unotthere && !usubmerged) {
+        /* this used to be the 'else' case below */
+        impossible("%s attacks you without knowing your location?",
+                   Some_Monnam(mtmp));
+        return;
+    }
 
     /* no map_invisible() -- no way to tell where _this_ is coming from */
 
     if (!flags.verbose)
         return;
+    /* no feedback if hero doesn't see the monster's spot */
     if (!cansee(mtmp->mx, mtmp->my))
         return;
     /* maybe it's attacking an image around the corner? */
 
     compat = ((mattk->adtyp == AD_SEDU || mattk->adtyp == AD_SSEX)
-              ? could_seduce(mtmp, &youmonst, mattk) : 0);
+              ? could_seduce(mtmp, &gy.youmonst, mattk) : 0);
     Monst_name = Monnam(mtmp);
 
-    if (!mtmp->mcansee || (Invis && !perceives(mtmp->data))) {
+    set_msg_xy(mtmp->mx, mtmp->my);
+    if (unotseen) { /* !mtmp->cansee || (Invis && !perceives(mtmp->data)) */
 #if 0 /*JP:T*/
         const char *swings = (mattk->aatyp == AT_BITE) ? "snaps"
                              : (mattk->aatyp == AT_KICK) ? "kicks"
@@ -236,55 +307,55 @@ struct attack *mattk;
                                   || nolimbs(mtmp->data)) ? "lunges"
                                  : "swings";
 #else
-        const char *swings = (mattk->aatyp == AT_BITE) ? "Šš‚İ‚Â‚­"
-                             : (mattk->aatyp == AT_KICK) ? "R‚Æ‚Î‚·"
+        const char *swings = (mattk->aatyp == AT_BITE) ? "å™›ã¿ã¤ã"
+                             : (mattk->aatyp == AT_KICK) ? "è¹´ã¨ã°ã™"
                                : (mattk->aatyp == AT_STNG
                                   || mattk->aatyp == AT_BUTT
-                                  || nolimbs(mtmp->data)) ? "“Ëi‚·‚é"
-                                 : "U‚è‰ñ‚·";
+                                  || nolimbs(mtmp->data)) ? "çªé€²ã™ã‚‹"
+                                 : "æŒ¯ã‚Šå›ã™";
 #endif
 
-        if (compat)
+        if (compat) {
 /*JP
             pline("%s tries to touch you and misses!", Monst_name);
 */
-            pline("%s‚Í‚ ‚È‚½‚ÉG‚ë‚¤‚Æ‚µ‚½‚ª¸”s‚µ‚½I", Monst_name);
-        else
+            pline("%sã¯ã‚ãªãŸã«è§¦ã‚ã†ã¨ã—ãŸãŒå¤±æ•—ã—ãŸï¼", Monst_name);
+        } else {
             switch (rn2(3)) {
             case 0:
 /*JP
                 pline("%s %s wildly and misses!", Monst_name, swings);
 */
-                pline("%s‚ÍŒƒ‚µ‚­%s‚ªC‚Í‚¸‚µ‚½I", Monst_name, swings);
+                pline("%sã¯æ¿€ã—ã%sãŒï¼Œã¯ãšã—ãŸï¼", Monst_name, swings);
                 break;
             case 1:
 /*JP
                 pline("%s attacks a spot beside you.", Monst_name);
 */
-                pline("%s‚ÌUŒ‚‚Í‚ ‚È‚½‚Ì˜e• ‚ğ‚©‚·‚ß‚½D", Monst_name);
+                pline("%sã®æ”»æ’ƒã¯ã‚ãªãŸã®è„‡è…¹ã‚’ã‹ã™ã‚ãŸï¼", Monst_name);
                 break;
             case 2:
 #if 0 /*JP:T*/
                 pline("%s strikes at %s!", Monst_name,
-                      (levl[mtmp->mux][mtmp->muy].typ == WATER)
+                      is_waterwall(mtmp->mux,mtmp->muy)
                         ? "empty water"
                         : "thin air");
 #else
-                pline("%s‚Í%s‚ğ‘Å‚¿‚Â‚¯‚½I", Monst_name,
-                      (levl[mtmp->mux][mtmp->muy].typ == WATER)
-                        ? "…"
-                        : "‰½‚à‚È‚¢‚Æ‚±‚ë");
+                pline("%sã¯%sã‚’æ‰“ã¡ã¤ã‘ãŸï¼", Monst_name,
+                      is_waterwall(mtmp->mux,mtmp->muy)
+                        ? "æ°´"
+                        : "ä½•ã‚‚ãªã„ã¨ã“ã‚");
 #endif
                 break;
             default:
 /*JP
                 pline("%s %s wildly!", Monst_name, swings);
 */
-                pline("%s‚ÍŒƒ‚µ‚­%sI", Monst_name, swings);
+                pline("%sã¯æ¿€ã—ã%sï¼", Monst_name, swings);
                 break;
             }
-
-    } else if (Displaced) {
+        }
+    } else if (unotthere) { /* Displaced */
         /* give 'displaced' message even if hero is Blind */
         if (compat)
 #if 0 /*JP:T*/
@@ -292,9 +363,9 @@ struct attack *mattk;
                   (compat == 2) ? "engagingly" : "seductively",
                   Invis ? "invisible " : "");
 #else
-            pline("%s‚Í%s‚ ‚È‚½‚ÌŒ¶‰e‚É‘Î‚µ‚Ä%s”÷Î‚ñ‚¾DDD", Monst_name,
-                  Invis ? "“§–¾‚È" : "",
-                  (compat == 2) ? "–£—Í“I‚É" : "—U˜f“I‚É");
+            pline("%sã¯%sã‚ãªãŸã®å¹»å½±ã«å¯¾ã—ã¦%så¾®ç¬‘ã‚“ã ï¼ï¼ï¼", Monst_name,
+                  Invis ? "é€æ˜ãª" : "",
+                  (compat == 2) ? "é­…åŠ›çš„ã«" : "èª˜æƒ‘çš„ã«");
 #endif
         else
 #if 0 /*JP:T*/
@@ -304,42 +375,45 @@ struct attack *mattk;
                    * image, since the displaced image is also invisible. */
                   Monst_name, Invis ? "invisible " : "");
 #else
-            pline("%s‚Í‚ ‚È‚½‚Ì%sŒ¶‰e‚ğUŒ‚‚µC‚Í‚¸‚µ‚½I",
-                  Monst_name, Invis ? "“§–¾‚È" : "");
+            pline("%sã¯ã‚ãªãŸã®%så¹»å½±ã‚’æ”»æ’ƒã—ï¼Œã¯ãšã—ãŸï¼",
+                  Monst_name, Invis ? "é€æ˜ãª" : "");
 #endif
 
-    } else if (Underwater) {
+    } else if (usubmerged) { /* Underwater */
         /* monsters may miss especially on water level where
            bubbles shake the player here and there */
         if (compat)
 /*JP
             pline("%s reaches towards your distorted image.", Monst_name);
 */
-            pline("%s‚Í‚ ‚È‚½‚Ì˜c‚ñ‚¾Œ¶‰e‚Ì•û‚ÖŒü‚©‚Á‚½D", Monst_name);
+            pline("%sã¯ã‚ãªãŸã®æ­ªã‚“ã å¹»å½±ã®æ–¹ã¸å‘ã‹ã£ãŸï¼", Monst_name);
         else
 /*JP
             pline("%s is fooled by water reflections and misses!",
 */
-            pline("%s‚Í…‚Ì”½Ë‚É‚¾‚Ü‚³‚êC‚Í‚¸‚µ‚½I",
+            pline("%sã¯æ°´ã®åå°„ã«ã ã¾ã•ã‚Œï¼Œã¯ãšã—ãŸï¼",
                   Monst_name);
 
-    } else
-        impossible("%s attacks you without knowing your location?",
-                   Monst_name);
+    } else {
+        ; /*NOTREACHED*/
+    }
 }
 
 void
-expels(mtmp, mdat, message)
-struct monst *mtmp;
-struct permonst *mdat; /* if mtmp is polymorphed, mdat != mtmp->data */
-boolean message;
+expels(
+    struct monst *mtmp,
+    struct permonst *mdat, /* if mtmp is polymorphed, mdat != mtmp->data */
+    boolean message)
 {
+    disp.botl = TRUE;
     if (message) {
-        if (is_animal(mdat)) {
+        if (digests(mdat)) {
 /*JP
             You("get regurgitated!");
 */
-            You("“f‚«‚¾‚³‚ê‚½I");
+            You("åãã ã•ã‚ŒãŸï¼");
+        } else if (enfolds(mdat)) {
+            pline_mon(mtmp, "%s unfolds and you are released!", Monnam(mtmp));
         } else {
             char blast[40];
             struct attack *attk = attacktype_fordmg(mdat, AT_ENGL, AD_ANY);
@@ -354,60 +428,66 @@ boolean message;
 /*JP
                         Strcpy(blast, " in a shower of sparks");
 */
-                        Strcpy(blast, "‚Ì‰Î‰Ô‚Ì‰J‚Ì’†‚©‚ç");
+                        Strcpy(blast, "ã®ç«èŠ±ã®é›¨ã®ä¸­ã‹ã‚‰");
                         break;
                     case AD_COLD:
 /*JP
                         Strcpy(blast, " in a blast of frost");
 */
-                        Strcpy(blast, "‚Ì—â‹C‚Ì•—‚Ì’†‚©‚ç");
+                        Strcpy(blast, "ã®å†·æ°—ã®é¢¨ã®ä¸­ã‹ã‚‰");
                         break;
+#if 1 /*JP:T*/
+                    default:
+                        Strcpy(blast, "ã‹ã‚‰");
+                        break;
+#endif
                     }
                 } else {
 /*JP
                     Strcpy(blast, " with a squelch");
 */
-                    Strcpy(blast, "‚©‚ç“f‚«o‚³‚ê‚é‚æ‚¤‚É");
+                    Strcpy(blast, "ã‹ã‚‰åãå‡ºã•ã‚Œã‚‹ã‚ˆã†ã«");
                 }
 /*JP
                 You("get expelled from %s%s!", mon_nam(mtmp), blast);
 */
-                You("%s%s’Eo‚µ‚½I", mon_nam(mtmp), blast);
+                You("%s%sè„±å‡ºã—ãŸï¼", mon_nam(mtmp), blast);
             }
         }
     }
     unstuck(mtmp); /* ball&chain returned in unstuck() */
-    mnexto(mtmp);
+    mnexto(mtmp, RLOC_NOMSG);
     newsym(u.ux, u.uy);
-    spoteffects(TRUE);
     /* to cover for a case where mtmp is not in a next square */
     if (um_dist(mtmp->mx, mtmp->my, 1))
 /*JP
         pline("Brrooaa...  You land hard at some distance.");
 */
-        pline("ƒuƒƒƒDD‰“‚­‚É’…—¤‚·‚é‚Ì‚Í“ï‚µ‚¢D");
+        pline("ãƒ–ãƒ­ãƒ­ãƒ­ï¼ï¼é ãã«ç€é™¸ã™ã‚‹ã®ã¯é›£ã—ã„ï¼");
+    spoteffects(TRUE);
 }
 
 /* select a monster's next attack, possibly substituting for its usual one */
 struct attack *
-getmattk(magr, mdef, indx, prev_result, alt_attk_buf)
-struct monst *magr, *mdef;
-int indx, prev_result[];
-struct attack *alt_attk_buf;
+getmattk(
+    struct monst *magr, struct monst *mdef,
+    int indx, int prev_result[],
+    struct attack *alt_attk_buf)
 {
     struct permonst *mptr = magr->data;
     struct attack *attk = &mptr->mattk[indx];
-    struct obj *weap = (magr == &youmonst) ? uwep : MON_WEP(magr);
+    struct obj *weap = (magr == &gy.youmonst) ? uwep : MON_WEP(magr);
+    boolean udefend = mdef == &gy.youmonst;
 
     /* honor SEDUCE=0 */
     if (!SYSOPT_SEDUCE) {
-        extern const struct attack sa_no[NATTK];
+        extern const struct attack c_sa_no[NATTK];
 
         /* if the first attack is for SSEX damage, all six attacks will be
            substituted (expected succubus/incubus handling); if it isn't
            but another one is, only that other one will be substituted */
         if (mptr->mattk[0].adtyp == AD_SSEX) {
-            *alt_attk_buf = sa_no[indx];
+            *alt_attk_buf = c_sa_no[indx];
             attk = alt_attk_buf;
         } else if (attk->adtyp == AD_SSEX) {
             *alt_attk_buf = *attk;
@@ -419,7 +499,7 @@ struct attack *alt_attk_buf;
     /* prevent a monster with two consecutive disease or hunger attacks
        from hitting with both of them on the same turn; if the first has
        already hit, switch to a stun attack for the second */
-    if (indx > 0 && prev_result[indx - 1] > 0
+    if (indx > 0 && prev_result[indx - 1] > M_ATTK_MISS
         && (attk->adtyp == AD_DISE || attk->adtyp == AD_PEST
             || attk->adtyp == AD_FAMN)
         && attk->adtyp == mptr->mattk[indx - 1].adtyp) {
@@ -428,14 +508,14 @@ struct attack *alt_attk_buf;
         attk->adtyp = AD_STUN;
 
     /* make drain-energy damage be somewhat in proportion to energy */
-    } else if (attk->adtyp == AD_DREN && mdef == &youmonst) {
+    } else if (attk->adtyp == AD_DREN && udefend) {
         int ulev = max(u.ulevel, 6);
 
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         /* 3.6.0 used 4d6 but since energy drain came out of max energy
            once current energy was gone, that tended to have a severe
-           effect on low energy characters; it's now 2d6 with ajustments */
+           effect on low energy characters; it's now 2d6 with adjustments */
         if (u.uen <= 5 * ulev && attk->damn > 1) {
             attk->damn -= 1; /* low energy: 2d6 -> 1d6 */
             if (u.uenmax <= 2 * ulev && attk->damd > 3)
@@ -447,8 +527,16 @@ struct attack *alt_attk_buf;
             /* note: 3d9 is slightly higher than previous 4d6 */
         }
 
-    } else if (attk->aatyp == AT_ENGL && magr->mspec_used) {
-        /* can't re-engulf yet; switch to simpler attack */
+    /* holders/engulfers who release the hero have mspec_used set to rnd(2)
+       and can't re-hold/re-engulf until it has been decremented to zero;
+       likewise for transformation by genetic engineer */
+    } else if (magr->mspec_used && (attk->aatyp == AT_ENGL
+                                    || attk->aatyp == AT_HUGS
+                                    || attk->adtyp == AD_STCK
+                                    || attk->adtyp == AD_POLY)) {
+        boolean wimpy = (attk->damd == 0); /* lichen, violet fungus */
+
+        /* can't re-engulf or re-grab yet; switch to simpler attack */
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         if (attk->adtyp == AD_ACID || attk->adtyp == AD_ELEC
@@ -460,26 +548,96 @@ struct attack *alt_attk_buf;
         }
         attk->damn = 1; /* relatively weak: 1d6 */
         attk->damd = 6;
+        if (wimpy && attk->aatyp == AT_CLAW) {
+            attk->aatyp = AT_TUCH;
+            attk->damn = attk->damd = 0;
+        }
 
     /* barrow wight, Nazgul, erinys have weapon attack for non-physical
        damage; force physical damage if attacker has been cancelled or
        if weapon is sufficiently interesting; a few unique creatures
        have two weapon attacks where one does physical damage and other
        doesn't--avoid forcing physical damage for those */
-    } else if (indx == 0 && magr != &youmonst
+    } else if (indx == 0 && magr != &gy.youmonst
                && attk->aatyp == AT_WEAP && attk->adtyp != AD_PHYS
                && !(mptr->mattk[1].aatyp == AT_WEAP
                     && mptr->mattk[1].adtyp == AD_PHYS)
                && (magr->mcan
                    || (weap && ((weap->otyp == CORPSE
                                  && touch_petrifies(&mons[weap->corpsenm]))
-                                || weap->oartifact == ART_STORMBRINGER
-                                || weap->oartifact == ART_VORPAL_BLADE)))) {
+                                || is_art(weap, ART_STORMBRINGER)
+                                || is_art(weap, ART_VORPAL_BLADE))))) {
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         attk->adtyp = AD_PHYS;
+
+    /* liches have a touch attack for cold damage and also a spell attack;
+       they won't use the spell for monster vs monster so become impotent
+       against cold resistant foes; change the touch damage from cold to
+       physical if target will resist */
+    } else if (indx == 0 && attk->aatyp == AT_TUCH && attk->adtyp == AD_COLD
+               && (udefend ? Cold_resistance : resists_cold(mdef))
+               /* don't substitute if target is immune to normal damage */
+               && mdef->data != &mons[PM_SHADE]) {
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        attk->adtyp = AD_PHYS;
+        /* lessen new physical damage compared to old cold damage:
+         *        before  after
+         * lich:    1d10  1d6
+         * demi:    3d4   2d4
+         * master:  3d6   2d6
+         * arch-:   5d6   3d6
+         */
+        attk->damn = (attk->damn + 1) / 2;
+        if (attk->damd == 10)
+            attk->damd = 6;
+
     }
+
+    /* elementals on their home plane do double damage */
+    if (attk != alt_attk_buf && is_home_elemental(mptr)) {
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        attk->damn *= 2;
+    }
+
     return attk;
+}
+
+/* calc some variables needed for mattacku() */
+staticfn void
+calc_mattacku_vars(
+    struct monst *mtmp,
+    boolean *ranged, boolean *range2,
+    boolean *foundyou, boolean *youseeit)
+{
+    *ranged = (mdistu(mtmp) > 3);
+    *range2 = !monnear(mtmp, mtmp->mux, mtmp->muy);
+    *foundyou = u_at(mtmp->mux, mtmp->muy);
+    *youseeit = canseemon(mtmp);
+
+    /* do_attack() uses bhitpos to set/clear notonhead; do likewise here */
+    gb.bhitpos.x = u.ux, gb.bhitpos.y = u.uy;
+    /* hero poly'd into a long worm isn't allowed to grow a tail, so
+       hitting tail instead of head can't happen */
+    gn.notonhead = FALSE;
+}
+
+/* return TRUE iff monster or hero is trapped in a (spiked) pit */
+boolean
+mtrapped_in_pit(struct monst *mtmp)
+{
+    struct trap *ttmp = 0;
+
+    if (mtmp == &gy.youmonst)
+        ttmp = (u.utrap && u.utraptype == TT_PIT) ? t_at(u.ux, u.uy) : 0;
+    else
+        ttmp = mtmp->mtrapped ? t_at(mtmp->mx, mtmp->my) : 0;
+
+    if (ttmp && is_pit(ttmp->ttyp))
+        return TRUE;
+    return FALSE;
 }
 
 /*
@@ -492,28 +650,32 @@ struct attack *alt_attk_buf;
  *              take care of it...
  */
 int
-mattacku(mtmp)
-register struct monst *mtmp;
+mattacku(struct monst *mtmp)
 {
     struct attack *mattk, alt_attk;
     int i, j = 0, tmp, sum[NATTK];
     struct permonst *mdat = mtmp->data;
-    boolean ranged = (distu(mtmp->mx, mtmp->my) > 3);
-    /* Is it near you?  Affects your actions */
-    boolean range2 = !monnear(mtmp, mtmp->mux, mtmp->muy);
-    /* Does it think it's near you?  Affects its actions */
-    boolean foundyou = (mtmp->mux == u.ux && mtmp->muy == u.uy);
-    /* Is it attacking you or your image? */
-    boolean youseeit = canseemon(mtmp);
-    /* Might be attacking your image around the corner, or
-     * invisible, or you might be blind....
+    /*
+     * ranged: Is it near you?  Affects your actions.
+     * range2: Does it think it's near you?  Affects its actions.
+     * foundyou: Is it attacking you or your image?
+     * youseeit: Can you observe the attack?  It might be attacking your
+     *     image around the corner, or invisible, or you might be blind.
+     * skipnonmagc: Are further physical attack attempts useless?  (After
+     *     a wild miss--usually due to attacking displaced image.  Avoids
+     *     excessively verbose miss feedback when monster can do multiple
+     *     attacks and would miss the same wrong spot each time.)
      */
-    boolean skipnonmagc = FALSE;
-    /* Are further physical attack attempts useless? */
+    boolean ranged, range2, foundyou, firstfoundyou, youseeit,
+            skipnonmagc = FALSE;
+
+    calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
 
     if (!ranged)
         nomul(0);
-    if (DEADMONSTER(mtmp) || (Underwater && !is_swimmer(mtmp->data)))
+    if (DEADMONSTER(mtmp))
+        return 1;
+    if (Underwater && !is_swimmer(mtmp->data))
         return 0;
 
     /* If swallowed, can only be affected by u.ustuck */
@@ -522,28 +684,29 @@ register struct monst *mtmp;
             return 0;
         u.ustuck->mux = u.ux;
         u.ustuck->muy = u.uy;
-        range2 = 0;
-        foundyou = 1;
         if (u.uinvulnerable)
             return 0; /* stomachs can't hurt you! */
-
+        range2 = 0;
+        foundyou = 1;
     } else if (u.usteed) {
         if (mtmp == u.usteed)
             /* Your steed won't attack you */
             return 0;
         /* Orcs like to steal and eat horses and the like */
-        if (!rn2(is_orc(mtmp->data) ? 2 : 4)
-            && distu(mtmp->mx, mtmp->my) <= 2) {
-            /* Attack your steed instead */
+        if (!rn2(is_orc(mtmp->data) ? 2 : 4) && m_next2u(mtmp)) {
+            /* attack your steed instead; 'bhitpos' and 'notonhead' are
+               already set from targeting hero */
             i = mattackm(mtmp, u.usteed);
-            if ((i & MM_AGR_DIED))
+            if ((i & M_ATTK_AGR_DIED) != 0)
                 return 1;
             /* make sure steed is still alive and within range */
-            if ((i & MM_DEF_DIED) || !u.usteed
-                || distu(mtmp->mx, mtmp->my) > 2)
+            if ((i & M_ATTK_DEF_DIED) != 0 || !u.usteed
+                || !m_next2u(mtmp))
                 return 0;
             /* Let your steed retaliate */
-            return !!(mattackm(u.usteed, mtmp) & MM_DEF_DIED);
+            gb.bhitpos.x = mtmp->mx, gb.bhitpos.y = mtmp->my;
+            gn.notonhead = FALSE;
+            return !!(mattackm(u.usteed, mtmp) & M_ATTK_DEF_DIED);
         }
     }
 
@@ -551,7 +714,7 @@ register struct monst *mtmp;
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         u.uundetected = 0;
-        if (is_hider(youmonst.data) && u.umonnum != PM_TRAPPER) {
+        if (is_hider(gy.youmonst.data) && u.umonnum != PM_TRAPPER) {
             /* ceiling hider */
             coord cc; /* maybe we need a unexto() function? */
             struct obj *obj;
@@ -559,12 +722,12 @@ register struct monst *mtmp;
 /*JP
             You("fall from the %s!", ceiling(u.ux, u.uy));
 */
-            You("%s‚©‚ç—‚¿‚½I", ceiling(u.ux,u.uy));
+            You("%sã‹ã‚‰è½ã¡ãŸï¼", ceiling(u.ux,u.uy));
             /* take monster off map now so that its location
                is eligible for placing hero; we assume that a
                removed monster remembers its old spot <mx,my> */
             remove_monster(mtmp->mx, mtmp->my);
-            if (!enexto(&cc, u.ux, u.uy, youmonst.data)
+            if (!enexto(&cc, u.ux, u.uy, gy.youmonst.data)
                 /* a fish won't voluntarily swap positions
                    when it's in water and hero is over land */
                 || (mtmp->data->mlet == S_EEL
@@ -578,9 +741,9 @@ register struct monst *mtmp;
                 place_monster(mtmp, mtmp->mx, mtmp->my); /* put back */
                 newsym(u.ux, u.uy); /* u.uundetected was toggled */
 /*JP
-                pline("%s draws back as you drop!", Monnam(mtmp));
+                pline_mon(mtmp, "%s draws back as you drop!", Monnam(mtmp));
 */
-                pline("‚ ‚È‚½‚ª—‚¿‚é‚±‚Æ‚Å%s‚Íˆø‚«–ß‚³‚ê‚½I", Monnam(mtmp));
+                pline_mon(mtmp, "ã‚ãªãŸãŒè½ã¡ã‚‹ã“ã¨ã§%sã¯å¼•ãæˆ»ã•ã‚ŒãŸï¼", Monnam(mtmp));
                 return 0;
             }
 
@@ -592,22 +755,22 @@ register struct monst *mtmp;
                 /* tail hasn't grown, so if it now occupies <cc.x,.y>
                    then one of its original spots must be free */
                 if (m_at(cc.x, cc.y))
-                    (void) enexto(&cc, u.ux, u.uy, youmonst.data);
+                    (void) enexto(&cc, u.ux, u.uy, gy.youmonst.data);
             }
-            teleds(cc.x, cc.y, TRUE); /* move hero */
+            teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG); /* move hero */
             set_apparxy(mtmp);
             newsym(u.ux, u.uy);
 
-            if (youmonst.data->mlet != S_PIERCER)
+            if (gy.youmonst.data->mlet != S_PIERCER)
                 return 0; /* lurkers don't attack */
 
             obj = which_armor(mtmp, WORN_HELMET);
-            if (obj && is_metallic(obj)) {
+            if (hard_helmet(obj)) {
 #if 0 /*JP:T*/
                 Your("blow glances off %s %s.", s_suffix(mon_nam(mtmp)),
                      helm_simple_name(obj));
 #else
-                Your("UŒ‚‚Í%s‚Ì%s‚ğ‚©‚·‚ß‚½‚¾‚¯‚¾‚Á‚½D", mon_nam(mtmp),
+                Your("æ”»æ’ƒã¯%sã®%sã‚’ã‹ã™ã‚ãŸã ã‘ã ã£ãŸï¼", mon_nam(mtmp),
                       helm_simple_name(obj));
 #endif
             } else {
@@ -615,7 +778,7 @@ register struct monst *mtmp;
 /*JP
                     pline("%s is hit by a falling piercer (you)!",
 */
-                    pline("%s‚Í—‚¿‚Ä‚«‚½j(‚ ‚È‚½)‚Å‚Â‚¢‚½I",
+                    pline("%sã¯è½ã¡ã¦ããŸé‡(ã‚ãªãŸ)ã§å‚·ã¤ã„ãŸï¼",
                           Monnam(mtmp));
                     if ((mtmp->mhp -= d(3, 6)) < 1)
                         killed(mtmp);
@@ -623,7 +786,7 @@ register struct monst *mtmp;
 /*JP
                     pline("%s is almost hit by a falling piercer (you)!",
 */
-                    pline("%s‚Í‚à‚¤­‚µ‚Å—‚¿‚Ä‚«‚½j(‚ ‚È‚½)‚Å‚Â‚­‚Æ‚±‚ë‚¾‚Á‚½I",
+                    pline("%sã¯ã‚‚ã†å°‘ã—ã§è½ã¡ã¦ããŸé‡(ã‚ãªãŸ)ã§å‚·ã¤ãã¨ã“ã‚ã ã£ãŸï¼",
                           Monnam(mtmp));
             }
 
@@ -633,7 +796,7 @@ register struct monst *mtmp;
 /*JP
                 pline("It tries to move where you are hiding.");
 */
-                pline("‰½Ò‚©‚ª‚ ‚È‚½‚ª‰B‚ê‚Ä‚¢‚é‚Æ‚±‚ë‚ğˆÚ“®‚µ‚æ‚¤‚Æ‚µ‚½D");
+                pline("ä½•è€…ã‹ãŒã‚ãªãŸãŒéš ã‚Œã¦ã„ã‚‹ã¨ã“ã‚ã‚’ç§»å‹•ã—ã‚ˆã†ã¨ã—ãŸï¼");
             } else {
                 /* Ugly kludge for eggs.  The message is phrased so as
                  * to be directed at the monster, not the player,
@@ -641,10 +804,10 @@ register struct monst *mtmp;
                  * parallelism to work, we can't rephrase it, so we
                  * zap the "laid by you" momentarily instead.
                  */
-                struct obj *obj = level.objects[u.ux][u.uy];
+                struct obj *obj = svl.level.objects[u.ux][u.uy];
 
                 if (obj || u.umonnum == PM_TRAPPER
-                    || (youmonst.data->mlet == S_EEL
+                    || (gy.youmonst.data->mlet == S_EEL
                         && is_pool(u.ux, u.uy))) {
                     int save_spe = 0; /* suppress warning */
 
@@ -655,26 +818,34 @@ register struct monst *mtmp;
                     }
                     /* note that m_monnam() overrides hallucination, which is
                        what we want when message is from mtmp's perspective */
-                    if (youmonst.data->mlet == S_EEL
+                    if (gy.youmonst.data->mlet == S_EEL
                         || u.umonnum == PM_TRAPPER)
-                        pline(
 #if 0 /*JP:T*/
+                        pline(
                              "Wait, %s!  There's a hidden %s named %s there!",
-                              m_monnam(mtmp), youmonst.data->mname, plname);
+                              m_monnam(mtmp),
+                              pmname(gy.youmonst.data, Ugender), svp.plname);
 #else
-                              "‘Ò‚ÄC%sI%s‚Æ‚¢‚¤–¼‚Ì%s‚ª‰B‚ê‚Ä‚¢‚éI",
-                              m_monnam(mtmp), plname, youmonst.data->mname);
+                         pline(
+                             "å¾…ã¦ï¼Œ%sï¼%sã¨ã„ã†åã®%sãŒéš ã‚Œã¦ã„ã‚‹ï¼",
+                              m_monnam(mtmp),
+                              svp.plname, pmname(gy.youmonst.data, Ugender));
 #endif
                     else
-                        pline(
 #if 0 /*JP:T*/
+                        pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
-                              m_monnam(mtmp), youmonst.data->mname, plname,
-                              doname(level.objects[u.ux][u.uy]));
+                              m_monnam(mtmp),
+                              pmname(gy.youmonst.data, Ugender),
+                              svp.plname,
+                              doname(svl.level.objects[u.ux][u.uy]));
 #else
-                          "‘Ò‚ÄC%sI%s‚Æ‚¢‚¤–¼‚Ì%s‚ª%s‚Ì‰º‚É‰B‚ê‚Ä‚¢‚éI",
-                              m_monnam(mtmp), plname, youmonst.data->mname, 
-                              doname(level.objects[u.ux][u.uy]));
+                        pline(
+                          "å¾…ã¦ï¼Œ%sï¼%sã¨ã„ã†åã®%sãŒ%sã®ä¸‹ã«éš ã‚Œã¦ã„ã‚‹ï¼",
+                              m_monnam(mtmp),
+                              svp.plname,
+                              pmname(gy.youmonst.data, Ugender),
+                              doname(svl.level.objects[u.ux][u.uy]));
 #endif
                     if (obj)
                         obj->spe = save_spe;
@@ -687,9 +858,9 @@ register struct monst *mtmp;
     }
 
     /* hero might be a mimic, concealed via #monster */
-    if (youmonst.data->mlet == S_MIMIC && U_AP_TYPE && !range2
+    if (gy.youmonst.data->mlet == S_MIMIC && U_AP_TYPE && !range2
         && foundyou && !u.uswallow) {
-        boolean sticky = sticks(youmonst.data);
+        boolean sticky = sticks(gy.youmonst.data);
 
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
@@ -697,19 +868,19 @@ register struct monst *mtmp;
 /*JP
             pline("It gets stuck on you.");
 */
-            pline("‰½Ò‚©‚ª‚ ‚È‚½‚Ìã‚É‚Ì‚µ‚©‚©‚Á‚½D");
+            pline("ä½•è€…ã‹ãŒã‚ãªãŸã®ä¸Šã«ã®ã—ã‹ã‹ã£ãŸï¼");
         else /* see note about m_monnam() above */
 #if 0 /*JP:T*/
             pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
-                  youmonst.data->mname, plname);
+                  pmname(gy.youmonst.data, Ugender), svp.plname);
 #else
-            pline("‘Ò‚ÄC%sI‚»‚ê‚Í%s‚Æ‚¢‚¤–¼‚Ì%s‚¾I", m_monnam(mtmp), 
-                  plname, youmonst.data->mname);
+            pline("å¾…ã¦ï¼Œ%sï¼ãã‚Œã¯%sã¨ã„ã†åã®%sã ï¼", m_monnam(mtmp),
+                  svp.plname, pmname(gy.youmonst.data, Ugender));
 #endif
         if (sticky)
-            u.ustuck = mtmp;
-        youmonst.m_ap_type = M_AP_NOTHING;
-        youmonst.mappearance = 0;
+            set_ustuck(mtmp);
+        gy.youmonst.m_ap_type = M_AP_NOTHING;
+        gy.youmonst.mappearance = 0;
         newsym(u.ux, u.uy);
         return 0;
     }
@@ -720,37 +891,41 @@ register struct monst *mtmp;
             map_invisible(mtmp->mx, mtmp->my);
         if (!youseeit)
 #if 0 /*JP:T*/
-            pline("%s %s!", Something, (likes_gold(mtmp->data)
-                                        && youmonst.mappearance == GOLD_PIECE)
-                                           ? "tries to pick you up"
-                                           : "disturbs you");
+            pline("%s %s!", Something,
+                  (likes_gold(mtmp->data)
+                   && gy.youmonst.mappearance == GOLD_PIECE)
+                  ? "tries to pick you up"
+                  : "disturbs you");
 #else
-            pline("%s‚Í%sI", Something, (likes_gold(mtmp->data)
-                                        && youmonst.mappearance == GOLD_PIECE)
-                                           ? "‚ ‚È‚½‚ğE‚¨‚¤‚Æ‚µ‚½"
-                                           : "–³‹‚µ‚½");
+            pline("%sã¯%sï¼", Something,
+                  (likes_gold(mtmp->data)
+                   && gy.youmonst.mappearance == GOLD_PIECE)
+                  ? "ã‚ãªãŸã‚’æ‹¾ãŠã†ã¨ã—ãŸ"
+                  : "ã‚ãªãŸã‚’é‚ªé­”ã—ãŸ");
 #endif
         else /* see note about m_monnam() above */
 #if 0 /*JP:T*/
             pline("Wait, %s!  That %s is really %s named %s!", m_monnam(mtmp),
-                  mimic_obj_name(&youmonst), an(mons[u.umonnum].mname),
-                  plname);
+                  mimic_obj_name(&gy.youmonst),
+                  an(pmname(&mons[u.umonnum], Ugender)), svp.plname);
 #else
-            pline("‘Ò‚ÄC%sI‚»‚Ì%s‚Í%s‚Æ‚¢‚¤–¼‚Ì%s‚¾I", m_monnam(mtmp),
-                  mimic_obj_name(&youmonst), plname,
-                  mons[u.umonnum].mname);
+            pline("å¾…ã¦ï¼Œ%sï¼ãã®%sã¯%sã¨ã„ã†åã®%sã ï¼", m_monnam(mtmp),
+                  mimic_obj_name(&gy.youmonst),
+                  svp.plname, an(pmname(&mons[u.umonnum], Ugender)));
 #endif
-        if (multi < 0) { /* this should always be the case */
+        if (gm.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
 #if 0 /*JP:T*/
             Sprintf(buf, "You appear to be %s again.",
-                    Upolyd ? (const char *) an(youmonst.data->mname)
+                    Upolyd ? (const char *) an(pmname(gy.youmonst.data,
+                                                      flags.female))
                            : (const char *) "yourself");
 #else
-            Sprintf(buf, "‚ ‚È‚½‚Í‚Ó‚½‚½‚Ñ%s‚É‚È‚Á‚½D",
-                    Upolyd ? (const char *) youmonst.data->mname
-                           : (const char *) "©•ª©g");
+            Sprintf(buf, "ã‚ãªãŸã¯å†ã³%sã®å§¿ã«ãªã£ãŸï¼",
+                    Upolyd ? (const char *) pmname(gy.youmonst.data, 
+                                                   flags.female)
+                           : (const char *) "è‡ªåˆ†è‡ªèº«");
 #endif
             unmul(buf); /* immediately stop mimicking */
         }
@@ -760,7 +935,7 @@ register struct monst *mtmp;
     /*  Work out the armor class differential   */
     tmp = AC_VALUE(u.uac) + 10; /* tmp ~= 0 - 20 */
     tmp += mtmp->m_lev;
-    if (multi < 0)
+    if (gm.multi < 0)
         tmp += 4;
     if ((Invis && !perceives(mdat)) || !mtmp->mcansee)
         tmp -= 2;
@@ -775,126 +950,80 @@ register struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
     }
 
-    /*  Special demon handling code */
-    if ((mtmp->cham == NON_PM) && is_demon(mdat) && !range2
-        && mtmp->data != &mons[PM_BALROG] && mtmp->data != &mons[PM_SUCCUBUS]
-        && mtmp->data != &mons[PM_INCUBUS])
-        if (!mtmp->mcan && !rn2(13))
-            (void) msummon(mtmp);
+    /* when not cancelled and not in current form due to shapechange, many
+       demons can summon more demons and were creatures can summon critters;
+       also, were creature might change from human to animal or vice versa */
+    if (mtmp->cham == NON_PM && !mtmp->mcan && !range2
+        && (is_demon(mdat) || is_were(mdat))) {
+        boolean already_fleeing = mtmp->mflee != 0;
 
-    /*  Special lycanthrope handling code */
-    if ((mtmp->cham == NON_PM) && is_were(mdat) && !range2) {
-        if (is_human(mdat)) {
-            if (!rn2(5 - (night() * 2)) && !mtmp->mcan)
-                new_were(mtmp);
-        } else if (!rn2(30) && !mtmp->mcan)
-            new_were(mtmp);
-        mdat = mtmp->data;
-
-        if (!rn2(10) && !mtmp->mcan) {
-            int numseen, numhelp;
-#if 0 /*JP*/
-            char buf[BUFSZ], genericwere[BUFSZ];
-#else
-            char genericwere[BUFSZ];
-#endif
-
-/*JP
-            Strcpy(genericwere, "creature");
-*/
-            Strcpy(genericwere, "‰½‚©");
-            numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
-            if (youseeit) {
-/*JP
-                pline("%s summons help!", Monnam(mtmp));
-*/
-                pline("%s‚Í•‚¯‚ğŒÄ‚ñ‚¾I", Monnam(mtmp));
-                if (numhelp > 0) {
-                    if (numseen == 0)
-/*JP
-                        You_feel("hemmed in.");
-*/
-                        pline("‰½Ò‚©‚ÉˆÍ‚Ü‚ê‚½‚æ‚¤‚È‹C‚ª‚·‚éD");
-                } else
-/*JP
-                    pline("But none comes.");
-*/
-                    pline("‚µ‚©‚µ‰½‚à—ˆ‚È‚©‚Á‚½D");
-            } else {
-                const char *from_nowhere;
-
-                if (!Deaf) {
-/*JP
-                    pline("%s %s!", Something, makeplural(growl_sound(mtmp)));
-*/
-                    pline("‰½‚©‚ª%sI", growl_sound(mtmp));
-                    from_nowhere = "";
-                } else
-/*JP
-                    from_nowhere = " from nowhere";
-*/
-                    from_nowhere = "‚Ç‚±‚©‚ç‚Æ‚à‚È‚­";
-                if (numhelp > 0) {
-                    if (numseen < 1)
-/*JP
-                        You_feel("hemmed in.");
-*/
-                        pline("‰½Ò‚©‚ÉˆÍ‚Ü‚ê‚½‚æ‚¤‚È‹C‚ª‚·‚éD");
-                    else {
-#if 0 /*JP*/
-                        if (numseen == 1)
-                            Sprintf(buf, "%s appears", an(genericwere));
-                        else
-                            Sprintf(buf, "%s appear",
-                                    makeplural(genericwere));
-                        pline("%s%s!", upstart(buf), from_nowhere);
-#else
-                        pline("%s‚ª%sŒ»‚ê‚½I",
-                              genericwere, from_nowhere);
-#endif
-                    }
-                } /* else no help came; but you didn't know it tried */
-            }
-        }
+        summonmu(mtmp, youseeit);
+        /* were-creature might have changed to beast form; if that has
+           caused it to become afraid (due to non-human reacting to scroll
+           of scare monster or engraved "Elbereth" which was being ignored
+           while in human form), don't continue this attack */
+        if (mtmp->mflee && !already_fleeing)
+            return 0;
+        mdat = mtmp->data; /* update cached value in case of were change */
     }
 
-    if (u.uinvulnerable) {
+    if (u.uinvulnerable) { /* in the midst of successful prayer */
         /* monsters won't attack you */
         if (mtmp == u.ustuck) {
 /*JP
-            pline("%s loosens its grip slightly.", Monnam(mtmp));
+            pline_mon(mtmp, "%s loosens its grip slightly.", Monnam(mtmp));
 */
-            pline("%s‚Í’÷‚ß‚Â‚¯‚ğ‚í‚¸‚©‚ÉŠÉ‚ß‚½D", Monnam(mtmp));
+            pline_mon(mtmp, "%sã¯ç· ã‚ã¤ã‘ã‚’ã‚ãšã‹ã«ç·©ã‚ãŸï¼", Monnam(mtmp));
         } else if (!range2) {
             if (youseeit || sensemon(mtmp))
 /*JP
                 pline("%s starts to attack you, but pulls back.",
 */
-                pline("%s‚Í‚ ‚È‚½‚ğUŒ‚‚µ‚©‚¯‚½‚ªC‚Ğ‚Á‚±‚ß‚½D",
+                pline("%sã¯ã‚ãªãŸã‚’æ”»æ’ƒã—ã‹ã‘ãŸãŒï¼Œã²ã£ã“ã‚ãŸï¼",
                       Monnam(mtmp));
             else
 /*JP
                 You_feel("%s move nearby.", something);
 */
-                pline("‰½Ò‚©‚ª‚ ‚È‚½‚Ì‚»‚Î‚ğ’Ê‚è‚Ê‚¯‚½‚æ‚¤‚È‹C‚ª‚µ‚½D");
+                pline("ä½•è€…ã‹ãŒã‚ãªãŸã®ãã°ã‚’é€šã‚Šã¬ã‘ãŸã‚ˆã†ãªæ°—ãŒã—ãŸï¼");
         }
         return 0;
     }
 
     /* Unlike defensive stuff, don't let them use item _and_ attack. */
     if (find_offensive(mtmp)) {
-        int foo = use_offensive(mtmp);
+        int offended = use_offensive(mtmp);
 
-        if (foo != 0)
-            return (foo == 1);
+        if (offended != 0)
+            return (offended == 1);
     }
 
+    gs.skipdrin = FALSE; /* [see mattackm(mhitm.c)] */
+    firstfoundyou = foundyou;
+
     for (i = 0; i < NATTK; i++) {
-        sum[i] = 0;
-        mon_currwep = (struct obj *)0;
-        mattk = getmattk(mtmp, &youmonst, i, sum, &alt_attk);
+        sum[i] = M_ATTK_MISS;
+        /* counterattack against attack [i-1] might have been fatal */
+        if (DEADMONSTER(mtmp))
+            return 1;
+        if (i > 0) {
+            /* recalc in case prior attack moved hero; mtmp doesn't make
+               another attempt to guess your location but might have
+               accidentally knocked you to where it thought you were
+               [not sure whether that's actually possible] */
+            calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
+            /* if hero was found but isn't anymore, avoid wildmiss now */
+            if (firstfoundyou && !foundyou)
+                continue; /* set sum[i] to 'miss' but skip other actions */
+            if (!u_at(gb.bhitpos.x, gb.bhitpos.y))
+                continue;
+        }
+        mon_currwep = (struct obj *) 0;
+        mattk = getmattk(mtmp, &gy.youmonst, i, sum, &alt_attk);
         if ((u.uswallow && mattk->aatyp != AT_ENGL)
-            || (skipnonmagc && mattk->aatyp != AT_MAGC))
+            || (skipnonmagc && mattk->aatyp != AT_MAGC)
+            || (gs.skipdrin && mattk->aatyp == AT_TENT
+                && mattk->adtyp == AD_DRIN))
             continue;
 
         switch (mattk->aatyp) {
@@ -905,12 +1034,17 @@ register struct monst *mtmp;
         case AT_TUCH:
         case AT_BUTT:
         case AT_TENT:
+            if (mattk->aatyp == AT_KICK && mtrapped_in_pit(mtmp))
+                continue;
             if (!range2 && (!MON_WEP(mtmp) || mtmp->mconf || Conflict
-                            || !touch_petrifies(youmonst.data))) {
+                            || !touch_petrifies(gy.youmonst.data))) {
                 if (foundyou) {
                     if (tmp > (j = rnd(20 + i))) {
+                        if (unsolid(gy.youmonst.data)
+                            && failed_grab(mtmp, &gy.youmonst, mattk))
+                            continue;
                         if (mattk->aatyp != AT_KICK
-                            || !thick_skinned(youmonst.data))
+                            || !thick_skinned(gy.youmonst.data))
                             sum[i] = hitmu(mtmp, mattk);
                     } else
                         missmu(mtmp, (tmp == j), mattk);
@@ -925,8 +1059,10 @@ register struct monst *mtmp;
         case AT_HUGS: /* automatic if prev two attacks succeed */
             /* Note: if displaced, prev attacks never succeeded */
             if ((!range2 && i >= 2 && sum[i - 1] && sum[i - 2])
-                || mtmp == u.ustuck)
-                sum[i] = hitmu(mtmp, mattk);
+                || mtmp == u.ustuck) {
+                if (!failed_grab(mtmp, &gy.youmonst, mattk))
+                    sum[i] = hitmu(mtmp, mattk);
+            }
             break;
 
         case AT_GAZE: /* can affect you either ranged or not */
@@ -953,27 +1089,34 @@ register struct monst *mtmp;
                     } else {
                         missmu(mtmp, (tmp == j), mattk);
                     }
-                } else if (is_animal(mtmp->data)) {
+                } else if (digests(mtmp->data)) {
 /*JP
-                    pline("%s gulps some air!", Monnam(mtmp));
+                    pline_mon(mtmp, "%s gulps some air!", Monnam(mtmp));
 */
-                    pline("%s‚Í‘§‚ğ‹z‚¢‚±‚ñ‚¾I", Monnam(mtmp));
+                    pline_mon(mtmp, "%sã¯æ¯ã‚’å¸ã„ã“ã‚“ã ï¼", Monnam(mtmp));
                 } else {
-                    if (youseeit)
-/*JP
-                        pline("%s lunges forward and recoils!", Monnam(mtmp));
-*/
-                        pline("%s‚Í“Ëi‚µC–ß‚Á‚½I", Monnam(mtmp));
-                    else
+                    if (youseeit) {
+#if 0 /*JP:T*/
+                        pline_mon(mtmp, "%s lunges forward and recoils!",
+                                  Monnam(mtmp));
+#else
+                        pline_mon(mtmp, "%sã¯çªé€²ã—ï¼Œæˆ»ã£ãŸï¼",
+                                  Monnam(mtmp));
+#endif
+                    } else {
+                        if (is_whirly(mtmp->data)) {
+                            Soundeffect(se_rushing_wind_noise, 60);
+                        }
 #if 0 /*JP:T*/
                         You_hear("a %s nearby.",
                                  is_whirly(mtmp->data) ? "rushing noise"
                                                        : "splat");
 #else
-                        You_hear("‚·‚®‚»‚Î‚Å%s‰¹‚ğ•·‚¢‚½D",
-                                 is_whirly(mtmp->data) ? "“ËŒ‚‚µ‚Ä‚­‚é"
-                                                       : "ƒsƒVƒƒƒb‚Æ‚¢‚¤");
+                        You_hear("ã™ããã°ã§%séŸ³ã‚’èã„ãŸï¼",
+                                 is_whirly(mtmp->data) ? "çªæ’ƒã—ã¦ãã‚‹"
+                                                       : "ãƒ”ã‚·ãƒ£ãƒƒã¨ã„ã†");
 #endif
+                    }
                 }
             }
             break;
@@ -1007,11 +1150,16 @@ register struct monst *mtmp;
                 if (foundyou) {
                     mon_currwep = MON_WEP(mtmp);
                     if (mon_currwep) {
-                        hittmp = hitval(mon_currwep, &youmonst);
+                        boolean bash = (is_pole(mon_currwep)
+                                        && !is_art(mon_currwep,
+                                                   ART_SNICKERSNEE)
+                                        && m_next2u(mtmp));
+
+                        hittmp = hitval(mon_currwep, &gy.youmonst);
                         tmp += hittmp;
-                        mswings(mtmp, mon_currwep);
+                        mswings(mtmp, mon_currwep, bash);
                     }
-                    if (tmp > (j = dieroll = rnd(20 + i)))
+                    if (tmp > (j = gm.mhitu_dieroll = rnd(20 + i)))
                         sum[i] = hitmu(mtmp, mattk);
                     else
                         missmu(mtmp, (tmp == j), mattk);
@@ -1035,52 +1183,166 @@ register struct monst *mtmp;
         default: /* no attack */
             break;
         }
-        if (context.botl)
+        if (disp.botl)
             bot();
         /* give player a chance of waking up before dying -kaa */
-        if (sum[i] == 1) { /* successful attack */
-            if (u.usleep && u.usleep < monstermoves && !rn2(10)) {
-                multi = -1;
+        if (sum[i] == M_ATTK_HIT) { /* successful attack */
+            if (u.usleep && u.usleep < svm.moves && !rn2(10)) {
+                gm.multi = -1;
 /*JP
-                nomovemsg = "The combat suddenly awakens you.";
+                gn.nomovemsg = "The combat suddenly awakens you.";
 */
-                nomovemsg = "‚ ‚È‚½‚Í‹N‚±‚³‚ê‚½D";
+                gn.nomovemsg = "ã‚ãªãŸã¯èµ·ã“ã•ã‚ŒãŸï¼";
             }
         }
-        if (sum[i] == 2)
+        if ((sum[i] & M_ATTK_AGR_DIED))
             return 1; /* attacker dead */
-        if (sum[i] == 3)
+        if ((sum[i] & M_ATTK_AGR_DONE))
             break; /* attacker teleported, no more attacks */
         /* sum[i] == 0: unsuccessful attack */
     }
     return 0;
 }
 
-STATIC_OVL boolean
-diseasemu(mdat)
-struct permonst *mdat;
+/* monster summons help for its fight against hero */
+staticfn void
+summonmu(struct monst *mtmp, boolean youseeit)
+{
+    struct permonst *mdat = mtmp->data;
+
+    /*
+     * Extracted from mattacku() to reduce clutter there.
+     * Caller has verified that 'mtmp' hasn't been cancelled
+     * and isn't a shapechanger.
+     */
+
+    if (is_demon(mdat)) {
+        if (mdat != &mons[PM_BALROG] && mdat != &mons[PM_AMOROUS_DEMON]) {
+            if (!rn2(Inhell ? 10 : 16))
+                (void) msummon(mtmp);
+        }
+        return; /* no such thing as a demon were creature, so we're done */
+    }
+
+    if (is_were(mdat)) {
+        /* if hero has Protection_from_shape_changers, new_were() will work
+           in the critter-to-human direction but be a no-op the other way;
+           we repeat the criteria here for clarity */
+        if (is_human(mdat)) { /* maybe switch to animal form */
+            if (!Protection_from_shape_changers && !rn2(5 - (night() * 2)))
+                new_were(mtmp);
+        } else { /* maybe switch to back human form */
+            if (Protection_from_shape_changers || !rn2(30))
+                new_were(mtmp);
+        }
+        mdat = mtmp->data; /* form change invalidates cached value */
+
+        /* maybe summon compatible critters;
+           not blocked by Protection_from_shape_changers */
+        if (!rn2(10)) {
+            int numseen, numhelp;
+#if 0 /*JP*/
+            char buf[BUFSZ], genericwere[BUFSZ];
+#else
+            char genericwere[BUFSZ];
+#endif
+
+/*JP
+            Strcpy(genericwere, "creature");
+*/
+            Strcpy(genericwere, "ä½•ã‹");
+            if (youseeit)
+/*JP
+                pline_mon(mtmp, "%s summons help!", Monnam(mtmp));
+*/
+                pline_mon(mtmp, "%sã¯åŠ©ã‘ã‚’å‘¼ã‚“ã ï¼", Monnam(mtmp));
+            numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
+            if (youseeit) {
+                if (numhelp > 0) {
+                    if (numseen == 0)
+/*JP
+                        You_feel("hemmed in.");
+*/
+                        pline("ä½•è€…ã‹ã«å›²ã¾ã‚ŒãŸã‚ˆã†ãªæ°—ãŒã™ã‚‹ï¼");
+                } else {
+/*JP
+                    pline("But none comes.");
+*/
+                    pline("ã—ã‹ã—ä½•ã‚‚æ¥ãªã‹ã£ãŸï¼");
+                }
+            } else {
+                const char *from_nowhere;
+
+                if (!Deaf) {
+#if 0 /*JP:T*/
+                    pline("%s %s!", Something,
+                          makeplural(growl_sound(mtmp)));
+#else
+                    pline("ä½•ã‹ãŒ%sï¼",
+                          growl_sound(mtmp));
+#endif
+                    from_nowhere = "";
+                } else {
+/*JP
+                    from_nowhere = " from nowhere";
+*/
+                    from_nowhere = "ã©ã“ã‹ã‚‰ã¨ã‚‚ãªã";
+                }
+                if (numhelp > 0) {
+                    if (numseen < 1) {
+/*JP
+                        You_feel("hemmed in.");
+*/
+                        pline("ä½•è€…ã‹ã«å›²ã¾ã‚ŒãŸã‚ˆã†ãªæ°—ãŒã™ã‚‹ï¼");
+                    } else {
+#if 0 /*JP*/
+                        if (numseen == 1)
+                            Sprintf(buf, "%s appears", an(genericwere));
+                        else
+                            Sprintf(buf, "%s appear",
+                                    makeplural(genericwere));
+                        pline("%s%s!", upstart(buf), from_nowhere);
+#else
+                        pline("%sãŒ%sç¾ã‚ŒãŸï¼",
+                              genericwere, from_nowhere);
+#endif
+                    }
+                } /* else no help came; but you didn't know it tried */
+            }
+        } /* summon critters */
+        return;
+    } /* were creature */
+}
+
+boolean
+diseasemu(struct permonst *mdat)
 {
     if (Sick_resistance) {
 /*JP
         You_feel("a slight illness.");
 */
-        You("‚·‚±‚µ‹C•ª‚ªˆ«‚­‚È‚Á‚½‚æ‚¤‚È‹C‚ª‚µ‚½D");
+        You("ã™ã“ã—æ°—åˆ†ãŒæ‚ªããªã£ãŸã‚ˆã†ãªæ°—ãŒã—ãŸï¼");
         return FALSE;
     } else {
         make_sick(Sick ? Sick / 3L + 1L : (long) rn1(ACURR(A_CON), 20),
-                  mdat->mname, TRUE, SICK_NONVOMITABLE);
+                  mdat->pmnames[NEUTRAL], TRUE, SICK_NONVOMITABLE);
         return TRUE;
     }
 }
 
 /* check whether slippery clothing protects from hug or wrap attack */
-STATIC_OVL boolean
-u_slip_free(mtmp, mattk)
-struct monst *mtmp;
-struct attack *mattk;
+boolean
+u_slip_free(
+    struct monst *mtmp,
+    struct attack *mattk)
 {
-    struct obj *obj = (uarmc ? uarmc : uarm);
+    struct obj *obj;
 
+    /* greased armor does not protect against AT_ENGL+AD_WRAP */
+    if (mattk->aatyp == AT_ENGL)
+        return FALSE;
+
+    obj = (uarmc ? uarmc : uarm);
     if (!obj)
         obj = uarmu;
     if (mattk->adtyp == AD_DRIN)
@@ -1091,7 +1353,7 @@ struct attack *mattk;
     if (obj && (obj->greased || obj->otyp == OILSKIN_CLOAK)
         && (!obj->cursed || rn2(3))) {
 #if 0 /*JP:T*/
-        pline("%s %s your %s %s!", Monnam(mtmp),
+        pline_mon(mtmp, "%s %s your %s %s!", Monnam(mtmp),
               (mattk->adtyp == AD_WRAP) ? "slips off of"
                                         : "grabs you, but cannot hold onto",
               obj->greased ? "greased" : "slippery",
@@ -1101,20 +1363,20 @@ struct attack *mattk;
                   ? xname(obj)
                   : cloak_simple_name(obj));
 #else
-        pline("%s‚Í%s%s%sI", Monnam(mtmp),
-              obj->greased ? "–û‚Ì“h‚ç‚ê‚½" : "ŠŠ‚è‚â‚·‚¢",
+        pline_mon(mtmp, "%sã¯%s%s%sï¼", Monnam(mtmp),
+              obj->greased ? "æ²¹ã®å¡—ã‚‰ã‚ŒãŸ" : "æ»‘ã‚Šã‚„ã™ã„",
               (obj->greased || objects[obj->otyp].oc_name_known)
                   ? xname(obj)
                   : cloak_simple_name(obj),
-              (mattk->adtyp == AD_WRAP) ? "‚ÅŠŠ‚Á‚½"
-                                        : "‚ğ‚Â‚©‚Ü‚¦‚æ‚¤‚Æ‚µ‚½‚ªC‚Å‚«‚È‚©‚Á‚½");
+              (mattk->adtyp == AD_WRAP) ? "ã§æ»‘ã£ãŸ"
+                                        : "ã‚’ã¤ã‹ã¾ãˆã‚ˆã†ã¨ã—ãŸãŒï¼Œã§ããªã‹ã£ãŸ");
 #endif
 
         if (obj->greased && !rn2(2)) {
 /*JP
             pline_The("grease wears off.");
 */
-            pline("‰‚Í—‚¿‚Ä‚µ‚Ü‚Á‚½D");
+            pline("è„‚ã¯è½ã¡ã¦ã—ã¾ã£ãŸï¼");
             obj->greased = 0;
             update_inventory();
         }
@@ -1125,23 +1387,25 @@ struct attack *mattk;
 
 /* armor that sufficiently covers the body might be able to block magic */
 int
-magic_negation(mon)
-struct monst *mon;
+magic_negation(struct monst *mon)
 {
     struct obj *o;
     long wearmask;
     int armpro, mc = 0;
-    boolean is_you = (mon == &youmonst),
+    boolean is_you = (mon == &gy.youmonst),
+            via_amul = FALSE,
             gotprot = is_you ? (EProtection != 0L)
                              /* high priests have innate protection */
-                             : (mon->data == &mons[PM_HIGH_PRIEST]);
+                             : (mon->data == &mons[PM_HIGH_CLERIC]);
 
-    for (o = is_you ? invent : mon->minvent; o; o = o->nobj) {
+    for (o = is_you ? gi.invent : mon->minvent; o; o = o->nobj) {
         /* a_can field is only applicable for armor (which must be worn) */
         if ((o->owornmask & W_ARMOR) != 0L) {
             armpro = objects[o->otyp].a_can;
             if (armpro > mc)
                 mc = armpro;
+        } else if ((o->owornmask & W_AMUL) != 0L) {
+            via_amul = (o->otyp == AMULET_OF_GUARDING);
         }
         /* if we've already confirmed Protection, skip additional checks */
         if (is_you || gotprot)
@@ -1156,15 +1420,18 @@ struct monst *mon;
     }
 
     if (gotprot) {
-        /* extrinsic Protection increases mc by 1 */
-        if (mc < 3)
-            mc += 1;
+        /* extrinsic Protection increases mc by 1 (2 for amulet of guarding);
+           multiple sources don't provide multiple increments */
+        mc += via_amul ? 2 : 1;
+        if (mc > 3)
+            mc = 3;
     } else if (mc < 1) {
         /* intrinsic Protection is weaker (play balance; obtaining divine
            protection is too easy); it confers minimum mc 1 instead of 0 */
         if ((is_you && ((HProtection && u.ublessed > 0) || u.uspellprot))
             /* aligned priests and angels have innate intrinsic Protection */
-            || (mon->data == &mons[PM_ALIGNED_PRIEST] || is_minion(mon->data)))
+            || (mon->data == &mons[PM_ALIGNED_CLERIC]
+                || is_minion(mon->data)))
             mc = 1;
     }
     return mc;
@@ -1172,21 +1439,19 @@ struct monst *mon;
 
 /*
  * hitmu: monster hits you
- *        returns 2 if monster dies (e.g. "yellow light"), 1 otherwise
- *        3 if the monster lives but teleported/paralyzed, so it can't keep
- *             attacking you
- */
-STATIC_OVL int
-hitmu(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack *mattk;
+ * returns MM_ flags
+*/
+staticfn int
+hitmu(struct monst *mtmp, struct attack *mattk)
 {
     struct permonst *mdat = mtmp->data;
-    int uncancelled, ptmp;
-    int dmg, armpro, permdmg, tmphp;
-    char buf[BUFSZ];
-    struct permonst *olduasmon = youmonst.data;
+    struct permonst *olduasmon = gy.youmonst.data;
     int res;
+    struct mhitm_data mhm;
+    mhm.hitflags = M_ATTK_MISS;
+    mhm.permdmg = 0;
+    mhm.specialdmg = 0;
+    mhm.done = FALSE;
 
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
@@ -1196,13 +1461,14 @@ register struct attack *mattk;
      */
     if (mtmp->mundetected && (hides_under(mdat) || mdat->mlet == S_EEL)) {
         mtmp->mundetected = 0;
-        if (!(Blind ? Blind_telepat : Unblind_telepat)) {
+        if (!tp_sensemon(mtmp) && !Detect_monsters) {
             struct obj *obj;
-#if 0 /*JP*/
+#if 0 /*JP*//*unused*/
             const char *what;
+            char Amonbuf[BUFSZ];
 #endif
 
-            if ((obj = level.objects[mtmp->mx][mtmp->my]) != 0) {
+            if ((obj = svl.level.objects[mtmp->mx][mtmp->my]) != 0) {
 #if 0 /*JP*/
                 if (Blind && !obj->dknown)
                     what = something;
@@ -1211,14 +1477,18 @@ register struct attack *mattk;
                 else
                     what = doname(obj);
 
-                pline("%s was hidden under %s!", Amonnam(mtmp), what);
+                Strcpy(Amonbuf, Amonnam(mtmp));
+                /* mtmp might be invisible with hero unable to see same */
+                if (!strcmp(Amonbuf, "It")) /* note: not strcmpi() */
+                    Strcpy(Amonbuf, Something);
+                pline("%s was hidden under %s!", Amonbuf, what);
 #else
                 if (Blind && !obj->dknown)
-                    pline("%s‚ª‰½‚©‚Ì‰º‚É‰B‚ê‚Ä‚¢‚éI", Amonnam(mtmp));
+                    pline("%sãŒä½•ã‹ã®ä¸‹ã«éš ã‚Œã¦ã„ã‚‹ï¼", Amonnam(mtmp));
                 else if (is_pool(mtmp->mx, mtmp->my) && !Underwater)
-                    pline("%s‚ª…’†‚É‰B‚ê‚Ä‚¢‚éI", Amonnam(mtmp));
+                    pline("%sãŒæ°´ä¸­ã«éš ã‚Œã¦ã„ã‚‹ï¼", Amonnam(mtmp));
                 else
-                    pline("%s‚ª%s‚Ì‰º‚É‰B‚ê‚Ä‚¢‚éI", Amonnam(mtmp), doname(obj));
+                    pline("%sãŒ%sã®ä¸‹ã«éš ã‚Œã¦ã„ã‚‹ï¼", Amonnam(mtmp), doname(obj));
 #endif
             }
             newsym(mtmp->mx, mtmp->my);
@@ -1226,992 +1496,42 @@ register struct attack *mattk;
     }
 
     /*  First determine the base damage done */
-    dmg = d((int) mattk->damn, (int) mattk->damd);
+    mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     if ((is_undead(mdat) || is_vampshifter(mtmp)) && midnight())
-        dmg += d((int) mattk->damn, (int) mattk->damd); /* extra damage */
+        mhm.damage += d((int) mattk->damn, (int) mattk->damd); /* extra dmg */
 
-    /*  Next a cancellation factor.
-     *  Use uncancelled when cancellation factor takes into account certain
-     *  armor's special magic protection.  Otherwise just use !mtmp->mcan.
-     */
-    armpro = magic_negation(&youmonst);
-    uncancelled = !mtmp->mcan && (rn2(10) >= 3 * armpro);
+    mhitm_adtyping(mtmp, mattk, &gy.youmonst, &mhm);
 
-    permdmg = 0;
-    /*  Now, adjust damages via resistances or specific attacks */
-    switch (mattk->adtyp) {
-    case AD_PHYS:
-        if (mattk->aatyp == AT_HUGS && !sticks(youmonst.data)) {
-            if (!u.ustuck && rn2(2)) {
-                if (u_slip_free(mtmp, mattk)) {
-                    dmg = 0;
-                } else {
-                    u.ustuck = mtmp;
-/*JP
-                    pline("%s grabs you!", Monnam(mtmp));
-*/
-                    pline("%s‚É‚Â‚©‚Ü‚¦‚ç‚ê‚Ä‚¢‚éI", Monnam(mtmp));
-                }
-            } else if (u.ustuck == mtmp) {
-                exercise(A_STR, FALSE);
-#if 0 /*JP:T*/
-                You("are being %s.", (mtmp->data == &mons[PM_ROPE_GOLEM])
-                                         ? "choked"
-                                         : "crushed");
-#else
-                You("%s‚Ä‚¢‚éD", (mtmp->data == &mons[PM_ROPE_GOLEM])
-                                         ? "ñ‚ği‚ß‚ç‚ê"
-                                         : "‰Ÿ‚µ‚Â‚Ô‚³‚ê");
-#endif
-            }
-        } else { /* hand to hand weapon */
-            struct obj *otmp = mon_currwep;
+    (void) mhitm_knockback(mtmp, &gy.youmonst, mattk, &mhm.hitflags,
+                           (MON_WEP(mtmp) != 0));
 
-            if (mattk->aatyp == AT_WEAP && otmp) {
-                struct obj *marmg;
-                int tmp;
+    if (mhm.done)
+        return mhm.hitflags;
 
-                if (otmp->otyp == CORPSE
-                    && touch_petrifies(&mons[otmp->corpsenm])) {
-                    dmg = 1;
-#if 0 /*JP:T*/
-                    pline("%s hits you with the %s corpse.", Monnam(mtmp),
-                          mons[otmp->corpsenm].mname);
-#else
-                    pline("%s‚Í%s‚Ì€‘Ì‚ÅUŒ‚‚µ‚½D", Monnam(mtmp),
-                          mons[otmp->corpsenm].mname);
-#endif
-                    if (!Stoned)
-                        goto do_stone;
-                }
-                dmg += dmgval(otmp, &youmonst);
-                if ((marmg = which_armor(mtmp, W_ARMG)) != 0
-                    && marmg->otyp == GAUNTLETS_OF_POWER)
-                    dmg += rn1(4, 3); /* 3..6 */
-                if (dmg <= 0)
-                    dmg = 1;
-                if (!(otmp->oartifact
-                      && artifact_hit(mtmp, &youmonst, otmp, &dmg, dieroll)))
-                    hitmsg(mtmp, mattk);
-                if (!dmg)
-                    break;
-                if (objects[otmp->otyp].oc_material == SILVER
-                    && Hate_silver) {
-/*JP
-                    pline_The("silver sears your flesh!");
-*/
-                    pline("‚ ‚È‚½‚Ì‘Ì‚Í‹â‚ÅÄ‚©‚ê‚½I");
-                    exercise(A_CON, FALSE);
-                }
-                /* this redundancy necessary because you have
-                   to take the damage _before_ being cloned;
-                   need to have at least 2 hp left to split */
-                tmp = dmg;
-                if (u.uac < 0)
-                    tmp -= rnd(-u.uac);
-                if (tmp < 1)
-                    tmp = 1;
-                if (u.mh - tmp > 1
-                    && (objects[otmp->otyp].oc_material == IRON
-                        /* relevant 'metal' objects are scalpel and tsurugi */
-                        || objects[otmp->otyp].oc_material == METAL)
-                    && (u.umonnum == PM_BLACK_PUDDING
-                        || u.umonnum == PM_BROWN_PUDDING)) {
-                    if (tmp > 1)
-                        exercise(A_STR, FALSE);
-                    /* inflict damage now; we know it can't be fatal */
-                    u.mh -= tmp;
-                    context.botl = 1;
-                    dmg = 0; /* don't inflict more damage below */
-                    if (cloneu())
-/*JP
-                        You("divide as %s hits you!", mon_nam(mtmp));
-*/
-                        pline("%s‚ÌUŒ‚‚É‚æ‚Á‚Ä‚ ‚È‚½‚Í•ª—ô‚µ‚½I", mon_nam(mtmp));
-                }
-                rustm(&youmonst, otmp);
-            } else if (mattk->aatyp != AT_TUCH || dmg != 0
-                       || mtmp != u.ustuck)
-                hitmsg(mtmp, mattk);
-        }
-        break;
-    case AD_DISE:
-        hitmsg(mtmp, mattk);
-        if (!diseasemu(mdat))
-            dmg = 0;
-        break;
-    case AD_FIRE:
-        hitmsg(mtmp, mattk);
-        if (uncancelled) {
-/*JP
-            pline("You're %s!", on_fire(youmonst.data, mattk));
-*/
-            pline("‚ ‚È‚½‚Í%sI", on_fire(youmonst.data, mattk));
-            if (completelyburns(youmonst.data)) { /* paper or straw golem */
-/*JP
-                You("go up in flames!");
-*/
-                You("‰Š‚É•ï‚Ü‚ê‚½I");
-                /* KMH -- this is okay with unchanging */
-                rehumanize();
-                break;
-            } else if (Fire_resistance) {
-/*JP
-                pline_The("fire doesn't feel hot!");
-*/
-                pline("‰Î‚Í‚º‚ñ‚º‚ñ”M‚­‚È‚¢I");
-                dmg = 0;
-            }
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(SCROLL_CLASS, AD_FIRE);
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(POTION_CLASS, AD_FIRE);
-            if ((int) mtmp->m_lev > rn2(25))
-                destroy_item(SPBOOK_CLASS, AD_FIRE);
-            burn_away_slime();
-        } else
-            dmg = 0;
-        break;
-    case AD_COLD:
-        hitmsg(mtmp, mattk);
-        if (uncancelled) {
-/*JP
-            pline("You're covered in frost!");
-*/
-            You("•X‚Å•¢‚í‚ê‚½I");
-            if (Cold_resistance) {
-/*JP
-                pline_The("frost doesn't seem cold!");
-*/
-                pline("•X‚Í—â‚³‚ğŠ´‚¶‚³‚¹‚È‚¢I");
-                dmg = 0;
-            }
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(POTION_CLASS, AD_COLD);
-        } else
-            dmg = 0;
-        break;
-    case AD_ELEC:
-        hitmsg(mtmp, mattk);
-        if (uncancelled) {
-/*JP
-            You("get zapped!");
-*/
-            You("“dŒ‚‚ğ‚­‚ç‚Á‚½I");
-            if (Shock_resistance) {
-/*JP
-                pline_The("zap doesn't shock you!");
-*/
-                pline("“dŒ‚‚Í‚µ‚Ñ‚ê‚ğŠ´‚¶‚³‚¹‚È‚¢I");
-                dmg = 0;
-            }
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(WAND_CLASS, AD_ELEC);
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(RING_CLASS, AD_ELEC);
-        } else
-            dmg = 0;
-        break;
-    case AD_SLEE:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && multi >= 0 && !rn2(5)) {
-            if (Sleep_resistance)
-                break;
-            fall_asleep(-rnd(10), TRUE);
-            if (Blind)
-/*JP
-                You("are put to sleep!");
-*/
-                You("–°‚è‚É‚¨‚¿‚½I");
-            else
-/*JP
-                You("are put to sleep by %s!", mon_nam(mtmp));
-*/
-                You("%s‚É–°‚ç‚³‚ê‚½I", mon_nam(mtmp));
-        }
-        break;
-    case AD_BLND:
-        if (can_blnd(mtmp, &youmonst, mattk->aatyp, (struct obj *) 0)) {
-            if (!Blind)
-/*JP
-                pline("%s blinds you!", Monnam(mtmp));
-*/
-                pline("%s‚ÌUŒ‚‚Å–Ú‚ªŒ©‚¦‚È‚­‚È‚Á‚½I", Monnam(mtmp));
-            make_blinded(Blinded + (long) dmg, FALSE);
-            if (!Blind)
-                Your1(vision_clears);
-        }
-        dmg = 0;
-        break;
-    case AD_DRST:
-        ptmp = A_STR;
-        goto dopois;
-    case AD_DRDX:
-        ptmp = A_DEX;
-        goto dopois;
-    case AD_DRCO:
-        ptmp = A_CON;
- dopois:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(8)) {
-#if 0 /*JP:T*/
-            Sprintf(buf, "%s %s", s_suffix(Monnam(mtmp)),
-                    mpoisons_subj(mtmp, mattk));
-#else
-            Sprintf(buf, "%s‚Ì%s", Monnam(mtmp),
-                    mpoisons_subj(mtmp, mattk));
-#endif
-            poisoned(buf, ptmp, mdat->mname, 30, FALSE);
-        }
-        break;
-    case AD_DRIN:
-        hitmsg(mtmp, mattk);
-        if (defends(AD_DRIN, uwep) || !has_head(youmonst.data)) {
-/*JP
-            You("don't seem harmed.");
-*/
-            You("‚Â‚¢‚Ä‚¢‚È‚¢‚æ‚¤‚¾D");
-            /* Not clear what to do for green slimes */
-            break;
-        }
-        if (u_slip_free(mtmp, mattk))
-            break;
-
-        if (uarmh && rn2(8)) {
-            /* not body_part(HEAD) */
-/*JP
-            Your("%s blocks the attack to your head.",
-*/
-            Your("%s‚ª“ª‚Ö‚ÌUŒ‚‚ğ–h‚¢‚¾D",
-                 helm_simple_name(uarmh));
-            break;
-        }
-        /* negative armor class doesn't reduce this damage */
-        if (Half_physical_damage)
-            dmg = (dmg + 1) / 2;
-        mdamageu(mtmp, dmg);
-        dmg = 0; /* don't inflict a second dose below */
-
-        if (!uarmh || uarmh->otyp != DUNCE_CAP) {
-            /* eat_brains() will miss if target is mindless (won't
-               happen here; hero is considered to retain his mind
-               regardless of current shape) or is noncorporeal
-               (can't happen here; no one can poly into a ghost
-               or shade) so this check for missing is academic */
-            if (eat_brains(mtmp, &youmonst, TRUE, (int *) 0) == MM_MISS)
-                break;
-        }
-        /* adjattrib gives dunce cap message when appropriate */
-        (void) adjattrib(A_INT, -rnd(2), FALSE);
-        forget_levels(25);  /* lose memory of 25% of levels */
-        forget_objects(25); /* lose memory of 25% of objects */
-        break;
-    case AD_PLYS:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && multi >= 0 && !rn2(3)) {
-            if (Free_action) {
-/*JP
-                You("momentarily stiffen.");
-*/
-                You("ˆêud’¼‚µ‚½D");
-            } else {
-                if (Blind)
-/*JP
-                    You("are frozen!");
-*/
-                    You("“®‚¯‚È‚¢I");
-                else
-/*JP
-                    You("are frozen by %s!", mon_nam(mtmp));
-*/
-                    pline("%s‚É‚æ‚Á‚Ä“®‚¯‚È‚­‚È‚Á‚½I", mon_nam(mtmp));
-                nomovemsg = You_can_move_again;
-                nomul(-rnd(10));
-/*JP
-                multi_reason = "paralyzed by a monster";
-*/
-                multi_reason = "‰ö•¨‚É–ƒáƒ‚³‚¹‚ç‚ê‚½Œ„‚É";
-                exercise(A_DEX, FALSE);
-            }
-        }
-        break;
-    case AD_DRLI:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(3) && !Drain_resistance) {
-/*JP
-            losexp("life drainage");
-*/
-            losexp("¶–½—Í‚ğ‹zû‚³‚ê‚Ä");
-        }
-        break;
-    case AD_LEGS: {
-        long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
-/*JP
-        const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left",
-*/
-        const char *sidestr = (side == RIGHT_SIDE) ? "‰E" : "¶",
-                   *Monst_name = Monnam(mtmp), *leg = body_part(LEG);
-
-        /* This case is too obvious to ignore, but Nethack is not in
-         * general very good at considering height--most short monsters
-         * still _can_ attack you when you're flying or mounted.
-         */
-        if ((u.usteed || Levitation || Flying) && !is_flyer(mtmp->data)) {
-/*JP
-            pline("%s tries to reach your %s %s!", Monst_name, sidestr, leg);
-*/
-            pline("%s‚Í‚ ‚È‚½‚Ì%s%s‚ÉUŒ‚‚µ‚æ‚¤‚Æ‚µ‚½I", Monst_name, sidestr, leg);
-            dmg = 0;
-        } else if (mtmp->mcan) {
-#if 0 /*JP:T*/
-            pline("%s nuzzles against your %s %s!", Monnam(mtmp),
-                  sidestr, leg);
-#else
-            pline("%s‚Í‚ ‚È‚½‚Ì%s%s‚É•@‚ğ‚·‚è‚æ‚¹‚½I", Monnam(mtmp),
-                  sidestr, leg);
-#endif
-            dmg = 0;
-        } else {
-            if (uarmf) {
-                if (rn2(2) && (uarmf->otyp == LOW_BOOTS
-                               || uarmf->otyp == IRON_SHOES)) {
-#if 0 /*JP:T*/
-                    pline("%s pricks the exposed part of your %s %s!",
-                          Monst_name, sidestr, leg);
-#else
-                    pline("%s‚Í‚ ‚È‚½‚Ì%s%s‚ğ‚¿‚­‚è‚Æh‚µ‚½I",
-                          Monst_name, sidestr, leg);
-#endif
-                } else if (!rn2(5)) {
-#if 0 /*JP:T*/
-                    pline("%s pricks through your %s boot!", Monst_name,
-                          sidestr);
-#else
-                    pline("%s‚Í‚ ‚È‚½‚Ì%s‚ÌŒC‚²‚µ‚É‚¿‚­‚è‚Æh‚µ‚½I", Monst_name,
-                          sidestr);
-#endif
-                } else {
-#if 0 /*JP:T*/
-                    pline("%s scratches your %s boot!", Monst_name,
-                          sidestr);
-#else
-                    pline("%s‚Í‚ ‚È‚½‚Ì%s‚ÌŒC‚ğ‚Ğ‚Á‚©‚¢‚½I", Monst_name,
-                          sidestr);
-#endif
-                    dmg = 0;
-                    break;
-                }
-            } else
-/*JP
-                pline("%s pricks your %s %s!", Monst_name, sidestr, leg);
-*/
-                pline("%s‚Í‚ ‚È‚½‚Ì%s%s‚ğ‚¿‚­‚è‚Æh‚µ‚½I", Monst_name, sidestr, leg);
-
-            set_wounded_legs(side, rnd(60 - ACURR(A_DEX)));
-            exercise(A_STR, FALSE);
-            exercise(A_DEX, FALSE);
-        }
-        break;
-    }
-    case AD_STON: /* cockatrice */
-        hitmsg(mtmp, mattk);
-        if (!rn2(3)) {
-            if (mtmp->mcan) {
-                if (!Deaf)
-/*JP
-                    You_hear("a cough from %s!", mon_nam(mtmp));
-*/
-                    You_hear("%s‚ªƒSƒzƒbƒSƒzƒb‚Æ‚¢‚¤‰¹‚ğ•·‚¢‚½I", mon_nam(mtmp));
-            } else {
-                if (!Deaf)
-/*JP
-                    You_hear("%s hissing!", s_suffix(mon_nam(mtmp)));
-*/
-                    You_hear("%s‚ªƒVƒ…[ƒb‚Æ‚¢‚¤º‚ğ•·‚¢‚½I", mon_nam(mtmp));
-                if (!rn2(10)
-                    || (flags.moonphase == NEW_MOON && !have_lizard())) {
- do_stone:
-                    if (!Stoned && !Stone_resistance
-                        && !(poly_when_stoned(youmonst.data)
-                             && polymon(PM_STONE_GOLEM))) {
-                        int kformat = KILLED_BY_AN;
-                        const char *kname = mtmp->data->mname;
-
-                        if (mtmp->data->geno & G_UNIQ) {
-                            if (!type_is_pname(mtmp->data))
-                                kname = the(kname);
-                            kformat = KILLED_BY;
-                        }
-                        make_stoned(5L, (char *) 0, kformat, kname);
-                        return 1;
-                        /* done_in_by(mtmp, STONING); */
-                    }
-                }
-            }
-        }
-        break;
-    case AD_STCK:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !u.ustuck && !sticks(youmonst.data))
-            u.ustuck = mtmp;
-        break;
-    case AD_WRAP:
-        if ((!mtmp->mcan || u.ustuck == mtmp) && !sticks(youmonst.data)) {
-            if (!u.ustuck && !rn2(10)) {
-                if (u_slip_free(mtmp, mattk)) {
-                    dmg = 0;
-                } else {
-/*JP
-                    pline("%s swings itself around you!", Monnam(mtmp));
-*/
-                    pline("%s‚Í‚ ‚È‚½‚É‘Ì‚ğ—‚İ‚Â‚©‚¹‚½I", Monnam(mtmp));
-                    u.ustuck = mtmp;
-                }
-            } else if (u.ustuck == mtmp) {
-                if (is_pool(mtmp->mx, mtmp->my) && !Swimming && !Amphibious) {
-                    boolean moat = (levl[mtmp->mx][mtmp->my].typ != POOL)
-                                   && (levl[mtmp->mx][mtmp->my].typ != WATER)
-                                   && !Is_medusa_level(&u.uz)
-                                   && !Is_waterlevel(&u.uz);
-
-/*JP
-                    pline("%s drowns you...", Monnam(mtmp));
-*/
-                    pline("‚ ‚È‚½‚Í%s‚É—‚İ‚Â‚©‚ê‚Ä“M‚ê‚½DDD", Monnam(mtmp));
-                    killer.format = KILLED_BY_AN;
-#if 0 /*JP*/
-                    Sprintf(killer.name, "%s by %s",
-                            moat ? "moat" : "pool of water",
-                            an(mtmp->data->mname));
-#else
-                    Sprintf(buf, "%s‚Ì%s‚É—‚İ‚Â‚©‚ê‚Ä",
-                            moat ? "–x" : "’r",
-                            mtmp->data->mname);
-#endif
-                    done(DROWNING);
-                } else if (mattk->aatyp == AT_HUGS)
-/*JP
-                    You("are being crushed.");
-*/
-                    You("‚Â‚Ô‚³‚ê‚Â‚Â‚ ‚éD");
-            } else {
-                dmg = 0;
-                if (flags.verbose)
-#if 0 /*JP:T*/
-                    pline("%s brushes against your %s.", Monnam(mtmp),
-                          body_part(LEG));
-#else
-                    pline("%s‚Í‚ ‚È‚½‚Ì%s‚ÉG‚ê‚½D", Monnam(mtmp),
-                          body_part(LEG));
-#endif
-            }
-        } else
-            dmg = 0;
-        break;
-    case AD_WERE:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(4) && u.ulycn == NON_PM
-            && !Protection_from_shape_changers && !defends(AD_WERE, uwep)) {
-/*JP
-            You_feel("feverish.");
-*/
-            You("”M‚ª‚ ‚é‚æ‚¤‚È‹C‚ª‚µ‚½D");
-            exercise(A_CON, FALSE);
-            set_ulycn(monsndx(mdat));
-            retouch_equipment(2);
-        }
-        break;
-    case AD_SGLD:
-        hitmsg(mtmp, mattk);
-        if (youmonst.data->mlet == mdat->mlet)
-            break;
-        if (!mtmp->mcan)
-            stealgold(mtmp);
-        break;
-
-    case AD_SSEX:
-        if (SYSOPT_SEDUCE) {
-            if (could_seduce(mtmp, &youmonst, mattk) == 1 && !mtmp->mcan)
-                if (doseduce(mtmp))
-                    return 3;
-            break;
-        }
-        /*FALLTHRU*/
-    case AD_SITM: /* for now these are the same */
-    case AD_SEDU:
-        if (is_animal(mtmp->data)) {
-            hitmsg(mtmp, mattk);
-            if (mtmp->mcan)
-                break;
-            /* Continue below */
-        } else if (dmgtype(youmonst.data, AD_SEDU)
-                   /* !SYSOPT_SEDUCE: when hero is attacking and AD_SSEX
-                      is disabled, it would be changed to another damage
-                      type, but when defending, it remains as-is */
-                   || dmgtype(youmonst.data, AD_SSEX)) {
-#if 0 /*JP:T*/
-            pline("%s %s.", Monnam(mtmp),
-                  Deaf ? "says something but you can't hear it"
-                       : mtmp->minvent
-                      ? "brags about the goods some dungeon explorer provided"
-                  : "makes some remarks about how difficult theft is lately");
-#else
-            pline("%s‚Í%sD", Monnam(mtmp),
-                  Deaf ? "‰½‚©‚ğŒ¾‚Á‚½‚ª•·‚±‚¦‚È‚©‚Á‚½"
-                       : mtmp->minvent
-                      ? "‚ ‚é–À‹{’TŒŸ‰Æ‚ª’u‚¢‚Ä‚Á‚½•i•¨‚ğ©–‚µ‚½"
-                  : "Å‹ßŞ“‚ª‚¢‚©‚É¢“ï‚©’WX‚Æq‚×‚½");
-#endif
-            if (!tele_restrict(mtmp))
-                (void) rloc(mtmp, TRUE);
-            return 3;
-        } else if (mtmp->mcan) {
-            if (!Blind)
-#if 0 /*JP:T*/
-                pline("%s tries to %s you, but you seem %s.",
-                      Adjmonnam(mtmp, "plain"),
-                      flags.female ? "charm" : "seduce",
-                      flags.female ? "unaffected" : "uninterested");
-#else
-                pline("%s‚Í‚ ‚È‚½‚ğ%s‚µ‚æ‚¤‚Æ‚µ‚½C‚µ‚©‚µ‚ ‚È‚½‚Í%sD",
-                      Adjmonnam(mtmp, "’n–¡‚È"),
-                      flags.female ? "–£—¹" : "—U˜f",
-                      flags.female ? "‰e‹¿‚ğó‚¯‚È‚¢" : "‹»–¡‚ª‚È‚¢");
-#endif
-            if (rn2(3)) {
-                if (!tele_restrict(mtmp))
-                    (void) rloc(mtmp, TRUE);
-                return 3;
-            }
-            break;
-        }
-        buf[0] = '\0';
-        switch (steal(mtmp, buf)) {
-        case -1:
-            return 2;
-        case 0:
-            break;
-        default:
-            if (!is_animal(mtmp->data) && !tele_restrict(mtmp))
-                (void) rloc(mtmp, TRUE);
-            if (is_animal(mtmp->data) && *buf) {
-                if (canseemon(mtmp))
-#if 0 /*JP:T*/
-                    pline("%s tries to %s away with %s.", Monnam(mtmp),
-                          locomotion(mtmp->data, "run"), buf);
-#else
-                    pline("%s‚Í%s‚ğ‚Á‚Ä“¦‚°o‚µ‚½D", Monnam(mtmp),
-                          buf);
-#endif
-            }
-            monflee(mtmp, 0, FALSE, FALSE);
-            return 3;
-        }
-        break;
-
-    case AD_SAMU:
-        hitmsg(mtmp, mattk);
-        /* when the Wizard or quest nemesis hits, there's a 1/20 chance
-           to steal a quest artifact (any, not just the one for the hero's
-           own role) or the Amulet or one of the invocation tools */
-        if (!rn2(20))
-            stealamulet(mtmp);
-        break;
-
-    case AD_TLPT:
-        hitmsg(mtmp, mattk);
-        if (uncancelled) {
-            if (flags.verbose)
-#if 0 /*JP:T*/
-                Your("position suddenly seems %suncertain!",
-                     (Teleport_control && !Stunned && !unconscious()) ? ""
-                     : "very ");
-#else
-                pline("©•ª‚Ì‚¢‚éˆÊ’u‚ª“Ë‘R%s•s–¾Šm‚É‚È‚Á‚½I",
-                     (Teleport_control && !Stunned && !unconscious()) ? ""
-                     : "‚Æ‚Ä‚à");
-#endif
-            tele();
-            /* As of 3.6.2:  make sure damage isn't fatal; previously, it
-               was possible to be teleported and then drop dead at
-               the destination when QM's 1d4 damage gets applied below;
-               even though that wasn't "wrong", it seemed strange,
-               particularly if the teleportation had been controlled
-               [applying the damage first and not teleporting if fatal
-               is another alternative but it has its own complications] */
-            if ((Half_physical_damage ? (dmg - 1) / 2 : dmg)
-                >= (tmphp = (Upolyd ? u.mh : u.uhp))) {
-                dmg = tmphp - 1;
-                if (Half_physical_damage)
-                    dmg *= 2; /* doesn't actually increase damage; we only
-                               * get here if half the original damage would
-                               * would have been fatal, so double reduced
-                               * damage will be less than original damage */
-                if (dmg < 1) { /* implies (tmphp <= 1) */
-                    dmg = 1;
-                    /* this might increase current HP beyond maximum HP but
-                       it will be immediately reduced below, so that should
-                       be indistinguishable from zero damage; we don't drop
-                       damage all the way to zero because that inhibits any
-                       passive counterattack if poly'd hero has one */
-                    if (Upolyd && u.mh == 1)
-                        ++u.mh;
-                    else if (!Upolyd && u.uhp == 1)
-                        ++u.uhp;
-                    /* [don't set context.botl here] */
-                }
-            }
-        }
-        break;
-    case AD_RUST:
-        hitmsg(mtmp, mattk);
-        if (mtmp->mcan)
-            break;
-        if (u.umonnum == PM_IRON_GOLEM) {
-/*JP
-            You("rust!");
-*/
-            You("K‚Ñ‚Â‚¢‚½I");
-            /* KMH -- this is okay with unchanging */
-            rehumanize();
-            break;
-        }
-        erode_armor(&youmonst, ERODE_RUST);
-        break;
-    case AD_CORR:
-        hitmsg(mtmp, mattk);
-        if (mtmp->mcan)
-            break;
-        erode_armor(&youmonst, ERODE_CORRODE);
-        break;
-    case AD_DCAY:
-        hitmsg(mtmp, mattk);
-        if (mtmp->mcan)
-            break;
-        if (u.umonnum == PM_WOOD_GOLEM || u.umonnum == PM_LEATHER_GOLEM) {
-/*JP
-            You("rot!");
-*/
-            You("•…‚Á‚½I");
-            /* KMH -- this is okay with unchanging */
-            rehumanize();
-            break;
-        }
-        erode_armor(&youmonst, ERODE_ROT);
-        break;
-    case AD_HEAL:
-        /* a cancelled nurse is just an ordinary monster,
-         * nurses don't heal those that cause petrification */
-        if (mtmp->mcan || (Upolyd && touch_petrifies(youmonst.data))) {
-            hitmsg(mtmp, mattk);
-            break;
-        }
-        if (!uwep && !uarmu && !uarm && !uarmc
-            && !uarms && !uarmg && !uarmf && !uarmh) {
-            boolean goaway = FALSE;
-
-/*JP
-            pline("%s hits!  (I hope you don't mind.)", Monnam(mtmp));
-*/
-            pline("%s‚ÌUŒ‚‚Í–½’†‚µ‚½D(‹C‚É‚µ‚È‚¢‚æ‚¤‚ÉD)", Monnam(mtmp));
-            if (Upolyd) {
-                u.mh += rnd(7);
-                if (!rn2(7)) {
-                    /* no upper limit necessary; effect is temporary */
-                    u.mhmax++;
-                    if (!rn2(13))
-                        goaway = TRUE;
-                }
-                if (u.mh > u.mhmax)
-                    u.mh = u.mhmax;
-            } else {
-                u.uhp += rnd(7);
-                if (!rn2(7)) {
-                    /* hard upper limit via nurse care: 25 * ulevel */
-                    if (u.uhpmax < 5 * u.ulevel + d(2 * u.ulevel, 10))
-                        u.uhpmax++;
-                    if (!rn2(13))
-                        goaway = TRUE;
-                }
-                if (u.uhp > u.uhpmax)
-                    u.uhp = u.uhpmax;
-            }
-            if (!rn2(3))
-                exercise(A_STR, TRUE);
-            if (!rn2(3))
-                exercise(A_CON, TRUE);
-            if (Sick)
-                make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-            context.botl = 1;
-            if (goaway) {
-                mongone(mtmp);
-                return 2;
-            } else if (!rn2(33)) {
-                if (!tele_restrict(mtmp))
-                    (void) rloc(mtmp, TRUE);
-                monflee(mtmp, d(3, 6), TRUE, FALSE);
-                return 3;
-            }
-            dmg = 0;
-        } else {
-            if (Role_if(PM_HEALER)) {
-                if (!Deaf && !(moves % 5))
-/*JP
-                    verbalize("Doc, I can't help you unless you cooperate.");
-*/
-                    verbalize("ƒhƒNƒ^[I‹¦—Í‚ğ‚¨‚Ë‚ª‚¢‚µ‚Ü‚·‚íD");
-                dmg = 0;
-            } else
-                hitmsg(mtmp, mattk);
-        }
-        break;
-    case AD_CURS:
-        hitmsg(mtmp, mattk);
-        if (!night() && mdat == &mons[PM_GREMLIN])
-            break;
-        if (!mtmp->mcan && !rn2(10)) {
-            if (!Deaf) {
-                if (Blind)
-/*JP
-                    You_hear("laughter.");
-*/
-                    You_hear("Î‚¢º‚ğ•·‚¢‚½D");
-                else
-/*JP
-                    pline("%s chuckles.", Monnam(mtmp));
-*/
-                    pline("%s‚ÍƒNƒXƒNƒXÎ‚Á‚½D", Monnam(mtmp));
-            }
-            if (u.umonnum == PM_CLAY_GOLEM) {
-/*JP
-                pline("Some writing vanishes from your head!");
-*/
-                pline("‚¢‚­‚Â‚©‚Ì•¶š‚ª‚ ‚È‚½‚Ì“ª‚©‚çÁ‚¦‚½I");
-                /* KMH -- this is okay with unchanging */
-                rehumanize();
-                break;
-            }
-            attrcurse();
-        }
-        break;
-    case AD_STUN:
-        hitmsg(mtmp, mattk);
-        if (!mtmp->mcan && !rn2(4)) {
-            make_stunned((HStun & TIMEOUT) + (long) dmg, TRUE);
-            dmg /= 2;
-        }
-        break;
-    case AD_ACID:
-        hitmsg(mtmp, mattk);
-        if (!mtmp->mcan && !rn2(3))
-            if (Acid_resistance) {
-#if 0 /*JP:T*/
-                pline("You're covered in %s, but it seems harmless.",
-                      hliquid("acid"));
-#else
-                pline("%s‚Å•¢‚í‚ê‚½D‚µ‚©‚µ‚Â‚©‚È‚¢D",
-                      hliquid("_"));
-#endif
-                dmg = 0;
-            } else {
-/*JP
-                pline("You're covered in %s!  It burns!", hliquid("acid"));
-*/
-                pline("%s‚Å•¢‚í‚êÄ‚¯‚½I", hliquid("_"));
-                exercise(A_STR, FALSE);
-            }
-        else
-            dmg = 0;
-        break;
-    case AD_SLOW:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && HFast && !defends(AD_SLOW, uwep) && !rn2(4))
-            u_slow_down();
-        break;
-    case AD_DREN:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(4)) /* 25% chance */
-            drain_en(dmg);
-        dmg = 0;
-        break;
-    case AD_CONF:
-        hitmsg(mtmp, mattk);
-        if (!mtmp->mcan && !rn2(4) && !mtmp->mspec_used) {
-            mtmp->mspec_used = mtmp->mspec_used + (dmg + rn2(6));
-            if (Confusion)
-/*JP
-                You("are getting even more confused.");
-*/
-                You("‚Ü‚·‚Ü‚·¬—‚µ‚½D");
-            else
-/*JP
-                You("are getting confused.");
-*/
-                You("¬—‚µ‚Ä‚«‚½D");
-            make_confused(HConfusion + dmg, FALSE);
-        }
-        dmg = 0;
-        break;
-    case AD_DETH:
-/*JP
-        pline("%s reaches out with its deadly touch.", Monnam(mtmp));
-*/
-        pline("%s‚Í€‚Ì˜r‚ğ‚Ì‚Î‚µ‚½D", Monnam(mtmp));
-        if (is_undead(youmonst.data)) {
-            /* Still does normal damage */
-/*JP
-            pline("Was that the touch of death?");
-*/
-            pline("¡‚Ì‚Í€‚Ìé‚¾‚Á‚½‚Ì‚©‚ÈH");
-            break;
-        }
-        switch (rn2(20)) {
-        case 19:
-        case 18:
-        case 17:
-            if (!Antimagic) {
-                killer.format = KILLED_BY_AN;
-/*JP
-                Strcpy(killer.name, "touch of death");
-*/
-                Strcpy(killer.name, "€‚Ìé‚Å");
-                done(DIED);
-                dmg = 0;
-                break;
-            }
-            /*FALLTHRU*/
-        default: /* case 16: ... case 5: */
-/*JP
-            You_feel("your life force draining away...");
-*/
-            You("‘Ì—Í‚ª’D‚í‚ê‚Ä‚¢‚­‚æ‚¤‚È‹C‚ª‚µ‚½DDD");
-            permdmg = 1; /* actual damage done below */
-            break;
-        case 4:
-        case 3:
-        case 2:
-        case 1:
-        case 0:
-            if (Antimagic)
-                shieldeff(u.ux, u.uy);
-/*JP
-            pline("Lucky for you, it didn't work!");
-*/
-            pline("‰^‚Ì‚æ‚¢‚±‚Æ‚É‚È‚ñ‚Æ‚à‚È‚©‚Á‚½I");
-            dmg = 0;
-            break;
-        }
-        break;
-    case AD_PEST:
-/*JP
-        pline("%s reaches out, and you feel fever and chills.", Monnam(mtmp));
-*/
-        pline("%s‚Í˜r‚ğ‚Ì‚Î‚µ‚½C‚ ‚È‚½‚Íˆ«Š¦‚ğŠ´‚¶‚½D", Monnam(mtmp));
-        (void) diseasemu(mdat); /* plus the normal damage */
-        break;
-    case AD_FAMN:
-/*JP
-        pline("%s reaches out, and your body shrivels.", Monnam(mtmp));
-*/
-        pline("%s‚Í˜r‚ğL‚Î‚µ‚½C‚ ‚È‚½‚Ì‘Ì‚Í‚µ‚È‚Ñ‚½D", Monnam(mtmp));
-        exercise(A_CON, FALSE);
-        if (!is_fainted())
-            morehungry(rn1(40, 40));
-        /* plus the normal damage */
-        break;
-    case AD_SLIM:
-        hitmsg(mtmp, mattk);
-        if (!uncancelled)
-            break;
-        if (flaming(youmonst.data)) {
-/*JP
-            pline_The("slime burns away!");
-*/
-            pline_The("ƒXƒ‰ƒCƒ€‚Í”R‚¦‚½I");
-            dmg = 0;
-        } else if (Unchanging || noncorporeal(youmonst.data)
-                   || youmonst.data == &mons[PM_GREEN_SLIME]) {
-/*JP
-            You("are unaffected.");
-*/
-            You("‰e‹¿‚ğó‚¯‚È‚¢D");
-            dmg = 0;
-        } else if (!Slimed) {
-/*JP
-            You("don't feel very well.");
-*/
-            You("‹C•ª‚ªˆ«‚¢D");
-            make_slimed(10L, (char *) 0);
-            delayed_killer(SLIMED, KILLED_BY_AN, mtmp->data->mname);
-        } else
-/*JP
-            pline("Yuck!");
-*/
-            pline("ƒEƒQƒF[I");
-        break;
-    case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
-        hitmsg(mtmp, mattk);
-        /* uncancelled is sufficient enough; please
-           don't make this attack less frequent */
-        if (uncancelled) {
-            struct obj *obj = some_armor(&youmonst);
-
-            if (!obj) {
-                /* some rings are susceptible;
-                   amulets and blindfolds aren't (at present) */
-                switch (rn2(5)) {
-                case 0:
-                    break;
-                case 1:
-                    obj = uright;
-                    break;
-                case 2:
-                    obj = uleft;
-                    break;
-                case 3:
-                    obj = uamul;
-                    break;
-                case 4:
-                    obj = ublindf;
-                    break;
-                }
-            }
-            if (drain_item(obj, FALSE)) {
-/*JP
-                pline("%s less effective.", Yobjnam2(obj, "seem"));
-*/
-                Your("%s‚©‚ç–‚—Í‚ªÁ‚¦‚½‚æ‚¤‚¾D", xname(obj));
-            }
-        }
-        break;
-    default:
-        dmg = 0;
-        break;
-    }
     if ((Upolyd ? u.mh : u.uhp) < 1) {
         /* already dead? call rehumanize() or done_in_by() as appropriate */
         mdamageu(mtmp, 1);
-        dmg = 0;
+        mhm.damage = 0;
     }
 
     /*  Negative armor class reduces damage done instead of fully protecting
      *  against hits.
      */
-    if (dmg && u.uac < 0) {
-        dmg -= rnd(-u.uac);
-        if (dmg < 1)
-            dmg = 1;
+    if (mhm.damage && u.uac < 0) {
+        mhm.damage -= rnd(-u.uac);
+        if (mhm.damage < 1)
+            mhm.damage = 1;
     }
 
-    if (dmg) {
+    if (mhm.damage > 0) {
+        /* [Half_physical_damage isn't applied to mhm.permdmg] */
         if (Half_physical_damage
-            /* Mitre of Holiness */
-            || (Role_if(PM_PRIEST) && uarmh && is_quest_artifact(uarmh)
-                && (is_undead(mtmp->data) || is_demon(mtmp->data)
-                    || is_vampshifter(mtmp))))
-            dmg = (dmg + 1) / 2;
+            /* Mitre of Holiness, even if not currently blessed */
+            || (Role_if(PM_CLERIC) && uarmh && is_quest_artifact(uarmh)
+                && mon_hates_blessings(mtmp)))
+            mhm.damage = (mhm.damage + 1) / 2;
 
-        if (permdmg) { /* Death's life force drain */
+        if (mhm.permdmg) { /* Death's life force drain */
             int lowerlimit, *hpmax_p;
             /*
              * Apply some of the damage to permanent hit points:
@@ -2222,38 +1542,38 @@ register struct attack *mattk;
              *  otherwise        0..50%
              * Never reduces hpmax below 1 hit point per level.
              */
-            permdmg = rn2(dmg / 2 + 1);
+            mhm.permdmg = rn2(mhm.damage / 2 + 1);
             if (Upolyd || u.uhpmax > 25 * u.ulevel)
-                permdmg = dmg;
+                mhm.permdmg = mhm.damage;
             else if (u.uhpmax > 10 * u.ulevel)
-                permdmg += dmg / 2;
+                mhm.permdmg += mhm.damage / 2;
             else if (u.uhpmax > 5 * u.ulevel)
-                permdmg += dmg / 4;
+                mhm.permdmg += mhm.damage / 4;
 
             if (Upolyd) {
                 hpmax_p = &u.mhmax;
-                /* [can't use youmonst.m_lev] */
-                lowerlimit = min((int) youmonst.data->mlevel, u.ulevel);
+                /* [can't use gy.youmonst.m_lev] */
+                lowerlimit = min((int) gy.youmonst.data->mlevel, u.ulevel);
             } else {
                 hpmax_p = &u.uhpmax;
-                lowerlimit = u.ulevel;
+                lowerlimit = minuhpmax(1);
             }
-            if (*hpmax_p - permdmg > lowerlimit)
-                *hpmax_p -= permdmg;
+            if (*hpmax_p - mhm.permdmg > lowerlimit)
+                *hpmax_p -= mhm.permdmg;
             else if (*hpmax_p > lowerlimit)
                 *hpmax_p = lowerlimit;
             /* else unlikely...
-             * already at or below minimum threshold; do nothing */
-            context.botl = 1;
+             * already at or below minimum threshold, do nothing to hpmax */
+            disp.botl = TRUE;
         }
 
-        mdamageu(mtmp, dmg);
+        mdamageu(mtmp, mhm.damage);
     }
 
-    if (dmg)
+    if (mhm.damage)
         res = passiveum(olduasmon, mtmp, mattk);
     else
-        res = 1;
+        res = M_ATTK_HIT;
     stop_occupation();
     return res;
 }
@@ -2262,13 +1582,13 @@ register struct attack *mattk;
  * to see if an engulfing attack should immediately take affect, like
  * a passive attack. TRUE if engulfing blindness occurred */
 boolean
-gulp_blnd_check()
+gulp_blnd_check(void)
 {
     struct attack *mattk;
 
     if (!Blinded && u.uswallow
         && (mattk = attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND))
-        && can_blnd(u.ustuck, &youmonst, mattk->aatyp, (struct obj *) 0)) {
+        && can_blnd(u.ustuck, &gy.youmonst, mattk->aatyp, (struct obj *) 0)) {
         ++u.uswldtim; /* compensate for gulpmu change */
         (void) gulpmu(u.ustuck, mattk);
         return TRUE;
@@ -2276,65 +1596,81 @@ gulp_blnd_check()
     return FALSE;
 }
 
-/* monster swallows you, or damage if u.uswallow */
-STATIC_OVL int
-gulpmu(mtmp, mattk)
-struct monst *mtmp;
-struct attack *mattk;
+/* monster swallows you, or damage if already swallowed (u.uswallow != 0) */
+staticfn int
+gulpmu(struct monst *mtmp, struct attack *mattk)
 {
     struct trap *t = t_at(u.ux, u.uy);
     int tmp = d((int) mattk->damn, (int) mattk->damd);
     int tim_tmp;
-    struct obj *otmp2;
+    struct obj *otmp2, *nextobj;
     int i;
     boolean physical_damage = FALSE;
 
     if (!u.uswallow) { /* swallows you */
         int omx = mtmp->mx, omy = mtmp->my;
 
-        if (!engulf_target(mtmp, &youmonst))
-            return 0;
+        if (!engulf_target(mtmp, &gy.youmonst))
+            return M_ATTK_MISS;
         if ((t && is_pit(t->ttyp)) && sobj_at(BOULDER, u.ux, u.uy))
-            return 0;
+            return M_ATTK_MISS;
+        if (failed_grab(mtmp, &gy.youmonst, mattk))
+            return M_ATTK_MISS;
 
         if (Punished)
             unplacebc(); /* ball&chain go away */
         remove_monster(omx, omy);
         mtmp->mtrapped = 0; /* no longer on old trap */
         place_monster(mtmp, u.ux, u.uy);
-        u.ustuck = mtmp;
+        set_ustuck(mtmp);
         newsym(mtmp->mx, mtmp->my);
-        if (is_animal(mtmp->data) && u.usteed) {
+        /* 5.0: dismount for all engulfers, not just for purple worms */
+        if (u.usteed) {
             char buf[BUFSZ];
 
-            /* Too many quirks presently if hero and steed
-             * are swallowed. Pretend purple worms don't
-             * like horses for now :-)
-             */
             Strcpy(buf, mon_nam(u.usteed));
 #if 0 /*JP:T*/
-            pline("%s lunges forward and plucks you off %s!", Monnam(mtmp),
-                  buf);
-#else
-            pline("%s‚Í“Ëi‚µ‚ ‚È‚½‚ğ%s‚©‚çˆø‚«—‚µ‚½I", Monnam(mtmp),
-                  buf);
+            urgent_pline("%s %s forward and plucks you off %s!",
+                         Some_Monnam(mtmp),
+                         /* 't', purple 'w' */
+                         is_animal(mtmp->data) ? "lunges"
+                           /* 'v', air 'E' */
+                           : is_whirly(mtmp->data) ? "whirls"
+                             /* none (some 'v', already whirling) */
+                             : unsolid(mtmp->data) ? "flows"
+                               /* ochre 'j', Juiblex */
+                               : amorphous(mtmp->data) ? "oozes"
+                                 /* none (all AT_ENGL are already covered) */
+                                 : "surges",
+                         buf);
+#else /*ã€Œçªé€²ã€ã§ã‚·ãƒ³ãƒ—ãƒ«ã«å‡¦ç†*/
+            urgent_pline("%sã¯çªé€²ã—ã‚ãªãŸã‚’%sã‹ã‚‰å¼•ãè½ã—ãŸï¼",
+                         Some_Monnam(mtmp), buf);
 #endif
             dismount_steed(DISMOUNT_ENGULFED);
-        } else
-/*JP
-            pline("%s engulfs you!", Monnam(mtmp));
-*/
-            pline("%s‚Í‚ ‚È‚½‚ğˆù‚İ‚±‚ñ‚¾I", Monnam(mtmp));
+        } else {
+#if 0 /*JP:T*/
+            urgent_pline("%s %s!", Monnam(mtmp),
+                         digests(mtmp->data) ? "swallows you whole"
+                         : enfolds(mtmp->data) ? "folds itself around you"
+                           : "engulfs you");
+#else
+            urgent_pline("%sã¯ã‚ãªãŸ%sï¼", Monnam(mtmp),
+                         digests(mtmp->data) ? "ã‚’ã¾ã‚‹ã”ã¨å·»ãè¾¼ã‚“ã "
+                         : enfolds(mtmp->data) ? "ã®å‘¨ã‚Šã‚’åŒ…ã¿è¾¼ã‚“ã "
+                           : "ã‚’é£²ã¿è¾¼ã‚“ã ");
+#endif
+        }
         stop_occupation();
         reset_occupations(); /* behave as if you had moved */
 
         if (u.utrap) {
 #if 0 /*JP:T*/
             You("are released from the %s!",
-                u.utraptype == TT_WEB ? "web" : "trap");
+                (u.utraptype == TT_WEB) ? "web" : "trap");
 #else
-            You("%s‚©‚ç‰ğ•ú‚³‚ê‚½I",
-                u.utraptype == TT_WEB ? "‚­‚à‚Ì‘ƒ" : "ã©");
+            You("%sã‹ã‚‰è§£æ”¾ã•ã‚ŒãŸï¼",
+                (u.utraptype == TT_WEB) ? "ãã‚‚ã®å·£" : "ç½ ");
 #endif
             reset_utrap(FALSE);
         }
@@ -2346,14 +1682,18 @@ struct attack *mattk;
 
             pline_The("%s %s loose.", s, vtense(s, "snap"));
 #else
-            pline("•R‚Íƒpƒ`ƒ“‚Æ‚Í‚¸‚ê‚½D");
+            pline("ç´ã¯ãƒ‘ãƒãƒ³ã¨ã¯ãšã‚ŒãŸï¼");
 #endif
             unleash_all();
         }
 
-        if (touch_petrifies(youmonst.data) && !resists_ston(mtmp)) {
+        if (touch_petrifies(gy.youmonst.data) && !resists_ston(mtmp)) {
             /* put the attacker back where it started;
-               the resulting statue will end up there */
+               the resulting statue will end up there
+               [note: if poly'd hero could ride or non-poly'd hero could
+               acquire touch_petrifies() capability somehow, this code
+               would need to deal with possibility of steed having taken
+               engulfer's previous spot when hero was forcibly dismounted] */
             remove_monster(mtmp->mx, mtmp->my); /* u.ux,u.uy */
             place_monster(mtmp, omx, omy);
             minstapetrify(mtmp, TRUE);
@@ -2361,8 +1701,8 @@ struct attack *mattk;
                fully swallowed yet so that won't work here */
             if (Punished)
                 placebc();
-            u.ustuck = 0;
-            return (!DEADMONSTER(mtmp)) ? 0 : 2;
+            set_ustuck((struct monst *) 0);
+            return (!DEADMONSTER(mtmp)) ? M_ATTK_MISS : M_ATTK_AGR_DIED;
         }
 
         display_nhwindow(WIN_MESSAGE, FALSE);
@@ -2372,28 +1712,31 @@ struct attack *mattk;
            for other swallowings, longer time means more
            chances for the swallower to attack */
         if (mattk->adtyp == AD_DGST) {
-            tim_tmp = 25 - (int) mtmp->m_lev;
-            if (tim_tmp > 0)
-                tim_tmp = rnd(tim_tmp) / 2;
-            else if (tim_tmp < 0)
-                tim_tmp = -(rnd(-tim_tmp) / 2);
             /* having good armor & high constitution makes
                it take longer for you to be digested, but
                you'll end up trapped inside for longer too */
-            tim_tmp += -u.uac + 10 + (ACURR(A_CON) / 3 - 1);
+            tim_tmp = (int)ACURR(A_CON) + 10 - (int)u.uac + rn2(20);
+            if (tim_tmp < 0)
+                tim_tmp = 0;
+            tim_tmp /= (int) mtmp->m_lev;
+            tim_tmp += 3;
         } else {
             /* higher level attacker takes longer to eject hero */
             tim_tmp = rnd((int) mtmp->m_lev + 10 / 2);
         }
         /* u.uswldtim always set > 1 */
         u.uswldtim = (unsigned) ((tim_tmp < 2) ? 2 : tim_tmp);
-        swallowed(1);
-        for (otmp2 = invent; otmp2; otmp2 = otmp2->nobj)
-            (void) snuff_lit(otmp2);
+        swallowed(1); /* update the map display, shows hero swallowed */
+        if (!flaming(mtmp->data)) {
+            for (otmp2 = gi.invent; otmp2; otmp2 = nextobj) {
+                nextobj = otmp2->nobj;
+                (void) snuff_lit(otmp2);
+            }
+        }
     }
 
     if (mtmp != u.ustuck)
-        return 0;
+        return M_ATTK_MISS;
     if (Punished) {
         /* ball&chain are in limbo while swallowed; update their internal
            location to be at swallower's spot */
@@ -2416,7 +1759,7 @@ struct attack *mattk;
 /*JP
             pline("%s totally digests you!", Monnam(mtmp));
 */
-            pline("%s‚Í‚ ‚È‚½‚ğŠ®‘S‚ÉÁ‰»‚µ‚½I", Monnam(mtmp));
+            pline("%sã¯ã‚ãªãŸã‚’å®Œå…¨ã«æ¶ˆåŒ–ã—ãŸï¼", Monnam(mtmp));
             tmp = u.uhp;
             if (Half_physical_damage)
                 tmp *= 2; /* sorry */
@@ -2426,9 +1769,9 @@ struct attack *mattk;
                   (u.uswldtim == 2) ? " thoroughly"
                                     : (u.uswldtim == 1) ? " utterly" : "");
 #else
-            pline("%s‚Í‚ ‚È‚½‚ğ%sÁ‰»‚µ‚Ä‚¢‚éI", Monnam(mtmp),
-                  (u.uswldtim == 2) ? "“O’ê“I‚É"
-                                    : (u.uswldtim == 1) ? "Š®‘S‚É" : "");
+            pline("%sã¯ã‚ãªãŸã‚’%sæ¶ˆåŒ–ã—ã¦ã„ã‚‹ï¼", Monnam(mtmp),
+                  (u.uswldtim == 2) ? "å¾¹åº•çš„ã«"
+                                    : (u.uswldtim == 1) ? "å®Œå…¨ã«" : "");
 #endif
             exercise(A_STR, FALSE);
         }
@@ -2438,29 +1781,31 @@ struct attack *mattk;
         if (mtmp->data == &mons[PM_FOG_CLOUD]) {
 #if 0 /*JP:T*/
             You("are laden with moisture and %s",
-                flaming(youmonst.data)
+                flaming(gy.youmonst.data)
                     ? "are smoldering out!"
                     : Breathless ? "find it mildly uncomfortable."
-                                 : amphibious(youmonst.data)
+                                 : amphibious(gy.youmonst.data)
                                        ? "feel comforted."
                                        : "can barely breathe!");
 #else
-            You("¼‹C‚É‹ê‚µ‚ß‚ç‚êC%s",
-                flaming(youmonst.data)
-                    ? "‚­‚·‚Ô‚Á‚½I"
-                    : Breathless ? "­X•s‰õ‚ÉŠ´‚¶‚½D"
-                                 : amphibious(youmonst.data)
-                                       ? "ˆÀ‚ç‚¬‚ğŠ´‚¶‚½D"
-                                       : "‘§‚ğ‚·‚é‚Ì‚ª‚â‚Á‚Æ‚¾I");
+            You("æ¹¿æ°—ã«è‹¦ã—ã‚ã‚‰ã‚Œï¼Œ%s",
+                flaming(gy.youmonst.data)
+                    ? "ç‡ƒãˆå°½ããã†ã ï¼"
+                    : Breathless ? "å°‘ã€…ä¸å¿«ã«æ„Ÿã˜ãŸï¼"
+                                 : amphibious(gy.youmonst.data)
+                                       ? "å®‰ã‚‰ãã‚’æ„Ÿã˜ãŸï¼"
+                                       : "æ¯ã‚’ã™ã‚‹ã®ãŒã‚„ã£ã¨ã ï¼");
 #endif
-            /* NB: Amphibious includes Breathless */
-            if (Amphibious && !flaming(youmonst.data))
+            if ((Amphibious || Breathless) && !flaming(gy.youmonst.data))
                 tmp = 0;
         } else {
-/*JP
-            You("are pummeled with debris!");
-*/
-            You("Š¢âI‚Å’É‚ß‚Â‚¯‚ç‚ê‚½I");
+#if 0 /*JP:T*/
+            You("are %s!", enfolds(mtmp->data) ? "being squashed"
+                                               : "pummeled with debris");
+#else
+            You("%sï¼", enfolds(mtmp->data) ? "æŠ¼ã—ã¤ã¶ã•ã‚ŒãŸ"
+                                               : "ç“¦ç¤«ã§ç—›ã‚ã¤ã‘ã‚‰ã‚ŒãŸ");
+#endif
             exercise(A_STR, FALSE);
         }
         break;
@@ -2469,24 +1814,28 @@ struct attack *mattk;
 /*JP
             You("are covered with a seemingly harmless goo.");
 */
-            You("–³ŠQ‚Á‚Û‚¢‚Ë‚Î‚Â‚­‚à‚Ì‚Å‚¨‚¨‚í‚ê‚½D");
+            You("ç„¡å®³ã£ã½ã„ã­ã°ã¤ãã‚‚ã®ã§ãŠãŠã‚ã‚ŒãŸï¼");
+            /* NB: the monst[un]seesu calls in gulpmu are no-ops since the
+               hero must be currently swallowed for the attack to hit... */
+            monstseesu(M_SEEN_ACID);
             tmp = 0;
         } else {
             if (Hallucination)
 /*JP
                 pline("Ouch!  You've been slimed!");
 */
-                pline("‚°‚°‚ñI‚ ‚È‚½‚Í‚Ê‚é‚Ê‚é‚¾I");
+                pline("ã’ã’ã‚“ï¼ã‚ãªãŸã¯ã¬ã‚‹ã¬ã‚‹ã ï¼");
             else
 /*JP
                 You("are covered in slime!  It burns!");
 */
-                You("‚×‚Æ‚×‚Æ‚É‚È‚Á‚½D‚»‚µ‚Ä_‚ÉÄ‚©‚ê‚½I");
+                You("ã¹ã¨ã¹ã¨ã«ãªã£ãŸï¼ãã—ã¦é…¸ã«ç„¼ã‹ã‚ŒãŸï¼");
             exercise(A_STR, FALSE);
+            monstunseesu(M_SEEN_ACID);
         }
         break;
     case AD_BLND:
-        if (can_blnd(mtmp, &youmonst, mattk->aatyp, (struct obj *) 0)) {
+        if (can_blnd(mtmp, &gy.youmonst, mattk->aatyp, (struct obj *) 0)) {
             if (!Blind) {
                 long was_blinded = Blinded;
 
@@ -2494,13 +1843,13 @@ struct attack *mattk;
 /*JP
                     You_cant("see in here!");
 */
-                    You("‰½‚àŒ©‚¦‚È‚¢I");
+                    You("ä½•ã‚‚è¦‹ãˆãªã„ï¼");
                 make_blinded((long) tmp, FALSE);
                 if (!was_blinded && !Blind)
                     Your1(vision_clears);
             } else
                 /* keep him blind until disgorged */
-                make_blinded(Blinded + 1, FALSE);
+                incr_itimeout(&HBlinded, 1L);
         }
         tmp = 0;
         break;
@@ -2509,15 +1858,18 @@ struct attack *mattk;
 /*JP
             pline_The("air around you crackles with electricity.");
 */
-            pline("‚ ‚È‚½‚Ì‰ñ‚è‚Ì‹ó‹C‚Í“d‹C‚ÅƒsƒŠƒsƒŠ‚µ‚Ä‚¢‚éD");
+            pline("ã‚ãªãŸã®å›ã‚Šã®ç©ºæ°—ã¯é›»æ°—ã§ãƒ”ãƒªãƒ”ãƒªã—ã¦ã„ã‚‹ï¼");
             if (Shock_resistance) {
                 shieldeff(u.ux, u.uy);
 /*JP
                 You("seem unhurt.");
 */
-                You("‚Â‚©‚È‚¢‚æ‚¤‚¾D");
+                You("å‚·ã¤ã‹ãªã„ã‚ˆã†ã ï¼");
+                monstseesu(M_SEEN_ELEC);
                 ugolemeffects(AD_ELEC, tmp);
                 tmp = 0;
+            } else {
+                monstunseesu(M_SEEN_ELEC);
             }
         } else
             tmp = 0;
@@ -2529,14 +1881,17 @@ struct attack *mattk;
 /*JP
                 You_feel("mildly chilly.");
 */
-                pline("‚Ğ‚ñ‚â‚è‚µ‚½D");
+                pline("ã²ã‚“ã‚„ã‚Šã—ãŸï¼");
+                monstseesu(M_SEEN_COLD);
                 ugolemeffects(AD_COLD, tmp);
                 tmp = 0;
-            } else
+            } else {
 /*JP
                 You("are freezing to death!");
 */
-                You("“€€‚µ‚»‚¤‚¾I");
+                You("å‡æ­»ã—ãã†ã ï¼");
+                monstunseesu(M_SEEN_COLD);
+            }
         } else
             tmp = 0;
         break;
@@ -2547,14 +1902,17 @@ struct attack *mattk;
 /*JP
                 You_feel("mildly hot.");
 */
-                pline("ƒ|ƒJƒ|ƒJ‚µ‚½D");
+                pline("ãƒã‚«ãƒã‚«ã—ãŸï¼");
+                monstseesu(M_SEEN_FIRE);
                 ugolemeffects(AD_FIRE, tmp);
                 tmp = 0;
-            } else
+            } else {
 /*JP
                 You("are burning to a crisp!");
 */
-                You("”R‚¦‚ÄƒJƒ‰ƒJƒ‰‚É‚È‚Á‚½I");
+                You("ç‡ƒãˆã¦ã‚«ãƒ©ã‚«ãƒ©ã«ãªã£ãŸï¼");
+                monstunseesu(M_SEEN_FIRE);
+            }
             burn_away_slime();
         } else
             tmp = 0;
@@ -2566,7 +1924,7 @@ struct attack *mattk;
     case AD_DREN:
         /* AC magic cancellation doesn't help when engulfed */
         if (!mtmp->mcan && rn2(4)) /* 75% chance */
-            drain_en(tmp);
+            drain_en(tmp, FALSE);
         tmp = 0;
         break;
     default:
@@ -2575,183 +1933,163 @@ struct attack *mattk;
         break;
     }
 
-    if (physical_damage)
-        tmp = Maybe_Half_Phys(tmp);
+    if (physical_damage) {
+        /* same damage reduction for AC as in hitmu */
+        if (u.uac < 0)
+            tmp -= rnd(-u.uac);
+        if (tmp < 0)
+            tmp = 1;
 
+        tmp = Maybe_Half_Phys(tmp);
+    }
+
+    gm.mswallower = mtmp; /* match gulpmm() */
     mdamageu(mtmp, tmp);
+    gm.mswallower = 0;
     if (tmp)
         stop_occupation();
 
     if (!u.uswallow) {
         ; /* life-saving has already expelled swallowed hero */
-    } else if (touch_petrifies(youmonst.data) && !resists_ston(mtmp)) {
+    } else if (touch_petrifies(gy.youmonst.data) && !resists_ston(mtmp)) {
 #if 0 /*JP:T*/
         pline("%s very hurriedly %s you!", Monnam(mtmp),
-              is_animal(mtmp->data) ? "regurgitates" : "expels");
+              digests(mtmp->data) ? "regurgitates"
+              : enfolds(mtmp->data) ? "releases"
+                : "expels");
 #else
-        pline("%s‚ÍQ‚Ä‚Ä‚ ‚È‚½‚ğ%s‚µ‚½I", Monnam(mtmp),
-              is_animal(mtmp->data)? "“f‚«–ß" : "”ro");
+        pline("%sã¯æ…Œã¦ã¦ã‚ãªãŸã‚’%sã—ãŸï¼", Monnam(mtmp),
+              digests(mtmp->data) ? "åãæˆ»"
+              : enfolds(mtmp->data) ? "æ”¾"
+                : "æ’å‡º");
 #endif
         expels(mtmp, mtmp->data, FALSE);
-    } else if (!u.uswldtim || youmonst.data->msize >= MZ_HUGE) {
+    } else if (!u.uswldtim || gy.youmonst.data->msize >= MZ_HUGE) {
         /* As of 3.6.2: u.uswldtim used to be set to 0 by life-saving but it
            expels now so the !u.uswldtim case is no longer possible;
            however, polymorphing into a huge form while already
            swallowed is still possible */
-/*JP
-        You("get %s!", is_animal(mtmp->data) ? "regurgitated" : "expelled");
-*/
-        You("%s‚³‚ê‚½I", is_animal(mtmp->data)? "“f‚«–ß" : "”ro");
+#if 0 /*JP:T*/
+        You("get %s!", digests(mtmp->data) ? "regurgitated"
+                       : enfolds(mtmp->data) ? "released"
+                         : "expelled");
+#else
+        You("%sã•ã‚ŒãŸï¼", digests(mtmp->data) ? "åãæˆ»"
+                       : enfolds(mtmp->data) ? "è§£æ”¾"
+                         : "æ’å‡º");
+#endif
         if (flags.verbose
-            && (is_animal(mtmp->data)
-                || (dmgtype(mtmp->data, AD_DGST) && Slow_digestion)))
+            && (digests(mtmp->data) && Slow_digestion))
 /*JP
             pline("Obviously %s doesn't like your taste.", mon_nam(mtmp));
 */
-            You("‚Ç‚¤‚à%sD‚İ‚Ì–¡‚¶‚á‚È‚¢‚æ‚¤‚¾D", mon_nam(mtmp));
+            You("ã©ã†ã‚‚%så¥½ã¿ã®å‘³ã˜ã‚ƒãªã„ã‚ˆã†ã ï¼", mon_nam(mtmp));
         expels(mtmp, mtmp->data, FALSE);
     }
-    return 1;
+    return M_ATTK_HIT;
 }
 
 /* monster explodes in your face */
-STATIC_OVL int
-explmu(mtmp, mattk, ufound)
-struct monst *mtmp;
-struct attack *mattk;
-boolean ufound;
+staticfn int
+explmu(
+    struct monst *mtmp,
+    struct attack *mattk,
+    boolean ufound)
 {
-    boolean physical_damage = TRUE, kill_agr = TRUE;
+    boolean kill_agr = TRUE;
+    boolean not_affected;
+    int tmp;
 
     if (mtmp->mcan)
-        return 0;
+        return M_ATTK_MISS;
+
+    tmp = d((int) mattk->damn, (int) mattk->damd);
+    not_affected = defended(mtmp, (int) mattk->adtyp);
 
     if (!ufound) {
 #if 0 /*JP:T*/
         pline("%s explodes at a spot in %s!",
               canseemon(mtmp) ? Monnam(mtmp) : "It",
-              levl[mtmp->mux][mtmp->muy].typ == WATER ? "empty water"
-                                                      : "thin air");
+              is_waterwall(mtmp->mux,mtmp->muy) ? "empty water"
+                                                : "thin air");
 #else
-        pline("%s‚Í‰½‚à‚È‚¢%s‚Å”š”­‚µ‚½I",
-              canseemon(mtmp) ? Monnam(mtmp) : "‰½Ò‚©",
-              levl[mtmp->mux][mtmp->muy].typ == WATER ? "…’†"
-                                                      : "‹óŠÔ");
+        pline("%sã¯ä½•ã‚‚ãªã„%sã§çˆ†ç™ºã—ãŸï¼",
+              canseemon(mtmp) ? Monnam(mtmp) : "ä½•è€…ã‹",
+              is_waterwall(mtmp->mux,mtmp->muy) ? "æ°´ä¸­" : "ç©ºé–“");
 #endif
     } else {
-        int tmp = d((int) mattk->damn, (int) mattk->damd);
-        boolean not_affected = defends((int) mattk->adtyp, uwep);
-
         hitmsg(mtmp, mattk);
-
-        switch (mattk->adtyp) {
-        case AD_COLD:
-            physical_damage = FALSE;
-            not_affected |= Cold_resistance;
-            goto common;
-        case AD_FIRE:
-            physical_damage = FALSE;
-            not_affected |= Fire_resistance;
-            goto common;
-        case AD_ELEC:
-            physical_damage = FALSE;
-            not_affected |= Shock_resistance;
-            goto common;
-        case AD_PHYS:
-            /* there aren't any exploding creatures with AT_EXPL attack
-               for AD_PHYS damage but there might be someday; without this,
-               static analysis complains that 'physical_damage' is always
-               False when tested below; it's right, but having that in
-               place means one less thing to update if AD_PHYS gets added */
- common:
-
-            if (!not_affected) {
-                if (ACURR(A_DEX) > rnd(20)) {
-/*JP
-                    You("duck some of the blast.");
-*/
-                    You("ÕŒ‚‚ğ‚³‚¯‚½D");
-                    tmp = (tmp + 1) / 2;
-                } else {
-                    if (flags.verbose)
-/*JP
-                        You("get blasted!");
-*/
-                        You("ÕŒ‚‚ğ‚­‚ç‚Á‚½I");
-                }
-                if (mattk->adtyp == AD_FIRE)
-                    burn_away_slime();
-                if (physical_damage)
-                    tmp = Maybe_Half_Phys(tmp);
-                mdamageu(mtmp, tmp);
-            }
-            break;
-
-        case AD_BLND:
-            not_affected = resists_blnd(&youmonst);
-            if (!not_affected) {
-                /* sometimes you're affected even if it's invisible */
-                if (mon_visible(mtmp) || (rnd(tmp /= 2) > u.ulevel)) {
-/*JP
-                    You("are blinded by a blast of light!");
-*/
-                    You("‚Ü‚Î‚ä‚¢Œõ‚É–Ú‚ª‚­‚ç‚ñ‚¾I");
-                    make_blinded((long) tmp, FALSE);
-                    if (!Blind)
-                        Your1(vision_clears);
-                } else if (flags.verbose)
-/*JP
-                    You("get the impression it was not terribly bright.");
-*/
-                    You("‚»‚ê‚Í‹°‚ë‚µ‚­‚Ü‚Ô‚µ‚¢‚Æ‚¢‚¤‚Ù‚Ç‚¶‚á‚È‚¢‚Æv‚Á‚½D");
-            }
-            break;
-
-        case AD_HALU:
-            not_affected |= Blind || (u.umonnum == PM_BLACK_LIGHT
-                                      || u.umonnum == PM_VIOLET_FUNGUS
-                                      || dmgtype(youmonst.data, AD_STUN));
-            if (!not_affected) {
-                boolean chg;
-                if (!Hallucination)
-/*JP
-                    You("are caught in a blast of kaleidoscopic light!");
-*/
-                    You("–œ‰Ø‹¾‚ÌŒõ‚É•ß‚ç‚¦‚ç‚ê‚½I");
-                /* avoid hallucinating the black light as it dies */
-                mondead(mtmp);    /* remove it from map now */
-                kill_agr = FALSE; /* already killed (maybe lifesaved) */
-                chg =
-                    make_hallucinated(HHallucination + (long) tmp, FALSE, 0L);
-/*JP
-                You("%s.", chg ? "are freaked out" : "seem unaffected");
-*/
-                You("%sD", chg ? "Œ‚¢‚µ‚ê‚½" : "‰e‹¿‚ğó‚¯‚È‚©‚Á‚½");
-            }
-            break;
-
-        default:
-            break;
-        }
-        if (not_affected) {
-/*JP
-            You("seem unaffected by it.");
-*/
-            You("‰e‹¿‚ğó‚¯‚È‚¢‚æ‚¤‚¾D");
-            ugolemeffects((int) mattk->adtyp, tmp);
-        }
     }
-    if (kill_agr)
+
+    switch (mattk->adtyp) {
+    case AD_COLD:
+    case AD_FIRE:
+    case AD_ELEC:
+        mon_explodes(mtmp, mattk);
+        if (!DEADMONSTER(mtmp))
+            kill_agr = FALSE; /* lifesaving? */
+        break;
+    case AD_BLND:
+        not_affected = resists_blnd(&gy.youmonst);
+        if (ufound && !not_affected) {
+            /* sometimes you're affected even if it's invisible */
+            if (mon_visible(mtmp) || (rnd(tmp /= 2) > u.ulevel)) {
+/*JP
+                You("are blinded by a blast of light!");
+*/
+                You("ã¾ã°ã‚†ã„å…‰ã«ç›®ãŒãã‚‰ã‚“ã ï¼");
+                make_blinded((long) tmp, FALSE);
+                if (!Blind)
+                    Your1(vision_clears);
+            } else if (flags.verbose)
+/*JP
+                You("get the impression it was not terribly bright.");
+*/
+                You("ãã‚Œã¯æã‚ã—ãã¾ã¶ã—ã„ã¨ã„ã†ã»ã©ã˜ã‚ƒãªã„ã¨æ€ã£ãŸï¼");
+        }
+        break;
+    case AD_HALU:
+        not_affected |= Blind || (u.umonnum == PM_BLACK_LIGHT
+                                  || u.umonnum == PM_VIOLET_FUNGUS
+                                  || dmgtype(gy.youmonst.data, AD_STUN));
+        if (ufound && !not_affected) {
+            boolean chg;
+            if (!Hallucination)
+/*JP
+                You("are caught in a blast of kaleidoscopic light!");
+*/
+                You("ä¸‡è¯é¡ã®å…‰ã«æ•ã‚‰ãˆã‚‰ã‚ŒãŸï¼");
+            /* avoid hallucinating the black light as it dies */
+            mondead(mtmp);    /* remove it from map now */
+            kill_agr = FALSE; /* already killed (maybe lifesaved) */
+            chg =
+                make_hallucinated(HHallucination + (long) tmp, FALSE, 0L);
+/*JP
+            You("%s.", chg ? "are freaked out" : "seem unaffected");
+*/
+            You("%sï¼", chg ? "é…”ã„ã—ã‚ŒãŸ" : "å½±éŸ¿ã‚’å—ã‘ãªã‹ã£ãŸ");
+        }
+        break;
+    default:
+        impossible("unknown exploder damage type %d", mattk->adtyp);
+        break;
+    }
+    if (not_affected) {
+/*JP
+        You("seem unaffected by it.");
+*/
+        You("å½±éŸ¿ã‚’å—ã‘ãªã„ã‚ˆã†ã ï¼");
+        ugolemeffects((int) mattk->adtyp, tmp);
+    }
+    if (kill_agr && !DEADMONSTER(mtmp))
         mondead(mtmp);
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
-    return (!DEADMONSTER(mtmp)) ? 0 : 2;
+    return (!DEADMONSTER(mtmp)) ? M_ATTK_MISS : M_ATTK_AGR_DIED;
 }
 
 /* monster gazes at you */
 int
-gazemu(mtmp, mattk)
-struct monst *mtmp;
-struct attack *mattk;
+gazemu(struct monst *mtmp, struct attack *mattk)
 {
     static const char *const reactions[] = {
 #if 0 /*JP:T*/
@@ -2762,48 +2100,65 @@ struct attack *mattk;
         "tired",                 /* [6] */
         "dulled",                /* [7] */
 #else
-        "¬—‚µ‚½",                 /* [0] */
-        "NO‚Æ‚µ‚½",               /* [1] */
-        "¢˜f‚µ‚½",   "Œ¶˜f‚³‚ê‚½", /* [2,3] */
-        "ƒCƒ‰ƒCƒ‰‚µ‚½", "‹»•±‚µ‚½", /* [4,5] */
-        "”æ‚ê‚½",                   /* [6] */
-        "‚Ú‚ñ‚â‚è‚µ‚½",             /* [7] */
+        "æ··ä¹±ã—ãŸ",                 /* [0] */
+        "æœ¦æœ§ã¨ã—ãŸ",               /* [1] */
+        "å›°æƒ‘ã—ãŸ",   "å¹»æƒ‘ã•ã‚ŒãŸ", /* [2,3] */
+        "ã‚¤ãƒ©ã‚¤ãƒ©ã—ãŸ", "èˆˆå¥®ã—ãŸ", /* [4,5] */
+        "ç–²ã‚ŒãŸ",                   /* [6] */
+        "ã¼ã‚“ã‚„ã‚Šã—ãŸ",             /* [7] */
 #endif
     };
     int react = -1;
-    boolean cancelled = (mtmp->mcan != 0), already = FALSE;
+    boolean is_medusa, reflectable,
+            cancelled = (mtmp->mcan != 0), already = FALSE,
+            mcanseeu = (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)
+                        && mtmp->mcansee);
 
+    if (m_seenres(mtmp, cvt_adtyp_to_mseenres(mattk->adtyp)))
+        return M_ATTK_MISS;
+
+    is_medusa = (mtmp->data == &mons[PM_MEDUSA]);
+    reflectable = (Reflecting && couldsee(mtmp->mx, mtmp->my) && is_medusa);
     /* assumes that hero has to see monster's gaze in order to be
        affected, rather than monster just having to look at hero;
+       Unaware:  asleep or unconscious => not blind but won't see;
        when hallucinating, hero's brain doesn't register what
        it's seeing correctly so the gaze is usually ineffective
        [this could be taken a lot farther and select a gaze effect
        appropriate to what's currently being displayed, giving
        ordinary monsters a gaze attack when hero thinks he or she
        is facing a gazing creature, but let's not go that far...] */
-    if (Hallucination && rn2(4))
+    if ((Hallucination && rn2(4)) || (Unaware && !reflectable))
         cancelled = TRUE;
 
     switch (mattk->adtyp) {
     case AD_STON:
+        /* note: Medusa is the only monster with stoning gaze, so
+           'is_medusa' will always be True here */
         if (cancelled || !mtmp->mcansee) {
             if (!canseemon(mtmp))
                 break; /* silently */
+            if (Unaware) { /* can't see attacker even though not blind */
+                react = is_medusa ? 4 : 2; /* irritated or puzzled */
+                break;
+            }
+            if (is_medusa && Hallucination && !rn2(3))
+                pline("Someone seems overdue for a serpent cut.");
+            else
 #if 0 /*JP:T*/
-            pline("%s %s.", Monnam(mtmp),
-                  (mtmp->data == &mons[PM_MEDUSA] && mtmp->mcan)
-                      ? "doesn't look all that ugly"
-                      : "gazes ineffectually");
+                pline_mon(mtmp, "%s %s.", Monnam(mtmp),
+                      (is_medusa && mtmp->mcan && !react)
+                          ? "doesn't look all that ugly"
+                          : "gazes ineffectually");
 #else
-            pline("%s‚Í%sD", Monnam(mtmp),
-                  (mtmp->data == &mons[PM_MEDUSA] && mtmp->mcan)
-                      ? "‚»‚ê‚Ù‚ÇX‚­‚È‚¢‚±‚Æ‚É‹C‚ª‚Â‚¢‚½"
-                      : "–³ˆÓ–¡‚É‚É‚ç‚ñ‚¾");
+                pline_mon(mtmp, "%sã¯%sï¼", Monnam(mtmp),
+                      (is_medusa && mtmp->mcan && !react)
+                          ? "ãã‚Œã»ã©é†œããªã„ã“ã¨ã«æ°—ãŒã¤ã„ãŸ"
+                          : "ç„¡æ„å‘³ã«ã«ã‚‰ã‚“ã ");
 #endif
             break;
-        }
-        if (Reflecting && couldsee(mtmp->mx, mtmp->my)
-            && mtmp->data == &mons[PM_MEDUSA]) {
+         }
+        if (reflectable) {
             /* hero has line of sight to Medusa and she's not blind */
             boolean useeit = canseemon(mtmp);
 
@@ -2812,15 +2167,14 @@ struct attack *mattk;
                 (void) ureflects("%s gaze is reflected by your %s.",
                                  s_suffix(Monnam(mtmp)));
 #else
-                (void) ureflects("%s‚Ì‚É‚ç‚İ‚Í%s‚Å”½Ë‚³‚ê‚½D",
+                (void) ureflects("%sã®ã«ã‚‰ã¿ã¯%sã§åå°„ã•ã‚ŒãŸï¼",
                                  Monnam(mtmp));
 #endif
-            if (mon_reflects(
-                    mtmp, !useeit ? (char *) 0
+            if (mon_reflects(mtmp, !useeit ? (char *) 0
 /*JP
                                   : "The gaze is reflected away by %s %s!"))
 */
-                                  : "‚É‚ç‚İ‚Í%s‚Ì%s‚É‚æ‚Á‚Ä”½Ë‚³‚ê‚½I"))
+                                  : "ã«ã‚‰ã¿ã¯%sã®%sã«ã‚ˆã£ã¦åå°„ã•ã‚ŒãŸï¼"))
                 break;
             if (!m_canseeu(mtmp)) { /* probably you're invisible */
                 if (useeit)
@@ -2829,44 +2183,43 @@ struct attack *mattk;
                       "%s doesn't seem to notice that %s gaze was reflected.",
                           Monnam(mtmp), mhis(mtmp));
 #else
-                    pline("‚É‚ç‚İ‚ª”½Ë‚µ‚Ä‚¢‚é‚±‚Æ‚É%s‚Í‹C•t‚¢‚Ä‚¢‚È‚¢‚æ‚¤‚¾D",
+                    pline("ã«ã‚‰ã¿ãŒåå°„ã—ã¦ã„ã‚‹ã“ã¨ã«%sã¯æ°—ä»˜ã„ã¦ã„ãªã„ã‚ˆã†ã ï¼",
                           Monnam(mtmp));
 #endif
                 break;
             }
             if (useeit)
 /*JP
-                pline("%s is turned to stone!", Monnam(mtmp));
+                pline_mon(mtmp, "%s is turned to stone!", Monnam(mtmp));
 */
-                pline("%s‚ÍÎ‚É‚È‚Á‚½I", Monnam(mtmp));
-            stoned = TRUE;
+                pline_mon(mtmp, "%sã¯çŸ³ã«ãªã£ãŸï¼", Monnam(mtmp));
+            gs.stoned = TRUE;
             killed(mtmp);
 
             if (!DEADMONSTER(mtmp))
                 break;
-            return 2;
+            return M_ATTK_AGR_DIED;
         }
         if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)
-            && !Stone_resistance) {
+            && !Stone_resistance && !Unaware) {
 /*JP
             You("meet %s gaze.", s_suffix(mon_nam(mtmp)));
 */
-            You("%s‚É‚É‚ç‚Ü‚ê‚½D", mon_nam(mtmp));
+            You("%sã«ã«ã‚‰ã¾ã‚ŒãŸï¼", mon_nam(mtmp));
             stop_occupation();
-            if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
+            if (poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))
                 break;
 /*JP
-            You("turn to stone...");
+            urgent_pline("You turn to stone...");
 */
-            You("Î‚É‚È‚Á‚½DDD");
-            killer.format = KILLED_BY;
-            Strcpy(killer.name, mtmp->data->mname);
+            urgent_pline("çŸ³ã«ãªã£ãŸï¼ï¼ï¼");
+            svk.killer.format = KILLED_BY;
+            Strcpy(svk.killer.name, pmname(mtmp->data, Mgender(mtmp)));
             done(STONING);
         }
         break;
     case AD_CONF:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && !mtmp->mspec_used && rn2(5)) {
+        if (mcanseeu && !mtmp->mspec_used && rn2(5)) {
             if (cancelled) {
                 react = 0; /* "confused" */
                 already = (mtmp->mconf != 0);
@@ -2875,23 +2228,25 @@ struct attack *mattk;
 
                 mtmp->mspec_used = mtmp->mspec_used + (conf + rn2(6));
                 if (!Confusion)
-/*JP
-                    pline("%s gaze confuses you!", s_suffix(Monnam(mtmp)));
-*/
-                    pline("%s‚Ì‚É‚ç‚İ‚Å‚ ‚È‚½‚Í¬—‚µ‚½I", Monnam(mtmp));
+#if 0 /*JP:T*/
+                    pline_mon(mtmp, "%s gaze confuses you!",
+                              s_suffix(Monnam(mtmp)));
+#else
+                    pline_mon(mtmp, "%sã®ã«ã‚‰ã¿ã§ã‚ãªãŸã¯æ··ä¹±ã—ãŸï¼",
+                              Monnam(mtmp));
+#endif
                 else
 /*JP
                     You("are getting more and more confused.");
 */
-                    You("‚Ü‚·‚Ü‚·¬—‚µ‚½D");
+                    You("ã¾ã™ã¾ã™æ··ä¹±ã—ãŸï¼");
                 make_confused(HConfusion + conf, FALSE);
                 stop_occupation();
             }
         }
         break;
     case AD_STUN:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && !mtmp->mspec_used && rn2(5)) {
+        if (mcanseeu && !mtmp->mspec_used && rn2(5)) {
             if (cancelled) {
                 react = 1; /* "stunned" */
                 already = (mtmp->mstun != 0);
@@ -2900,17 +2255,17 @@ struct attack *mattk;
 
                 mtmp->mspec_used = mtmp->mspec_used + (stun + rn2(6));
 /*JP
-                pline("%s stares piercingly at you!", Monnam(mtmp));
+                pline_mon(mtmp, "%s stares piercingly at you!", Monnam(mtmp));
 */
-                pline("%s‚Í—â‚½‚¢‚Ü‚È‚´‚µ‚ğ‚ ‚È‚½‚ÉŒü‚¯‚½I", Monnam(mtmp));
+                pline_mon(mtmp, "%sã¯å†·ãŸã„ã¾ãªã–ã—ã‚’ã‚ãªãŸã«å‘ã‘ãŸï¼", Monnam(mtmp));
                 make_stunned((HStun & TIMEOUT) + (long) stun, TRUE);
                 stop_occupation();
             }
         }
         break;
     case AD_BLND:
-        if (canseemon(mtmp) && !resists_blnd(&youmonst)
-            && distu(mtmp->mx, mtmp->my) <= BOLT_LIM * BOLT_LIM) {
+        if (canseemon(mtmp) && !resists_blnd(&gy.youmonst)
+            && mdistu(mtmp) <= BOLT_LIM * BOLT_LIM) {
             if (cancelled) {
                 react = rn1(2, 2); /* "puzzled" || "dazzled" */
                 already = (mtmp->mcansee == 0);
@@ -2924,7 +2279,7 @@ struct attack *mattk;
 /*JP
                 You("are blinded by %s radiance!", s_suffix(mon_nam(mtmp)));
 */
-                You("%s‚ÌŒõ‚Å–Ú‚ªŒ©‚¦‚È‚­‚È‚Á‚½I", mon_nam(mtmp));
+                You("%sã®å…‰ã§ç›®ãŒè¦‹ãˆãªããªã£ãŸï¼", mon_nam(mtmp));
                 make_blinded((long) blnd, FALSE);
                 stop_occupation();
                 /* not blind at this point implies you're wearing
@@ -2943,32 +2298,39 @@ struct attack *mattk;
         }
         break;
     case AD_FIRE:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && !mtmp->mspec_used && rn2(5)) {
+        if (mcanseeu && !mtmp->mspec_used && rn2(5)) {
             if (cancelled) {
                 react = rn1(2, 4); /* "irritated" || "inflamed" */
             } else {
-                int dmg = d(2, 6), lev = (int) mtmp->m_lev;
+                int dmg = d(2, 6), orig_dmg = dmg, lev = (int) mtmp->m_lev;
 
-/*JP
-                pline("%s attacks you with a fiery gaze!", Monnam(mtmp));
-*/
-                pline("%s‚Í‰Š‚Ì‚É‚ç‚İUŒ‚‚ğ‚µ‚Ä‚«‚½I", Monnam(mtmp));
+#if 0 /*JP:T*/
+                pline_mon(mtmp, "%s attacks you with a fiery gaze!",
+                          Monnam(mtmp));
+#else
+                pline_mon(mtmp, "%sã¯ç‚ã®ã«ã‚‰ã¿æ”»æ’ƒã‚’ã—ã¦ããŸï¼",
+                          Monnam(mtmp));
+#endif
                 stop_occupation();
                 if (Fire_resistance) {
+                    shieldeff(u.ux, u.uy);
 /*JP
                     pline_The("fire doesn't feel hot!");
 */
-                    pline("‰Î‚Í‚º‚ñ‚º‚ñ”M‚­‚È‚¢I");
+                    pline("ç«ã¯ãœã‚“ãœã‚“ç†±ããªã„ï¼");
+                    monstseesu(M_SEEN_FIRE);
+                    ugolemeffects(AD_FIRE, d(12, 6));
                     dmg = 0;
+                } else {
+                    monstunseesu(M_SEEN_FIRE);
                 }
                 burn_away_slime();
                 if (lev > rn2(20))
-                    destroy_item(SCROLL_CLASS, AD_FIRE);
-                if (lev > rn2(20))
-                    destroy_item(POTION_CLASS, AD_FIRE);
-                if (lev > rn2(25))
-                    destroy_item(SPBOOK_CLASS, AD_FIRE);
+                    (void) burnarmor(&gy.youmonst);
+                if (lev > rn2(20)) {
+                    (void) destroy_items(&gy.youmonst, AD_FIRE, orig_dmg);
+                    ignite_items(gi.invent);
+                }
                 if (dmg)
                     mdamageu(mtmp, dmg);
             }
@@ -2976,8 +2338,7 @@ struct attack *mattk;
         break;
 #ifdef PM_BEHOLDER /* work in progress */
     case AD_SLEE:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && multi >= 0 && !rn2(5) && !Sleep_resistance) {
+        if (mcanseeu && gm.multi >= 0 && !rn2(5) && !Sleep_resistance) {
             if (cancelled) {
                 react = 6;                      /* "tired" */
                 already = (mtmp->mfrozen != 0); /* can't happen... */
@@ -2987,15 +2348,16 @@ struct attack *mattk;
                 pline("%s gaze makes you very sleepy...",
                       s_suffix(Monnam(mtmp)));
 #else
-                pline("%s‚Ì‚É‚ç‚İ‚Å‚ ‚È‚½‚Í–°‚­‚È‚Á‚½DDD",
+                pline("%sã®ã«ã‚‰ã¿ã§ã‚ãªãŸã¯çœ ããªã£ãŸï¼ï¼ï¼",
                       Monnam(mtmp));
 #endif
+                monstunseesu(M_SEEN_SLEEP);
             }
         }
         break;
     case AD_SLOW:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && (HFast & (INTRINSIC | TIMEOUT)) && !defends(AD_SLOW, uwep)
+        if (mcanseeu
+            && (HFast & (INTRINSIC | TIMEOUT)) && !defended(mtmp, AD_SLOW)
             && !rn2(4)) {
             if (cancelled) {
                 react = 7; /* "dulled" */
@@ -3017,33 +2379,44 @@ struct attack *mattk;
         /* cancelled/hallucinatory feedback; monster might look "confused",
            "stunned",&c but we don't actually set corresponding attribute */
 #if 0 /*JP:T*/
-        pline("%s looks %s%s.", Monnam(mtmp),
+        pline_mon(mtmp, "%s looks %s%s.", Monnam(mtmp),
               !rn2(3) ? "" : already ? "quite "
                                      : (!rn2(2) ? "a bit " : "somewhat "),
               reactions[react]);
 #else
-        pline("%s‚Í%s%s‚æ‚¤‚¾D", Monnam(mtmp),
-              !rn2(3) ? "" : already ? "‚©‚È‚è"
-                                     : (!rn2(2) ? "­‚µ" : "‚¢‚­‚ç‚©"),
+        pline_mon(mtmp, "%sã¯%s%sã‚ˆã†ã ï¼", Monnam(mtmp),
+              !rn2(3) ? "" : already ? "ã‹ãªã‚Š"
+                                     : (!rn2(2) ? "å°‘ã—" : "ã„ãã‚‰ã‹"),
               reactions[react]);
 #endif
     }
-    return 0;
+    return M_ATTK_MISS;
 }
 
 /* mtmp hits you for n points damage */
 void
-mdamageu(mtmp, n)
-struct monst *mtmp;
-int n;
+mdamageu(struct monst *mtmp, int n)
 {
-    context.botl = 1;
+    if (n < 0) {
+        impossible("mdamageu for negative damage? (%d)", n);
+        n = 0;
+    }
+
+    disp.botl = TRUE;
     if (Upolyd) {
         u.mh -= n;
+        showdamage(n);
+        /* caller might have reduced mhmax before calling mdamageu() */
+        if (u.mh > u.mhmax)
+            u.mh = u.mhmax;
         if (u.mh < 1)
             rehumanize();
     } else {
         u.uhp -= n;
+        showdamage(n);
+        /* caller might have reduced uhpmax before calling mdamageu() */
+        if (u.uhp > u.uhpmax)
+            u.uhp = u.uhpmax;
         if (u.uhp < 1)
             done_in_by(mtmp, DIED);
     }
@@ -3054,19 +2427,19 @@ int n;
  *         2 if wrong gender for nymph
  */
 int
-could_seduce(magr, mdef, mattk)
-struct monst *magr, *mdef;
-struct attack *mattk; /* non-Null: current attack; Null: general capability */
+could_seduce(
+    struct monst *magr, struct monst *mdef,
+    struct attack *mattk) /* non-Null: current atk; Null: genrl capability */
 {
     struct permonst *pagr;
     boolean agrinvis, defperc;
-    xchar genagr, gendef;
+    xint16 genagr, gendef;
     int adtyp;
 
     if (is_animal(magr->data))
         return 0;
-    if (magr == &youmonst) {
-        pagr = youmonst.data;
+    if (magr == &gy.youmonst) {
+        pagr = gy.youmonst.data;
         agrinvis = (Invis != 0);
         genagr = poly_gender();
     } else {
@@ -3074,7 +2447,7 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
         agrinvis = magr->minvis;
         genagr = gender(magr);
     }
-    if (mdef == &youmonst) {
+    if (mdef == &gy.youmonst) {
         defperc = (See_invisible != 0);
         gendef = poly_gender();
     } else {
@@ -3096,8 +2469,7 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
        for seduction, both pass the could_seduce() test;
        incubi/succubi have three attacks, their claw attacks for damage
        don't pass the test */
-    if ((pagr->mlet != S_NYMPH
-         && pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
+    if ((pagr->mlet != S_NYMPH && pagr != &mons[PM_AMOROUS_DEMON])
         || (adtyp != AD_SEDU && adtyp != AD_SSEX && adtyp != AD_SITM))
         return 0;
 
@@ -3106,30 +2478,33 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
 
 /* returns 1 if monster teleported (or hero leaves monster's vicinity) */
 int
-doseduce(mon)
-struct monst *mon;
+doseduce(struct monst *mon)
 {
     struct obj *ring, *nring;
-    boolean fem = (mon->data == &mons[PM_SUCCUBUS]); /* otherwise incubus */
+    boolean fem = (mon->data == &mons[PM_AMOROUS_DEMON]
+                   && Mgender(mon) == FEMALE); /* otherwise incubus */
     boolean seewho, naked; /* True iff no armor */
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ], Who[QBUFSZ];
 
     if (mon->mcan || mon->mspec_used) {
 #if 0 /*JP:T*/
-        pline("%s acts as though %s has got a %sheadache.", Monnam(mon),
-              mhe(mon), mon->mcan ? "severe " : "");
+        pline_mon(mon, "%s acts as though %s has got a %sheadache.",
+                  Monnam(mon), mhe(mon), mon->mcan ? "severe " : "");
 #else
-        pline("%s‚Í%s“ª‚ª’É‚¢‚Ó‚è‚ğ‚µ‚½D", Monnam(mon),
-              mon->mcan ? "‚Ğ‚Ç‚­" : "");
+        pline_mon(mon, "%sã¯%sé ­ãŒç—›ã„ãµã‚Šã‚’ã—ãŸï¼",
+                  Monnam(mon), mon->mcan ? "ã²ã©ã" : "");
 #endif
         return 0;
     }
-    if (unconscious()) {
-/*JP
-        pline("%s seems dismayed at your lack of response.", Monnam(mon));
-*/
-        pline("%s‚Í•Ô–‚ª‚È‚¢‚Ì‚Å‹C‚ªˆŞ‚¦‚½‚æ‚¤‚¾D", Monnam(mon));
+    if (unresponsive()) {
+#if 0 /*JP:T*/
+        pline_mon(mon, "%s seems dismayed at your lack of response.",
+                  Monnam(mon));
+#else
+        pline_mon(mon, "%sã¯è¿”äº‹ãŒãªã„ã®ã§æ°—ãŒèãˆãŸã‚ˆã†ã ï¼",
+                  Monnam(mon));
+#endif
         return 0;
     }
     seewho = canseemon(mon);
@@ -3137,17 +2512,17 @@ struct monst *mon;
 /*JP
         pline("Someone caresses you...");
 */
-        pline("‰½Ò‚©‚ª‚ ‚È‚½‚ğ•ø‚«‚µ‚ß‚Ä‚¢‚éDDD");
+        pline("ä½•è€…ã‹ãŒã‚ãªãŸã‚’æŠ±ãã—ã‚ã¦ã„ã‚‹ï¼ï¼ï¼");
     else
 /*JP
         You_feel("very attracted to %s.", mon_nam(mon));
 */
-        You("%s‚Éˆø‚«‚Â‚¯‚ç‚ê‚Ä‚é‚æ‚¤‚È‹C‚ª‚µ‚½D", mon_nam(mon));
+        You("%sã«å¼•ãã¤ã‘ã‚‰ã‚Œã¦ã‚‹ã‚ˆã†ãªæ°—ãŒã—ãŸï¼", mon_nam(mon));
     /* cache the seducer's name in a local buffer */
 /*JP
     Strcpy(Who, (!seewho ? (fem ? "She" : "He") : Monnam(mon)));
 */
-    Strcpy(Who, (!seewho ? (fem ? "”Ş—" : "”Ş") : Monnam(mon)));
+    Strcpy(Who, (!seewho ? (fem ? "å½¼å¥³" : "å½¼") : Monnam(mon)));
 
     /* if in the process of putting armor on or taking armor off,
        interrupt that activity now */
@@ -3156,7 +2531,7 @@ struct monst *mon;
     if (welded(uwep))
         tried_gloves = 1;
 
-    for (ring = invent; ring; ring = nring) {
+    for (ring = gi.invent; ring; ring = nring) {
         nring = ring->nobj;
         if (ring->otyp != RIN_ADORNMENT)
             continue;
@@ -3167,7 +2542,7 @@ struct monst *mon;
 /*JP
                     mayberem(mon, Who, uarmg, "gloves");
 */
-                    mayberem(mon, Who, uarmg, "¬è");
+                    mayberem(mon, Who, uarmg, "å°æ‰‹");
                 if (uarmg)
                     continue; /* next ring might not be worn */
             }
@@ -3178,19 +2553,20 @@ struct monst *mon;
                                  " looks pretty.  May I have it?\"", ring,
                                  xname, simpleonames, "ring");
 #else
-                (void) safe_qbuf(qbuf, "u‚È‚ñ‚Ä‘f“G‚È",
-                                 "‚Å‚µ‚å‚¤D‚í‚½‚µ‚É‚­‚ê‚Ü‚¹‚ñHv", ring,
-                                 xname, simpleonames, "w—Ö");
+                (void) safe_qbuf(qbuf, "ã€Œãªã‚“ã¦ç´ æ•µãª",
+                                 "ã§ã—ã‚‡ã†ï¼ã‚ãŸã—ã«ãã‚Œã¾ã›ã‚“ï¼Ÿã€", ring,
+                                 xname, simpleonames, "æŒ‡è¼ª");
 #endif
                 makeknown(RIN_ADORNMENT);
-                if (yn(qbuf) == 'n')
+                SetVoice(mon, 0, 80, 0);
+                if (y_n(qbuf) == 'n')
                     continue;
             } else
 #if 0 /*JP:T*/
                 pline("%s decides she'd like %s, and takes it.",
                       Who, yname(ring));
 #else
-                pline("%s‚Í%s‚ª‚Æ‚Ä‚à‹C‚É‚¢‚Á‚ÄC‚»‚ê‚ğæ‚è‚ ‚°‚½D",
+                pline("%sã¯%sãŒã¨ã¦ã‚‚æ°—ã«ã„ã£ã¦ï¼Œãã‚Œã‚’å–ã‚Šã‚ã’ãŸï¼",
                       Who, xname(ring));
 #endif
             makeknown(RIN_ADORNMENT);
@@ -3211,7 +2587,7 @@ struct monst *mon;
 /*JP
                     mayberem(mon, Who, uarmg, "gloves");
 */
-                    mayberem(mon, Who, uarmg, "¬è");
+                    mayberem(mon, Who, uarmg, "å°æ‰‹");
                 if (uarmg)
                     break; /* no point trying further rings */
             }
@@ -3219,28 +2595,29 @@ struct monst *mon;
             if (!Deaf && rn2(20) < ACURR(A_CHA)) {
 #if 0 /*JP:T*/
                 (void) safe_qbuf(qbuf, "\"That ",
-                                 " looks pretty.  Would you wear it for me?\"",
+                                " looks pretty.  Would you wear it for me?\"",
                                  ring, xname, simpleonames, "ring");
 #else
-                (void) safe_qbuf(qbuf, "u‚¨‚â‚È‚ñ‚Ä‚·‚Î‚ç‚µ‚¢",
-                                "‚¾D„‚Ì‚½‚ß‚Éw‚É‚Í‚ß‚Ä‚­‚ê‚È‚¢‚©‚¢Hv",
-                                 ring, xname, simpleonames, "w—Ö");
+                (void) safe_qbuf(qbuf, "ã€ŒãŠã‚„ãªã‚“ã¦ã™ã°ã‚‰ã—ã„",
+                                "ã ï¼ç§ã®ãŸã‚ã«æŒ‡ã«ã¯ã‚ã¦ãã‚Œãªã„ã‹ã„ï¼Ÿã€",
+                                 ring, xname, simpleonames, "æŒ‡è¼ª");
 #endif
                 makeknown(RIN_ADORNMENT);
-                if (yn(qbuf) == 'n')
+                SetVoice(mon, 0, 80, 0);
+                if (y_n(qbuf) == 'n')
                     continue;
             } else {
 #if 0 /*JP:T*/
                 pline("%s decides you'd look prettier wearing %s,",
                       Who, yname(ring));
 #else
-                pline("%s‚Í%s‚ğ‚Â‚¯‚½‚ ‚È‚½‚ª‚æ‚è–£—Í“I‚¾‚Æl‚¦C",
+                pline("%sã¯%sã‚’ã¤ã‘ãŸã‚ãªãŸãŒã‚ˆã‚Šé­…åŠ›çš„ã ã¨è€ƒãˆï¼Œ",
                       Who, xname(ring));
 #endif
 /*JP
                 pline("and puts it on your finger.");
 */
-                pline("‚ ‚È‚½‚Ìw‚É‚»‚ê‚ğ‚Í‚ß‚½D");
+                pline("ã‚ãªãŸã®æŒ‡ã«ãã‚Œã‚’ã¯ã‚ãŸï¼");
             }
             makeknown(RIN_ADORNMENT);
             if (!uright) {
@@ -3248,7 +2625,7 @@ struct monst *mon;
                 pline("%s puts %s on your right %s.",
                       Who, the(xname(ring)), body_part(HAND));
 #else
-                pline("%s‚Í%s‚ğ‚ ‚È‚½‚Ì‰E%s‚É‚Í‚ß‚½D",
+                pline("%sã¯%sã‚’ã‚ãªãŸã®å³%sã«ã¯ã‚ãŸï¼",
                       Who, the(xname(ring)), body_part(HAND));
 #endif
                 setworn(ring, RIGHT_RING);
@@ -3257,7 +2634,7 @@ struct monst *mon;
                 pline("%s puts %s on your left %s.",
                       Who, the(xname(ring)), body_part(HAND));
 #else
-                pline("%s‚Í%s‚ğ‚ ‚È‚½‚Ì¶%s‚É‚Í‚ß‚½D",
+                pline("%sã¯%sã‚’ã‚ãªãŸã®å·¦%sã«ã¯ã‚ãŸï¼",
                       Who, the(xname(ring)), body_part(HAND));
 #endif
                 setworn(ring, LEFT_RING);
@@ -3270,13 +2647,13 @@ struct monst *mon;
                 pline("%s replaces %s with %s.",
                       Who, yname(uright), yname(ring));
 #else
-                pline("%s‚Í%s‚ğ%s‚É‚Æ‚è‚©‚¦‚½D",
+                pline("%sã¯%sã‚’%sã«ã¨ã‚Šã‹ãˆãŸï¼",
                       Who, yname(uright), xname(ring));
 #endif
                 Ring_gone(uright);
                 /* ring removal might cause loss of levitation which could
                    drop hero onto trap that transports hero somewhere else */
-                if (u.utotype || distu(mon->mx, mon->my) > 2)
+                if (u.utotype || !m_next2u(mon))
                     return 1;
                 setworn(ring, RIGHT_RING);
             } else if (uleft && uleft->otyp != RIN_ADORNMENT) {
@@ -3285,11 +2662,11 @@ struct monst *mon;
                 pline("%s replaces %s with %s.",
                       Who, yname(uleft), yname(ring));
 #else
-                pline("%s‚Í%s‚ğ%s‚É‚Æ‚è‚©‚¦‚½D",
+                pline("%sã¯%sã‚’%sã«ã¨ã‚Šã‹ãˆãŸï¼",
                       Who, yname(uleft), xname(ring));
 #endif
                 Ring_gone(uleft);
-                if (u.utotype || distu(mon->mx, mon->my) > 2)
+                if (u.utotype || !m_next2u(mon))
                     return 1;
                 setworn(ring, LEFT_RING);
             } else
@@ -3301,17 +2678,17 @@ struct monst *mon;
 
     naked = (!uarmc && !uarmf && !uarmg && !uarms && !uarmh && !uarmu);
 #if 0 /*JP:T*/
-    pline("%s %s%s.", Who,
-          Deaf ? "seems to murmur into your ear"
-               : naked ? "murmurs sweet nothings into your ear"
-                       : "murmurs in your ear",
-          naked ? "" : ", while helping you undress");
+    urgent_pline("%s %s%s.", Who,
+                 Deaf ? "seems to murmur into your ear"
+                 : naked ? "murmurs sweet nothings into your ear"
+                   : "murmurs in your ear",
+                 naked ? "" : ", while helping you undress");
 #else
-    pline("%s‚Í%s%sD", Who,
-          naked ? "" : "‚ ‚È‚½‚Ì•‚ğ’E‚ª‚¹‚È‚ª‚ç",
-          Deaf ? "¨‚à‚Æ‚Å‰½‚©‚Â‚Ô‚â‚¢‚½‚æ‚¤‚¾"
-               : naked ? "¨‚à‚Æ‚ÅŠÃ‚¢‚³‚³‚â‚«‚ğ‚Â‚Ô‚â‚¢‚½"
-                       : "‚ ‚È‚½‚Ì¨‚à‚Æ‚Å‚Â‚Ô‚â‚¢‚½");
+    urgent_pline("%sã¯%s%sï¼", Who,
+                 naked ? "" : "ã‚ãªãŸã®æœã‚’è„±ãŒã›ãªãŒã‚‰",
+                 Deaf ? "è€³ã‚‚ã¨ã§ä½•ã‹ã¤ã¶ã‚„ã„ãŸã‚ˆã†ã "
+                 : naked ? "è€³ã‚‚ã¨ã§ç”˜ã„ã•ã•ã‚„ãã‚’ã¤ã¶ã‚„ã„ãŸ"
+                   : "ã‚ãªãŸã®è€³ã‚‚ã¨ã§ã¤ã¶ã‚„ã„ãŸ");
 #endif
     mayberem(mon, Who, uarmc, cloak_simple_name(uarmc));
     if (!uarmc)
@@ -3319,22 +2696,22 @@ struct monst *mon;
 /*JP
     mayberem(mon, Who, uarmf, "boots");
 */
-    mayberem(mon, Who, uarmf, "ƒu[ƒc");
+    mayberem(mon, Who, uarmf, "ãƒ–ãƒ¼ãƒ„");
     if (!tried_gloves)
 /*JP
         mayberem(mon, Who, uarmg, "gloves");
 */
-        mayberem(mon, Who, uarmg, "¬è");
+        mayberem(mon, Who, uarmg, "å°æ‰‹");
 /*JP
     mayberem(mon, Who, uarms, "shield");
 */
-    mayberem(mon, Who, uarms, "‚");
+    mayberem(mon, Who, uarms, "ç›¾");
     mayberem(mon, Who, uarmh, helm_simple_name(uarmh));
     if (!uarmc && !uarm)
 /*JP
         mayberem(mon, Who, uarmu, "shirt");
 */
-        mayberem(mon, Who, uarmu, "ƒVƒƒƒc");
+        mayberem(mon, Who, uarmu, "ã‚·ãƒ£ãƒ„");
 
     /* removing armor (levitation boots, or levitation ring to make
        room for adornment ring with incubus case) might result in the
@@ -3342,38 +2719,57 @@ struct monst *mon;
        and changing location, so hero might not be adjacent to seducer
        any more (mayberem() has its own adjacency test so we don't need
        to check after each potential removal) */
-    if (u.utotype || distu(mon->mx, mon->my) > 2)
+    if (u.utotype || !m_next2u(mon))
         return 1;
 
     if (uarm || uarmc) {
-        if (!Deaf)
+        if (!Deaf) {
+            if (!(ld() && mon->female)) {
+                SetVoice(mon, 0, 80, 0);
 #if 0 /*JP:T*/
-            verbalize("You're such a %s; I wish...",
-                      flags.female ? "sweet lady" : "nice guy");
+                verbalize("You're such a %s; I wish...",
+                          flags.female ? "sweet lady" : "nice guy");
 #else
-            verbalize("%s‚¾DDD‚Æ‚¢‚¢‚Ì‚ÉD",
-                      flags.female ? "ƒ`ƒƒ[ƒ~ƒ“ƒO" : "‚·‚Ä‚«");
+            verbalize("%sã ï¼ï¼ï¼ã¨ã„ã„ã®ã«ï¼",
+                      flags.female ? "ãƒãƒ£ãƒ¼ãƒŸãƒ³ã‚°" : "ã™ã¦ã");
 #endif
-        else if (seewho)
+            } else {
+                struct obj *yourgloves = u_carried_gloves();
+
+                /* have her call your gloves by their correct
+                   name, possibly revealing them to you */
+                if (yourgloves)
+                    observe_object(yourgloves);
+                verbalize("Well, then you owe me %s%s!",
+                          yourgloves ? yname(yourgloves)
+                                     : "twelve pairs of gloves",
+                          yourgloves ? " and eleven more pairs of gloves"
+                                     : "");
+            }
+        } else if (seewho)
 /*JP
-            pline("%s appears to sigh.", Monnam(mon));
+            pline_mon(mon, "%s appears to sigh.", Monnam(mon));
 */
-            pline("%s‚Í‚½‚ß‘§‚ğ‚Â‚¢‚½‚æ‚¤‚¾D", Monnam(mon));
+            pline_mon(mon, "%sã¯ãŸã‚æ¯ã‚’ã¤ã„ãŸã‚ˆã†ã ï¼", Monnam(mon));
         /* else no regret message if can't see or hear seducer */
 
         if (!tele_restrict(mon))
-            (void) rloc(mon, TRUE);
+            (void) rloc(mon, RLOC_MSG);
         return 1;
     }
     if (u.ualign.type == A_CHAOTIC)
         adjalign(1);
 
     /* by this point you have discovered mon's identity, blind or not... */
-/*JP
-    pline("Time stands still while you and %s lie in each other's arms...",
-*/
-    pline("‚ ‚È‚½‚Æ%s‚ª•ø‚«‡‚¤‚ÆC‚ª~‚Ü‚Á‚½‚æ‚¤‚ÉŠ´‚¶‚½DDD",
-          noit_mon_nam(mon));
+#if 0 /*JP:T*/
+    urgent_pline(
+             "Time stands still while you and %s lie in each other's arms...",
+                 noit_mon_nam(mon));
+#else
+    urgent_pline(
+             "ã‚ãªãŸã¨%sãŒæŠ±ãåˆã†ã¨ï¼Œæ™‚ãŒæ­¢ã¾ã£ãŸã‚ˆã†ã«æ„Ÿã˜ãŸï¼ï¼ï¼",
+                 noit_mon_nam(mon));
+#endif
     /* 3.6.1: a combined total for charisma plus intelligence of 35-1
        used to guarantee successful outcome; now total maxes out at 32
        as far as deciding what will happen; chance for bad outcome when
@@ -3384,14 +2780,14 @@ struct monst *mon;
 /*JP
         pline("%s seems to have enjoyed it more than you...",
 */
-        pline("%s‚Í‚ ‚È‚½‚æ‚èŠy‚µ‚ñ‚¾‚æ‚¤‚¾DDD",
+        pline("%sã¯ã‚ãªãŸã‚ˆã‚Šæ¥½ã—ã‚“ã ã‚ˆã†ã ï¼ï¼ï¼",
               noit_Monnam(mon));
         switch (rn2(5)) {
         case 0:
 /*JP
             You_feel("drained of energy.");
 */
-            You("‘Ì—Í‚ªÁ–Õ‚µ‚½‚æ‚¤‚È‹C‚ª‚µ‚½D");
+            You("æ´»åŠ›ãŒæ¶ˆè€—ã—ãŸã‚ˆã†ãªæ°—ãŒã—ãŸï¼");
             u.uen = 0;
             u.uenmax -= rnd(Half_physical_damage ? 5 : 10);
             exercise(A_CON, FALSE);
@@ -3402,35 +2798,35 @@ struct monst *mon;
 /*JP
             You("are down in the dumps.");
 */
-            You("ˆÓ‹CÁ’¾‚µ‚½D");
+            You("æ„æ°—æ¶ˆæ²ˆã—ãŸï¼");
             (void) adjattrib(A_CON, -1, TRUE);
             exercise(A_CON, FALSE);
-            context.botl = 1;
+            disp.botl = TRUE;
             break;
         case 2:
 /*JP
             Your("senses are dulled.");
 */
-            Your("ŒÜŠ´‚Í“İ‚Á‚½D");
+            Your("äº”æ„Ÿã¯éˆã£ãŸï¼");
             (void) adjattrib(A_WIS, -1, TRUE);
             exercise(A_WIS, FALSE);
-            context.botl = 1;
+            disp.botl = TRUE;
             break;
         case 3:
-            if (!resists_drli(&youmonst)) {
+            if (!resists_drli(&gy.youmonst)) {
 /*JP
                 You_feel("out of shape.");
 */
-                You("‚­‚½‚Ñ‚ê‚½D");
+                You("ããŸã³ã‚ŒãŸï¼");
 /*JP
                 losexp("overexertion");
 */
-                losexp("‰ß˜J‚Å");
+                losexp("éåŠ´ã§");
             } else {
 /*JP
                 You("have a curious feeling...");
 */
-                You("•Ï‚ÈŠ´‚¶‚ª‚µ‚½DDD");
+                You("å¤‰ãªæ„Ÿã˜ãŒã—ãŸï¼ï¼ï¼");
             }
             exercise(A_CON, FALSE);
             exercise(A_DEX, FALSE);
@@ -3442,13 +2838,13 @@ struct monst *mon;
 /*JP
             You_feel("exhausted.");
 */
-            You("”æ‚ê‚ğŠ´‚¶‚½D");
+            You("ç–²ã‚Œã‚’æ„Ÿã˜ãŸï¼");
             exercise(A_STR, FALSE);
             tmp = rn1(10, 6);
 /*JP
             losehp(Maybe_Half_Phys(tmp), "exhaustion", KILLED_BY);
 */
-            losehp(Maybe_Half_Phys(tmp), "¸—Í‚Ìg‚¢‚·‚¬‚Å", KILLED_BY);
+            losehp(Maybe_Half_Phys(tmp), "ç²¾åŠ›ã®ä½¿ã„ã™ãã§", KILLED_BY);
             break;
         } /* case 4 */
         } /* switch */
@@ -3457,39 +2853,41 @@ struct monst *mon;
 /*JP
         You("seem to have enjoyed it more than %s...", noit_mon_nam(mon));
 */
-        You("%s‚æ‚è‚àŠy‚µ‚ñ‚¾‚æ‚¤‚¾DDD", noit_mon_nam(mon));
+        You("%sã‚ˆã‚Šã‚‚æ¥½ã—ã‚“ã ã‚ˆã†ã ï¼ï¼ï¼", noit_mon_nam(mon));
         switch (rn2(5)) {
         case 0:
 /*JP
             You_feel("raised to your full potential.");
 */
-            You("öİ”\—Í‚ª‚‚Ü‚Á‚½‚æ‚¤‚ÉŠ´‚¶‚½D");
+            You("æ½œåœ¨èƒ½åŠ›ãŒé«˜ã¾ã£ãŸã‚ˆã†ã«æ„Ÿã˜ãŸï¼");
             exercise(A_CON, TRUE);
             u.uen = (u.uenmax += rnd(5));
+            if (u.uenmax > u.uenpeak)
+                u.uenpeak = u.uenmax;
             break;
         case 1:
 /*JP
             You_feel("good enough to do it again.");
 */
-            You("‚à‚¤ˆê“x‚Å‚«‚é‚Æv‚Á‚½D");
+            You("ã‚‚ã†ä¸€åº¦ã§ãã‚‹ã¨æ€ã£ãŸï¼");
             (void) adjattrib(A_CON, 1, TRUE);
             exercise(A_CON, TRUE);
-            context.botl = 1;
+            disp.botl = TRUE;
             break;
         case 2:
 /*JP
             You("will always remember %s...", noit_mon_nam(mon));
 */
-            You("‚¢‚Â‚Ü‚Å‚à%s‚ğŠo‚¦‚Ä‚é‚¾‚ë‚¤DDD", mon_nam(mon));
+            You("ã„ã¤ã¾ã§ã‚‚%sã‚’è¦šãˆã¦ã‚‹ã ã‚ã†ï¼ï¼ï¼", noit_mon_nam(mon));
             (void) adjattrib(A_WIS, 1, TRUE);
             exercise(A_WIS, TRUE);
-            context.botl = 1;
+            disp.botl = TRUE;
             break;
         case 3:
 /*JP
             pline("That was a very educational experience.");
 */
-            pline("‚Æ‚Ä‚à‹Md‚ÈŒoŒ±‚¾‚Á‚½D");
+            pline("ã¨ã¦ã‚‚è²´é‡ãªçµŒé¨“ã ã£ãŸï¼");
             pluslvl(FALSE);
             exercise(A_WIS, TRUE);
             break;
@@ -3497,12 +2895,12 @@ struct monst *mon;
 /*JP
             You_feel("restored to health!");
 */
-            You("‚Æ‚Ä‚àŒ’N‚É‚È‚Á‚½I");
+            You("ã¨ã¦ã‚‚å¥åº·ã«ãªã£ãŸï¼");
             u.uhp = u.uhpmax;
             if (Upolyd)
                 u.mh = u.mhmax;
             exercise(A_STR, TRUE);
-            context.botl = 1;
+            disp.botl = TRUE;
             break;
         }
     }
@@ -3514,17 +2912,20 @@ struct monst *mon;
         pline("%s demands that you pay %s, but you refuse...",
               noit_Monnam(mon), noit_mhim(mon));
 #else
-        pline("%s‚Í‚ ‚È‚½‚É‹à‚ğ•¥‚¤‚æ‚¤—v‹‚µ‚½‚ªC‚ ‚È‚½‚Í‹‘‚ñ‚¾DDD",
+        pline("%sã¯ã‚ãªãŸã«é‡‘ã‚’æ‰•ã†ã‚ˆã†è¦æ±‚ã—ãŸãŒï¼Œã‚ãªãŸã¯æ‹’ã‚“ã ï¼ï¼ï¼",
               noit_Monnam(mon));
 #endif
     } else if (u.umonnum == PM_LEPRECHAUN) {
-/*JP
-        pline("%s tries to take your money, but fails...", noit_Monnam(mon));
-*/
-        pline("%s‚Í‹à‚ğæ‚ë‚¤‚Æ‚µ‚½‚ªC¸”s‚µ‚½DDD", noit_Monnam(mon));
+#if 0 /*JP:T*/
+        pline_mon(mon, "%s tries to take your gold, but fails...",
+                  noit_Monnam(mon));
+#else
+        pline_mon(mon, "%sã¯é‡‘ã‚’å–ã‚ã†ã¨ã—ãŸãŒï¼Œå¤±æ•—ã—ãŸï¼ï¼ï¼",
+                  noit_Monnam(mon));
+#endif
     } else {
         long cost;
-        long umoney = money_cnt(invent);
+        long umoney = money_cnt(gi.invent);
 
         if (umoney > (long) LARGEST_INT - 10L)
             cost = (long) rnd(LARGEST_INT) + 500L;
@@ -3538,35 +2939,39 @@ struct monst *mon;
         if (cost > umoney)
             cost = umoney;
         if (!cost) {
+            if (!Deaf) {
+                SetVoice(mon, 0, 80, 0);
 /*JP
-            verbalize("It's on the house!");
+                verbalize("It's on the house!");
 */
-            verbalize("‚±‚ê‚Í‚¨‚²‚è%sI", fem ? "‚æ" : "‚³");
+                verbalize("ã“ã‚Œã¯ãŠã”ã‚Š%sï¼", fem ? "ã‚ˆ" : "ã•");
+            } else {
+                pline("No charge.");
+            }
         } else {
 #if 0 /*JP:T*/
-            pline("%s takes %ld %s for services rendered!", noit_Monnam(mon),
-                  cost, currency(cost));
+            pline_mon(mon, "%s takes %ld %s for services rendered!",
+                      noit_Monnam(mon), cost, currency(cost));
 #else
-            pline("%s‚ÍƒT[ƒrƒX—¿‚Æ‚µ‚Ä%ld%s’D‚¢æ‚Á‚½I", noit_Monnam(mon),
-                  cost, currency(cost));
+            pline_mon(mon, "%sã¯ã‚µãƒ¼ãƒ“ã‚¹æ–™ã¨ã—ã¦%ld%så¥ªã„å–ã£ãŸï¼",
+                      noit_Monnam(mon), cost, currency(cost));
 #endif
             money2mon(mon, cost);
-            context.botl = 1;
+            disp.botl = TRUE;
         }
     }
     if (!rn2(25))
         mon->mcan = 1; /* monster is worn out */
     if (!tele_restrict(mon))
-        (void) rloc(mon, TRUE);
+        (void) rloc(mon, RLOC_MSG);
     return 1;
 }
 
-STATIC_OVL void
-mayberem(mon, seducer, obj, str)
-struct monst *mon;
-const char *seducer; /* only used for alternate message */
-struct obj *obj;
-const char *str;
+/* 'mon' tries to remove a piece of hero's armor */
+staticfn void
+mayberem(struct monst *mon,
+         const char *seducer, /* only used for alternate message */
+         struct obj *obj, const char *str)
 {
     char qbuf[QBUFSZ];
 
@@ -3574,7 +2979,7 @@ const char *str;
         return;
     /* removal of a previous item might have sent the hero elsewhere
        (loss of levitation that leads to landing on a transport trap) */
-    if (u.utotype || distu(mon->mx, mon->my) > 2)
+    if (u.utotype || !m_next2u(mon))
         return;
 
     /* being deaf overrides confirmation prompt for high charisma */
@@ -3582,16 +2987,17 @@ const char *str;
 /*JP
         pline("%s takes off your %s.", seducer, str);
 */
-        pline("%s‚Í‚ ‚È‚½‚Ì%s‚ğ’E‚ª‚¹‚½D", seducer, str);
+        pline("%sã¯ã‚ãªãŸã®%sã‚’è„±ãŒã›ãŸï¼", seducer, str);
     } else if (rn2(20) < ACURR(A_CHA)) {
+        SetVoice(mon, 0, 80, 0); /* y_n aka yn_function is set up for this */
 #if 0 /*JP:T*/
         Sprintf(qbuf, "\"Shall I remove your %s, %s?\"", str,
                 (!rn2(2) ? "lover" : !rn2(2) ? "dear" : "sweetheart"));
 #else
-        Sprintf(qbuf,"u%s‚ğæ‚Á‚Ä‚¢‚¢C%sHv", str,
-                (!rn2(2) ? "‚Ë‚¥" : flags.female ? "ƒnƒj[" : "ƒ_[ƒŠƒ“" ));
+        Sprintf(qbuf,"ã€Œ%sã‚’å–ã£ã¦ã„ã„ï¼Œ%sï¼Ÿã€", str,
+                (!rn2(2) ? "ã­ã‡" : flags.female ? "ãƒãƒ‹ãƒ¼" : "ãƒ€ãƒ¼ãƒªãƒ³" ));
 #endif
-        if (yn(qbuf) == 'n')
+        if (y_n(qbuf) == 'n')
             return;
     } else {
         char hairbuf[BUFSZ];
@@ -3601,9 +3007,10 @@ const char *str;
                 body_part(HAIR));
 #else
         Sprintf(hairbuf,
-                flags.female ? "‚È‚ñ‚ÄãY—í‚È%s‚È‚ñ‚¾" : "Š•‚ğæ‚Á‚½‚ç‚È‚©‚È‚©ƒCƒJƒX‚¶‚á‚È‚¢",
+                flags.female ? "ãªã‚“ã¦ç¶ºéº—ãª%sãªã‚“ã " : "å…œã‚’å–ã£ãŸã‚‰ãªã‹ãªã‹ã‚¤ã‚«ã‚¹%sã˜ã‚ƒãªã„",
                 body_part(HAIR));
 #endif
+        SetVoice(mon, 0, 80, 0);
 #if 0 /*JP:T*/
         verbalize("Take off your %s; %s.", str,
                   (obj == uarm)
@@ -3619,22 +3026,98 @@ const char *str;
                                  /* obj == uarmh */
                                  : hairbuf);
 #else
-        verbalize("%s‚ğ’E‚¢‚ÅDDD%sD", str,
+        verbalize("%sã‚’è„±ã„ã§ï¼ï¼ï¼%sï¼", str,
                   (obj == uarm)
-                  ? "‚à‚¤‚¿‚å‚Á‚ÆŠñ‚è‚»‚Á‚Ä"
+                  ? "ã‚‚ã†ã¡ã‚‡ã£ã¨å¯„ã‚Šãã£ã¦"
                   : (obj == uarmc || obj == uarms)
-                  ? "‚»‚¤‚»‚¤"
+                  ? "ãã†ãã†"
                   : (obj == uarmf)
-                  ? (flags.female ? "ãY—í‚È‘«‚¾‚Ë" : "‚¤‚Ó‚ÁC‚½‚­‚Ü‚µ‚¢‘«‚Ë")
+                  ? (flags.female ? "ç¶ºéº—ãªè¶³ã ã­" : "ã†ãµã£ï¼ŒãŸãã¾ã—ã„è¶³ã­")
                   : (obj == uarmg)
-                  ? (flags.female ? "‚È‚ñ‚Ä‘f“G‚Èè‚¾" : "‚½‚­‚Ü‚µ‚¢˜r‚Ë")
+                  ? (flags.female ? "ãªã‚“ã¦ç´ æ•µãªæ‰‹ã " : "ãŸãã¾ã—ã„è…•ã­")
                   : (obj == uarmu)
-                  ? (flags.female ? "‚«‚ê‚¢‚È‘Ì‚¾" : "‚½‚­‚Ü‚µ‚¢‚Ì‚Ë")
+                  ? (flags.female ? "ãã‚Œã„ãªä½“ã " : "ãŸãã¾ã—ã„ã®ã­")
                   /* obj == uarmh */
                   : hairbuf);
 #endif
     }
     remove_worn_item(obj, TRUE);
+}
+
+staticfn int
+assess_dmg(struct monst *mtmp, int tmp)
+{
+    if ((mtmp->mhp -= tmp) <= 0) {
+/*JP
+        pline_mon(mtmp, "%s dies!", Monnam(mtmp));
+*/
+        pline_mon(mtmp, "%sã¯æ­»ã‚“ã ï¼", Monnam(mtmp));
+        xkilled(mtmp, XKILL_NOMSG);
+        if (!DEADMONSTER(mtmp))
+            return M_ATTK_HIT;
+        return M_ATTK_AGR_DIED;
+    }
+    return M_ATTK_HIT;
+}
+
+#if 0
+/* returns True if monster has a range attack in its repertoire
+   that it will actually utilize. Caller provides the assessment
+   callback (optional). Callback returns 0 if the attack is
+   active */
+
+boolean
+ranged_attk_assessed(
+    struct monst *mtmp,
+    boolean (*assessfunc)(struct monst *, int))
+{
+    int i;
+    struct permonst *ptr = mtmp->data;
+
+    for (i = 0; i < NATTK; i++)
+        if (DISTANCE_ATTK_TYPE(ptr->mattk[i].aatyp)) {
+            if (!assessfunc || (*assessfunc)(mtmp, i) == 0)
+                return TRUE;
+        }
+    return FALSE;
+}
+#endif
+
+/* can be used as ranged_attk_assessed() callback.
+   Returns TRUE if monster is avoiding use of this attack */
+boolean
+mon_avoiding_this_attack(
+    struct monst *mtmp,
+    int attkidx)
+{
+    struct permonst *ptr = mtmp->data;
+    int typ = -1;
+
+    if (attkidx >= 0
+        && (typ = get_atkdam_type(ptr->mattk[attkidx].adtyp)) >= 0
+        && m_seenres(mtmp, cvt_adtyp_to_mseenres(typ)))
+        return TRUE;
+    return FALSE;
+}
+
+/*
+ * This would be equivalent to:
+ *     ranged_attk_assessed(mtmp, mon_avoiding_this_attack)
+ * but without the added assessment function call overhead.
+ */
+boolean
+ranged_attk_available(struct monst *mtmp)
+{
+    int i, typ = -1;
+    struct permonst *ptr = mtmp->data;
+
+    for (i = 0; i < NATTK; i++) {
+        if (DISTANCE_ATTK_TYPE(ptr->mattk[i].aatyp)
+            && (typ = get_atkdam_type(ptr->mattk[i].adtyp)) >= 0
+                && m_seenres(mtmp, cvt_adtyp_to_mseenres(typ)) == 0)
+                return TRUE;
+    }
+    return FALSE;
 }
 
 /* FIXME:
@@ -3644,11 +3127,11 @@ const char *str;
  *  to know whether hero reverted in order to decide whether passive
  *  damage applies.
  */
-STATIC_OVL int
-passiveum(olduasmon, mtmp, mattk)
-struct permonst *olduasmon;
-struct monst *mtmp;
-struct attack *mattk;
+staticfn int
+passiveum(
+    struct permonst *olduasmon,
+    struct monst *mtmp,
+    struct attack *mattk)
 {
     int i, tmp;
     struct attack *oldu_mattk = 0;
@@ -3660,7 +3143,7 @@ struct attack *mattk;
      */
     for (i = 0; !oldu_mattk; i++) {
         if (i >= NATTK)
-            return 1;
+            return M_ATTK_HIT;
         if (olduasmon->mattk[i].aatyp == AT_NONE
             || olduasmon->mattk[i].aatyp == AT_BOOM)
             oldu_mattk = &olduasmon->mattk[i];
@@ -3677,23 +3160,23 @@ struct attack *mattk;
     case AD_ACID:
         if (!rn2(2)) {
 #if 0 /*JP:T*/
-            pline("%s is splashed by %s%s!", Monnam(mtmp),
+            pline_mon(mtmp, "%s is splashed by %s%s!", Monnam(mtmp),
                   /* temporary? hack for sequencing issue:  "your acid"
                      looks strange coming immediately after player has
                      been told that hero has reverted to normal form */
                   !Upolyd ? "" : "your ", hliquid("acid"));
 #else
-            pline("%s‚Í%s%s‚ğH‚ç‚Á‚½I", Monnam(mtmp),
+            pline_mon(mtmp, "%sã¯%s%sã‚’é£Ÿã‚‰ã£ãŸï¼", Monnam(mtmp),
                   /* temporary? hack for sequencing issue:  "your acid"
                      looks strange coming immediately after player has
                      been told that hero has reverted to normal form */
-                  !Upolyd ? "" : "‚ ‚È‚½‚Ì", hliquid("_"));
+                  !Upolyd ? "" : "ã‚ãªãŸã®", hliquid("é…¸"));
 #endif
             if (resists_acid(mtmp)) {
 /*JP
-                pline("%s is not affected.", Monnam(mtmp));
+                pline_mon(mtmp, "%s is not affected.", Monnam(mtmp));
 */
-                pline("%s‚Í‰e‹¿‚ğó‚¯‚È‚¢D", Monnam(mtmp));
+                pline_mon(mtmp, "%sã¯å½±éŸ¿ã‚’å—ã‘ãªã„ï¼", Monnam(mtmp));
                 tmp = 0;
             }
         } else
@@ -3702,7 +3185,7 @@ struct attack *mattk;
             erode_armor(mtmp, ERODE_CORRODE);
         if (!rn2(6))
             acid_damage(MON_WEP(mtmp));
-        goto assess_dmg;
+        return assess_dmg(mtmp, tmp);
     case AD_STON: /* cockatrice */
     {
         long protector = attk_protection((int) mattk->aatyp),
@@ -3721,16 +3204,16 @@ struct attack *mattk;
                 return 1;
             }
 /*JP
-            pline("%s turns to stone!", Monnam(mtmp));
+            pline_mon(mtmp, "%s turns to stone!", Monnam(mtmp));
 */
-            pline("%s‚ÍÎ‚É‚È‚Á‚½I", Monnam(mtmp));
-            stoned = 1;
+            pline_mon(mtmp, "%sã¯çŸ³ã«ãªã£ãŸï¼", Monnam(mtmp));
+            gs.stoned = 1;
             xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp))
-                return 1;
-            return 2;
+                return M_ATTK_HIT;
+            return M_ATTK_AGR_DIED;
         }
-        return 1;
+        return M_ATTK_HIT;
     }
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         if (mon_currwep) {
@@ -3739,12 +3222,12 @@ struct attack *mattk;
             (void) drain_item(mon_currwep, TRUE);
             /* No message */
         }
-        return 1;
+        return M_ATTK_HIT;
     default:
         break;
     }
     if (!Upolyd)
-        return 1;
+        return M_ATTK_HIT;
 
     /* These affect the enemy only if you are still a monster */
     if (rn2(3))
@@ -3754,10 +3237,10 @@ struct attack *mattk;
 /*JP
                 You("explode!");
 */
-                pline("‚ ‚È‚½‚Í”š”­‚µ‚½I");
+                pline("ã‚ãªãŸã¯çˆ†ç™ºã—ãŸï¼");
                 /* KMH, balance patch -- this is okay with unchanging */
                 rehumanize();
-                goto assess_dmg;
+                return assess_dmg(mtmp, tmp);
             }
             break;
         case AD_PLYS: /* Floating eye */
@@ -3768,66 +3251,70 @@ struct attack *mattk;
                     tmp = 127;
                 if (mtmp->mcansee && haseyes(mtmp->data) && rn2(3)
                     && (perceives(mtmp->data) || !Invis)) {
-                    if (Blind)
+                    if (Blind) {
 /*JP
                         pline("As a blind %s, you cannot defend yourself.",
 */
-                        pline("%s‚Í–Ú‚ªŒ©‚¦‚È‚¢‚Ì‚ÅC‚ ‚È‚½‚Í‚É‚ç‚İ‚Å–hŒä‚Å‚«‚È‚¢D",
-                              youmonst.data->mname);
-                    else {
+                        pline("%sã¯ç›®ãŒè¦‹ãˆãªã„ã®ã§ï¼Œã‚ãªãŸã¯ã«ã‚‰ã¿ã§é˜²å¾¡ã§ããªã„ï¼",
+                              pmname(gy.youmonst.data,
+                                     flags.female ? FEMALE : MALE));
+                    } else {
                         if (mon_reflects(mtmp,
 /*JP
                                          "Your gaze is reflected by %s %s."))
 */
-                                         "‚ ‚È‚½‚Ì‚É‚ç‚İ‚Í%s‚Ì%s‚Å”½Ë‚µ‚½D"))
+                                         "ã‚ãªãŸã®ã«ã‚‰ã¿ã¯%sã®%sã§åå°„ã—ãŸï¼"))
                             return 1;
-/*JP
-                        pline("%s is frozen by your gaze!", Monnam(mtmp));
-*/
-                        pline("%s‚Í‚ ‚È‚½‚Ì‚É‚ç‚İ‚Å“®‚¯‚È‚­‚È‚Á‚½I", Monnam(mtmp));
+#if 0 /*JP:T*/
+                        pline_mon(mtmp, "%s is frozen by your gaze!",
+                                  Monnam(mtmp));
+#else
+                        pline_mon(mtmp, "%sã¯ã‚ãªãŸã®ã«ã‚‰ã¿ã§å‹•ã‘ãªããªã£ãŸï¼",
+                                  Monnam(mtmp));
+#endif
                         paralyze_monst(mtmp, tmp);
-                        return 3;
+                        return M_ATTK_AGR_DONE;
                     }
                 }
             } else { /* gelatinous cube */
 /*JP
-                pline("%s is frozen by you.", Monnam(mtmp));
+                pline_mon(mtmp, "%s is frozen by you.", Monnam(mtmp));
 */
-                pline("%s‚Í“®‚¯‚È‚¢D", Monnam(mtmp));
+                pline_mon(mtmp, "%sã¯å‹•ã‘ãªã„ï¼", Monnam(mtmp));
                 paralyze_monst(mtmp, tmp);
-                return 3;
+                return M_ATTK_AGR_DONE;
             }
-            return 1;
+            return M_ATTK_HIT;
         case AD_COLD: /* Brown mold or blue jelly */
             if (resists_cold(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
 /*JP
-                pline("%s is mildly chilly.", Monnam(mtmp));
+                pline_mon(mtmp, "%s is mildly chilly.", Monnam(mtmp));
 */
-                pline("%s‚Í—â‚¦‚½D", Monnam(mtmp));
+                pline_mon(mtmp, "%sã¯å†·ãˆãŸï¼", Monnam(mtmp));
                 golemeffects(mtmp, AD_COLD, tmp);
                 tmp = 0;
                 break;
             }
 /*JP
-            pline("%s is suddenly very cold!", Monnam(mtmp));
+            pline_mon(mtmp, "%s is suddenly very cold!", Monnam(mtmp));
 */
-            pline("%s‚Í“Ë‘R“€‚è‚Ã‚¯‚É‚È‚Á‚½I", Monnam(mtmp));
-            u.mh += tmp / 2;
+            pline_mon(mtmp, "%sã¯çªç„¶å‡ã‚Šã¥ã‘ã«ãªã£ãŸï¼", Monnam(mtmp));
+            u.mh += (tmp + rn2(2)) / 2;
             if (u.mhmax < u.mh)
                 u.mhmax = u.mh;
-            if (u.mhmax > ((youmonst.data->mlevel + 1) * 8))
-                (void) split_mon(&youmonst, mtmp);
+            if (u.mhmax > (((int) gy.youmonst.data->mlevel + 1) * 8))
+                (void) split_mon(&gy.youmonst, mtmp);
             break;
         case AD_STUN: /* Yellow mold */
             if (!mtmp->mstun) {
                 mtmp->mstun = 1;
 #if 0 /*JP:T*/
-                pline("%s %s.", Monnam(mtmp),
+                pline_mon(mtmp, "%s %s.", Monnam(mtmp),
                       makeplural(stagger(mtmp->data, "stagger")));
 #else
-                pline("%s‚Í%sD", Monnam(mtmp),
-                      jpast(stagger(mtmp->data, "‚æ‚ë‚ß‚­")));
+                pline_mon(mtmp, "%sã¯%sï¼", Monnam(mtmp),
+                      jpast(stagger(mtmp->data, "ã‚ˆã‚ã‚ã")));
 #endif
             }
             tmp = 0;
@@ -3836,36 +3323,37 @@ struct attack *mattk;
             if (resists_fire(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
 #if 0 /*JP:T*/
-                pline("%s is mildly warm.", Monnam(mtmp));
+                pline_mon(mtmp, "%s is mildly warm.", Monnam(mtmp));
 #else
-                pline("%s‚Í’g‚©‚­‚È‚Á‚½D", Monnam(mtmp));
+                pline_mon(mtmp, "%sã¯æš–ã‹ããªã£ãŸï¼", Monnam(mtmp));
 #endif
                 golemeffects(mtmp, AD_FIRE, tmp);
                 tmp = 0;
                 break;
             }
 #if 0 /*JP:T*/
-            pline("%s is suddenly very hot!", Monnam(mtmp));
+            pline_mon(mtmp, "%s is suddenly very hot!", Monnam(mtmp));
 #else
-            pline("%s‚Í“Ë‘R”M‚­‚È‚Á‚½I", Monnam(mtmp));
+            pline_mon(mtmp, "%sã¯çªç„¶ç†±ããªã£ãŸï¼", Monnam(mtmp));
 #endif
             break;
         case AD_ELEC:
             if (resists_elec(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
 #if 0 /*JP:T*/
-                pline("%s is slightly tingled.", Monnam(mtmp));
+                pline_mon(mtmp, "%s is slightly tingled.", Monnam(mtmp));
 #else
-                pline("%s‚Í‚¿‚å‚Á‚ÆƒsƒŠƒsƒŠ‚µ‚½D", Monnam(mtmp));
+                pline_mon(mtmp, "%sã¯ã¡ã‚‡ã£ã¨ãƒ”ãƒªãƒ”ãƒªã—ãŸï¼", Monnam(mtmp));
 #endif
                 golemeffects(mtmp, AD_ELEC, tmp);
                 tmp = 0;
                 break;
             }
 #if 0 /*JP:T*/
-            pline("%s is jolted with your electricity!", Monnam(mtmp));
+            pline_mon(mtmp, "%s is jolted with your electricity!",
+                      Monnam(mtmp));
 #else
-            pline("%s‚Í“d‹CƒVƒ‡ƒbƒN‚ğ‚¤‚¯‚½I", Monnam(mtmp));
+            pline_mon(mtmp, "%sã¯é›»æ°—ã‚·ãƒ§ãƒƒã‚¯ã‚’ã†ã‘ãŸï¼", Monnam(mtmp));
 #endif
             break;
         default:
@@ -3875,42 +3363,34 @@ struct attack *mattk;
     else
         tmp = 0;
 
- assess_dmg:
-    if ((mtmp->mhp -= tmp) <= 0) {
-/*JP
-        pline("%s dies!", Monnam(mtmp));
-*/
-        pline("%s‚Í€‚ñ‚¾I", Monnam(mtmp));
-        xkilled(mtmp, XKILL_NOMSG);
-        if (!DEADMONSTER(mtmp))
-            return 1;
-        return 2;
-    }
-    return 1;
+    return assess_dmg(mtmp, tmp);
 }
 
 struct monst *
-cloneu()
+cloneu(void)
 {
     struct monst *mon;
-    int mndx = monsndx(youmonst.data);
+    int mndx = monsndx(gy.youmonst.data);
 
     if (u.mh <= 1)
         return (struct monst *) 0;
-    if (mvitals[mndx].mvflags & G_EXTINCT)
+    if (svm.mvitals[mndx].mvflags & G_EXTINCT)
         return (struct monst *) 0;
-    mon = makemon(youmonst.data, u.ux, u.uy, NO_MINVENT | MM_EDOG);
+    mon = makemon(gy.youmonst.data, u.ux, u.uy,
+                  NO_MINVENT | MM_EDOG | MM_NOMSG);
     if (!mon)
         return NULL;
     mon->mcloned = 1;
-    mon = christen_monst(mon, plname);
-    initedog(mon);
-    mon->m_lev = youmonst.data->mlevel;
+    mon = christen_monst(mon, svp.plname);
+    initedog(mon, TRUE);
+    mon->m_lev = gy.youmonst.data->mlevel;
     mon->mhpmax = u.mhmax;
     mon->mhp = u.mh / 2;
     u.mh -= mon->mhp;
-    context.botl = 1;
+    disp.botl = TRUE;
     return mon;
 }
+
+#undef ld
 
 /*mhitu.c*/

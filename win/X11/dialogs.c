@@ -44,7 +44,7 @@
  *    + Include nethack's lint.h to get nhStr() macro.
  *    + Use nhStr() on string literals (or macros from <X11/StringDefs.h>
  *      that hide string literals) to cast away implicit 'const' in order
- *      to suppress "warning: assignment discards qualifers from pointer
+ *      to suppress "warning: assignment discards qualifiers from pointer
  *      target type" issued by 'gcc -Wwrite-strings' as used by nethack.
  *      (For this file, always the second parameter to XtSetArg().)
  *
@@ -56,10 +56,6 @@
  *
  * $NHDT-Date: 1455157470 2016/02/11 02:24:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.9 $
  */
-
-/*
-** marked as XI18N for i18n by issei (1994/1/10)
-*/
 
 #ifndef SYSV
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
@@ -81,24 +77,17 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
+#define X11_BUILD
 #include "config.h" /* #define for const for non __STDC__ compilers */
+#undef X11_BUILD
+
 #include "lint.h"   /* for nethack's nhStr() macro */
-#if 1 /*JP*/
-#ifdef XAW_I18N
-#include <X11/Xaw/Xawi18n.h>
-#endif
-#endif
+#include "winX.h"   /* to make sure prototypes match corresponding functions */
 
 /* ":" added to both translations below to allow limited redefining of
  * keysyms before testing for keysym values -- dlc */
-#if 0 /*JP*/
 static const char okay_accelerators[] = "#override\n\
      :<Key>Return: set() notify() unset()\n";
-#else
-static const char okay_accelerators[] = "#override\n\
-     :<Key>Return: set() notify() unset()\n\
-     :<Ctrl>m: set() notify() unset()\n";
-#endif
 
 static const char cancel_accelerators[] = "#override\n\
      :<Key>Escape: set() notify() unset()\n\
@@ -111,11 +100,8 @@ static const char cancel_accelerators[] = "#override\n\
  *      an optional cancel button
  */
 Widget
-CreateDialog(parent, name, okay_callback, cancel_callback)
-Widget parent;
-String name;
-XtCallbackProc okay_callback;
-XtCallbackProc cancel_callback;
+CreateDialog(Widget parent, String name, XtCallbackProc okay_callback,
+             XtCallbackProc cancel_callback)
 {
     Widget form, prompt, response, okay, cancel;
     Arg args[20];
@@ -144,9 +130,6 @@ XtCallbackProc cancel_callback;
     XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
     XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
     XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
-#if defined(X11R6) && defined(XI18N)
-    XtSetArg(args[num_args], XtNinternational, True); num_args++;
-#endif
     prompt = XtCreateManagedWidget("prompt", labelWidgetClass, form,
                                    args, num_args);
 
@@ -166,9 +149,6 @@ XtCallbackProc cancel_callback;
     XtSetArg(args[num_args], nhStr(XtNeditType), XawtextEdit); num_args++;
     XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth); num_args++;
     XtSetArg(args[num_args], nhStr(XtNstring), ""); num_args++;
-#if defined(X11R6) && defined(XI18N)
-    XtSetArg(args[num_args], XtNinternational, True); num_args++;
-#endif
     response = XtCreateManagedWidget("response", asciiTextWidgetClass, form,
                                      args, num_args);
 
@@ -187,13 +167,7 @@ XtCallbackProc cancel_callback;
     XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
     XtSetArg(args[num_args], nhStr(XtNaccelerators),
              XtParseAcceleratorTable(okay_accelerators)); num_args++;
-#if defined(X11R6) && defined(XI18N)
-    XtSetArg(args[num_args], XtNinternational, True); num_args++;
-#endif
-/*JP
     okay = XtCreateManagedWidget("okay", commandWidgetClass, form,
-*/
-    okay = XtCreateManagedWidget("OK", commandWidgetClass, form,
                                  args, num_args);
     XtAddCallback(okay, XtNcallback, okay_callback, form);
     XtSetArg(args[0], XtNwidth, &owidth);
@@ -217,13 +191,7 @@ XtCallbackProc cancel_callback;
         XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
         XtSetArg(args[num_args], nhStr(XtNaccelerators),
                  XtParseAcceleratorTable(cancel_accelerators)); num_args++;
-#if defined(X11R6) && defined(XI18N)
-        XtSetArg(args[num_args], XtNinternational, True); num_args++;
-#endif
-/*JP
         cancel = XtCreateManagedWidget("cancel", commandWidgetClass, form,
-*/
-        cancel = XtCreateManagedWidget("ƒLƒƒƒ“ƒZƒ‹", commandWidgetClass, form,
                                        args, num_args);
         XtAddCallback(cancel, XtNcallback, cancel_callback, form);
         XtInstallAccelerators(response, cancel);
@@ -250,8 +218,7 @@ XtCallbackProc cancel_callback;
 /* get the prompt from the dialog box.  Used a startup time to
  * save away the initial prompt */
 String
-GetDialogPrompt(w)
-    Widget w;
+GetDialogPrompt(Widget w)
 {
     Arg args[1];
     Widget label;
@@ -266,9 +233,7 @@ GetDialogPrompt(w)
 
 /* set the prompt.  This is used to put error information in the prompt */
 void
-SetDialogPrompt(w, newprompt)
-Widget w;
-String newprompt;
+SetDialogPrompt(Widget w, String newprompt)
 {
     Arg args[1];
     Widget label;
@@ -280,8 +245,7 @@ String newprompt;
 
 /* get what the user typed; caller must free the response */
 String
-GetDialogResponse(w)
-Widget w;
+GetDialogResponse(Widget w)
 {
     Arg args[1];
     Widget response;
@@ -293,26 +257,15 @@ Widget w;
     return XtNewString(s);
 }
 
-/* set the default reponse */
+/* set the default response */
 void
-SetDialogResponse(w, s, ln)
-Widget w;
-String s;
-unsigned ln;
+SetDialogResponse(Widget w, String s, unsigned ln)
 {
-#ifndef XI18N
     Arg args[4];
-#else
-    Arg args[5];
-#endif
     Widget response;
     XFontStruct *font;
     Dimension width, nwidth, leftMargin, rightMargin;
     unsigned s_len = strlen(s);
-#ifdef XI18N
-    XFontSet fontset;
-    XFontSetExtents *extent;
-#endif
 
     if (s_len < ln)
         s_len = ln;
@@ -321,17 +274,9 @@ unsigned ln;
     XtSetArg(args[1], nhStr(XtNleftMargin), &leftMargin);
     XtSetArg(args[2], nhStr(XtNrightMargin), &rightMargin);
     XtSetArg(args[3], nhStr(XtNwidth), &width);
-#ifndef XI18N
     XtGetValues(response, args, FOUR);
     /* width includes margins as per Xaw documentation */
     nwidth = font->max_bounds.width * (s_len + 1) + leftMargin + rightMargin;
-#else
-    XtSetArg(args[4], XtNfontSet, &fontset);
-    XtGetValues(response, args, FIVE);
-    extent = XExtentsOfFontSet(fontset);
-    nwidth = ((extent->max_logical_extent.width * strlen(s)) + leftMargin
-              + rightMargin);
-#endif
     if (nwidth < width)
         nwidth = width;
 
@@ -344,8 +289,7 @@ unsigned ln;
 #if 0
 /* clear the response */
 void
-ClearDialogResponse(w)
-    Widget w;
+ClearDialogResponse(Widget w)
 {
     Arg args[2];
     Widget response;
@@ -361,9 +305,7 @@ ClearDialogResponse(w)
 
 /* position popup window under the cursor */
 void
-positionpopup(w, bottom)
-Widget w;
-boolean bottom; /* position y on bottom? */
+positionpopup(Widget w, boolean bottom) /* position y on bottom? */
 {
     Arg args[3];
     Cardinal num_args;

@@ -1,5 +1,5 @@
-/* NetHack 3.6	xwindowp.h	$NHDT-Date: 1432512779 2015/05/25 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* NetHack 5.0	xwindowp.h	$NHDT-Date: 1596498575 2020/08/03 23:49:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef _xwindowp_h
@@ -57,10 +57,6 @@ typedef struct {
     Pixel bright_cyan;
     Pixel white;
     XFontStruct *font;
-/* JP: this cannot work because winX11/Window.c does not include config.h */
-/* #ifdef XI18N*/
-    XFontSet	   fontset;
-/* #endif */
     XtCallbackList expose_callback;
     XtCallbackList input_callback;
     XtCallbackList resize_callback;

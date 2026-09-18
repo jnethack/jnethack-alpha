@@ -1,13 +1,13 @@
-# �悭���鎿��
+# よくある質問
 
-## �J�����g�f�B���N�g���̐ݒ�t�@�C����ύX���Ă����ʂ��Ȃ� (Windows)
+## カレントディレクトリの設定ファイルを変更しても効果がない (Windows)
 
-�ݒ�t�@�C���t�H���_��"%USERPROFILE%\JNetHack"�Ɉړ����܂����B
-(��{�I�ɂ�"C:\Users\(���[�U�[��)\JNetHack"�ł��B)
+設定ファイルフォルダは"%USERPROFILE%\JNetHack"に移動しました。
+(基本的には"C:\Users\(ユーザー名)\JNetHack"です。)
 
-���̑��̃t�H���_��"jnethack --showpaths"�ŕ\������܂��B
+その他のフォルダは"jnethack --showpaths"で表示されます。
 
-## default.nh ��ύX���Ă����ʂ��Ȃ� (Windows)
+## default.nh を変更しても効果がない (Windows)
 
-�ݒ�t�@�C������Windows��.jnethackrc�ɕύX����܂����B
-�ݒ���@�͕ς���Ă��Ȃ��̂ŃR�s�[���邾���œ��삵�܂��B
+設定ファイル名はWindowsも.jnethackrcに変更されました。
+設定方法は変わっていないのでコピーするだけで動作します。

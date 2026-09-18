@@ -1,4 +1,4 @@
-/* NetHack 3.6	priest.c	$NHDT-Date: 1545131519 2018/12/18 11:11:59 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 5.0	priest.c	$NHDT-Date: 1764567778 2025/11/30 21:42:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,26 +12,25 @@
 
 /* these match the categorizations shown by enlightenment */
 #define ALGN_SINNED (-4) /* worse than strayed (-1..-3) */
-#define ALGN_PIOUS 14    /* better than fervent (9..13) */
+#define ALGN_DEVOUT 14   /* better than fervent (9..13) */
 
-STATIC_DCL boolean FDECL(histemple_at, (struct monst *, XCHAR_P, XCHAR_P));
-STATIC_DCL boolean FDECL(has_shrine, (struct monst *));
+staticfn boolean histemple_at(struct monst *, coordxy, coordxy);
+staticfn boolean has_shrine(struct monst *);
 
 void
-newepri(mtmp)
-struct monst *mtmp;
+newepri(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
     if (!EPRI(mtmp)) {
         EPRI(mtmp) = (struct epri *) alloc(sizeof(struct epri));
         (void) memset((genericptr_t) EPRI(mtmp), 0, sizeof(struct epri));
+        EPRI(mtmp)->parentmid = mtmp->m_id;
     }
 }
 
 void
-free_epri(mtmp)
-struct monst *mtmp;
+free_epri(struct monst *mtmp)
 {
     if (mtmp->mextra && EPRI(mtmp)) {
         free((genericptr_t) EPRI(mtmp));
@@ -45,24 +44,21 @@ struct monst *mtmp;
  * Valid returns are  1: moved  0: didn't  -1: let m_move do it  -2: died.
  */
 int
-move_special(mtmp, in_his_shop, appr, uondoor, avoid, omx, omy, gx, gy)
-register struct monst *mtmp;
-boolean in_his_shop;
-schar appr;
-boolean uondoor, avoid;
-register xchar omx, omy, gx, gy;
+move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
+             boolean uondoor, boolean avoid,
+             coordxy omx, coordxy omy, coordxy ggx, coordxy ggy)
 {
-    register xchar nx, ny, nix, niy;
-    register schar i;
+    coordxy nx, ny, nix, niy;
+    schar i;
     schar chcnt, cnt;
-    coord poss[9];
-    long info[9];
+    struct mfndposdata mfp;
+    long ninfo = 0;
     long allowflags;
 #if 0 /* dead code; see below */
     struct obj *ib = (struct obj *) 0;
 #endif
 
-    if (omx == gx && omy == gy)
+    if (omx == ggx && omy == ggy)
         return 0;
     if (mtmp->mconf) {
         avoid = FALSE;
@@ -71,49 +67,36 @@ register xchar omx, omy, gx, gy;
 
     nix = omx;
     niy = omy;
-    if (mtmp->isshk)
-        allowflags = ALLOW_SSM;
-    else
-        allowflags = ALLOW_SSM | ALLOW_SANCT;
-    if (passes_walls(mtmp->data))
-        allowflags |= (ALLOW_ROCK | ALLOW_WALL);
-    if (throws_rocks(mtmp->data))
-        allowflags |= ALLOW_ROCK;
-    if (tunnels(mtmp->data))
-        allowflags |= ALLOW_DIG;
-    if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
-        allowflags |= OPENDOOR;
-        if (monhaskey(mtmp, TRUE))
-            allowflags |= UNLOCKDOOR;
-    }
-    if (is_giant(mtmp->data))
-        allowflags |= BUSTDOOR;
-    cnt = mfndpos(mtmp, poss, info, allowflags);
+    allowflags = mon_allowflags(mtmp);
+    cnt = mfndpos(mtmp, &mfp, allowflags);
 
     if (mtmp->isshk && avoid && uondoor) { /* perhaps we cannot avoid him */
         for (i = 0; i < cnt; i++)
-            if (!(info[i] & NOTONL))
+            if (!(mfp.info[i] & NOTONL))
                 goto pick_move;
         avoid = FALSE;
     }
 
-#define GDIST(x, y) (dist2(x, y, gx, gy))
-pick_move:
+#define GDIST(x, y) (dist2(x, y, ggx, ggy))
+ pick_move:
     chcnt = 0;
     for (i = 0; i < cnt; i++) {
-        nx = poss[i].x;
-        ny = poss[i].y;
+        nx = mfp.poss[i].x;
+        ny = mfp.poss[i].y;
         if (IS_ROOM(levl[nx][ny].typ)
             || (mtmp->isshk && (!in_his_shop || ESHK(mtmp)->following))) {
-            if (avoid && (info[i] & NOTONL))
+            if (avoid && (mfp.info[i] & NOTONL) && !(mfp.info[i] & ALLOW_M))
                 continue;
             if ((!appr && !rn2(++chcnt))
-                || (appr && GDIST(nx, ny) < GDIST(nix, niy))) {
+                || (appr && GDIST(nx, ny) < GDIST(nix, niy))
+                || (mfp.info[i] & ALLOW_M)) {
                 nix = nx;
                 niy = ny;
+                ninfo = mfp.info[i];
             }
         }
     }
+#undef GDIST
     if (mtmp->ispriest && avoid && nix == omx && niy == omy
         && onlineu(omx, omy)) {
         /* might as well move closer as long it's going to stay
@@ -123,7 +106,23 @@ pick_move:
     }
 
     if (nix != omx || niy != omy) {
-        if (MON_AT(nix, niy))
+
+        if (ninfo & ALLOW_ROCK) {
+            m_break_boulder(mtmp, nix, niy);
+            return 1;
+        } else if (ninfo & ALLOW_M) {
+            /* mtmp is deciding it would like to attack this turn.
+             * Returns from m_move_aggress don't correspond to the same things
+             * as this function should return, so we need to translate. */
+            switch (m_move_aggress(mtmp, nix, niy)) {
+            case 2:
+                return -2; /* died making the attack */
+            case 3:
+                return 1; /* attacked and spent this move */
+            }
+        }
+
+        if (MON_AT(nix, niy) || u_at(nix, niy))
             return 0;
         remove_monster(omx, omy);
         place_monster(mtmp, nix, niy);
@@ -137,7 +136,7 @@ pick_move:
                 pline("%s picks up %s.", Monnam(mtmp),
                       distant_name(ib, doname));
 #else
-                pline("%s‚Í%s‚ğE‚Á‚½D", Monnam(mtmp),
+                pline("%sã¯%sã‚’æ‹¾ã£ãŸï¼", Monnam(mtmp),
                       distant_name(ib, doname));
 #endif
             obj_extract_self(ib);
@@ -150,21 +149,18 @@ pick_move:
 }
 
 char
-temple_occupied(array)
-register char *array;
+temple_occupied(char *array)
 {
-    register char *ptr;
+    char *ptr;
 
     for (ptr = array; *ptr; ptr++)
-        if (rooms[*ptr - ROOMOFFSET].rtype == TEMPLE)
+        if (svr.rooms[*ptr - ROOMOFFSET].rtype == TEMPLE)
             return *ptr;
     return '\0';
 }
 
-STATIC_OVL boolean
-histemple_at(priest, x, y)
-register struct monst *priest;
-register xchar x, y;
+staticfn boolean
+histemple_at(struct monst *priest, coordxy x, coordxy y)
 {
     return (boolean) (priest && priest->ispriest
                       && (EPRI(priest)->shroom == *in_rooms(x, y, TEMPLE))
@@ -172,8 +168,7 @@ register xchar x, y;
 }
 
 boolean
-inhistemple(priest)
-struct monst *priest;
+inhistemple(struct monst *priest)
 {
     /* make sure we have a priest */
     if (!priest || !priest->ispriest)
@@ -189,10 +184,9 @@ struct monst *priest;
  * pri_move: return 1: moved  0: didn't  -1: let m_move do it  -2: died
  */
 int
-pri_move(priest)
-register struct monst *priest;
+pri_move(struct monst *priest)
 {
-    register xchar gx, gy, omx, omy;
+    coordxy ggx, ggy, omx, omy;
     schar temple;
     boolean avoid = TRUE;
 
@@ -204,60 +198,71 @@ register struct monst *priest;
 
     temple = EPRI(priest)->shroom;
 
-    gx = EPRI(priest)->shrpos.x;
-    gy = EPRI(priest)->shrpos.y;
+    ggx = EPRI(priest)->shrpos.x;
+    ggy = EPRI(priest)->shrpos.y;
 
-    gx += rn1(3, -1); /* mill around the altar */
-    gy += rn1(3, -1);
+    ggx += rn1(3, -1); /* mill around the altar */
+    ggy += rn1(3, -1);
 
     if (!priest->mpeaceful
-        || (Conflict && !resist(priest, RING_CLASS, 0, 0))) {
+        || (Conflict && !resist_conflict(priest))) {
         if (monnear(priest, u.ux, u.uy)) {
             if (Displaced)
 /*JP
                 Your("displaced image doesn't fool %s!", mon_nam(priest));
 */
-                Your("Œ¶‰e‚Í%s‚ğ‚¾‚Ü‚¹‚È‚©‚Á‚½I", mon_nam(priest));
+                Your("å¹»å½±ã¯%sã‚’ã ã¾ã›ãªã‹ã£ãŸï¼", mon_nam(priest));
             (void) mattacku(priest);
             return 0;
-        } else if (index(u.urooms, temple)) {
+        } else if (strchr(u.urooms, temple)) {
             /* chase player if inside temple & can see him */
             if (priest->mcansee && m_canseeu(priest)) {
-                gx = u.ux;
-                gy = u.uy;
+                ggx = u.ux;
+                ggy = u.uy;
             }
             avoid = FALSE;
         }
     } else if (Invis)
         avoid = FALSE;
 
-    return move_special(priest, FALSE, TRUE, FALSE, avoid, omx, omy, gx, gy);
+    return move_special(priest, FALSE, TRUE, FALSE, avoid, omx, omy, ggx, ggy);
 }
 
 /* exclusively for mktemple() */
 void
-priestini(lvl, sroom, sx, sy, sanctum)
-d_level *lvl;
-struct mkroom *sroom;
-int sx, sy;
-boolean sanctum; /* is it the seat of the high priest? */
+priestini(
+    d_level *lvl,
+    struct mkroom *sroom,
+    int sx, int sy,
+    boolean sanctum) /* is it the seat of the high priest? */
 {
     struct monst *priest;
     struct obj *otmp;
     int cnt;
+    int px = 0, py = 0, i, si = rn2(N_DIRS);
+    struct permonst *prim = &mons[sanctum ? PM_HIGH_CLERIC
+                                          : PM_ALIGNED_CLERIC];
 
-    if (MON_AT(sx + 1, sy))
-        (void) rloc(m_at(sx + 1, sy), FALSE); /* insurance */
+    for (i = 0; i < N_DIRS; i++) {
+        px = sx + xdir[DIR_CLAMP(i+si)];
+        py = sy + ydir[DIR_CLAMP(i+si)];
+        if (pm_good_location(px, py, prim))
+            break;
+    }
+    if (i == N_DIRS)
+        px = sx, py = sy;
 
-    priest = makemon(&mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST],
-                     sx + 1, sy, MM_EPRI);
+    if (MON_AT(px, py))
+        (void) rloc(m_at(px, py), RLOC_NOMSG); /* insurance */
+
+    priest = makemon(prim, px, py, MM_EPRI);
     if (priest) {
-        EPRI(priest)->shroom = (schar) ((sroom - rooms) + ROOMOFFSET);
+        EPRI(priest)->shroom = (schar) ((sroom - svr.rooms) + ROOMOFFSET);
         EPRI(priest)->shralign = Amask2align(levl[sx][sy].altarmask);
         EPRI(priest)->shrpos.x = sx;
         EPRI(priest)->shrpos.y = sy;
         assign_level(&(EPRI(priest)->shrlevel), lvl);
-        priest->mtrapseen = ~0; /* traps are known */
+        mon_learns_traps(priest, ALL_TRAPS); /* traps are known */
         priest->mpeaceful = 1;
         priest->ispriest = 1;
         priest->isminion = 0;
@@ -271,7 +276,7 @@ boolean sanctum; /* is it the seat of the high priest? */
         }
         /* 2 to 4 spellbooks */
         for (cnt = rn1(3, 2); cnt > 0; --cnt) {
-            (void) mpickobj(priest, mkobj(SPBOOK_CLASS, FALSE));
+            (void) mpickobj(priest, mkobj(SPBOOK_no_NOVEL, FALSE));
         }
         /* robe [via makemon()] */
         if (rn2(2) && (otmp = which_armor(priest, W_ARMC)) != 0) {
@@ -285,8 +290,7 @@ boolean sanctum; /* is it the seat of the high priest? */
 
 /* get a monster's alignment type without caller needing EPRI & EMIN */
 aligntyp
-mon_aligntyp(mon)
-struct monst *mon;
+mon_aligntyp(struct monst *mon)
 {
     aligntyp algn = mon->ispriest ? EPRI(mon)->shralign
                                   : mon->isminion ? EMIN(mon)->min_align
@@ -308,90 +312,104 @@ struct monst *mon;
  *              the true name even when under that influence
  */
 char *
-priestname(mon, pname)
-register struct monst *mon;
-char *pname; /* caller-supplied output buffer */
+priestname(
+    struct monst *mon,
+    int article,
+    boolean reveal_high_priest,
+    char *pname) /* caller-supplied output buffer */
 {
     boolean do_hallu = Hallucination,
-            aligned_priest = mon->data == &mons[PM_ALIGNED_PRIEST],
-            high_priest = mon->data == &mons[PM_HIGH_PRIEST];
+            aligned_priest = mon->data == &mons[PM_ALIGNED_CLERIC],
+            high_priest = mon->data == &mons[PM_HIGH_CLERIC];
     char whatcode = '\0';
-    const char *what = do_hallu ? rndmonnam(&whatcode) : mon->data->mname;
+    const char *what = do_hallu ? rndmonnam(&whatcode) : mon_pmname(mon);
 
     if (!mon->ispriest && !mon->isminion) /* should never happen...  */
         return strcpy(pname, what);       /* caller must be confused */
 
-    *pname = '\0';
-#if 0 /*JP*//*“ú–{Œê‚Å‚Í•s—v*/
-    if (!do_hallu || !bogon_is_pname(whatcode))
-        Strcat(pname, "the ");
+    /* for high priest(ess), "high" (or "grand" for poohbah) will be inserted
+       [this was done near the end but we want 'what' to be updated sooner] */
+#if 0 /*JP:T*/
+    if (mon->ispriest || aligned_priest || high_priest)
+        what = do_hallu ? "poohbah" : mon->female ? "priestess" : "priest";
+#else
+    if (mon->ispriest || aligned_priest || high_priest)
+        what = do_hallu ? "ç„¡èƒ½å®˜åƒš" : mon->female ? "å°¼åƒ§" : "åƒ§ä¾¶";
 #endif
-    if (mon->minvis)
+
+    *pname = '\0';
+#if 0 /*JP*//*æ—¥æœ¬èªã§ã¯å† è©ã‚’ä½¿ã‚ãªã„*/
+    if (article != ARTICLE_NONE && (!do_hallu || !bogon_is_pname(whatcode))) {
+        if (article == ARTICLE_YOUR || (article == ARTICLE_A && high_priest))
+            article = ARTICLE_THE;
+        if (article == ARTICLE_THE) {
+            Strcpy(pname, "the ");
+        } else if (!strcmp(what, "Angel")) {
+            /* bypass just_an(); it would yield "" due to treating capital A
+               as indicating a personal name */
+            Strcpy(pname, "an ");
+        } else {
+            (void) just_an(pname, what);
+        }
+    }
+#endif
+    /* pname[] contains "" or {"a ","an ","the "} */
+    if (mon->minvis) {
+#if 0 /*JP*//*æ—¥æœ¬èªã§ã¯å† è©ã‚’ä½¿ã‚ãªã„*/
+        /* avoid "a invisible priest" */
+        if (!strcmp(pname, "a "))
+            Strcpy(pname, "an ");
+#endif
 /*JP
         Strcat(pname, "invisible ");
 */
-        Strcat(pname, "“§–¾‚È");
-    if (mon->isminion && EMIN(mon)->renegade)
+        Strcat(pname, "é€æ˜ãª");
+    }
+    if (mon->isminion && EMIN(mon)->renegade) {
+#if 0 /*JP*//*æ—¥æœ¬èªã§ã¯å† è©ã‚’ä½¿ã‚ãªã„*/
+        /* avoid "an renegade Angel" */
+        if (!strcmp(pname, "an ") && !mon->minvis)
+            Strcpy(pname, "a ");
+#endif
 /*JP
         Strcat(pname, "renegade ");
 */
-        Strcat(pname, "— Ø‚èÒ‚Ì");
+        Strcat(pname, "è£åˆ‡ã‚Šè€…ã®");
+    }
 
-#if 1 /*JP*//*‘®«‚Í‚±‚±‚Å•t‚¯‚é*/
-    if (do_hallu || !high_priest || !Is_astralevel(&u.uz)
-        || distu(mon->mx, mon->my) <= 2 || program_state.gameover) {
+#if 1 /*JP*//*å±æ€§ã¯ã“ã“ã§ä»˜ã‘ã‚‹*/
+    if (do_hallu || !high_priest || reveal_high_priest
+        || !Is_astralevel(&u.uz)
+        || m_next2u(mon) || program_state.gameover) {
         Strcat(pname, halu_gname(mon_aligntyp(mon)));
-        Strcat(pname, "‚Ì");
+        Strcat(pname, "ã®");
     }
 #endif
-    if (mon->ispriest || aligned_priest) { /* high_priest implies ispriest */
-        if (!aligned_priest && !high_priest) {
-            ; /* polymorphed priest; use ``what'' as is */
-        } else {
-            if (high_priest)
+    if (mon->ispriest || aligned_priest) {
+        if (high_priest)
 #if 0 /*JP*/
-                Strcat(pname, "high ");
-#else
-                {
-                    if (Hallucination)
-                        what = "–³”\‚‹‰Š¯—»";
-                    else
-                        what = "–@‰¤";
-                }
-            else /* ã‹L‚ÅŠ®¬‚³‚¹‚ÄAˆÈ‰º‚ÌƒR[ƒh‚Í’Ê‚ç‚È‚­‚·‚é */
+            Strcat(pname, do_hallu ? "grand " : "high ");
+#else /*é ­ã«ä»˜ã‘ã‚‹ã®ã§ã¯ãªãã€åå‰è‡ªä½“ã‚’å¤‰ãˆã‚‹*/
+            what = do_hallu ? "ç„¡èƒ½é«˜ç´šå®˜åƒš"
+                   : mon->female ? "å¥³æ³•ç‹" : "æ³•ç‹";
 #endif
-            if (Hallucination)
-/*JP
-                what = "poohbah";
-*/
-                what = "–³”\Š¯—»";
-            else if (mon->female)
-/*JP
-                what = "priestess";
-*/
-                what = "“ò‘m";
-            else
-/*JP
-                what = "priest";
-*/
-                what = "‘m—µ";
-        }
     } else {
 /*JP
         if (mon->mtame && !strcmpi(what, "Angel"))
 */
-        if (mon->mtame && !strcmpi(what, "“Vg"))
+        if (mon->mtame && !strcmpi(what, "å¤©ä½¿"))
 /*JP
             Strcat(pname, "guardian ");
 */
-            Strcat(pname, "ŒxŒì");
+            Strcat(pname, "è­¦è­·");
     }
 
     Strcat(pname, what);
-#if 0 /*JP*//*‘®«‚Í‚·‚Å‚É•t‚¯‚Ä‚¢‚é*/
+#if 0 /*JP*//*å±æ€§ã¯ã™ã§ã«ä»˜ã‘ã¦ã„ã‚‹*/
     /* same as distant_monnam(), more or less... */
-    if (do_hallu || !high_priest || !Is_astralevel(&u.uz)
-        || distu(mon->mx, mon->my) <= 2 || program_state.gameover) {
+    if (do_hallu || !high_priest || reveal_high_priest
+        || !Is_astralevel(&u.uz)
+        || m_next2u(mon) || program_state.gameover) {
         Strcat(pname, " of ");
         Strcat(pname, halu_gname(mon_aligntyp(mon)));
     }
@@ -400,15 +418,13 @@ char *pname; /* caller-supplied output buffer */
 }
 
 boolean
-p_coaligned(priest)
-struct monst *priest;
+p_coaligned(struct monst *priest)
 {
     return (boolean) (u.ualign.type == mon_aligntyp(priest));
 }
 
-STATIC_OVL boolean
-has_shrine(pri)
-struct monst *pri;
+staticfn boolean
+has_shrine(struct monst *pri)
 {
     struct rm *lev;
     struct epri *epri_p;
@@ -424,10 +440,9 @@ struct monst *pri;
 }
 
 struct monst *
-findpriest(roomno)
-char roomno;
+findpriest(char roomno)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
@@ -439,10 +454,11 @@ char roomno;
     return (struct monst *) 0;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* called from check_special_room() when the player enters the temple room */
 void
-intemple(roomno)
-int roomno;
+intemple(int roomno)
 {
     struct monst *priest, *mtmp;
     struct epri *epri_p;
@@ -457,13 +473,14 @@ int roomno;
 
     if ((priest = findpriest((char) roomno)) != 0) {
         /* tended */
+        record_achievement(ACH_TMPL);
 
         epri_p = EPRI(priest);
         shrined = has_shrine(priest);
-        sanctum = (priest->data == &mons[PM_HIGH_PRIEST]
+        sanctum = (priest->data == &mons[PM_HIGH_CLERIC]
                    && (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
-        can_speak = (priest->mcanmove && !priest->msleeping);
-        if (can_speak && !Deaf && moves >= epri_p->intone_time) {
+        can_speak = !helpless(priest);
+        if (can_speak && !Deaf && svm.moves >= epri_p->intone_time) {
             unsigned save_priest = priest->ispriest;
 
             /* don't reveal the altar's owner upon temple entry in
@@ -475,11 +492,11 @@ int roomno;
             pline("%s intones:",
                   canseemon(priest) ? Monnam(priest) : "A nearby voice");
 #else
-            pline("%s‚ª‰r¥‚µ‚½F",
-                  canseemon(priest) ? Monnam(priest) : "‹ß‚­‚Å’N‚©");
+            pline("%sãŒè© å”±ã—ãŸï¼š",
+                  canseemon(priest) ? Monnam(priest) : "è¿‘ãã§èª°ã‹");
 #endif
             priest->ispriest = save_priest;
-            epri_p->intone_time = moves + (long) d(10, 500); /* ~2505 */
+            epri_p->intone_time = svm.moves + (long) d(10, 500); /* ~2505 */
             /* make sure that we don't suppress entry message when
                we've just given its "priest intones" introduction */
             epri_p->enter_time = 0L;
@@ -491,11 +508,11 @@ int roomno;
 /*JP
                 msg1 = "Infidel, you have entered Moloch's Sanctum!";
 */
-                msg1 = "ˆÙ’[Ò‚æI‚±‚±‚ÍCƒ‚[ƒƒbƒN‚Ì¹ˆæ‚¾I";
+                msg1 = "ç•°ç«¯è€…ã‚ˆï¼ã“ã“ã¯ï¼Œãƒ¢ãƒ¼ãƒ­ãƒƒã‚¯ã®è–åŸŸã ï¼";
 /*JP
                 msg2 = "Be gone!";
 */
-                msg2 = "—§‚¿‚³‚êI";
+                msg2 = "ç«‹ã¡å»ã‚Œï¼";
                 priest->mpeaceful = 0;
                 /* became angry voluntarily; no penalty for attacking him */
                 set_malign(priest);
@@ -504,23 +521,24 @@ int roomno;
 /*JP
                 msg1 = "You desecrate this place by your presence!";
 */
-                msg1 = "‚¨‚Ü‚¦‚Í‚±‚Ì_¹‚ÈêŠ‚ğ‰˜‚µ‚Ä‚¢‚éI";
+                msg1 = "ãŠã¾ãˆã¯ã“ã®ç¥è–ãªå ´æ‰€ã‚’æ±šã—ã¦ã„ã‚‹ï¼";
             }
-        } else if (moves >= epri_p->enter_time) {
+        } else if (svm.moves >= epri_p->enter_time) {
 #if 0 /*JP:T*/
             Sprintf(buf, "Pilgrim, you enter a %s place!",
                     !shrined ? "desecrated" : "sacred");
 #else
-            Sprintf(buf, "„—çÒ‚æC‚¨‚Ü‚¦‚Í%s’n‚É‚¢‚éI",
-                    !shrined ? "•sò‚Ì" : "_¹‚È‚é");
+            Sprintf(buf, "å·¡ç¤¼è€…ã‚ˆï¼ŒãŠã¾ãˆã¯%såœ°ã«ã„ã‚‹ï¼",
+                    !shrined ? "ä¸æµ„ã®" : "ç¥è–ãªã‚‹");
 #endif
             msg1 = buf;
         }
         if (msg1 && can_speak && !Deaf) {
+            SetVoice(priest, 0, 80, 0);
             verbalize1(msg1);
             if (msg2)
                 verbalize1(msg2);
-            epri_p->enter_time = moves + (long) d(10, 100); /* ~505 */
+            epri_p->enter_time = svm.moves + (long) d(10, 100); /* ~505 */
         }
         if (!sanctum) {
             if (!shrined || !p_coaligned(priest)
@@ -528,31 +546,31 @@ int roomno;
 /*JP
                 msg1 = "have a%s forbidding feeling...";
 */
-                msg1 = "%s‹ß‚Ã‚«‚ª‚½‚¢‹C‚ª‚µ‚½DDD";
+                msg1 = "%sè¿‘ã¥ããŒãŸã„æ°—æŒãŒã—ãŸï¼ï¼ï¼";
 /*JP
                 msg2 = (!shrined || !p_coaligned(priest)) ? "" : " strange";
 */
-                msg2 = (!shrined || !p_coaligned(priest)) ? "" : "Šï–­‚È";
+                msg2 = (!shrined || !p_coaligned(priest)) ? "" : "å¥‡å¦™ãª";
                 this_time = &epri_p->hostile_time;
                 other_time = &epri_p->peaceful_time;
             } else {
 /*JP
                 msg1 = "experience %s sense of peace.";
 */
-                msg1 = "%s–‚¿‘«‚è‚½‹C‚¿‚É‚È‚Á‚½D";
+                msg1 = "%sæº€ã¡è¶³ã‚ŠãŸæ°—æŒã¡ã«ãªã£ãŸï¼";
 /*JP
-                msg2 = (u.ualign.record >= ALGN_PIOUS) ? "a" : "an unusual";
+                msg2 = (u.ualign.record >= ALGN_DEVOUT) ? "a" : "an unusual";
 */
-                msg2 = (u.ualign.record >= ALGN_PIOUS) ? "" : "‚¢‚Â‚É‚È‚­";
+                msg2 = (u.ualign.record >= ALGN_DEVOUT) ? "" : "ã„ã¤ã«ãªã";
                 this_time = &epri_p->peaceful_time;
                 other_time = &epri_p->hostile_time;
             }
             /* give message if we haven't seen it recently or
                if alignment update has caused it to switch from
                forbidding to sense-of-peace or vice versa */
-            if (moves >= *this_time || *other_time >= *this_time) {
+            if (svm.moves >= *this_time || *other_time >= *this_time) {
                 You(msg1, msg2);
-                *this_time = moves + (long) d(10, 20); /* ~55 */
+                *this_time = svm.moves + (long) d(10, 20); /* ~55 */
                 /* avoid being tricked by the RNG:  switch might have just
                    happened and previous random threshold could be larger */
                 if (*this_time <= *other_time)
@@ -570,19 +588,19 @@ int roomno;
 /*JP
             You("have an eerie feeling...");
 */
-            You("‚¼‚Á‚Æ‚µ‚½DDD");
+            You("ãã£ã¨ã—ãŸï¼ï¼ï¼");
             break;
         case 1:
 /*JP
             You_feel("like you are being watched.");
 */
-            You("Œ©‚Â‚ß‚ç‚ê‚Ä‚¢‚é‚æ‚¤‚È‹C‚ª‚µ‚½D");
+            You("è¦‹ã¤ã‚ã‚‰ã‚Œã¦ã„ã‚‹ã‚ˆã†ãªæ°—ãŒã—ãŸï¼");
             break;
         case 2:
 /*JP
             pline("A shiver runs down your %s.", body_part(SPINE));
 */
-            pline("‚ ‚È‚½‚Ì%s‚ğk‚¦‚ª‘–‚Á‚½D", body_part(SPINE));
+            pline("ã‚ãªãŸã®%sã‚’éœ‡ãˆãŒèµ°ã£ãŸï¼", body_part(SPINE));
             break;
         default:
             break; /* no message; unfortunately there's no
@@ -590,49 +608,50 @@ int roomno;
                       make sure we give one the first time */
         }
         if (!rn2(5)
-            && (mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS))
+            && (mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NOMSG))
                    != 0) {
-            int ngen = mvitals[PM_GHOST].born;
+            int ngen = svm.mvitals[PM_GHOST].born;
             if (canspotmon(mtmp))
 #if 0 /*JP:T*/
                 pline("A%s ghost appears next to you%c",
                       ngen < 5 ? "n enormous" : "",
                       ngen < 10 ? '!' : '.');
 #else
-                pline("%s—H—ì‚ª‚ ‚È‚½‚Ì‚·‚®‚»‚Î‚ÉŒ»‚í‚ê‚½%s",
-                      ngen < 5 ? "‹‘å‚È" : "",
-                      ngen < 10 ? "I" : "D");
+                pline("%så¹½éœŠãŒã‚ãªãŸã®ã™ããã°ã«ç¾ã‚ã‚ŒãŸ%s",
+                      ngen < 5 ? "å·¨å¤§ãª" : "",
+                      ngen < 10 ? "ï¼" : "ï¼");
 #endif
             else
 /*JP
                 You("sense a presence close by!");
 */
-                You("‚·‚®‚»‚Î‚É‰½‚©‚ª‚¢‚é‚Ì‚ğŠ´‚¶‚½I");
+                You("ã™ããã°ã«ä½•ã‹ãŒã„ã‚‹ã®ã‚’æ„Ÿã˜ãŸï¼");
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
             if (flags.verbose)
 /*JP
                 You("are frightened to death, and unable to move.");
 */
-                You("‚Ü‚Á‚³‚¨‚É‚È‚Á‚Ä‹Á‚«C“®‚¯‚È‚­‚È‚Á‚½D");
+                You("ã¾ã£ã•ãŠã«ãªã£ã¦é©šãï¼Œå‹•ã‘ãªããªã£ãŸï¼");
             nomul(-3);
 /*JP
-            multi_reason = "being terrified of a ghost";
+            gm.multi_reason = "being terrified of a ghost";
 */
-            multi_reason = "—H—ì‚É‹°•|‚µ‚Ä‚¢‚é‚É";
+            gm.multi_reason = "å¹½éœŠã«ææ€–ã—ã¦ã„ã‚‹æ™‚ã«";
 /*JP
-            nomovemsg = "You regain your composure.";
+            gn.nomovemsg = "You regain your composure.";
 */
-            nomovemsg = "‚ ‚È‚½‚Í•½Ã‚ğæ‚è–ß‚µ‚½D";
+            gn.nomovemsg = "ã‚ãªãŸã¯å¹³é™ã‚’å–ã‚Šæˆ»ã—ãŸï¼";
         }
     }
 }
 
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 /* reset the move counters used to limit temple entry feedback;
    leaving the level and then returning yields a fresh start */
 void
-forget_temple_entry(priest)
-struct monst *priest;
+forget_temple_entry(struct monst *priest)
 {
     struct epri *epri_p = priest->ispriest ? EPRI(priest) : 0;
 
@@ -645,53 +664,63 @@ struct monst *priest;
 }
 
 void
-priest_talk(priest)
-register struct monst *priest;
+priest_talk(struct monst *priest)
 {
     boolean coaligned = p_coaligned(priest);
     boolean strayed = (u.ualign.record < 0);
+    unsigned *cheapskate = NULL;
+    if (EPRI(priest)) cheapskate = &EPRI(priest)->cheapskate_count;
+
+    /*
+     * Note: we won't be called if hero is Deaf [since dochat() will
+     * return before calling domonnoise()], so we don't need to check
+     * for that before the various calls to verbalize() here.
+     */
 
     /* KMH, conduct */
-    u.uconduct.gnostic++;
+    if (!u.uconduct.gnostic++)
+        livelog_printf(LL_CONDUCT,
+                       "rejected atheism by consulting with %s",
+                       mon_nam(priest));
 
     if (priest->mflee || (!priest->ispriest && coaligned && strayed)) {
 /*JP
         pline("%s doesn't want anything to do with you!", Monnam(priest));
 */
-        pline("%s‚Í‚ ‚È‚½‚É\‚¢‚½‚­‚È‚¢‚æ‚¤‚¾I", Monnam(priest));
+        pline("%sã¯ã‚ãªãŸã«æ§‹ã„ãŸããªã„ã‚ˆã†ã ï¼", Monnam(priest));
         priest->mpeaceful = 0;
         return;
     }
 
     /* priests don't chat unless peaceful and in their own temple */
-    if (!inhistemple(priest) || !priest->mpeaceful
-        || !priest->mcanmove || priest->msleeping) {
-        static const char *cranky_msg[3] = {
+    if (!inhistemple(priest) || !priest->mpeaceful || helpless(priest)) {
+        static const char *const cranky_msg[3] = {
 /*JP
             "Thou wouldst have words, eh?  I'll give thee a word or two!",
 */
-            "“ğŒ¾—t‚ğ–]‚Ş‚Ì‚©H",
+            "æ±è¨€è‘‰ã‚’æœ›ã‚€ã®ã‹ï¼Ÿ",
 /*JP
             "Talk?  Here is what I have to say!",
 */
-            "˜b‚·H‰½‚ğŒ¾‚¦‚Î‚æ‚¢‚Ì‚¾I",
+            "è©±ã™ï¼Ÿä½•ã‚’è¨€ãˆã°ã‚ˆã„ã®ã ï¼",
 /*JP
             "Pilgrim, I would speak no longer with thee."
 */
-            "„—çÒ‚æC“ğ‚ÉŒê‚é‚±‚Æ‚È‚Ç‚È‚¢D"
+            "å·¡ç¤¼è€…ã‚ˆï¼Œæ±ã«èªã‚‹ã“ã¨ãªã©ãªã„ï¼"
         };
 
-        if (!priest->mcanmove || priest->msleeping) {
+        if (helpless(priest)) {
 #if 0 /*JP:T*/
             pline("%s breaks out of %s reverie!", Monnam(priest),
                   mhis(priest));
 #else
-            pline("%s‚ÍáÒ‘z‚ğ’†’f‚µ‚½I", Monnam(priest));
+            pline("%sã¯ç‘æƒ³ã‚’ä¸­æ–­ã—ãŸï¼", Monnam(priest));
 #endif
             priest->mfrozen = priest->msleeping = 0;
             priest->mcanmove = 1;
         }
         priest->mpeaceful = 0;
+        SetVoice(priest, 0, 80, 0);
         verbalize1(cranky_msg[rn2(3)]);
         return;
     }
@@ -699,109 +728,161 @@ register struct monst *priest;
     /* you desecrated the temple and now you want to chat? */
     if (priest->mpeaceful && *in_rooms(priest->mx, priest->my, TEMPLE)
         && !has_shrine(priest)) {
+        SetVoice(priest, 0, 80, 0);
         verbalize(
 /*JP
               "Begone!  Thou desecratest this holy place with thy presence.");
 */
-              "—§‚¿‹‚êI“ğ‚Í‚±‚Ì_¹‚È‚éêŠ‚ğ‰˜‚µ‚Ä‚¢‚éD");
+              "ç«‹ã¡å»ã‚Œï¼æ±ã¯ã“ã®ç¥è–ãªã‚‹å ´æ‰€ã‚’æ±šã—ã¦ã„ã‚‹ï¼");
         priest->mpeaceful = 0;
         return;
     }
-    if (!money_cnt(invent)) {
+    if (!money_cnt(gi.invent)) {
         if (coaligned && !strayed) {
             long pmoney = money_cnt(priest->minvent);
             if (pmoney > 0L) {
-                /* Note: two bits is actually 25 cents.  Hmm. */
 #if 0 /*JP:T*/
-                pline("%s gives you %s for an ale.", Monnam(priest),
-                      (pmoney == 1L) ? "one bit" : "two bits");
+                const char *bits;
+                bits = (Hallucination) ? currency(pmoney)
+                                       : (pmoney == 1L) ? "bit" : "bits";
+                /* Note: two bits is actually 25 cents.  Hmm. */
+                pline("%s gives you %s%s for an ale.", Monnam(priest),
+                      (pmoney == 1L) ? "one " : "two ", bits);
 #else
-                pline("%s‚Í‚ ‚È‚½‚ªƒG[ƒ‹ğ‚ğˆù‚ß‚é‚æ‚¤‚ÉC%s‚ğ—^‚¦‚½D", Monnam(priest),
-                      (pmoney == 1L) ? "‹à‰İ1–‡" : "‹à‰İ2–‡");
+                pline("%sã¯ã‚ãªãŸãŒã‚¨ãƒ¼ãƒ«é…’ã‚’é£²ã‚ã‚‹ã‚ˆã†ã«ï¼Œé‡‘è²¨%ldæšã‚’ä¸ãˆãŸï¼", Monnam(priest),
+                      (pmoney == 1L) ? 1L : 2L);
 #endif
                 money2u(priest, pmoney > 1L ? 2 : 1);
             } else
 /*JP
                 pline("%s preaches the virtues of poverty.", Monnam(priest));
 */
-                pline("%s‚Í´•n‚Ì”ü“¿‚É‚Â‚¢‚Äà‹³‚µ‚½D", Monnam(priest));
+                pline("%sã¯æ¸…è²§ã®ç¾å¾³ã«ã¤ã„ã¦èª¬æ•™ã—ãŸï¼", Monnam(priest));
             exercise(A_WIS, TRUE);
         } else
 /*JP
             pline("%s is not interested.", Monnam(priest));
 */
-            pline("%s‚Í‹»–¡‚ğ¦‚³‚È‚¢D", Monnam(priest));
+            pline("%sã¯èˆˆå‘³ã‚’ç¤ºã•ãªã„ï¼", Monnam(priest));
         return;
     } else {
+        /* there's now some randomization in how much you need to donate, but
+           you are given suggested donation values that will guarantee
+           clairvoyance and protection respectively; with more gold visible
+           you need to donate more but get a greater effect; and if you
+           cheapskate out to rerandomize the donation amounts they will be
+           higher next time */
         long offer;
+        long suggested = (u.ulevelpeak ? u.ulevelpeak : 1 ) *
+            rn1(101, 150 + (cheapskate ? *cheapskate : 0) * 40);
+        long quan = money_cnt(gi.invent) / (suggested * 3);
+        char buf[BUFSZ];
 
+        if (quan < 1)
+            quan = 1;
+
+#if 0 /*JP:T*/
+        Sprintf(buf, "How much will you offer (suggested: %ld or %ld)?",
+                suggested * quan, suggested * quan * 2);
+#else
+        Sprintf(buf, "ã„ãã‚‰å¯„è´ˆã—ã¾ã™ã‹ï¼Ÿ(ãŠã™ã™ã‚: %ld ã‹ %ld)",
+                suggested * quan, suggested * quan * 2);
+#endif
+
+        if (flags.debug)
+            pline("%s asks you for a contribution for the temple (base %ld).",
+                  Monnam(priest), suggested);
+        else
 /*JP
-        pline("%s asks you for a contribution for the temple.",
+            pline("%s asks you for a contribution for the temple.",
 */
-        pline("%s‚Í‚ ‚È‚½‚É›‰@‚Ö‚ÌŠñ‘¡‚ğ‹‚ß‚½D",
-              Monnam(priest));
-        if ((offer = bribe(priest)) == 0) {
+            pline("%sã¯ã‚ãªãŸã«å¯ºé™¢ã¸ã®å¯„è´ˆã‚’æ±‚ã‚ãŸï¼",
+                  Monnam(priest));
+        if ((offer = bribe(priest, buf)) == 0) {
+            SetVoice(priest, 0, 80, 0);
 /*JP
             verbalize("Thou shalt regret thine action!");
 */
-            verbalize("“ğ‚Ìsˆ×‚Í_‚ğ–`“À‚·‚é‚à‚Ì‚È‚èI");
+            verbalize("æ±ã®è¡Œç‚ºã¯ç¥ã‚’å†’æ¶œã™ã‚‹ã‚‚ã®ãªã‚Šï¼");
             if (coaligned)
                 adjalign(-1);
-        } else if (offer < (u.ulevel * 200)) {
-            if (money_cnt(invent) > (offer * 2L)) {
+            if (cheapskate) ++*cheapskate;
+        } else if (offer < suggested * quan) {
+            if (money_cnt(gi.invent) > (offer * 2L)) {
+                SetVoice(priest, 0, 80, 0);
 /*JP
                 verbalize("Cheapskate.");
 */
-                verbalize("ƒPƒ`‚ßD");
+                verbalize("ã‚±ãƒã‚ï¼");
+                if (cheapskate) ++*cheapskate;
             } else {
+                SetVoice(priest, 0, 80, 0);
 /*JP
                 verbalize("I thank thee for thy contribution.");
 */
-                verbalize("“ğ‚ÌŠñ‘¡‚É•ñ‚¢‚æ‚¤‚¼D");
+                verbalize("æ±ã®å¯„è´ˆã«å ±ã„ã‚ˆã†ãï¼");
                 /* give player some token */
                 exercise(A_WIS, TRUE);
             }
-        } else if (offer < (u.ulevel * 400)) {
+        } else if (offer < suggested * quan * 2) {
+            SetVoice(priest, 0, 80, 0);
 /*JP
             verbalize("Thou art indeed a pious individual.");
 */
-            verbalize("“ğC‚Ü‚³‚ÉŒhåi‚È‚èD");
-            if (money_cnt(invent) < (offer * 2L)) {
+            verbalize("æ±ï¼Œã¾ã•ã«æ•¬è™”ãªã‚Šï¼");
+            if (money_cnt(gi.invent) < (offer * 2L)) {
                 if (coaligned && u.ualign.record <= ALGN_SINNED)
                     adjalign(1);
-/*JP
-                verbalize("I bestow upon thee a blessing.");
-*/
-                verbalize("“ğ‚Éj•Ÿ‚ğD");
-                incr_itimeout(&HClairvoyant, rn1(500, 500));
             }
-        } else if (offer < (u.ulevel * 600)
-                   /* u.ublessed is only active when Protection is
-                      enabled via something other than worn gear
-                      (theft by gremlin clears the intrinsic but not
-                      its former magnitude, making it recoverable) */
-                   && (!(HProtection & INTRINSIC)
-                       || (u.ublessed < 20
-                           && (u.ublessed < 9 || !rn2(u.ublessed))))) {
 /*JP
-            verbalize("Thou hast been rewarded for thy devotion.");
+            verbalize("I bestow upon thee a blessing.");
 */
-            verbalize("“ğ‚ªŒ£g‚É•ñ‚í‚ñD");
+            verbalize("æ±ã«ç¥ç¦ã‚’ï¼");
+            incr_itimeout(&HClairvoyant, rn1(500 * offer / suggested,
+                                             500 * offer / suggested));
+        } else if (offer < suggested * quan * 3) {
+            int orig_ublessed = u.ublessed;
+
+            /* u.ublessed is only active when Protection is enabled via
+               something other than worn gear (theft by gremlin clears the
+               intrinsic but not its former magnitude, making it
+               recoverable) */
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
+                orig_ublessed = -1; /* force "rewarded" message */
+            }
+
+            for (; offer >= (2 * suggested); offer -= (2 * suggested)) {
                 if (!u.ublessed)
                     u.ublessed = rn1(3, 2);
-            } else
-                u.ublessed++;
+                else if (u.ublessed < 20 &&
+                         (u.ublessed < 9 || !rn2(u.ublessed)))
+                    u.ublessed++;
+            }
+            SetVoice(priest, 0, 80, 0);
+            if (u.ublessed > orig_ublessed) {
+/*JP
+                verbalize("Thou hast been rewarded for thy devotion.");
+*/
+                verbalize("æ±ãŒçŒ®èº«ã«å ±ã‚ã‚“ï¼");
+            } else {
+/*JP
+                verbalize("Thy selfless generosity is deeply appreciated.");
+*/
+                verbalize("æ±è‡ªèº«ã®çœŸä¾¡ã¯å¤§ã„ã«èªã‚ã‚‰ã‚ŒãŸï¼");
+            }
         } else {
+            SetVoice(priest, 0, 80, 0);
 /*JP
             verbalize("Thy selfless generosity is deeply appreciated.");
 */
-            verbalize("“ğ©g‚Ì^‰¿‚Í‘å‚¢‚É”F‚ß‚ç‚ê‚½D");
-            if (money_cnt(invent) < (offer * 2L) && coaligned) {
-                if (strayed && (moves - u.ucleansed) > 5000L) {
+            verbalize("æ±è‡ªèº«ã®çœŸä¾¡ã¯å¤§ã„ã«èªã‚ã‚‰ã‚ŒãŸï¼");
+            /* money_cnt check is preserved for futureproofing but probably
+               can't fail in the current code */
+            if (money_cnt(gi.invent) < (offer * 2L) && coaligned) {
+                if (strayed && (svm.moves - u.ucleansed) > 5000L) {
                     u.ualign.record = 0; /* cleanse thee */
-                    u.ucleansed = moves;
+                    u.ucleansed = svm.moves;
                 } else {
                     adjalign(2);
                 }
@@ -811,31 +892,28 @@ register struct monst *priest;
 }
 
 struct monst *
-mk_roamer(ptr, alignment, x, y, peaceful)
-register struct permonst *ptr;
-aligntyp alignment;
-xchar x, y;
-boolean peaceful;
+mk_roamer(struct permonst *ptr, aligntyp alignment, coordxy x, coordxy y,
+          boolean peaceful)
 {
-    register struct monst *roamer;
-    register boolean coaligned = (u.ualign.type == alignment);
+    struct monst *roamer;
+    boolean coaligned = (u.ualign.type == alignment);
 
 #if 0 /* this was due to permonst's pxlth field which is now gone */
-    if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
+    if (ptr != &mons[PM_ALIGNED_CLERIC] && ptr != &mons[PM_ANGEL])
         return (struct monst *) 0;
 #endif
 
     if (MON_AT(x, y))
-        (void) rloc(m_at(x, y), FALSE); /* insurance */
+        (void) rloc(m_at(x, y), RLOC_NOMSG); /* insurance */
 
-    if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK | MM_EMIN)))
+    if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK | MM_EMIN | MM_NOMSG)))
         return (struct monst *) 0;
 
     EMIN(roamer)->min_align = alignment;
     EMIN(roamer)->renegade = (coaligned && !peaceful);
     roamer->ispriest = 0;
     roamer->isminion = 1;
-    roamer->mtrapseen = ~0; /* traps are known */
+    mon_learns_traps(roamer, ALL_TRAPS); /* traps are known */
     roamer->mpeaceful = peaceful;
     roamer->msleeping = 0;
     set_malign(roamer); /* peaceful may have changed */
@@ -845,12 +923,11 @@ boolean peaceful;
 }
 
 void
-reset_hostility(roamer)
-register struct monst *roamer;
+reset_hostility(struct monst *roamer)
 {
     if (!roamer->isminion)
         return;
-    if (roamer->data != &mons[PM_ALIGNED_PRIEST]
+    if (roamer->data != &mons[PM_ALIGNED_CLERIC]
         && roamer->data != &mons[PM_ANGEL])
         return;
 
@@ -862,12 +939,12 @@ register struct monst *roamer;
 }
 
 boolean
-in_your_sanctuary(mon, x, y)
-struct monst *mon; /* if non-null, <mx,my> overrides <x,y> */
-xchar x, y;
+in_your_sanctuary(
+    struct monst *mon, /* if non-null, <mx,my> overrides <x,y> */
+    coordxy x, coordxy y)
 {
-    register char roomno;
-    register struct monst *priest;
+    char roomno;
+    struct monst *priest;
 
     if (mon) {
         if (is_minion(mon->data) || is_rider(mon->data))
@@ -887,20 +964,22 @@ xchar x, y;
 
 /* when attacking "priest" in his temple */
 void
-ghod_hitsu(priest)
-struct monst *priest;
+ghod_hitsu(struct monst *priest)
 {
-    int x, y, ax, ay, roomno = (int) temple_occupied(u.urooms);
     struct mkroom *troom;
+    struct monst *oldbuzzer;
+    struct obj *oldcurrwand;
+    coordxy x, y, ax, ay;
+    int roomno = (int) temple_occupied(u.urooms);
 
     if (!roomno || !has_shrine(priest))
         return;
 
     ax = x = EPRI(priest)->shrpos.x;
     ay = y = EPRI(priest)->shrpos.y;
-    troom = &rooms[roomno - ROOMOFFSET];
+    troom = &svr.rooms[roomno - ROOMOFFSET];
 
-    if ((u.ux == x && u.uy == y) || !linedup(u.ux, u.uy, x, y, 1)) {
+    if (u_at(x, y) || !linedup(u.ux, u.uy, x, y, 1)) {
         if (IS_DOOR(levl[u.ux][u.uy].typ)) {
             if (u.ux == troom->lx - 1) {
                 x = troom->hx;
@@ -944,7 +1023,7 @@ struct monst *priest;
 /*JP
         pline("%s roars in anger:  \"Thou shalt suffer!\"",
 */
-        pline("%s‚Í“{‚è‚Ìº‚ğ‚ ‚°‚½Fu“ğC‹ê‚µ‚Ş‚ª‚æ‚¢Iv",
+        pline("%sã¯æ€’ã‚Šã®å£°ã‚’ã‚ã’ãŸï¼šã€Œæ±ï¼Œè‹¦ã—ã‚€ãŒã‚ˆã„ï¼ã€",
               a_gname_at(ax, ay));
         break;
     case 1:
@@ -952,7 +1031,7 @@ struct monst *priest;
         pline("%s voice booms:  \"How darest thou harm my servant!\"",
               s_suffix(a_gname_at(ax, ay)));
 #else
-        pline("%s‚Ìº‚ª‹¿‚¢‚½Fu‚í‚ª‰º–l‚É‹ê‚µ‚Ş‚ª‚æ‚¢Iv",
+        pline("%sã®å£°ãŒéŸ¿ã„ãŸï¼šã€Œã‚ˆãã‚‚ã‚ãŒä¸‹åƒ•ã‚’å‚·ã¤ã‘ãŸãªï¼ã€",
               a_gname_at(ax, ay));
 #endif
         break;
@@ -960,20 +1039,26 @@ struct monst *priest;
 /*JP
         pline("%s roars:  \"Thou dost profane my shrine!\"",
 */
-        pline("%s‚Ìº‚ª•·‚±‚¦‚éFu“ğC‰ä‚ª¹“°‚ğ‰˜‚µ‚½‚èIv",
+        pline("%sã®å£°ãŒèã“ãˆã‚‹ï¼šã€Œæ±ï¼Œæˆ‘ãŒè–å ‚ã‚’æ±šã—ãŸã‚Šï¼ã€",
               a_gname_at(ax, ay));
         break;
     }
 
-    buzz(-10 - (AD_ELEC - 1), 6, x, y, sgn(tbx),
-         sgn(tby)); /* bolt of lightning */
+    /* bolt of lightning cast by unspecified monster */
+    oldcurrwand = gc.current_wand;
+    gc.current_wand = 0;
+    oldbuzzer = gb.buzzer;
+    gb.buzzer = 0;
+    buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 6, x, y, sgn(gt.tbx), sgn(gt.tby));
+    gb.buzzer = oldbuzzer;
+    gc.current_wand = oldcurrwand;
     exercise(A_WIS, FALSE);
 }
 
 void
-angry_priest()
+angry_priest(void)
 {
-    register struct monst *priest;
+    struct monst *priest;
     struct rm *lev;
 
     if ((priest = findpriest(temple_occupied(u.urooms))) != 0) {
@@ -996,6 +1081,7 @@ angry_priest()
                 newemin(priest);
             priest->ispriest = 0; /* now a roaming minion */
             priest->isminion = 1;
+            assert(has_emin(priest));
             EMIN(priest)->min_align = eprip->shralign;
             EMIN(priest)->renegade = FALSE;
             /* discard priest's memory of his former shrine;
@@ -1012,7 +1098,7 @@ angry_priest()
  * [Perhaps we should convert them into roamers instead?]
  */
 void
-clearpriests()
+clearpriests(void)
 {
     struct monst *mtmp;
 
@@ -1026,9 +1112,7 @@ clearpriests()
 
 /* munge priest-specific structure when restoring -dlc */
 void
-restpriest(mtmp, ghostly)
-register struct monst *mtmp;
-boolean ghostly;
+restpriest(struct monst *mtmp, boolean ghostly)
 {
     if (u.uz.dlevel) {
         if (ghostly)
@@ -1036,432 +1120,7 @@ boolean ghostly;
     }
 }
 
-/*
- * align_str(), piousness(), mstatusline() and ustatusline() used to be
- * in pline.c, presumeably because the latter two generate one line of
- * output.  The USE_OLDARGS config gets warnings from 2016ish-vintage
- * gcc (for -Wint-to-pointer-cast, activated by -Wall or -W) when they
- * follow pline() itself.  Fixing up the variadic calls like is done for
- * lev_comp would be needlessly messy there.
- *
- * They don't belong here.  If/when enlightenment ever gets split off
- * from cmd.c (which definitely doesn't belong there), they should go
- * with it.
- */
-
-const char *
-align_str(alignment)
-aligntyp alignment;
-{
-    switch ((int) alignment) {
-    case A_CHAOTIC:
-/*JP
-        return "chaotic";
-*/
-        return "¬“×";
-    case A_NEUTRAL:
-/*JP
-        return "neutral";
-*/
-        return "’†—§";
-    case A_LAWFUL:
-/*JP
-        return "lawful";
-*/
-        return "’˜";
-    case A_NONE:
-/*JP
-        return "unaligned";
-*/
-        return "–³S";
-    }
-/*JP
-    return "unknown";
-*/
-    return "•s–¾";
-}
-
-/* used for self-probing */
-char *
-piousness(showneg, suffix)
-boolean showneg;
-const char *suffix;
-{
-    static char buf[32]; /* bigger than "insufficiently neutral" */
-    const char *pio;
-
-    /* note: piousness 20 matches MIN_QUEST_ALIGN (quest.h) */
-    if (u.ualign.record >= 20)
-/*JP
-        pio = "piously";
-*/
-        pio = "Œhåi‚È";
-    else if (u.ualign.record > 13)
-/*JP
-        pio = "devoutly";
-*/
-        pio = "MS[‚¢";
-    else if (u.ualign.record > 8)
-/*JP
-        pio = "fervently";
-*/
-        pio = "”MS‚È";
-    else if (u.ualign.record > 3)
-/*JP
-        pio = "stridently";
-*/
-        pio = "‘å‚°‚³‚È";
-    else if (u.ualign.record == 3)
-        pio = "";
-    else if (u.ualign.record > 0)
-/*JP
-        pio = "haltingly";
-*/
-        pio = "•sŠ®‘S‚È";
-    else if (u.ualign.record == 0)
-/*JP
-        pio = "nominally";
-*/
-        pio = "Œ`‚¾‚¯‚Ì";
-    else if (!showneg)
-/*JP
-        pio = "insufficiently";
-*/
-        pio = "•s\•ª‚È";
-    else if (u.ualign.record >= -3)
-/*JP
-        pio = "strayed";
-*/
-        pio = "–À‚¢‚ğ‚Á‚½";
-    else if (u.ualign.record >= -8)
-/*JP
-        pio = "sinned";
-*/
-        pio = "ß‚ğ•‰‚Á‚½";
-    else
-/*JP
-        pio = "transgressed";
-*/
-        pio = "ˆí’E‚µ‚½";
-
-    Sprintf(buf, "%s", pio);
-    if (suffix && (!showneg || u.ualign.record >= 0)) {
-#if 0 /*JP*/
-        if (u.ualign.record != 3)
-            Strcat(buf, " ");
-#endif
-        Strcat(buf, suffix);
-    }
-    return buf;
-}
-
-/* stethoscope or probing applied to monster -- one-line feedback */
-void
-mstatusline(mtmp)
-struct monst *mtmp;
-{
-    aligntyp alignment = mon_aligntyp(mtmp);
-    char info[BUFSZ], monnambuf[BUFSZ];
-
-    info[0] = 0;
-    if (mtmp->mtame) {
-/*JP
-        Strcat(info, ", tame");
-*/
-        Strcat(info, ", ”‚¢‚È‚ç‚³‚ê‚Ä‚¢‚é");
-        if (wizard) {
-            Sprintf(eos(info), " (%d", mtmp->mtame);
-            if (!mtmp->isminion)
-                Sprintf(eos(info), "; hungry %ld; apport %d",
-                        EDOG(mtmp)->hungrytime, EDOG(mtmp)->apport);
-            Strcat(info, ")");
-        }
-    } else if (mtmp->mpeaceful)
-/*JP
-        Strcat(info, ", peaceful");
-*/
-        Strcat(info, ", —FD“I");
-
-    if (mtmp->data == &mons[PM_LONG_WORM]) {
-        int segndx, nsegs = count_wsegs(mtmp);
-
-        /* the worm code internals don't consider the head of be one of
-           the worm's segments, but we count it as such when presenting
-           worm feedback to the player */
-        if (!nsegs) {
-/*JP
-            Strcat(info, ", single segment");
-*/
-            Strcat(info, ", ‘S‘Ì");
-        } else {
-            ++nsegs; /* include head in the segment count */
-            segndx = wseg_at(mtmp, bhitpos.x, bhitpos.y);
-#if 0 /*JP:T*/
-            Sprintf(eos(info), ", %d%s of %d segments",
-                    segndx, ordin(segndx), nsegs);
-#else
-            Sprintf(eos(info), ", %dß‚Ì‚¤‚¿%d”Ô–Ú",
-                    nsegs, segndx);
-#endif
-        }
-    }
-    if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])
-        /* don't reveal the innate form (chameleon, vampire, &c),
-           just expose the fact that this current form isn't it */
-/*JP
-        Strcat(info, ", shapechanger");
-*/
-        Strcat(info, ", •Ï‰»");
-    /* pets eating mimic corpses mimic while eating, so this comes first */
-    if (mtmp->meating)
-/*JP
-        Strcat(info, ", eating");
-*/
-        Strcat(info, ", H–’†");
-    /* a stethoscope exposes mimic before getting here so this
-       won't be relevant for it, but wand of probing doesn't */
-    if (mtmp->mundetected || mtmp->m_ap_type)
-        mhidden_description(mtmp, TRUE, eos(info));
-    if (mtmp->mcan)
-/*JP
-        Strcat(info, ", cancelled");
-*/
-        Strcat(info, ", –³—Í");
-    if (mtmp->mconf)
-/*JP
-        Strcat(info, ", confused");
-*/
-        Strcat(info, ", ¬—ó‘Ô");
-    if (mtmp->mblinded || !mtmp->mcansee)
-/*JP
-        Strcat(info, ", blind");
-*/
-        Strcat(info, ", –Ó–Ú");
-    if (mtmp->mstun)
-/*JP
-        Strcat(info, ", stunned");
-*/
-        Strcat(info, ", ‚­‚ç‚­‚çó‘Ô");
-    if (mtmp->msleeping)
-/*JP
-        Strcat(info, ", asleep");
-*/
-        Strcat(info, ", ‡–°ó‘Ô");
-#if 0 /* unfortunately mfrozen covers temporary sleep and being busy \
-         (donning armor, for instance) as well as paralysis */
-    else if (mtmp->mfrozen)
-        Strcat(info, ", paralyzed");
-#else
-    else if (mtmp->mfrozen || !mtmp->mcanmove)
-/*JP
-        Strcat(info, ", can't move");
-*/
-        Strcat(info, ", “®‚¯‚È‚¢");
-#endif
-    /* [arbitrary reason why it isn't moving] */
-    else if (mtmp->mstrategy & STRAT_WAITMASK)
-/*JP
-        Strcat(info, ", meditating");
-*/
-        Strcat(info, ", –»‘z’†");
-    if (mtmp->mflee)
-/*JP
-        Strcat(info, ", scared");
-*/
-        Strcat(info, ", ‹¯‚¦‚Ä‚¢‚é");
-    if (mtmp->mtrapped)
-/*JP
-        Strcat(info, ", trapped");
-*/
-        Strcat(info, ", ã©‚É‚©‚©‚Á‚Ä‚¢‚é");
-    if (mtmp->mspeed)
-#if 0 /*JP:T*/
-        Strcat(info, (mtmp->mspeed == MFAST) ? ", fast"
-                      : (mtmp->mspeed == MSLOW) ? ", slow"
-                         : ", [? speed]");
-#else
-        Strcat(info, (mtmp->mspeed == MFAST) ? ", ‘f‘‚¢"
-                      : (mtmp->mspeed == MSLOW) ? ", ’x‚¢"
-                         : ", ‘¬“x•s–¾");
-#endif
-    if (mtmp->minvis)
-/*JP
-        Strcat(info, ", invisible");
-*/
-        Strcat(info, ", •s‰Â‹");
-    if (mtmp == u.ustuck)
-#if 0 /*JP:T*/
-        Strcat(info, sticks(youmonst.data) ? ", held by you"
-                      : !u.uswallow ? ", holding you"
-                         : attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST)
-                            ? ", digesting you"
-                            : is_animal(u.ustuck->data) ? ", swallowing you"
-                               : ", engulfing you");
-#else
-        Strcat(info, sticks(youmonst.data) ? ", ‚ ‚È‚½‚ª’Í‚Ü‚¦‚Ä‚¢‚é"
-                      : !u.uswallow ? ", ’Í‚Ü‚¦‚Ä‚¢‚é"
-                         : attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_DGST)
-                            ? ", Á‰»‚µ‚Ä‚¢‚é"
-                            : is_animal(u.ustuck->data) ? ", ˆù‚İ‚ñ‚Å‚¢‚é"
-                               : ", Šª‚«‚ñ‚Å‚¢‚é");
-#endif
-    if (mtmp == u.usteed)
-/*JP
-        Strcat(info, ", carrying you");
-*/
-        Strcat(info, ", ‚ ‚È‚½‚ğæ‚¹‚Ä‚¢‚é");
-
-    /* avoid "Status of the invisible newt ..., invisible" */
-    /* and unlike a normal mon_nam, use "saddled" even if it has a name */
-    Strcpy(monnambuf, x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                               (SUPPRESS_IT | SUPPRESS_INVISIBLE), FALSE));
-
-/*JP
-    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", monnambuf,
-*/
-    pline("%s‚Ìó‘Ô (%s)F Level %d  HP %d(%d)  AC %d%s", monnambuf,
-          align_str(alignment), mtmp->m_lev, mtmp->mhp, mtmp->mhpmax,
-          find_mac(mtmp), info);
-}
-
-/* stethoscope or probing applied to hero -- one-line feedback */
-void
-ustatusline()
-{
-    char info[BUFSZ];
-
-    info[0] = '\0';
-    if (Sick) {
-#if 0 /*JP*/
-        Strcat(info, ", dying from");
-        if (u.usick_type & SICK_VOMITABLE)
-            Strcat(info, " food poisoning");
-        if (u.usick_type & SICK_NONVOMITABLE) {
-            if (u.usick_type & SICK_VOMITABLE)
-                Strcat(info, " and");
-            Strcat(info, " illness");
-        }
-#else
-        Strcat(info, ", ");
-        if (u.usick_type & SICK_VOMITABLE)
-            Strcat(info, "H’†“Å");
-        if (u.usick_type & SICK_NONVOMITABLE) {
-            if (u.usick_type & SICK_VOMITABLE)
-                Strcat(info, "‚Æ");
-            Strcat(info, "•a‹C");
-        }
-        Strcat(info, "‚Å€‚É‚Â‚Â‚ ‚é");
-#endif
-    }
-    if (Stoned)
-/*JP
-        Strcat(info, ", solidifying");
-*/
-        Strcat(info, ", Î‰»‚µ‚Â‚Â‚ ‚é");
-    if (Slimed)
-/*JP
-        Strcat(info, ", becoming slimy");
-*/
-        Strcat(info, ", ƒXƒ‰ƒCƒ€‚É‚È‚è‚Â‚Â‚ ‚é");
-    if (Strangled)
-/*JP
-        Strcat(info, ", being strangled");
-*/
-        Strcat(info, ", ñ‚ği‚ß‚ç‚ê‚Ä‚¢‚é");
-    if (Vomiting)
-#if 0 /*JP:T*/
-        Strcat(info, ", nauseated"); /* !"nauseous" */
-#else
-        Strcat(info, ", “f‚«‹C‚ª‚·‚é");
-#endif
-    if (Confusion)
-/*JP
-        Strcat(info, ", confused");
-*/
-        Strcat(info, ", ¬—ó‘Ô");
-    if (Blind) {
-#if 0 /*JP*/
-        Strcat(info, ", blind");
-        if (u.ucreamed) {
-            if ((long) u.ucreamed < Blinded || Blindfolded
-                || !haseyes(youmonst.data))
-                Strcat(info, ", cover");
-            Strcat(info, "ed by sticky goop");
-        } /* note: "goop" == "glop"; variation is intentional */
-#else
-        Strcat(info, ", ");
-        if (u.ucreamed) {
-            Strcat(info, "‚Ë‚Î‚Ë‚Î‚×‚Æ‚Â‚­‚à‚Ì‚Å");
-            if ((long)u.ucreamed < Blinded || Blindfolded
-                || !haseyes(youmonst.data))
-              Strcat(info, "•¢‚í‚ê‚Ä");
-        }
-        Strcat(info, "–Ó–Úó‘Ô");
-#endif
-    }
-    if (Stunned)
-/*JP
-        Strcat(info, ", stunned");
-*/
-        Strcat(info, ", ‚­‚ç‚­‚çó‘Ô");
-    if (!u.usteed && Wounded_legs) {
-        const char *what = body_part(LEG);
-        if ((Wounded_legs & BOTH_SIDES) == BOTH_SIDES)
-            what = makeplural(what);
-/*JP
-        Sprintf(eos(info), ", injured %s", what);
-*/
-        Sprintf(eos(info), ", %s‚É‚¯‚ª‚ğ‚µ‚Ä‚¢‚é", what);
-    }
-    if (Glib)
-/*JP
-        Sprintf(eos(info), ", slippery %s", makeplural(body_part(HAND)));
-*/
-        Sprintf(eos(info), ", %s‚ª‚Ê‚é‚Ê‚é", makeplural(body_part(HAND)));
-    if (u.utrap)
-/*JP
-        Strcat(info, ", trapped");
-*/
-        Strcat(info, ", ã©‚É‚©‚©‚Á‚Ä‚¢‚é");
-    if (Fast)
-/*JP
-        Strcat(info, Very_fast ? ", very fast" : ", fast");
-*/
-        Strcat(info, Very_fast ? ", ‚Æ‚Ä‚à‘f‘‚¢" : ", ‘f‘‚¢");
-    if (u.uundetected)
-/*JP
-        Strcat(info, ", concealed");
-*/
-        Strcat(info, ", ‰B‚ê‚Ä‚¢‚é");
-    if (Invis)
-/*JP
-        Strcat(info, ", invisible");
-*/
-        Strcat(info, ", •s‰Â‹");
-    if (u.ustuck) {
-#if 0 /*JP*/
-        if (sticks(youmonst.data))
-            Strcat(info, ", holding ");
-        else
-            Strcat(info, ", held by ");
-        Strcat(info, mon_nam(u.ustuck));
-#else
-        Strcat(info, ", ");
-        Strcat(info, mon_nam(u.ustuck));
-        if (sticks(youmonst.data))
-            Strcat(info, "‚ğ’Í‚Ü‚¦‚Ä‚¢‚é");
-        else
-            Strcat(info, "‚É’Í‚Ü‚¦‚ç‚ê‚Ä‚¢‚é");
-#endif
-    }
-
-/*JP
-    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", plname,
-*/
-    pline("%s‚Ìó‘Ô (%s)F Level %d  HP %d(%d)  AC %d%s", plname,
-          piousness(FALSE, align_str(u.ualign.type)),
-          Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
-          Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
-}
+#undef ALGN_SINNED
+#undef ALGN_DEVOUT
 
 /*priest.c*/

@@ -2,39 +2,56 @@ name: build on windows
 
 on:
   push:
-    branches: [develop]
+    branches: [jnh]
+
+concurrency:
+  group: windows-release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: windows-2022
+    permissions:
+      contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: checkout
+        uses: actions/checkout@v4
         with:
           submodules: true
+          persist-credentials: false
 
-      - uses: ilammy/msvc-dev-cmd@v1
+      - name: msvcsetup
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: nhsetup
+        run: sys/windows/nhsetup
 
       - name: buildmain
         run: |
-          sys/winnt/nhsetup
           cd src
-          nmake install
-
-      - name: archive
-        run: |
-          7z a latest.zip binary/
+          nmake GIT=1 package
 
       - name: tag
         uses: EndBug/latest-tag@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: release
-        uses: ncipollo/release-action@v1
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view latest --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release edit latest --title "latest" --prerelease --repo "${{ github.repository }}"
+            gh release upload latest package/nethack-500-win-x64.zip --clobber --repo "${{ github.repository }}"
+          else
+            gh release create latest package/nethack-500-win-x64.zip --title "latest" --prerelease --repo "${{ github.repository }}"
+          fi
+
+      - name: notify
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
-          name: "latest"
-          allowUpdates: true
-          tag: latest
-          commit: develop
-          replacesArtifacts: true
-          prerelease: true
-          artifacts: ./latest.zip
+          status: ${{ job.status }}

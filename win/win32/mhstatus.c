@@ -1,5 +1,5 @@
-/* NetHack 3.6	mhstatus.c	$NHDT-Date: 1536411224 2018/09/08 12:53:44 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.29 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* NetHack 5.0	mhstatus.c	$NHDT-Date: 1596498360 2020/08/03 23:46:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
+/* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include <assert.h>
@@ -19,7 +19,6 @@
 
 
 extern COLORREF nhcolor_to_RGB(int c); /* from mhmap */
-
 typedef struct back_buffer {
     HWND hWnd;
     HDC hdc;
@@ -28,6 +27,11 @@ typedef struct back_buffer {
     int width;
     int height;
 } back_buffer_t;
+
+void back_buffer_free(back_buffer_t * back_buffer);
+void back_buffer_allocate(back_buffer_t * back_buffer, int width, int height);
+void back_buffer_size(back_buffer_t * back_buffer, int width, int height);
+void back_buffer_init(back_buffer_t * back_buffer, HWND hWnd, int width, int height);
 
 void back_buffer_free(back_buffer_t * back_buffer)
 {
@@ -73,7 +77,7 @@ typedef struct mswin_nethack_status_window {
     mswin_status_lines * status_lines;
     back_buffer_t back_buffer;
     boolean blink_state; /* true = invert blink text */
-    boolean has_blink_fields; /* true if one or more has blink attriubte */
+    boolean has_blink_fields; /* true if one or more has blink attribute */
 } NHStatusWindow, *PNHStatusWindow;
 
 
@@ -86,7 +90,7 @@ static LRESULT onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam);
 #define DEFAULT_COLOR_FG_STATUS COLOR_WINDOWTEXT
 
 HWND
-mswin_init_status_window()
+mswin_init_status_window(void)
 {
     static int run_once = 0;
     HWND ret;
@@ -127,6 +131,7 @@ mswin_init_status_window()
     if (!data)
         panic("out of memory");
 
+    windowdata[NHW_STATUS].address = (genericptr_t) data;
     ZeroMemory(data, sizeof(NHStatusWindow));
     SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR) data);
 
@@ -151,7 +156,7 @@ mswin_init_status_window()
 }
 
 void
-register_status_window_class()
+register_status_window_class(void)
 {
     WNDCLASS wcex;
     ZeroMemory(&wcex, sizeof(wcex));
@@ -199,15 +204,17 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             size_t space_remaining = msg_data->max_size;
 
             for (int line = 0; line < NHSW_LINES; line++) {
-                mswin_status_line *status_line = data->status_lines[line].lines;
+                mswin_status_line *status_line = &data->status_lines->lines[line];
                 for (int i = 0; i < status_line->status_strings.count; i++) {
                     mswin_status_string * status_string = status_line->status_strings.status_strings[i];
-                    if (status_string->space_in_front) {
-                        strncat(msg_data->buffer, " ", space_remaining);
+                    if (status_string->str != NULL) {
+                        if (status_string->space_in_front) {
+                            strncat(msg_data->buffer, " ", space_remaining);
+                            space_remaining = msg_data->max_size - strlen(msg_data->buffer);
+                        }
+                        strncat(msg_data->buffer, status_string->str, space_remaining);
                         space_remaining = msg_data->max_size - strlen(msg_data->buffer);
                     }
-                    strncat(msg_data->buffer, status_string->str, space_remaining);
-                    space_remaining = msg_data->max_size - strlen(msg_data->buffer);
                 }
                 strncat(msg_data->buffer, "\r\n", space_remaining);
                 space_remaining = msg_data->max_size - strlen(msg_data->buffer);
@@ -220,9 +227,9 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             InvalidateRect(hWnd, NULL, TRUE);
         } break;
 
-		case MSNH_MSG_RANDOM_INPUT:
-			nhassert(0); // unexpected
-			break;
+                case MSNH_MSG_RANDOM_INPUT:
+                    nhassert(0); // unexpected
+                    break;
 
         } /* end switch( wParam ) { */
     } break;
@@ -251,6 +258,7 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         free(data);
         SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) 0);
+        windowdata[NHW_STATUS].address = 0;
         break;
 
     case WM_SETFOCUS:
@@ -270,12 +278,10 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 static LRESULT
-onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
+onWMPaint(HWND hWnd, WPARAM wParam UNUSED, LPARAM lParam UNUSED)
 {
     SIZE sz;
-#if 0 /*JP*/
     WCHAR wbuf[BUFSZ];
-#endif
     RECT rt;
     PAINTSTRUCT ps;
     PNHStatusWindow data;
@@ -350,13 +356,9 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
                 cached_font * fnt = mswin_get_font(NHW_STATUS, fntatr, hdc, FALSE);
 
-#if 0 /*JP*/
                 BOOL useUnicode = fnt->supportsUnicode;
-#endif
 
-#if 0 /*JP*//* wchar‚É•ÏŠ·‚µ‚È‚¢ */
-                winos_ascii_to_wide_str(str, wbuf, SIZE(wbuf));
-#endif
+                winos_ascii_to_wide_str((const unsigned char *) str, wbuf, SIZE(wbuf));
 
                 nFg = (clr == NO_COLOR ? status_fg_color
                     : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)
@@ -395,7 +397,6 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     SetBkColor(hdc, status_bg_color);
                     SetTextColor(hdc, status_fg_color);
 
-#if 0 /*JP*/
                     if (useUnicode) {
                         /* get bounding rectangle */
                         GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
@@ -410,13 +411,6 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                         /* first draw title normally */
                         DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
                     }
-#else
-                    /* get bounding rectangle */
-                    GetTextExtentPoint32(hdc, str, vlen, &sz);
-
-                    /* first draw title normally */
-                    DrawText(hdc, str, vlen, &rt, DT_LEFT);
-#endif
                     int bar_percent = status_string->bar_percent;
                     if (bar_percent > 0) {
                         /* calc bar length */
@@ -433,14 +427,10 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                         SetBkMode(hdc, TRANSPARENT);
                         SetTextColor(hdc, nBg);
 
-#if 0 /*JP*/
                         if (useUnicode)
                             DrawTextW(hdc, wbuf, vlen, &barrect, DT_LEFT);
                         else
                             DrawTextA(hdc, str, vlen, &barrect, DT_LEFT);
-#else
-                        DrawText(hdc, str, vlen, &barrect, DT_LEFT);
-#endif
                     }
                     DeleteObject(back_brush);
                 }
@@ -457,7 +447,6 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     SetBkColor(hdc, nBg);
                     SetTextColor(hdc, nFg);
 
-#if 0 /*JP*/
                     if (useUnicode) {
                         /* get bounding rectangle */
                         GetTextExtentPoint32W(hdc, wbuf, vlen, &sz);
@@ -472,13 +461,6 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
                         /* draw */
                         DrawTextA(hdc, str, vlen, &rt, DT_LEFT);
                     }
-#else
-                    /* get bounding rectangle */
-                    GetTextExtentPoint32(hdc, str, vlen, &sz);
-
-                    /* draw */
-                    DrawText(hdc, str, vlen, &rt, DT_LEFT);
-#endif
                 }
                 assert(sz.cy >= 0);
 

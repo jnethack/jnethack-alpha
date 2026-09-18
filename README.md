@@ -2,43 +2,43 @@
 
 # JNetHack
 
-JNetHack��NetHack����{�ꉻ�������̂ł��B
+JNetHackはNetHackを日本語化したものです。
 
-## ����̃����[�X�m�[�g
+## 今回のリリースノート
 
-���ꂪ3.6.7�x�[�X�̍ŏI�����[�X�ƂȂ�A�����5.0.0�x�[�X�Ń����[�X����\��ł��B
+これが3.6.7ベースの最終リリースとなり、今後は5.0.0ベースでリリースする予定です。
 
-���܂�Windows���ł̓o�C�i���Ɠ����ʒu�ɂ��̑��̃t�@�C���ނ�u����悤�ɐݒ肵�Ă��܂������A�p��łɍ��킹�Ă��ꂼ��قȂ�t�H���_�ɒu���悤�ɂ��܂����B�ڂ�����FAQ.md���Q�Ƃ��Ă��������B
+今までWindows環境ではバイナリと同じ位置にその他のファイル類を置けるように設定していましたが、英語版に合わせてそれぞれ異なるフォルダに置くようにしました。詳しくはFAQ.mdを参照してください。
 
-OSDN���łɂ��A���C�����|�W�g����GitHub�Ɉڂ��܂����B�܂��AWeb�T�C�g�� https://jnethack.github.io/ �Ɏb��ڐ݂��܂����B
+OSDN消滅により、メインリポジトリもGitHubに移しました。また、Webサイトも https://jnethack.github.io/ に暫定移設しました。
 
-�ڍׂɂ��Ă�ChangeLog.j���Q�Ƃ��Ă��������B
+詳細についてはChangeLog.jを参照してください。
 
-## JNetHack 3.4.* ����̕ύX�_
+## JNetHack 3.4.* からの変更点
 
-JNetHack 3.4.* ����ύX���ꂽ��ȓ_�͈ȉ��̒ʂ�ł��B
+JNetHack 3.4.* から変更された主な点は以下の通りです。
 
- * �\�[�X�R�[�h�z�z��Shift_JIS�ɕύX���Ă��܂��BUNIX���Ńr���h����ꍇ��EUC-JP�ɕϊ����Ă��������B
- * �肢��s�E�Ń��[�U�[���͂��s���ꍇ�A���{��݂̂��󂯕t���܂��B
- * ���o�͕����R�[�h�Ƃ���JIS�͎w��ł��Ȃ��Ȃ�܂����B���̑���UTF-8���w��ł���悤�ɂȂ��Ă��܂��B
- * Mac/UNIX���ł̓f�t�H���g�̓��o�͕����R�[�h��UTF-8�ɂȂ��Ă��܂��B���̕����R�[�h�ɂ���ꍇ��kcode�I�v�V�������g���Ă��������B
- * Windows�ł̐ݒ�t�@�C����.jnethackrc�ɕύX����Ă��܂��B
+ * ソースコード配布はShift_JISに変更しています。UNIX環境でビルドする場合はEUC-JPに変換してください。
+ * 願いや虐殺でユーザー入力を行う場合、日本語のみを受け付けます。
+ * 入出力文字コードとしてJISは指定できなくなりました。その代わりUTF-8を指定できるようになっています。
+ * Mac/UNIX環境ではデフォルトの入出力文字コードはUTF-8になっています。他の文字コードにする場合はkcodeオプションを使ってください。
+ * Windows版の設定ファイルは.jnethackrcに変更されています。
 
-## ���̑��̃h�L�������g
+## その他のドキュメント
 
- * ChangeLog.j: �ύX����
- * READMEj1.txt: JNetHack 1.* �����README
- * japanese/build.md: �r���h���@
+ * ChangeLog.j: 変更履歴
+ * READMEj1.txt: JNetHack 1.* 時代のREADME
+ * japanese/build.md: ビルド方法
 
-## ���|�W�g��
+## レポジトリ
 
-JNetHack �ł͓�̃��|�W�g�����g���Ă��܂��B
+JNetHack では二つのレポジトリを使っています。
 
-### ���C�����|�W�g�� https://github.com/jnethack/jnethack-release
+### メインレポジトリ https://github.com/jnethack/jnethack-release
 
-������x�m�F�����\�[�X�R�[�h���o�^����܂��B�����Ƃ���rebase�͂��܂���B
+ある程度確認したソースコードが登録されます。原則としてrebaseはしません。
 
-### �J�����|�W�g�� https://github.com/jnethack/jnethack-alpha
+### 開発レポジトリ https://github.com/jnethack/jnethack-alpha
 
-�J�����̃\�[�X���o�^����܂��B�p�ɂ�rebase����܂��B
-TravisCI�AAppVeyor�AGitHub Actions�Ńr���h�̊m�F�����Ă��܂��B
+開発中のソースが登録されます。頻繁にrebaseされます。
+TravisCI、AppVeyor、GitHub Actionsでビルドの確認をしています。

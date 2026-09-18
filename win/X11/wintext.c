@@ -1,16 +1,11 @@
-/* NetHack 3.6	wintext.c	$NHDT-Date: 1552422654 2019/03/12 20:30:54 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.18 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* NetHack 5.0	wintext.c	$NHDT-Date: 1597967808 2020/08/20 23:56:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
-
-/* JNetHack Copyright */
-/* (c) Issei Numata 1994-1999                                      */
-/* For 3.4-, Copyright (c) SHIRAKATA Kentaro, 2002-                */
-/* JNetHack may be freely redistributed.  See license for details. */
 
 /*
  * File for dealing with text windows.
  *
- *	+ No global functions.
+ *      + No global functions.
  */
 
 #ifndef SYSV
@@ -33,7 +28,10 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
+#define X11_BUILD
 #include "hack.h"
+#undef X11_BUILD
+
 #include "winX.h"
 #include "xwindow.h"
 
@@ -41,10 +39,6 @@
 #include <X11/xpm.h>
 #endif
 
-#ifdef INSTALLCOLORMAP
-extern Colormap     cmap;
-#endif
- 
 #define TRANSIENT_TEXT /* text window is a transient window (no positioning) \
                           */
 
@@ -57,16 +51,12 @@ static const char rip_translations[] = "#override\n\
      <BtnDown>: rip_dismiss_text()\n\
      <Key>: rip_dismiss_text()";
 
-static Widget FDECL(create_ripout_widget, (Widget));
+static Widget create_ripout_widget(Widget);
 #endif
 
 /*ARGSUSED*/
 void
-delete_text(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+delete_text(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     struct xwindow *wp;
     struct text_info_t *text_info;
@@ -88,17 +78,13 @@ Cardinal *num_params;
 }
 
 /*
- * Callback used for all text windows.  The window is poped down on any key
+ * Callback used for all text windows.  The window is popped down on any key
  * or button down event.  It is destroyed if the main nethack code is done
  * with it.
  */
 /*ARGSUSED*/
 void
-dismiss_text(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+dismiss_text(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     struct xwindow *wp;
     struct text_info_t *text_info;
@@ -121,11 +107,7 @@ Cardinal *num_params;
 
 /* Dismiss when a non-modifier key pressed. */
 void
-key_dismiss_text(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+key_dismiss_text(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch = key_event_to_char((XKeyEvent *) event);
     if (ch)
@@ -135,11 +117,7 @@ Cardinal *num_params;
 #ifdef GRAPHIC_TOMBSTONE
 /* Dismiss from clicking on rip image. */
 void
-rip_dismiss_text(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+rip_dismiss_text(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     dismiss_text(XtParent(w), event, params, num_params);
 }
@@ -147,10 +125,8 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-add_to_text_window(wp, attr, str)
-struct xwindow *wp;
-int attr; /* currently unused */
-const char *str;
+add_to_text_window(struct xwindow *wp, int attr, /* currently unused */
+                   const char *str)
 {
     struct text_info_t *text_info = wp->text_information;
     int width;
@@ -160,40 +136,25 @@ const char *str;
     append_text_buffer(&text_info->text, str, FALSE);
 
     /* Calculate text width and save longest line */
-#ifndef XI18N
     width = XTextWidth(text_info->fs, str, (int) strlen(str));
-#else
-    width = XmbTextEscapement(text_info->fontset, str, (int) strlen(str));
-#endif
     if (width > text_info->max_width)
         text_info->max_width = width;
 }
 
 void
-display_text_window(wp, blocking)
-struct xwindow *wp;
-boolean blocking;
+display_text_window(struct xwindow *wp, boolean blocking)
 {
     struct text_info_t *text_info;
     Arg args[8];
     Cardinal num_args;
     Dimension width, height, font_height;
     int nlines;
-/*JP*/
-#ifdef XI18N
-    XFontSetExtents *extent;
-#endif
 
     text_info = wp->text_information;
     width = text_info->max_width + text_info->extra_width;
     text_info->blocked = blocking;
     text_info->destroy_on_ack = FALSE;
     font_height = nhFontHeight(wp->w);
-
-/*JP*/
-#ifdef XI18N
-    extent = XExtentsOfFontSet(text_info->fontset);
-#endif
 
     /*
      * Calculate the number of lines to use.  First, find the number of
@@ -203,13 +164,7 @@ boolean blocking;
      * _some_ lines.  Finally, use the number of lines in the text if
      * there are fewer than the max.
      */
-/*JP*/
-#ifndef XI18N
     nlines = (XtScreen(wp->w)->height - text_info->extra_height) / font_height;
-#else
-    nlines =
-        (XtScreen(wp->w)->height - text_info->extra_height) / extent->max_logical_extent.height;
-#endif
     nlines -= 4;
 
     if (nlines > text_info->text.num_lines)
@@ -217,12 +172,7 @@ boolean blocking;
     if (nlines <= 0)
         nlines = 1;
 
-/*JP*/
-#ifndef XI18N
     height = nlines * font_height + text_info->extra_height;
-#else
-    height = (nlines * extent->max_logical_extent.height) + text_info->extra_height;
-#endif
 
     num_args = 0;
 
@@ -247,7 +197,7 @@ boolean blocking;
 
     if (width > (Dimension) XtScreen(wp->w)->width) { /* too wide for screen */
         /* Back off some amount - we really need to back off the scrollbar */
-        /* width plus some extra.					   */
+        /* width plus some extra.                                          */
         width = XtScreen(wp->w)->width - 20;
     }
     XtSetArg(args[num_args], XtNstring, text_info->text.text);
@@ -283,7 +233,7 @@ boolean blocking;
     if (num_args)
         XtSetValues(wp->w, args, num_args);
 
-    /* We want the user to acknowlege. */
+    /* We want the user to acknowledge. */
     if (blocking) {
         (void) x_event(EXIT_ON_EXIT);
         nh_XtPopdown(wp->popup);
@@ -291,8 +241,7 @@ boolean blocking;
 }
 
 void
-create_text_window(wp)
-struct xwindow *wp;
+create_text_window(struct xwindow *wp)
 {
     struct text_info_t *text_info;
     Arg args[8];
@@ -346,12 +295,8 @@ struct xwindow *wp;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(text_translations));
     num_args++;
-/*JP*/
-#if defined(X11R6) && defined(XI18N)
-    XtSetArg(args[num_args], XtNinternational, True);   num_args++;
-#endif
 
-    wp->w = XtCreateManagedWidget(killer.name[0] && WIN_MAP == WIN_ERR
+    wp->w = XtCreateManagedWidget(svk.killer.name[0] && WIN_MAP == WIN_ERR
                                       ? "tombstone"
                                       : "text_text", /* name */
                                   asciiTextWidgetClass,
@@ -361,11 +306,7 @@ struct xwindow *wp;
 
     /* Get the font and margin information. */
     num_args = 0;
-#ifndef XI18N
     XtSetArg(args[num_args], XtNfont, &text_info->fs);
-#else
-    XtSetArg(args[num_args], XtNfontSet, &text_info->fontset);
-#endif
     num_args++;
     XtSetArg(args[num_args], nhStr(XtNtopMargin), &top_margin);
     num_args++;
@@ -379,16 +320,10 @@ struct xwindow *wp;
 
     text_info->extra_width = left_margin + right_margin;
     text_info->extra_height = top_margin + bottom_margin;
-
-#if 1 /*JP*/
-    /* Send events to "text" which is where the translations are. */
-    XtSetKeyboardFocus (form, wp->w);
-#endif
 }
 
 void
-destroy_text_window(wp)
-struct xwindow *wp;
+destroy_text_window(struct xwindow *wp)
 {
     /* Don't need to pop down, this only called from dismiss_text(). */
 
@@ -411,8 +346,7 @@ struct xwindow *wp;
 }
 
 void
-clear_text_window(wp)
-struct xwindow *wp;
+clear_text_window(struct xwindow *wp)
 {
     clear_text_buffer(&wp->text_information->text);
 }
@@ -422,10 +356,7 @@ struct xwindow *wp;
 
 /* Append a line to the text buffer. */
 void
-append_text_buffer(tb, str, concat)
-struct text_buffer *tb;
-const char *str;
-boolean concat;
+append_text_buffer(struct text_buffer *tb, const char *str, boolean concat)
 {
     char *copy;
     int length;
@@ -456,7 +387,7 @@ boolean concat;
     if (tb->num_lines) { /* not first --- append a newline */
         char appchar = '\n';
 
-        if (concat && !index("!.?'\")", tb->text[tb->text_last - 1])) {
+        if (concat && !strchr("!.?'\")", tb->text[tb->text_last - 1])) {
             appchar = ' ';
             tb->num_lines--; /* offset increment at end of function */
         }
@@ -470,7 +401,7 @@ boolean concat;
         if (length) {
             /* Remove all newlines. Otherwise we have a confused line count. */
             copy = (tb->text + tb->text_last);
-            while ((copy = index(copy, '\n')) != (char *) 0)
+            while ((copy = strchr(copy, '\n')) != (char *) 0)
                 *copy = ' ';
         }
 
@@ -482,8 +413,7 @@ boolean concat;
 
 /* Initialize text buffer. */
 void
-init_text_buffer(tb)
-struct text_buffer *tb;
+init_text_buffer(struct text_buffer *tb)
 {
     tb->text = (char *) alloc(START_SIZE);
     tb->text[0] = '\0';
@@ -494,8 +424,7 @@ struct text_buffer *tb;
 
 /* Empty the text buffer */
 void
-clear_text_buffer(tb)
-struct text_buffer *tb;
+clear_text_buffer(struct text_buffer *tb)
 {
     tb->text_last = 0;
     tb->text[0] = '\0';
@@ -504,8 +433,7 @@ struct text_buffer *tb;
 
 /* Free up allocated memory. */
 void
-free_text_buffer(tb)
-struct text_buffer *tb;
+free_text_buffer(struct text_buffer *tb)
 {
     free(tb->text);
     tb->text = (char *) 0;
@@ -516,7 +444,7 @@ struct text_buffer *tb;
 
 #ifdef GRAPHIC_TOMBSTONE
 
-static void FDECL(rip_exposed, (Widget, XtPointer, XtPointer));
+static void rip_exposed(Widget, XtPointer, XtPointer);
 
 static XImage *rip_image = 0;
 
@@ -535,59 +463,34 @@ calculate_rip_text(int how, time_t when)
 
     char buf[BUFSZ];
     char *dpx;
-    int line;
-    long year;
+    int line, year;
+    long cash;
 
     /* Put name on stone */
-    Sprintf(rip_line[NAME_LINE], "%s", plname);
+    Sprintf(rip_line[NAME_LINE], "%.16s", svp.plname); /* STONE_LINE_LEN */
 
     /* Put $ on stone */
-    Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
+    cash = max(gd.done_money, 0L);
+    /* arbitrary upper limit; practical upper limit is quite a bit less */
+    if (cash > 999999999L)
+        cash = 999999999L;
+    Sprintf(buf, "%ld Au", cash);
+    Sprintf(rip_line[GOLD_LINE], "%ld Au", cash);
+
     /* Put together death description */
     formatkiller(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {
-        register int i, i0;
+        int i, i0;
         char tmpchar;
-#if 1 /*JP*/
-        unsigned char *uc;
-        int jstone_line;
 
-        if ((i0 = strlen(dpx)) <= STONE_LINE_LEN)
-                  jstone_line = STONE_LINE_LEN;
-        else if (i0 / 2 <= STONE_LINE_LEN )
-            jstone_line = ((i0 + 3) / 4) * 2;
-        else if (i0 / 3 <= STONE_LINE_LEN )
-            jstone_line = ((i0 + 5) / 6) * 2;
-        else
-            jstone_line = ((i0+7)/8)*2;
-#endif
-
-#if 0 /*JP*/
         if ((i0 = strlen(dpx)) > STONE_LINE_LEN) {
             for (i = STONE_LINE_LEN; ((i0 > STONE_LINE_LEN) && i); i--)
-#else
-        if (i0 > jstone_line) {
-            for(i = jstone_line; ((i0 > jstone_line) && i); i--)
-#endif
                 if (dpx[i] == ' ')
                     i0 = i;
-#if 0 /*JP*/
             if (!i)
                 i0 = STONE_LINE_LEN;
-#else
-            if (!i) {
-                i0 = 0;
-                while(i0 < jstone_line){
-                    uc = (unsigned char *)(dpx + i0);
-                    if(*uc < 128)
-                        ++i0;
-                    else
-                        i0 += 2;
-                }
-            }
-#endif
         }
         tmpchar = dpx[i0];
         dpx[i0] = 0;
@@ -600,8 +503,8 @@ calculate_rip_text(int how, time_t when)
     }
 
     /* Put year on stone */
-    year = yyyymmdd(when) / 10000L;
-    Sprintf(rip_line[YEAR_LINE], "%4ld", year);
+    year = (int) ((yyyymmdd(when) / 10000L) % 10000L);
+    Sprintf(rip_line[YEAR_LINE], "%4d", year);
 }
 
 /*
@@ -609,17 +512,15 @@ calculate_rip_text(int how, time_t when)
  */
 /*ARGSUSED*/
 static void
-rip_exposed(w, client_data, widget_data)
-Widget w;
-XtPointer client_data UNUSED;
-XtPointer widget_data; /* expose event from Window widget */
+rip_exposed(Widget w, XtPointer client_data UNUSED,
+            XtPointer widget_data) /* expose event from Window widget */
 {
     XExposeEvent *event = (XExposeEvent *) widget_data;
     Display *dpy = XtDisplay(w);
     Arg args[8];
     XGCValues values;
     XtGCMask mask;
-    GC gc;
+    GC ggc;
     static Pixmap rip_pixmap = None;
     int i, x, y;
 
@@ -642,10 +543,10 @@ XtPointer widget_data; /* expose event from Window widget */
     XtGetValues(w, args, 1);
     values.function = GXcopy;
     values.font = WindowFont(w);
-    gc = XtGetGC(w, mask, &values);
+    ggc = XtGetGC(w, mask, &values);
 
     if (rip_pixmap != None) {
-        XCopyArea(dpy, rip_pixmap, XtWindow(w), gc, event->x, event->y,
+        XCopyArea(dpy, rip_pixmap, XtWindow(w), ggc, event->x, event->y,
                   event->width, event->height, event->x, event->y);
     }
 
@@ -653,22 +554,15 @@ XtPointer widget_data; /* expose event from Window widget */
     y = appResources.tombtext_y;
     for (i = 0; i <= YEAR_LINE; i++) {
         int len = strlen(rip_line[i]);
-#ifndef XI18N
         XFontStruct *font = WindowFontStruct(w);
         int width = XTextWidth(font, rip_line[i], len);
 
-        XDrawString(dpy, XtWindow(w), gc, x - width / 2, y, rip_line[i], len);
-#else
-        XFontSet fontset = WindowFontSet(w);
-        int width = XmbTextEscapement(fontset, rip_line[i], len);
-
-        XmbDrawString(dpy, XtWindow(w), fontset, gc, x - width / 2, y, rip_line[i], len);
-#endif
+        XDrawString(dpy, XtWindow(w), ggc, x - width / 2, y, rip_line[i], len);
         x += appResources.tombtext_dx;
         y += appResources.tombtext_dy;
     }
 
-    XtReleaseGC(w, gc);
+    XtReleaseGC(w, ggc);
 }
 
 /*
@@ -687,14 +581,7 @@ create_ripout_widget(Widget parent)
         XpmAttributes attributes;
         int errorcode;
 
-#if 0 /*JP*/
         attributes.valuemask = XpmCloseness;
-#else
-        attributes.valuemask = XpmCloseness | XpmColormap;
-#endif
-#ifdef INSTALLCOLORMAP
-        attributes.colormap = cmap;
-#endif
         attributes.closeness = 65535; /* Try anything */
         errorcode = XpmReadFileToImage(XtDisplay(parent),
                                        appResources.tombstone,

@@ -12,25 +12,25 @@ this program.  Japanization part of JNetHack obey original license
 completely.  Japanization part copyright belong to the authors(see
 below).
 
-JNetHack‚Í NetHack-3.6.1‚É“ú–{Œê‰»‚ğ{‚µ‚½‚à‚Ì‚Å‚·DJNetHack‚ğÄ”z•z‚·‚é
-Û‚ÍƒIƒŠƒWƒiƒ‹‚ÌNetHack-3.6.1‚Ìƒ‰ƒCƒZƒ“ƒX (dat/license)‚ğ‚æ‚­“Ç‚ñ‚Å‚­‚¾
-‚³‚¢D“ú–{Œê‰»‚³‚ê‚½ NetHack‚ÍCƒIƒŠƒWƒiƒ‹‚Ì”z•z‹K’è‚ÉŠ®‘S‚É]‚Á‚Ä‚¢‚Ü‚·D
-“ú–{Œê‰»‚³‚ê‚½•”•ª‚Ì Copyright‚ÍìÒ‚ç‚É‚ ‚è‚Ü‚·(‰º‹LQl)D‚Ü‚½CƒIƒŠƒW
-ƒiƒ‹‚Ìƒ‰ƒCƒZƒ“ƒX‚ÅŒ¾‚¤‚Æ‚±‚ë‚Ì NetHack‚Æ‚Í JNetHack ‚ğ‚àŠÜ‚Ş‚Æ‚µ‚Ü‚·D
+JNetHackã¯ NetHack-3.6.1ã«æ—¥æœ¬èªåŒ–ã‚’æ–½ã—ãŸã‚‚ã®ã§ã™ï¼JNetHackã‚’å†é…å¸ƒã™ã‚‹
+éš›ã¯ã‚ªãƒªã‚¸ãƒŠãƒ«ã®NetHack-3.6.1ã®ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ (dat/license)ã‚’ã‚ˆãèª­ã‚“ã§ãã 
+ã•ã„ï¼æ—¥æœ¬èªåŒ–ã•ã‚ŒãŸ NetHackã¯ï¼Œã‚ªãƒªã‚¸ãƒŠãƒ«ã®é…å¸ƒè¦å®šã«å®Œå…¨ã«å¾“ã£ã¦ã„ã¾ã™ï¼
+æ—¥æœ¬èªåŒ–ã•ã‚ŒãŸéƒ¨åˆ†ã® Copyrightã¯ä½œè€…ã‚‰ã«ã‚ã‚Šã¾ã™(ä¸‹è¨˜å‚è€ƒ)ï¼ã¾ãŸï¼Œã‚ªãƒªã‚¸
+ãƒŠãƒ«ã®ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã§è¨€ã†ã¨ã“ã‚ã® NetHackã¨ã¯ JNetHack ã‚’ã‚‚å«ã‚€ã¨ã—ã¾ã™ï¼
 
 
-			     ’˜ìŒ Òˆê——
+			     è‘—ä½œæ¨©è€…ä¸€è¦§
 
 Issei Numata		HAMADA Naoki		Shigehiro Miyashita
 Tomoyuki Shiraishi	Kazuhiro FUjieda	Kunedog
-Shinkou Awatsu		Takeshi Nishimura	‚“cK¡
-SHIRAKATA Kentaro	”Â‘q[—m		”óŒû—Yˆê
+Shinkou Awatsu		Takeshi Nishimura	é«˜ç”°å¹¸æ²»
+SHIRAKATA Kentaro	æ¿å€‰å……æ´‹		æ¨‹å£é›„ä¸€
 Haruko Numata
 
-				 Ó«
+				 è¬è¾
 				   
-ˆÈ‰º‚ÉC‚½‚í‚¢‚à‚È‚¢‚±‚Æ‚©‚çŒµ‚µ‚¢‚±‚Æ‚Ü‚ÅC‹Md‚Èl¶‚Ìˆê•”•ª‚ğ‚­‚¾‚ç
-‚È‚¢‚±‚Æ‚É–v“ª‚µ‚½lŠÔ‚Ì–¼‚ğ¦‚·D
+ä»¥ä¸‹ã«ï¼ŒãŸã‚ã„ã‚‚ãªã„ã“ã¨ã‹ã‚‰å³ã—ã„ã“ã¨ã¾ã§ï¼Œè²´é‡ãªäººç”Ÿã®ä¸€éƒ¨åˆ†ã‚’ãã ã‚‰
+ãªã„ã“ã¨ã«æ²¡é ­ã—ãŸäººé–“ã®åã‚’ç¤ºã™ï¼
 				   
 aBE TOru		HAMADA Naoki		Shigehiro Miyashita
 Shinkou Awatsu		Tomoyuki Shiraishi	Masayuki Koba
@@ -46,12 +46,12 @@ MAKOTO Matsushita	Sayu			IIDA Yosiaki
 Satoshi Asami		OZAWA Sakuro		FUCHIGAMI Masachika
 KIHARA Hideto		UCHIDA Toshiaki		Satoh Yoshiyuki
 Terishige Fukui		Yamamoto Hirotaka	Hiramoto Kouji
-MORIMOTO Kenji		“à“c@˜a—m		Noritaka Ishizumi
+MORIMOTO Kenji		å†…ç”°ã€€å’Œæ´‹		Noritaka Ishizumi
 Yosuke Mitsumath	Kenji Gotoh		Terushige Fukui
-‚¤‚¦‚¾ ‚³‚Æ‚µ		´…“ª			Hirata Makoto
+ã†ãˆã  ã•ã¨ã—		æ¸…æ°´é ­			Hirata Makoto
 FUmiki Niioka		Akira Tsuneduka		Tsubai Masanari
 Shinmyoh Koji		Yukihiko Aoki		Hideaki YOSHIFUJI
-‹v—¯Œ«¡		Niizato Manabu		” R —m
+ä¹…ç•™è³¢æ²»		Niizato Manabu		ç®±å±± æ´‹
 G-HAL
 
-‚¨‚æ‚ÑCdq-ml‚Ìƒƒ“ƒo[
+ãŠã‚ˆã³ï¼Œdq-mlã®ãƒ¡ãƒ³ãƒãƒ¼

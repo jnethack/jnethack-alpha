@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhfont.h	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	mhfont.h	$NHDT-Date: 1596498350 2020/08/03 23:45:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,16 +15,12 @@
 typedef struct cached_font {
     int code;
     HFONT hFont;
-#if 0 /*JP*/
     BOOL supportsUnicode;
-#endif
     int width;
     int height;
 } cached_font;
 
-#if 0 /*JP*/
 BOOL mswin_font_supports_unicode(HFONT hFont);
-#endif
 cached_font * mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace);
 HFONT mswin_create_splashfont(HWND hWnd);
 UINT mswin_charset(void);

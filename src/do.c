@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1576638499 2019/12/18 03:08:19 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.198 $ */
+/* NetHack 5.0	do.c	$NHDT-Date: 1774269965 2026/03/23 04:46:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.404 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,33 +11,34 @@
 /* JNetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "lev.h"
 
-STATIC_DCL void FDECL(trycall, (struct obj *));
-STATIC_DCL void NDECL(polymorph_sink);
-STATIC_DCL boolean NDECL(teleport_sink);
-STATIC_DCL void FDECL(dosinkring, (struct obj *));
-STATIC_PTR int FDECL(drop, (struct obj *));
-STATIC_PTR int NDECL(wipeoff);
-STATIC_DCL int FDECL(menu_drop, (int));
-STATIC_DCL int NDECL(currentlevel_rewrite);
-STATIC_DCL void NDECL(final_level);
-/* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
+staticfn boolean teleport_sink(void);
+staticfn void dosinkring(struct obj *);
+staticfn int drop(struct obj *);
+staticfn int menudrop_split(struct obj *, long);
+staticfn boolean engulfer_digests_food(struct obj *);
+staticfn boolean danger_uprops(void);
+staticfn int wipeoff(void);
+staticfn int menu_drop(int);
+staticfn boolean u_stuck_cannot_go(const char *);
+staticfn NHFILE *currentlevel_rewrite(void);
+staticfn void familiar_level_msg(void);
+staticfn void final_level(void);
+staticfn void temperature_change_msg(schar);
+staticfn boolean better_not_try_to_drop_that(struct obj *);
 
-extern int n_dgns; /* number of dungeons, from dungeon.c */
+    /* static boolean badspot(coordxy,coordxy); */
 
-static NEARDATA const char drop_types[] = { ALLOW_COUNT, COIN_CLASS,
-                                            ALL_CLASSES, 0 };
-
-/* 'd' command: drop one inventory item */
+/* the #drop command: drop one inventory item */
 int
-dodrop()
+dodrop(void)
 {
-    int result, i = (invent) ? 0 : (SIZE(drop_types) - 1);
+    int result;
 
     if (*u.ushops)
         sellobj_state(SELL_DELIBERATE);
-    result = drop(getobj(&drop_types[i], "drop"));
+    result = drop(getobj("drop", any_obj_ok,
+                         GETOBJ_PROMPT | GETOBJ_ALLOWCNT));
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
     if (result)
@@ -51,19 +52,25 @@ dodrop()
  * it's gone for good...  If the destination is not a pool, returns FALSE.
  */
 boolean
-boulder_hits_pool(otmp, rx, ry, pushing)
-struct obj *otmp;
-register int rx, ry;
-boolean pushing;
+boulder_hits_pool(
+    struct obj *otmp, /* the object falling into a pool or water or lava */
+    coordxy rx, coordxy ry, /* coordinates of the pool */
+    boolean pushing)  /* for a boulder, whether or not it is being pushed */
 {
     if (!otmp || otmp->otyp != BOULDER) {
         impossible("Not a boulder?");
-    } else if (!Is_waterlevel(&u.uz) && is_pool_or_lava(rx, ry)) {
+    } else if (is_pool_or_lava(rx, ry)) {
         boolean lava = is_lava(rx, ry), fills_up;
         const char *what = waterbody_name(rx, ry);
         schar ltyp = levl[rx][ry].typ;
         int chance = rn2(10); /* water: 90%; lava: 10% */
-        fills_up = lava ? chance == 0 : chance != 0;
+        struct monst *mtmp;
+
+        /* chance for boulder to fill pool:  Plane of Water==0%,
+           lava 10%, wall of water==50%, other water==90% */
+        fills_up = Is_waterlevel(&u.uz) ? FALSE
+                   : IS_WATERWALL(ltyp) ? (chance < 5)
+                     : lava ? (chance == 0) : (chance != 0);
 
         if (fills_up) {
             struct trap *ttmp = t_at(rx, ry);
@@ -71,8 +78,21 @@ boolean pushing;
             if (ltyp == DRAWBRIDGE_UP) {
                 levl[rx][ry].drawbridgemask &= ~DB_UNDER; /* clear lava */
                 levl[rx][ry].drawbridgemask |= DB_FLOOR;
-            } else
+            } else {
                 levl[rx][ry].typ = ROOM, levl[rx][ry].flags = 0;
+                recalc_block_point(rx, ry);
+            }
+            /* 5.0: normally DEADMONSTER() is used when traversing the fmon
+               list--dead monsters usually aren't still at specific map
+               locations; however, if ice melts causing a giant to drown,
+               that giant would still be on the map when it drops inventory;
+               if it was carrying a boulder which now fills the pool, 'mtmp'
+               will be dead here; killing it again would yield impossible
+               "dmonsfree: N removed doesn't match N+1 pending" when other
+               monsters have finished their current turn */
+            if ((mtmp = m_at(rx, ry)) != 0 && !DEADMONSTER(mtmp)
+                && !m_in_air(mtmp))
+                mondied(mtmp);
 
             if (ttmp)
                 (void) delfloortrap(ttmp);
@@ -85,21 +105,21 @@ boolean pushing;
 /*JP
                 Strcpy(whobuf, "you");
 */
-                Strcpy(whobuf, "Ç†Ç»ÇΩ");
+                Strcpy(whobuf, "„ÅÇ„Å™„Åü");
                 if (u.usteed)
                     Strcpy(whobuf, y_monnam(u.usteed));
 #if 0 /*JP:T*/
                 pline("%s %s %s into the %s.", upstart(whobuf),
                       vtense(whobuf, "push"), the(xname(otmp)), what);
 #else
-                pline("%sÇÕ%sÇ%sÇÃíÜÇ÷âüÇµÇ±ÇÒÇæÅD", whobuf,
+                pline("%s„ÅØ%s„Çí%s„ÅÆ‰∏≠„Å∏Êäº„Åó„Åì„Çì„Å†Ôºé", whobuf,
                       xname(otmp), what);
 #endif
                 if (flags.verbose && !Blind)
 /*JP
                     pline("Now you can cross it!");
 */
-                    pline("Ç≥ÇüìnÇÍÇÈÇºÅI");
+                    pline("„Åï„ÅÅÊ∏°„Çå„Çã„ÅûÔºÅ");
                 /* no splashing in this case */
             }
         }
@@ -111,34 +131,41 @@ boolean pushing;
                           the(xname(otmp)), fills_up ? "fills" : "falls into",
                           what);
 #else
-                    pline("%sÇ%sÇ…%sÇ∆ëÂÇ´Ç»ÇµÇ‘Ç´Ç™Ç†Ç™Ç¡ÇΩÅD",
+                    pline("%s„Çí%s„Å´%s„Å®Â§ß„Åç„Å™„Åó„Å∂„Åç„Åå„ÅÇ„Åå„Å£„ÅüÔºé",
                           xname(otmp), what,
-                          fills_up ? "ñÑÇﬂçûÇﬁ" : "óéÇ∑" );
+                          fills_up ? "Âüã„ÇÅËæº„ÇÄ" : "ËêΩ„Åô" );
 #endif
-                } else if (!Deaf)
+                } else if (!Deaf) {
+                    if (lava) {
+                        Soundeffect(se_sizzling, 100);
+                    } else {
+                        Soundeffect(se_splash, 100);
+                    }
 /*JP
                     You_hear("a%s splash.", lava ? " sizzling" : "");
 */
-                    You_hear("%sÇ∆åæÇ§âπÇï∑Ç¢ÇΩÅD",lava ? "ÉVÉÖÅ[Éb" : "ÉpÉVÉÉÉb");
+                    You_hear("%s„Å®Ë®Ä„ÅÜÈü≥„ÇíËÅû„ÅÑ„ÅüÔºé",lava ? "„Ç∑„É•„Éº„ÉÉ" : "„Éë„Ç∑„É£„ÉÉ");
+                }
                 wake_nearto(rx, ry, 40);
             }
 
             if (fills_up && u.uinwater && distu(rx, ry) == 0) {
-                u.uinwater = 0;
+                set_uinwater(0); /* u.uinwater = 0 */
                 docrt();
-                vision_full_recalc = 1;
+                gv.vision_full_recalc = 1;
 /*JP
                 You("find yourself on dry land again!");
 */
-                You("Ç¢Ç¬ÇÃÇ‹Ç…Ç©ä£Ç¢ÇΩèÍèäÇ…Ç¢ÇΩÅI");
-            } else if (lava && distu(rx, ry) <= 2) {
+                You("„ÅÑ„Å§„ÅÆ„Åæ„Å´„Åã‰πæ„ÅÑ„ÅüÂ†¥ÊâÄ„Å´„ÅÑ„ÅüÔºÅ");
+            } else if (lava && next2u(rx, ry)) {
                 int dmg;
+
 #if 0 /*JP:T*/
                 You("are hit by molten %s%c",
                     hliquid("lava"), Fire_resistance ? '.' : '!');
 #else
-                You("Ç«ÇÎÇ«ÇÎÇÃ%sÇ≈É_ÉÅÅ[ÉWÇéÛÇØÇΩ%s",
-                    hliquid("ónä‚"), Fire_resistance ? "ÅD" : "ÅI");
+                You("„Å©„Çç„Å©„Çç„ÅÆ%s„Åß„ÉÄ„É°„Éº„Ç∏„ÇíÂèó„Åë„Åü%s",
+                    hliquid("Ê∫∂Â≤©"), Fire_resistance ? "Ôºé" : "ÔºÅ");
 #endif
                 burn_away_slime();
                 dmg = d((Fire_resistance ? 1 : 3), 6);
@@ -147,19 +174,20 @@ boolean pushing;
                        "molten lava", KILLED_BY);
 #else
                 losehp(Maybe_Half_Phys(dmg), /* lava damage */
-                       "Ç«ÇÎÇ«ÇÎÇÃónä‚Ç≈", KILLED_BY);
+                       "„Å©„Çç„Å©„Çç„ÅÆÊ∫∂Â≤©„Åß", KILLED_BY);
 #endif
             } else if (!fills_up && flags.verbose
-                       && (pushing ? !Blind : cansee(rx, ry)))
+                       && (pushing ? !Blind : cansee(rx, ry))) {
 /*JP
                 pline("It sinks without a trace!");
 */
-                pline("ÇªÇÍÇÕÇ†Ç∆Ç©ÇΩÇ‡Ç»Ç≠íæÇÒÇæÅI");
+                pline("„Åù„Çå„ÅØ„ÅÇ„Å®„Åã„Åü„ÇÇ„Å™„ÅèÊ≤à„Çì„Å†ÔºÅ");
+            }
         }
 
         /* boulder is now gone */
         if (pushing)
-            delobj(otmp);
+            useupf(otmp, otmp->quan);
         else
             obfree(otmp, (struct obj *) 0);
         return TRUE;
@@ -172,38 +200,40 @@ boolean pushing;
  * away.
  */
 boolean
-flooreffects(obj, x, y, verb)
-struct obj *obj;
-int x, y;
-const char *verb;
+flooreffects(
+    struct obj *obj,      /* the object landing on the floor */
+    coordxy x, coordxy y, /* map coordinates for spot where it is landing */
+    const char *verb)     /* "fall", "drop", "land", &c */
 {
-#if 1 /*JP*//* trap.c */
-        extern const char *set_you[2];
+#if 1 /*JP*/
+    extern const char *set_you[2]; /* trap.c */
 #endif
     struct trap *t;
     struct monst *mtmp;
     struct obj *otmp;
-#if 0 /*JP*//*unused*/
+    coord save_bhitpos;
     boolean tseen;
-    int ttyp = NO_TRAP;
-#endif
+    int ttyp = NO_TRAP, res = FALSE;
 
     if (obj->where != OBJ_FREE)
         panic("flooreffects: obj not free");
 
     /* make sure things like water_damage() have no pointers to follow */
     obj->nobj = obj->nexthere = (struct obj *) 0;
+    /* erode_obj() (called from water_damage() or lava_damage()) needs
+       bhitpos, but that was screwing up wand zapping that called us from
+       rloco(), so we now restore bhitpos before we return */
+    save_bhitpos = gb.bhitpos;
+    gb.bhitpos.x = x, gb.bhitpos.y = y;
 
     if (obj->otyp == BOULDER && boulder_hits_pool(obj, x, y, FALSE)) {
-        return TRUE;
+        res = TRUE;
     } else if (obj->otyp == BOULDER && (t = t_at(x, y)) != 0
                && (is_pit(t->ttyp) || is_hole(t->ttyp))) {
-#if 0 /*JP*/
         ttyp = t->ttyp;
         tseen = t->tseen ? TRUE : FALSE;
-#endif
         if (((mtmp = m_at(x, y)) && mtmp->mtrapped)
-            || (u.utrap && u.ux == x && u.uy == y)) {
+            || (u.utrap && u_at(x,y))) {
             if (*verb && (cansee(x, y) || distu(x, y) == 0))
 #if 0 /*JP:T*/
                 pline("%s boulder %s into the pit%s.",
@@ -211,8 +241,8 @@ const char *verb;
                       vtense((const char *) 0, verb),
                       mtmp ? "" : " with you");
 #else
-                pline("ä‚ÇÕ%sóéÇµåäÇ÷%sÅD",
-                      mtmp ? "" : "Ç†Ç»ÇΩÇ∆Ç¢Ç¡ÇµÇÂÇ…",
+                pline("Â≤©„ÅØ%sËêΩ„ÅóÁ©¥„Å∏%sÔºé",
+                      mtmp ? "" : "„ÅÇ„Å™„Åü„Å®„ÅÑ„Å£„Åó„Çá„Å´",
                       jpast(verb));
 #endif
             if (mtmp) {
@@ -226,7 +256,7 @@ const char *verb;
                        might have been thrown by a giant or launched by
                        a rolling boulder trap triggered by a monster or
                        dropped by a scroll of earth read by a monster */
-                    if (context.mon_moving) {
+                    if (svc.context.mon_moving) {
                         /* normally we'd use ohitmon() but it can call
                            drop_throw() which calls flooreffects() */
                         damage = dmgval(obj, mtmp);
@@ -239,10 +269,10 @@ const char *verb;
                                        || is_vampshifter(mtmp))
                                       ? "destroyed" : "killed");
 #else
-                                pline("%sÇÕ%sÅI", Monnam(mtmp),
+                                pline("%s„ÅØ%sÔºÅ", Monnam(mtmp),
                                       (nonliving(mtmp->data)
                                        || is_vampshifter(mtmp))
-                                      ? "ì|Ç≥ÇÍÇΩ" : "éEÇ≥ÇÍÇΩ");
+                                      ? "ÂÄí„Åï„Çå„Åü" : "ÊÆ∫„Åï„Çå„Åü");
 #endif
                             mondied(mtmp);
                         }
@@ -250,126 +280,198 @@ const char *verb;
                         (void) hmon(mtmp, obj, HMON_THROWN, dieroll);
                     }
                     if (!DEADMONSTER(mtmp) && !is_whirly(mtmp->data))
-                        return FALSE; /* still alive */
+                        res = FALSE; /* still alive, boulder still intact */
+                    nhUse(res);
                 }
                 mtmp->mtrapped = 0;
             } else {
-                if (!Passes_walls && !throws_rocks(youmonst.data)) {
-#if 0 /*JP*/
+                if (!Passes_walls && !throws_rocks(gy.youmonst.data)) {
+#if 0 /*JP:T*/
                     losehp(Maybe_Half_Phys(rnd(15)),
                            "squished under a boulder", NO_KILLER_PREFIX);
 #else
                     losehp(Maybe_Half_Phys(rnd(15)),
-                           "ä‚ÇÃâ∫Ç≈í◊Ç≥ÇÍÇƒ", KILLED_BY);
+                           "Â≤©„ÅÆ‰∏ã„ÅßÊΩ∞„Åï„Çå„Å¶", KILLED_BY);
 #endif
-                    return FALSE; /* player remains trapped */
+                    goto deletedwithboulder;
                 } else
                     reset_utrap(TRUE);
             }
         }
         if (*verb) {
-            if (Blind && (x == u.ux) && (y == u.uy)) {
+            if (Blind && u_at(x, y)) {
+                Soundeffect(se_crashing_boulder, 100);
 /*JP
                 You_hear("a CRASH! beneath you.");
 */
-                You_hear("ë´å≥Ç≈âΩÇ©Ç™ç”ÇØÇÈâπÇï∑Ç¢ÇΩÅD");
+                You_hear("Ë∂≥ÂÖÉ„Åß‰Ωï„Åã„ÅåÁ†ï„Åë„ÇãÈü≥„ÇíËÅû„ÅÑ„ÅüÔºé");
             } else if (!Blind && cansee(x, y)) {
 #if 0 /*JP:T*/
                 pline_The("boulder %s%s.",
-                          (ttyp == TRAPDOOR && !tseen)
-                              ? "triggers and " : "",
-                          (ttyp == TRAPDOOR)
-                              ? "plugs a trap door"
-                              : (ttyp == HOLE) ? "plugs a hole"
-                                               : "fills a pit");
+                          (ttyp == TRAPDOOR && !tseen) ? "triggers and " : "",
+                          (ttyp == TRAPDOOR) ? "plugs a trap door"
+                          : (ttyp == HOLE) ? "plugs a hole"
+                            : "fills a pit");
 #else
-                pline_The("ä‚ÇÕ%s%sÅD", t->tseen ? "" : "„©ÇãNìÆÇµÇƒÅC",
-                          t->ttyp == TRAPDOOR ? "óéÇµî‡ÇñÑÇﬂÇΩ" :
-                          t->ttyp == HOLE ? "åäÇñÑÇﬂÇΩ" :
-                          "óéÇµåäÇñÑÇﬂÇΩ");
+                pline_The("Â≤©„ÅØ%s%sÔºé",
+                          (ttyp == TRAPDOOR && !tseen) ? "ÁΩ†„ÇíËµ∑Âãï„Åó„Å¶Ôºå" : "",
+                          (ttyp == TRAPDOOR) ? "ËêΩ„ÅóÊââ„ÇíÂüã„ÇÅ„Åü"
+                          : (ttyp == HOLE) ? "Á©¥„ÇíÂüã„ÇÅ„Åü"
+                            : "ËêΩ„ÅóÁ©¥„ÇíÂüã„ÇÅ„Åü");
 #endif
             } else {
+                Soundeffect(se_boulder_drop, 100);
 /*JP
                 You_hear("a boulder %s.", verb);
 */
-                You_hear("ä‚Ç™%sâπÇï∑Ç¢ÇΩÅD", verb);
+                You_hear("Â≤©„Åå%sÈü≥„ÇíËÅû„ÅÑ„ÅüÔºé", verb);
             }
         }
         /*
          * Note:  trap might have gone away via ((hmon -> killed -> xkilled)
          *  || mondied) -> mondead -> m_detach -> fill_pit.
          */
-        if ((t = t_at(x, y)) != 0)
-            deltrap(t);
+ deletedwithboulder:
+        /* creating a pit in ice results in that ice being turned into
+           floor so we shouldn't need any special ice handing here */
+        if ((t = t_at(x, y)) != 0) {
+            (void) delfloortrap(t);
+            if (u.utrap && u_at(x, y))
+                reset_utrap(FALSE);
+        }
         useupf(obj, 1L);
         bury_objs(x, y);
         newsym(x, y);
-        return TRUE;
+        res = TRUE;
     } else if (is_lava(x, y)) {
-        return lava_damage(obj, x, y);
+        res = lava_damage(obj, x, y);
     } else if (is_pool(x, y)) {
         /* Reasonably bulky objects (arbitrary) splash when dropped.
          * If you're floating above the water even small things make
          * noise.  Stuff dropped near fountains always misses */
-        if ((Blind || (Levitation || Flying)) && !Deaf
-            && ((x == u.ux) && (y == u.uy))) {
+        if ((Blind || (Levitation || Flying)) && !Deaf && u_at(x, y)) {
             if (!Underwater) {
-                if (weight(obj) > 9) {
+                if (weight(obj) > WT_SPLASH_THRESHOLD) {
 /*JP
                     pline("Splash!");
 */
-                    pline("ÉoÉVÉÉÉbÅI");
+                    pline("„Éê„Ç∑„É£„ÉÉÔºÅ");
                 } else if (Levitation || Flying) {
 /*JP
                     pline("Plop!");
 */
-                    pline("É|É`ÉÉÉìÅI");
+                    pline("„Éù„ÉÅ„É£„É≥ÔºÅ");
                 }
             }
             map_background(x, y, 0);
             newsym(x, y);
         }
-        return water_damage(obj, NULL, FALSE) == ER_DESTROYED;
-    } else if (u.ux == x && u.uy == y && (t = t_at(x, y)) != 0
+        res = water_damage(obj, NULL, FALSE) == ER_DESTROYED;
+    } else if (u_at(x, y) && (t = t_at(x, y)) != 0
                && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
-        if (Blind && !Deaf)
+        if (is_pit(t->ttyp)) {
+            if (Blind && !Deaf) {
+                Soundeffect(se_item_tumble_downwards, 50);
 /*JP
-            You_hear("%s tumble downwards.", the(xname(obj)));
+                You_hear("%s tumble downwards.", the(xname(obj)));
 */
-            You_hear("%sÇ™â∫ÇÃï˚Ç÷ì]Ç™Ç¡ÇƒÇ¢Ç≠âπÇï∑Ç¢ÇΩÅD", xname(obj));
-        else
+                You_hear("%s„Åå‰∏ã„ÅÆÊñπ„Å∏Ëª¢„Åå„Å£„Å¶„ÅÑ„ÅèÈü≥„ÇíËÅû„ÅÑ„ÅüÔºé", xname(obj));
+            } else {
 #if 0 /*JP*/
-            pline("%s %s into %s %s.", The(xname(obj)),
-                  otense(obj, "tumble"), the_your[t->madeby_u],
-                  is_pit(t->ttyp) ? "pit" : "hole");
+                pline("%s into %s pit.", Tobjnam(obj, "tumble"),
+                      the_your[t->madeby_u]);
 #else
-            pline("%sÇÕ%såäÇ…ì]Ç™ÇËÇ®ÇøÇΩÅD", xname(obj),
-                  set_you[t->madeby_u]);
+                pline("%s„ÅØ%sÁ©¥„Å´Ëª¢„Åå„Çä„Åä„Å°„ÅüÔºé", xname(obj),
+                      set_you[t->madeby_u]);
 #endif
+            }
+        } else if (ship_object(obj, x, y, FALSE)) {
+            /* ship_object will print an appropriate "the item falls
+             * through the hole" message, so no need to do it here. */
+            res = TRUE;
+        }
     } else if (obj->globby) {
+        struct obj *globbyobj = obj;  /* allow obj to be nonnull arg */
+
         /* Globby things like puddings might stick together */
-        while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
-            pudding_merge_message(obj, otmp);
+        while (globbyobj
+               && (otmp = obj_nexto_xy(globbyobj, x, y, TRUE)) != 0) {
+            pudding_merge_message(globbyobj, otmp);
             /* intentionally not getting the melded object; obj_meld may set
              * obj to null. */
-            (void) obj_meld(&obj, &otmp);
+            (void) obj_meld(&globbyobj, &otmp);
         }
-        return (boolean) !obj;
+        res = (boolean) !globbyobj;
+    } else if (svc.context.mon_moving && IS_ALTAR(levl[x][y].typ)
+               && cansee(x,y)) {
+        doaltarobj(obj);
+    } else if (obj->oclass == POTION_CLASS && svl.level.flags.temperature > 0
+               && (levl[x][y].typ == ROOM || levl[x][y].typ == CORR)) {
+        /* Potions are sometimes destroyed when landing on very hot
+           ground. The basic odds are 50% for nonblessed potions and
+           30% for blessed potions; if you have handled the object
+           (i.e. it is or was yours), these odds are adjusted by Luck
+           (each Luck point affects them by 2%). Artifact potions
+           would not be affected, if any existed.
+
+           Oil is not affected because its boiling point (and flash
+           point) are higher than that of water. For example, whale
+           oil, one of the substances traditionally used in oil lamps,
+           can survive over 100 degrees Centigrade more heat than
+           water can.*/
+        if (cansee(x,y)) {
+            /* unconditional "ground" is safe as this only runs for
+               room and corridor tiles */
+#if 0 /*JP:T*/
+            pline("%s up as %s the hot ground.", Tobjnam(obj, "heat"),
+                  is_plural(obj) ? "they hit" : "it hits");
+#else
+            pline("%s„ÅØÁÜ±„ÅÑÂú∞Èù¢„Å´ËêΩ„Å°„Åü„ÅÆ„ÅßÂä†ÁÜ±„Åï„Çå„ÅüÔºé", xname(obj));
+#endif
+        }
+
+        int survival_chance = obj->blessed ? 70 : 50;
+        if (obj->invlet)
+            survival_chance += Luck * 2;
+        if (obj->otyp == POT_OIL)
+            survival_chance = 100;
+
+        if (!obj_resists(obj, survival_chance, 100)) {
+            if (cansee(x,y)) {
+#if 0 /*JP:T*/
+                pline("%s from the heat!",
+                      is_plural(obj) ? "They shatter" : "It shatters");
+#else
+                pline("%s„ÅØÁÜ±„ÅßÂâ≤„Çå„ÅüÔºÅ", xname(obj));
+#endif
+            } else {
+/*JP
+                You_hear("a shattering noise.");
+*/
+                You_hear("‰Ωï„Åã„ÅåÂâ≤„Çå„ÇãÈü≥„ÇíËÅû„ÅÑ„ÅüÔºé");
+            }
+            breakobj(obj, x, y, FALSE, FALSE);
+            res = TRUE;
+        }
     }
-    return FALSE;
+
+    gb.bhitpos = save_bhitpos;
+    return res;
 }
 
 /* obj is an object dropped on an altar */
 void
-doaltarobj(obj)
-register struct obj *obj;
+doaltarobj(struct obj *obj)
 {
     if (Blind)
         return;
 
     if (obj->oclass != COIN_CLASS) {
         /* KMH, conduct */
-        u.uconduct.gnostic++;
+        if (!svc.context.mon_moving && !u.uconduct.gnostic++)
+            livelog_printf(LL_CONDUCT,
+                           "eschewed atheism, by dropping %s on an altar",
+                           doname(obj));
     } else {
         /* coins don't have bless/curse status */
         obj->blessed = obj->cursed = 0;
@@ -381,7 +483,7 @@ register struct obj *obj;
               an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)), doname(obj),
               otense(obj, "hit"));
 #else
-        pline("%sÇ™ç’ídÇ…êGÇÍÇÈÇ∆%såıÇ¡ÇΩÅD",
+        pline("%s„ÅåÁ•≠Â£á„Å´Ëß¶„Çå„Çã„Å®%sÂÖâ„Å£„ÅüÔºé",
               doname(obj),
               hcolor_adv(obj->blessed ? NH_AMBER : NH_BLACK));
 #endif
@@ -391,15 +493,16 @@ register struct obj *obj;
 /*JP
         pline("%s %s on the altar.", Doname2(obj), otense(obj, "land"));
 */
-        pline("%sÇç’ídÇÃè„Ç…íuÇ¢ÇΩÅD", Doname2(obj));
+        pline("%s„ÇíÁ•≠Â£á„ÅÆ‰∏ä„Å´ÁΩÆ„ÅÑ„ÅüÔºé", Doname2(obj));
         if (obj->oclass != COIN_CLASS)
             obj->bknown = 1; /* ok to bypass set_bknown() */
     }
 }
 
-STATIC_OVL void
-trycall(obj)
-register struct obj *obj;
+/* If obj is neither formally identified nor informally called something
+ * already, prompt the player to call its object type. */
+void
+trycall(struct obj *obj)
 {
     if (!objects[obj->otyp].oc_name_known && !objects[obj->otyp].oc_uname)
         docall(obj);
@@ -407,8 +510,8 @@ register struct obj *obj;
 
 /* Transforms the sink at the player's position into
    a fountain, throne, altar or grave. */
-STATIC_DCL void
-polymorph_sink()
+void
+polymorph_sink(void)
 {
     uchar sym = S_sink;
     boolean sinklooted;
@@ -418,27 +521,26 @@ polymorph_sink()
         return;
 
     sinklooted = levl[u.ux][u.uy].looted != 0;
-    level.flags.nsinks--;
-    levl[u.ux][u.uy].doormask = 0; /* levl[][].flags */
+    /* svl.level.flags.nsinks--; // set_levltyp() will update this */
+    levl[u.ux][u.uy].flags = 0;
     switch (rn2(4)) {
     default:
     case 0:
         sym = S_fountain;
-        levl[u.ux][u.uy].typ = FOUNTAIN;
+        set_levltyp(u.ux, u.uy, FOUNTAIN); /* updates level.flags.nfountains */
         levl[u.ux][u.uy].blessedftn = 0;
         if (sinklooted)
             SET_FOUNTAIN_LOOTED(u.ux, u.uy);
-        level.flags.nfountains++;
         break;
     case 1:
         sym = S_throne;
-        levl[u.ux][u.uy].typ = THRONE;
+        set_levltyp(u.ux, u.uy, THRONE);
         if (sinklooted)
             levl[u.ux][u.uy].looted = T_LOOTED;
         break;
     case 2:
         sym = S_altar;
-        levl[u.ux][u.uy].typ = ALTAR;
+        set_levltyp(u.ux, u.uy, ALTAR);
         /* 3.6.3: this used to pass 'rn2(A_LAWFUL + 2) - 1' to
            Align2amask() but that evaluates its argument more than once */
         algn = rn2(3) - 1; /* -1 (A_Cha) or 0 (A_Neu) or +1 (A_Law) */
@@ -447,7 +549,7 @@ polymorph_sink()
         break;
     case 3:
         sym = S_room;
-        levl[u.ux][u.uy].typ = ROOM;
+        set_levltyp(u.ux, u.uy, ROOM);
         make_grave(u.ux, u.uy, (char *) 0);
         if (levl[u.ux][u.uy].typ == GRAVE)
             sym = S_grave;
@@ -459,51 +561,57 @@ polymorph_sink()
 /*JP
         pline_The("sink transforms into %s!", an(defsyms[sym].explanation));
 */
-        pline_The("ó¨Çµë‰ÇÕ%sÇ…ïœâªÇµÇΩÅI", defsyms[sym].explanation);
+        pline_The("ÊµÅ„ÅóÂè∞„ÅØ%s„Å´Â§âÂåñ„Åó„ÅüÔºÅ", defsyms[sym].explanation);
     else
 /*JP
         pline_The("sink vanishes.");
 */
-        pline("ó¨Çµë‰ÇÕè¡Ç¶ÇΩÅD");
+        pline("ÊµÅ„ÅóÂè∞„ÅØÊ∂à„Åà„ÅüÔºé");
     newsym(u.ux, u.uy);
 }
 
 /* Teleports the sink at the player's position;
    return True if sink teleported. */
-STATIC_DCL boolean
-teleport_sink()
+staticfn boolean
+teleport_sink(void)
 {
-    int cx, cy;
-    int cnt = 0;
-    struct trap *trp;
-    struct engr *eng;
+    coordxy cx, cy;
+    unsigned alreadylooted;
+    int trycnt = 0;
 
     do {
-        cx = rnd(COLNO - 1);
-        cy = rn2(ROWNO);
-        trp = t_at(cx, cy);
-        eng = engr_at(cx, cy);
-    } while ((levl[cx][cy].typ != ROOM || trp || eng || cansee(cx, cy))
-             && cnt++ < 200);
+#if 0   /* this isn't incorrect but it is extremely unlikely that spots
+         * on the level's edge will be ROOM so picking such wastes tries */
+        cx = rnd(COLNO - 1);           /* 1..COLNO-1 */
+        cy = rn2(ROWNO);               /* 0..ROWNO-1 */
+#else   /* use this instead */
+        cx = 1 + rnd((COLNO - 1) - 2); /* 2..COLNO-2 */
+        cy = 1 + rn2(ROWNO - 2);       /* 1..ROWNO-2 */
+#endif
+        if (levl[cx][cy].typ == ROOM
+            && !t_at(cx, cy) && !engr_at(cx, cy)
+            && (!cansee(cx, cy) || distu(cx, cy) > 3 * 3)) {
+            /* this ends up having set_levltyp() count all sinks and
+               fountains on the level twice but that is not a problem */
+            alreadylooted = levl[u.ux][u.uy].looted;
+            /* remove old sink */
+            set_levltyp(u.ux, u.uy, ROOM); /* was SINK so updates nsinks */
+            levl[u.ux][u.uy].looted = 0;
+            newsym(u.ux, u.uy);
+            /* create sink at new position */
+            set_levltyp(cx, cy, SINK); /* now SINK so also updates nsinks */
+            levl[cx][cy].looted = alreadylooted ? 1 : 0;
+            newsym(cx, cy);
+            return TRUE;
+        }
+    } while (++trycnt < 200);
 
-    if (levl[cx][cy].typ == ROOM && !trp && !eng) {
-        /* create sink at new position */
-        levl[cx][cy].typ = SINK;
-        levl[cx][cy].looted = levl[u.ux][u.uy].looted;
-        newsym(cx, cy);
-        /* remove old sink */
-        levl[u.ux][u.uy].typ = ROOM;
-        levl[u.ux][u.uy].looted = 0;
-        newsym(u.ux, u.uy);
-        return TRUE;
-    }
     return FALSE;
 }
 
 /* obj is a ring being dropped over a kitchen sink */
-STATIC_OVL void
-dosinkring(obj)
-register struct obj *obj;
+staticfn void
+dosinkring(struct obj *obj)
 {
     struct obj *otmp, *otmp2;
     boolean ideed = TRUE;
@@ -512,20 +620,20 @@ register struct obj *obj;
 /*JP
     You("drop %s down the drain.", doname(obj));
 */
-    You("%sÇîrêÖå˚Ç…óéÇµÇΩÅD", doname(obj));
+    You("%s„ÇíÊéíÊ∞¥Âè£„Å´ËêΩ„Åó„ÅüÔºé", doname(obj));
     obj->in_use = TRUE;  /* block free identification via interrupt */
     switch (obj->otyp) { /* effects that can be noticed without eyes */
     case RIN_SEARCHING:
 /*JP
         You("thought %s got lost in the sink, but there it is!", yname(obj));
 */
-        You("%sÇé∏Ç¡ÇΩãCÇ™ÇµÇΩÇ™ÅCãCÇÃÇπÇ¢ÇæÇ¡ÇΩÅI", yname(obj));
+        You("%s„ÇíÂ§±„Å£„ÅüÊ∞ó„Åå„Åó„Åü„ÅåÔºåÊ∞ó„ÅÆ„Åõ„ÅÑ„Å†„Å£„ÅüÔºÅ", yname(obj));
         goto giveback;
     case RIN_SLOW_DIGESTION:
 /*JP
         pline_The("ring is regurgitated!");
 */
-        pline("éwó÷ÇÕãtó¨ÇµÇΩÅI");
+        pline("ÊåáËº™„ÅØÈÄÜÊµÅ„Åó„ÅüÔºÅ");
  giveback:
         obj->in_use = FALSE;
         dropx(obj);
@@ -535,40 +643,41 @@ register struct obj *obj;
 /*JP
         pline_The("sink quivers upward for a moment.");
 */
-        pline("ó¨Çµë‰ÇÕàÍèuÅCè„â∫Ç…êkÇ¶ÇΩÅD");
+        pline("ÊµÅ„ÅóÂè∞„ÅØ‰∏ÄÁû¨Ôºå‰∏ä‰∏ã„Å´Èúá„Åà„ÅüÔºé");
         break;
     case RIN_POISON_RESISTANCE:
 /*JP
         You("smell rotten %s.", makeplural(fruitname(FALSE)));
 */
-        pline("ïÖÇ¡ÇΩ%sÇÃÇÊÇ§Ç»ìıÇ¢Ç™ÇµÇΩÅD", fruitname(FALSE));
+        pline("ËÖê„Å£„Åü%s„ÅÆ„Çà„ÅÜ„Å™ÂåÇ„ÅÑ„Åå„Åó„ÅüÔºé", fruitname(FALSE));
         break;
     case RIN_AGGRAVATE_MONSTER:
 #if 0 /*JP:T*/
         pline("Several %s buzz angrily around the sink.",
               Hallucination ? makeplural(rndmonnam(NULL)) : "flies");
 #else
-        pline("êîïCÇÃ%sÇ™ÉuÉìÉuÉìó¨Çµë‰ÇÃâÒÇËÇîÚÇ—Ç‹ÇÌÇ¡ÇΩÅD",
-              Hallucination ? rndmonnam(NULL) : "ÉnÉG");
+        pline("Êï∞Âåπ„ÅÆ%s„Åå„Éñ„É≥„Éñ„É≥ÊµÅ„ÅóÂè∞„ÅÆÂõû„Çä„ÇíÈ£õ„Å≥„Åæ„Çè„Å£„ÅüÔºé",
+              Hallucination ? rndmonnam(NULL) : "„Éè„Ç®");
 #endif
         break;
     case RIN_SHOCK_RESISTANCE:
 /*JP
         pline("Static electricity surrounds the sink.");
 */
-        pline("ó¨Çµë‰Ç™ÉsÉäÉsÉäÇµÇÕÇ∂ÇﬂÇΩÅD");
+        pline("ÊµÅ„ÅóÂè∞„Åå„Éî„É™„Éî„É™„Åó„ÅØ„Åò„ÇÅ„ÅüÔºé");
         break;
     case RIN_CONFLICT:
+        Soundeffect(se_drain_noises, 50);
 /*JP
         You_hear("loud noises coming from the drain.");
 */
-        You_hear("îrêÖå˚Ç©ÇÁÇÃëÂÇ´Ç»âπÇï∑Ç¢ÇΩÅD");
+        You_hear("ÊéíÊ∞¥Âè£„Åã„Çâ„ÅÆÂ§ß„Åç„Å™Èü≥„ÇíËÅû„ÅÑ„ÅüÔºé");
         break;
     case RIN_SUSTAIN_ABILITY: /* KMH */
 /*JP
         pline_The("%s flow seems fixed.", hliquid("water"));
 */
-        pline("%sÇÃó¨ÇÍÇ™àÍíËÇ…Ç»Ç¡ÇΩÇÊÇ§ÇæÅD", hliquid("êÖ"));
+        pline("%s„ÅÆÊµÅ„Çå„Åå‰∏ÄÂÆö„Å´„Å™„Å£„Åü„Çà„ÅÜ„Å†Ôºé", hliquid("Ê∞¥"));
         break;
     case RIN_GAIN_STRENGTH:
 #if 0 /*JP:T*/
@@ -576,9 +685,9 @@ register struct obj *obj;
                   hliquid("water"),
                   (obj->spe < 0) ? "weak" : "strong");
 #else
-        pline("%sÇÃó¨ÇÍÇ™%sÇ≠Ç»Ç¡ÇΩÇÊÇ§ÇæÅD",
-                  hliquid("êÖ"),
-                  (obj->spe < 0) ? "é„" : "ã≠");
+        pline("%s„ÅÆÊµÅ„Çå„Åå%s„Åè„Å™„Å£„Åü„Çà„ÅÜ„Å†Ôºé",
+                  hliquid("Ê∞¥"),
+                  (obj->spe < 0) ? "Âº±" : "Âº∑");
 #endif
         break;
     case RIN_GAIN_CONSTITUTION:
@@ -587,9 +696,9 @@ register struct obj *obj;
                   hliquid("water"),
                   (obj->spe < 0) ? "less" : "great");
 #else
-        pline("ó¨ÇÍÇÈ%sÇÃó Ç™%sÇ≠Ç»Ç¡ÇΩÇÊÇ§ÇæÅD",
-                  hliquid("êÖ"),
-                  (obj->spe < 0) ? "è≠Ç»" : "ëΩ");
+        pline("ÊµÅ„Çå„Çã%s„ÅÆÈáè„Åå%s„Åè„Å™„Å£„Åü„Çà„ÅÜ„Å†Ôºé",
+                  hliquid("Ê∞¥"),
+                  (obj->spe < 0) ? "Â∞ë„Å™" : "Â§ö");
 #endif
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
@@ -598,9 +707,9 @@ register struct obj *obj;
                   hliquid("water"),
                   (obj->spe < 0) ? "misses" : "hits");
 #else
-        pline("%sÇ™îrêÖå˚%sÇÊÇ§Ç…Ç»Ç¡ÇΩÅD",
-                  hliquid("êÖ"),
-                  (obj->spe < 0) ? "Ç©ÇÁîΩÇÍÇÈ" : "ÇﬂÇ™ÇØÇƒó¨ÇÍÇÈ");
+        pline("%s„ÅåÊéíÊ∞¥Âè£%s„Çà„ÅÜ„Å´„Å™„Å£„ÅüÔºé",
+                  hliquid("Ê∞¥"),
+                  (obj->spe < 0) ? "„Åã„Çâ„Åù„Çå„Çã" : "„ÇÅ„Åå„Åë„Å¶ÊµÅ„Çå„Çã");
 #endif
         break;
     case RIN_INCREASE_DAMAGE:
@@ -608,13 +717,13 @@ register struct obj *obj;
         pline_The("water's force seems %ser now.",
                   (obj->spe < 0) ? "small" : "great");
 #else
-        pline("êÖÇÃê®Ç¢Ç™%sÇ≠Ç»Ç¡ÇΩÇÊÇ§ÇæÅD",
-                  (obj->spe < 0) ? "é„" : "ã≠");
+        pline("Ê∞¥„ÅÆÂã¢„ÅÑ„Åå%s„Åè„Å™„Å£„Åü„Çà„ÅÜ„Å†Ôºé",
+                  (obj->spe < 0) ? "Âº±" : "Âº∑");
 #endif
         break;
     case RIN_HUNGER:
         ideed = FALSE;
-        for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
+        for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
             otmp2 = otmp->nexthere;
             if (otmp != uball && otmp != uchain
                 && !obj_resists(otmp, 1, 99)) {
@@ -623,7 +732,7 @@ register struct obj *obj;
                     pline("Suddenly, %s %s from the sink!", doname(otmp),
                           otense(otmp, "vanish"));
 #else
-                    pline("ìÀëRÅC%sÇÕó¨Çµë‰Ç©ÇÁè¡Ç¶ÇΩÅI", doname(otmp));
+                    pline("Á™ÅÁÑ∂Ôºå%s„ÅØÊµÅ„ÅóÂè∞„Åã„ÇâÊ∂à„Åà„ÅüÔºÅ", doname(otmp));
 #endif
                     ideed = TRUE;
                 }
@@ -636,7 +745,7 @@ register struct obj *obj;
 /*JP
         pline("Several flies buzz around the sink.");
 */
-        pline("êîïCÇÃÉnÉGÇ™ÉuÉìÉuÉìó¨Çµë‰ÇÃâÒÇËÇîÚÇ—Ç‹ÇÌÇ¡ÇΩÅD");
+        pline("Êï∞Âåπ„ÅÆ„Éè„Ç®„Åå„Éñ„É≥„Éñ„É≥ÊµÅ„ÅóÂè∞„ÅÆÂõû„Çä„ÇíÈ£õ„Å≥„Åæ„Çè„Å£„ÅüÔºé");
         break;
     case RIN_TELEPORTATION:
         nosink = teleport_sink();
@@ -645,7 +754,7 @@ register struct obj *obj;
 /*JP
         pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
 */
-        pline_The("ó¨Çµë‰ÇÕ%sè¡Ç¶ÇΩÅD", nosink ? "" : "àÍèu");
+        pline_The("ÊµÅ„ÅóÂè∞„ÅØ%sÊ∂à„Åà„ÅüÔºé", nosink ? "" : "‰∏ÄÁû¨");
         ideed = FALSE;
         break;
     case RIN_POLYMORPH:
@@ -665,69 +774,69 @@ register struct obj *obj;
 /*JP
             pline_The("faucets flash brightly for a moment.");
 */
-            pline("é÷å˚ÇÕàÍèuñæÇÈÇ≠ãPÇ¢ÇΩÅD");
+            pline("ËõáÂè£„ÅØ‰∏ÄÁû¨Êòé„Çã„ÅèËºù„ÅÑ„ÅüÔºé");
             break;
         case RIN_REGENERATION:
 /*JP
             pline_The("sink looks as good as new.");
 */
-            pline("ó¨Çµë‰Ç™êVïiÇÃÇÊÇ§Ç…Ç»Ç¡ÇΩÅD");
+            pline("ÊµÅ„ÅóÂè∞„ÅåÊñ∞ÂìÅ„ÅÆ„Çà„ÅÜ„Å´„Å™„Å£„ÅüÔºé");
             break;
         case RIN_INVISIBILITY:
 /*JP
             You("don't see anything happen to the sink.");
 */
-            pline("ó¨Çµë‰Ç…âΩÇ™ãNÇ´ÇΩÇÃÇ©å©Ç¶Ç»Ç©Ç¡ÇΩÅD");
+            pline("ÊµÅ„ÅóÂè∞„Å´‰Ωï„ÅåËµ∑„Åç„Åü„ÅÆ„ÅãË¶ã„Åà„Å™„Åã„Å£„ÅüÔºé");
             break;
         case RIN_FREE_ACTION:
 /*JP
             You_see("the ring slide right down the drain!");
 */
-            pline("éwó÷Ç™îrêÖå˚ÇÇ∑ÇÈÇËÇ∆îÇØÇÈÇÃÇå©ÇΩÅI");
+            pline("ÊåáËº™„ÅåÊéíÊ∞¥Âè£„Çí„Åô„Çã„Çä„Å®„Åô„Åπ„ÇäËêΩ„Å°„Çã„ÅÆ„ÇíË¶ã„ÅüÔºÅ");
             break;
         case RIN_SEE_INVISIBLE:
 #if 0 /*JP:T*/
             You_see("some %s in the sink.",
                     Hallucination ? "oxygen molecules" : "air");
 #else
-            pline("ó¨Çµë‰ÇÃè„ÇÃ%sÇ™å©Ç¶ÇΩÅD",
-                  Hallucination ? "é_ëfï™éq" : "ãÛãC");
+            pline("ÊµÅ„ÅóÂè∞„ÅÆ‰∏ä„ÅÆ%s„ÅåË¶ã„Åà„ÅüÔºé",
+                  Hallucination ? "ÈÖ∏Á¥†ÂàÜÂ≠ê" : "Á©∫Ê∞ó");
 #endif
             break;
         case RIN_STEALTH:
 /*JP
             pline_The("sink seems to blend into the floor for a moment.");
 */
-            pline("àÍèuÅCó¨Çµë‰Ç™è∞Ç…ónÇØÇ±ÇÒÇæÇÊÇ§Ç…å©Ç¶ÇΩÅD");
+            pline("‰∏ÄÁû¨ÔºåÊµÅ„ÅóÂè∞„ÅåÂ∫ä„Å´Ê∫∂„Åë„Åì„Çì„Å†„Çà„ÅÜ„Å´Ë¶ã„Åà„ÅüÔºé");
             break;
         case RIN_FIRE_RESISTANCE:
 #if 0 /*JP*/
             pline_The("hot %s faucet flashes brightly for a moment.",
                       hliquid("water"));
-#else /*Ç∆ÇËÇ†Ç¶Ç∏hliquid()ÇÕégÇÌÇ»Ç¢å`Ç…*/
-            pline("àÍèuÅCîMìíÇÃé÷å˚Ç™ñæÇÈÇ≠ãPÇ¢ÇΩÅD");
+#else /*„Å®„Çä„ÅÇ„Åà„Åöhliquid()„ÅØ‰Ωø„Çè„Å™„ÅÑÂΩ¢„Å´*/
+            pline("‰∏ÄÁû¨ÔºåÁÜ±ÊπØ„ÅÆËõáÂè£„ÅåÊòé„Çã„ÅèËºù„ÅÑ„ÅüÔºé");
 #endif
             break;
         case RIN_COLD_RESISTANCE:
 #if 0 /*JP*/
             pline_The("cold %s faucet flashes brightly for a moment.",
                       hliquid("water"));
-#else /*Ç∆ÇËÇ†Ç¶Ç∏hliquid()ÇÕégÇÌÇ»Ç¢å`Ç…*/
-            pline("àÍèuÅCó‚êÖÇÃé÷å˚Ç™ñæÇÈÇ≠ãPÇ¢ÇΩÅD");
+#else /*„Å®„Çä„ÅÇ„Åà„Åöhliquid()„ÅØ‰Ωø„Çè„Å™„ÅÑÂΩ¢„Å´*/
+            pline("‰∏ÄÁû¨ÔºåÂÜ∑Ê∞¥„ÅÆËõáÂè£„ÅåÊòé„Çã„ÅèËºù„ÅÑ„ÅüÔºé");
 #endif
             break;
         case RIN_PROTECTION_FROM_SHAPE_CHAN:
 /*JP
             pline_The("sink looks nothing like a fountain.");
 */
-            pline("ó¨Çµë‰ÇÕêÚÇ∆ÇÕÇ‹Ç¡ÇΩÇ≠à·Ç§Ç‡ÇÃÇÃÇÊÇ§Ç…å©Ç¶ÇΩÅD");
+            pline("ÊµÅ„ÅóÂè∞„ÅØÊ≥â„Å®„ÅØ„Åæ„Å£„Åü„ÅèÈÅï„ÅÜ„ÇÇ„ÅÆ„ÅÆ„Çà„ÅÜ„Å´Ë¶ã„Åà„ÅüÔºé");
             break;
         case RIN_PROTECTION:
 #if 0 /*JP:T*/
             pline_The("sink glows %s for a moment.",
                       hcolor((obj->spe < 0) ? NH_BLACK : NH_SILVER));
 #else
-            pline("ó¨Çµë‰ÇÕàÍèu%sãPÇ¢ÇΩÅD",
+            pline("ÊµÅ„ÅóÂè∞„ÅØ‰∏ÄÁû¨%sËºù„ÅÑ„ÅüÔºé",
                       hcolor_adv((obj->spe < 0) ? NH_BLACK : NH_SILVER));
 #endif
             break;
@@ -735,39 +844,40 @@ register struct obj *obj;
 /*JP
             pline_The("sink glows %s for a moment.", hcolor(NH_WHITE));
 */
-            pline("ó¨Çµë‰ÇÕàÍèu%sãPÇ¢ÇΩÅD", hcolor_adv(NH_WHITE));
+            pline("ÊµÅ„ÅóÂè∞„ÅØ‰∏ÄÁû¨%sËºù„ÅÑ„ÅüÔºé", hcolor_adv(NH_WHITE));
             break;
         case RIN_TELEPORT_CONTROL:
-/*JP: "beam aboard" ÇÕÉXÉ^Å[ÉgÉåÉbÉNÇÃÅuì]ëóÅv*/
+/*JP: "beam aboard" „ÅØ„Çπ„Çø„Éº„Éà„É¨„ÉÉ„ÇØ„ÅÆ„ÄåËª¢ÈÄÅ„Äç*/
 /*JP
             pline_The("sink looks like it is being beamed aboard somewhere.");
 */
-            pline("ó¨Çµë‰ÇÕÇ«Ç±Ç©Ç…ì]ëóÇ≥ÇÍÇÊÇ§Ç∆ÇµÇƒÇ¢ÇÈÇÊÇ§Ç…å©Ç¶ÇΩÅD");
+            pline("ÊµÅ„ÅóÂè∞„ÅØ„Å©„Åì„Åã„Å´Ëª¢ÈÄÅ„Åï„Çå„Çà„ÅÜ„Å®„Åó„Å¶„ÅÑ„Çã„Çà„ÅÜ„Å´Ë¶ã„Åà„ÅüÔºé");
             break;
         case RIN_POLYMORPH_CONTROL:
             pline_The(
 /*JP
                   "sink momentarily looks like a regularly erupting geyser.");
 */
-                  "ó¨Çµë‰ÇÕàÍèuãKë•ê≥ÇµÇ≠ï¨èoÇ∑ÇÈä‘åáêÚÇÃÇÊÇ§Ç…å©Ç¶ÇΩÅD");
+                  "ÊµÅ„ÅóÂè∞„ÅØ‰∏ÄÁû¨Ë¶èÂâáÊ≠£„Åó„ÅèÂô¥Âá∫„Åô„ÇãÈñìÊ¨†Ê≥â„ÅÆ„Çà„ÅÜ„Å´Ë¶ã„Åà„ÅüÔºé");
             break;
         default:
             break;
         }
     }
-    if (ideed)
+    if (ideed) {
         trycall(obj);
-    else if (!nosink)
+    } else if (!nosink) {
+        Soundeffect(se_ring_in_drain, 50);
 /*JP
         You_hear("the ring bouncing down the drainpipe.");
 */
-        You_hear("éwó÷Ç™îrêÖå˚Ç…ìñÇΩÇËÇ»Ç™ÇÁóéÇøÇÈâπÇï∑Ç¢ÇΩÅD");
-
+        You_hear("ÊåáËº™„ÅåÊéíÊ∞¥Âè£„Å´ÂΩì„Åü„Çä„Å™„Åå„ÇâËêΩ„Å°„ÇãÈü≥„ÇíËÅû„ÅÑ„ÅüÔºé");
+    }
     if (!rn2(20) && !nosink) {
 /*JP
         pline_The("sink backs up, leaving %s.", doname(obj));
 */
-        pline("ó¨Çµë‰Ç™ãtó¨ÇµÇƒÅC%sÇ™ñﬂÇ¡ÇƒÇ´ÇΩÅD", doname(obj));
+        pline("ÊµÅ„ÅóÂè∞„ÅåÈÄÜÊµÅ„Åó„Å¶Ôºå%s„ÅåÊàª„Å£„Å¶„Åç„ÅüÔºé", doname(obj));
         obj->in_use = FALSE;
         dropx(obj);
     } else if (!rn2(5)) {
@@ -782,23 +892,38 @@ register struct obj *obj;
 
 /* some common tests when trying to drop or throw items */
 boolean
-canletgo(obj, word)
-struct obj *obj;
-const char *word;
+canletgo(struct obj *obj, const char *word)
 {
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         if (*word)
 /*JP
             Norep("You cannot %s %s you are wearing.", word, something);
 */
-            Norep("Ç†Ç»ÇΩÇ™êgÇ…Ç¬ÇØÇƒÇ¢ÇÈÇ‡ÇÃÇ%sÇ±Ç∆ÇÕÇ≈Ç´Ç»Ç¢ÅD", word);
+            Norep("„ÅÇ„Å™„Åü„ÅåË∫´„Å´„Å§„Åë„Å¶„ÅÑ„Çã„ÇÇ„ÅÆ„Çí%s„Åì„Å®„ÅØ„Åß„Åç„Å™„ÅÑÔºé", word);
+        return FALSE;
+    }
+    if (obj == uwep && welded(uwep)) {
+        /* no weldmsg(), so uwep->bknown might become set silently
+           if word is "" */
+        if (*word) {
+            const char *hand = body_part(HAND);
+
+            if (bimanual(uwep))
+                hand = makeplural(hand);
+#if 0 /*JP:T*/
+            Norep("You cannot %s %s welded to your %s.", word, something,
+                  hand);
+#else
+            Norep("%s„Å´Ë≤º„Çä‰ªò„ÅÑ„Å¶„ÅÑ„Çã„ÇÇ„ÅÆ„Çí%s„Åì„Å®„ÅØ„Åß„Åç„Å™„ÅÑÔºé", hand, word);
+#endif
+        }
         return FALSE;
     }
     if (obj->otyp == LOADSTONE && obj->cursed) {
         /* getobj() kludge sets corpsenm to user's specified count
            when refusing to split a stack of cursed loadstones */
         if (*word) {
-#if 0 /*JP*//*ì˙ñ{åÍÇ≈ÇÕïsóv*/
+#if 0 /*JP*//*Êó•Êú¨Ë™û„Åß„ÅØ‰∏çË¶Å*/
             /* getobj() ignores a count for throwing since that is
                implicitly forced to be 1; replicate its kludge... */
             if (!strcmp(word, "throw") && obj->quan > 1L)
@@ -808,7 +933,7 @@ const char *word;
             pline("For some reason, you cannot %s%s the stone%s!", word,
                   obj->corpsenm ? " any of" : "", plur(obj->quan));
 #else
-            pline("Ç«Ç§Ç¢Ç§ÇÌÇØÇ©ÅCÇ†Ç»ÇΩÇÕêŒÇ%sÇ±Ç∆ÇÕÇ≈Ç´Ç»Ç¢ÅI",
+            pline("„Å©„ÅÜ„ÅÑ„ÅÜ„Çè„Åë„ÅãÔºå„ÅÇ„Å™„Åü„ÅØÁü≥„Çí%s„Åì„Å®„ÅØ„Åß„Åç„Å™„ÅÑÔºÅ",
                   word);
 #endif
         }
@@ -821,7 +946,7 @@ const char *word;
 /*JP
             pline_The("leash is tied around your %s.", body_part(HAND));
 */
-            pline("ïRÇÕÇ†Ç»ÇΩÇÃ%sÇ…åãÇ—Ç¬ÇØÇÁÇÍÇƒÇ¢ÇÈÅD", body_part(HAND));
+            pline("Á¥ê„ÅØ„ÅÇ„Å™„Åü„ÅÆ%s„Å´Áµê„Å≥„Å§„Åë„Çâ„Çå„Å¶„ÅÑ„ÇãÔºé", body_part(HAND));
         return FALSE;
     }
     if (obj->owornmask & W_SADDLE) {
@@ -829,27 +954,28 @@ const char *word;
 /*JP
             You("cannot %s %s you are sitting on.", word, something);
 */
-            You("èÊÇ¡ÇƒÇ¢ÇÈä‘ÇÕ%sÇ±Ç∆ÇÕÇ≈Ç´Ç»Ç¢ÅD", word);
+            You("‰πó„Å£„Å¶„ÅÑ„ÇãÈñì„ÅØ%s„Åì„Å®„ÅØ„Åß„Åç„Å™„ÅÑÔºé", word);
         return FALSE;
     }
     return TRUE;
 }
 
-STATIC_PTR int
-drop(obj)
-register struct obj *obj;
+staticfn int
+drop(struct obj *obj)
 {
     if (!obj)
-        return 0;
+        return ECMD_FAIL;
 /*JP
     if (!canletgo(obj, "drop"))
 */
-    if (!canletgo(obj, "íuÇ≠"))
-        return 0;
+    if (!canletgo(obj, "ÁΩÆ„Åè"))
+        return ECMD_FAIL;
+    if (obj->otyp == CORPSE && better_not_try_to_drop_that(obj))
+        return ECMD_FAIL;
     if (obj == uwep) {
         if (welded(uwep)) {
             weldmsg(obj);
-            return 0;
+            return ECMD_FAIL;
         }
         setuwep((struct obj *) 0);
     }
@@ -863,24 +989,33 @@ register struct obj *obj;
     if (u.uswallow) {
         /* barrier between you and the floor */
         if (flags.verbose) {
-            char *onam_p, monbuf[BUFSZ];
+            char *onam_p, *mnam_p, monbuf[BUFSZ];
 
+            mnam_p = mon_nam(u.ustuck);
             /* doname can call s_suffix, reusing its buffer */
-            Strcpy(monbuf, s_suffix(mon_nam(u.ustuck)));
-            onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
+            if (digests(u.ustuck->data)) {
 #if 0 /*JP:T*/
-            You("drop %s into %s %s.", onam_p, monbuf,
-                mbodypart(u.ustuck, STOMACH));
+                Sprintf(monbuf, "%s %s", s_suffix(mnam_p),
+                        mbodypart(u.ustuck, STOMACH));
 #else
-            You("%sÇ%s%sÇ…íuÇ¢ÇΩÅD", onam_p, monbuf,
-                mbodypart(u.ustuck, STOMACH));
+                Sprintf(monbuf, "%s„ÅÆ%s", mnam_p,
+                        mbodypart(u.ustuck, STOMACH));
+#endif
+                mnam_p = monbuf;
+            }
+            onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
+
+#if 0 /*JP:T*/
+            You("drop %s into %s.", onam_p, mnam_p);
+#else
+            You("%s„Çí%s„Å´ÁΩÆ„ÅÑ„ÅüÔºé", onam_p, mnam_p);
 #endif
         }
     } else {
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
             && IS_SINK(levl[u.ux][u.uy].typ)) {
             dosinkring(obj);
-            return 1;
+            return ECMD_TIME;
         }
         if (!can_reach_floor(TRUE)) {
             /* we might be levitating due to #invoke Heart of Ahriman;
@@ -894,36 +1029,30 @@ register struct obj *obj;
 /*JP
                 You("drop %s.", doname(obj));
 */
-                You("%sÇíuÇ¢ÇΩÅD", doname(obj));
-            /* Ensure update when we drop gold objects */
-            if (obj->oclass == COIN_CLASS)
-                context.botl = 1;
+                You("%s„ÇíÁΩÆ„ÅÑ„ÅüÔºé", doname(obj));
             freeinv(obj);
             hitfloor(obj, TRUE);
             if (levhack)
                 float_down(I_SPECIAL | TIMEOUT, W_ARTI | W_ART);
-            return 1;
+            return ECMD_TIME;
         }
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
 /*JP
             You("drop %s.", doname(obj));
 */
-            You("%sÇíuÇ¢ÇΩÅD", doname(obj));
+            You("%s„ÇíÁΩÆ„ÅÑ„ÅüÔºé", doname(obj));
     }
+    obj->how_lost = LOST_DROPPED;
     dropx(obj);
-    return 1;
+    return ECMD_TIME;
 }
 
 /* dropx - take dropped item out of inventory;
    called in several places - may produce output
    (eg ship_object() and dropy() -> sellobj() both produce output) */
 void
-dropx(obj)
-register struct obj *obj;
+dropx(struct obj *obj)
 {
-    /* Ensure update when we drop gold objects */
-    if (obj->oclass == COIN_CLASS)
-        context.botl = 1;
     freeinv(obj);
     if (!u.uswallow) {
         if (ship_object(obj, u.ux, u.uy, FALSE))
@@ -936,17 +1065,14 @@ register struct obj *obj;
 
 /* dropy - put dropped object at destination; called from lots of places */
 void
-dropy(obj)
-struct obj *obj;
+dropy(struct obj *obj)
 {
     dropz(obj, FALSE);
 }
 
 /* dropz - really put dropped object at its destination... */
 void
-dropz(obj, with_impact)
-struct obj *obj;
-boolean with_impact;
+dropz(struct obj *obj, boolean with_impact)
 {
     if (obj == uwep)
         setuwep((struct obj *) 0);
@@ -955,71 +1081,87 @@ boolean with_impact;
     if (obj == uswapwep)
         setuswapwep((struct obj *) 0);
 
-/*JP
-    if (!u.uswallow && flooreffects(obj, u.ux, u.uy, "drop"))
-*/
-    if (!u.uswallow && flooreffects(obj,u.ux,u.uy, "óéÇøÇÈ"))
-        return;
-    /* uswallow check done by GAN 01/29/87 */
     if (u.uswallow) {
-        boolean could_petrify = FALSE;
-        boolean could_poly = FALSE;
-        boolean could_slime = FALSE;
-        boolean could_grow = FALSE;
-        boolean could_heal = FALSE;
-
+        /* hero has dropped an item while inside an engulfer */
         if (obj != uball) { /* mon doesn't pick up ball */
-            if (obj->otyp == CORPSE) {
-                could_petrify = touch_petrifies(&mons[obj->corpsenm]);
-                could_poly = polyfodder(obj);
-                could_slime = (obj->corpsenm == PM_GREEN_SLIME);
-                could_grow = (obj->corpsenm == PM_WRAITH);
-                could_heal = (obj->corpsenm == PM_NURSE);
-            }
+            /* moving shop item into engulfer's inventory treated as theft */
             if (is_unpaid(obj))
                 (void) stolen_value(obj, u.ux, u.uy, TRUE, FALSE);
-            (void) mpickobj(u.ustuck, obj);
-            if (is_animal(u.ustuck->data)) {
-                if (could_poly || could_slime) {
-                    (void) newcham(u.ustuck,
-                                   could_poly ? (struct permonst *) 0
-                                              : &mons[PM_GREEN_SLIME],
-                                   FALSE, could_slime);
-                    delobj(obj); /* corpse is digested */
-                } else if (could_petrify) {
-                    minstapetrify(u.ustuck, TRUE);
-                    /* Don't leave a cockatrice corpse in a statue */
-                    if (!u.uswallow)
-                        delobj(obj);
-                } else if (could_grow) {
-                    (void) grow_up(u.ustuck, (struct monst *) 0);
-                    delobj(obj); /* corpse is digested */
-                } else if (could_heal) {
-                    u.ustuck->mhp = u.ustuck->mhpmax;
-                    delobj(obj); /* corpse is digested */
-                }
-            }
+            /* add to engulfer's inventory if not immediately eaten */
+            if (!engulfer_digests_food(obj))
+                (void) mpickobj(u.ustuck, obj);
         }
     } else {
+/*JP
+        if (flooreffects(obj, u.ux, u.uy, "drop"))
+*/
+        if (flooreffects(obj, u.ux, u.uy, "ËêΩ„Å°„Çã"))
+            return;
         place_object(obj, u.ux, u.uy);
         if (with_impact)
             container_impact_dmg(obj, u.ux, u.uy);
+        impact_disturbs_zombies(obj, with_impact);
         if (obj == uball)
             drop_ball(u.ux, u.uy);
-        else if (level.flags.has_shop)
+        else if (svl.level.flags.has_shop)
             sellobj(obj, u.ux, u.uy);
         stackobj(obj);
         if (Blind && Levitation)
             map_object(obj, 0);
         newsym(u.ux, u.uy); /* remap location under self */
     }
+    encumber_msg();
+}
+
+/* when swallowed, move dropped object from OBJ_FREE to u.ustuck's inventory;
+   for purple worm, immediately eat any corpse, glob, or special meat item
+   from object polymorph; return True if object is used up, False otherwise */
+staticfn boolean
+engulfer_digests_food(struct obj *obj)
+{
+    /* animal swallower (purple worn) eats any
+       corpse, glob, or meat <item> but not other types of food */
+    if (digests(u.ustuck->data)
+        && (obj->otyp == CORPSE || obj->globby
+            || obj->otyp == MEATBALL || obj->otyp == ENORMOUS_MEATBALL
+            || obj->otyp == MEAT_RING || obj->otyp == MEAT_STICK)) {
+        boolean could_petrify = FALSE,
+                could_poly = FALSE, could_slime = FALSE,
+                could_grow = FALSE, could_heal = FALSE;
+
+        if (obj->otyp == CORPSE) {
+            could_petrify = touch_petrifies(&mons[obj->corpsenm]);
+            could_poly = polyfood(obj);
+            could_grow = (obj->corpsenm == PM_WRAITH);
+            could_heal = (obj->corpsenm == PM_NURSE);
+        } else if (obj->otyp == GLOB_OF_GREEN_SLIME) {
+            could_slime = TRUE;
+        }
+        /* see or feel the effect */
+        pline("%s instantly digested!", Tobjnam(obj, "are"));
+
+        if (could_poly || could_slime) {
+            (void) newcham(u.ustuck, could_slime ? &mons[PM_GREEN_SLIME] : 0,
+                           could_slime ? NC_SHOW_MSG : NO_NC_FLAGS);
+        } else if (could_petrify) {
+            minstapetrify(u.ustuck, TRUE);
+        } else if (could_grow) {
+            (void) grow_up(u.ustuck, (struct monst *) 0);
+        } else if (could_heal) {
+            healmon(u.ustuck, u.ustuck->mhpmax, 0);
+            /* False: don't realize that sight is cured from inside */
+            mcureblindness(u.ustuck, FALSE);
+        }
+        delobj(obj); /* always used up */
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* things that must change when not held; recurse into containers.
    Called for both player and monsters */
 void
-obj_no_longer_held(obj)
-struct obj *obj;
+obj_no_longer_held(struct obj *obj)
 {
     if (!obj) {
         return;
@@ -1039,7 +1181,7 @@ struct obj *obj;
          */
         if (!obj->oerodeproof || !rn2(10)) {
             /* if monsters aren't moving, assume player is responsible */
-            if (!context.mon_moving && !program_state.gameover)
+            if (!svc.context.mon_moving && !program_state.gameover)
                 costly_alteration(obj, COST_DEGRD);
             obj->otyp = WORM_TOOTH;
             obj->oerodeproof = 0;
@@ -1048,18 +1190,18 @@ struct obj *obj;
     }
 }
 
-/* 'D' command: drop several things */
+/* the #droptype command: drop several things */
 int
-doddrop()
+doddrop(void)
 {
-    int result = 0;
+    int result = ECMD_OK;
 
-    if (!invent) {
+    if (!gi.invent) {
 /*JP
         You("have nothing to drop.");
 */
-        You("óéÇ∆Ç∑Ç‡ÇÃÇâΩÇ‡éùÇ¡ÇƒÇ¢Ç»Ç¢ÅD");
-        return 0;
+        You("ËêΩ„Å®„Åô„ÇÇ„ÅÆ„Çí‰Ωï„ÇÇÊåÅ„Å£„Å¶„ÅÑ„Å™„ÅÑÔºé");
+        return ECMD_OK;
     }
     add_valid_menu_class(0); /* clear any classes already there */
     if (*u.ushops)
@@ -1075,38 +1217,83 @@ doddrop()
     return result;
 }
 
+staticfn boolean
+better_not_try_to_drop_that(struct obj *otmp)
+{
+    char buf[BUFSZ];
+
+    /* u_safe_from_fatal_corpse() with st_all checks for gloves and stoning
+     *  resistance before bothering to prompt you.
+     */
+    if (otmp->otyp == CORPSE && !u_safe_from_fatal_corpse(otmp, st_all)) {
+        Snprintf(
+            buf, sizeof buf,
+            "Drop the %s corpse without %s protection on?",
+            obj_pmname(otmp), body_part(HAND));
+        return (paranoid_ynq(TRUE, buf, FALSE) != 'y');
+    }
+    return FALSE;
+}
+staticfn int /* check callers */
+menudrop_split(struct obj *otmp, long cnt)
+{
+    if (cnt && cnt < otmp->quan) {
+        if (welded(otmp)) {
+            ; /* don't split */
+        } else if (otmp->otyp == LOADSTONE && otmp->cursed) {
+            /* same kludge as getobj(), for canletgo()'s use */
+            otmp->corpsenm = (int) cnt; /* don't split */
+        } else {
+            otmp = splitobj(otmp, cnt);
+        }
+    }
+    return drop(otmp);
+}
+
 /* Drop things from the hero's inventory, using a menu. */
-STATIC_OVL int
-menu_drop(retry)
-int retry;
+staticfn int
+menu_drop(int retry)
 {
     int n, i, n_dropped = 0;
-    long cnt;
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
-    boolean all_categories = TRUE;
-    boolean drop_everything = FALSE;
+    boolean all_categories = TRUE, drop_everything = FALSE, autopick = FALSE;
+    boolean drop_justpicked = FALSE;
+    long justpicked_quan = 0;
 
     if (retry) {
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
 /*JP
-        n = query_category("Drop what type of items?", invent,
+        n = query_category("Drop what type of items?", gi.invent,
 */
-        n = query_category("Ç«ÇÃéÌóﬁÇÃÉAÉCÉeÉÄÇíuÇ´Ç‹Ç∑Ç©ÅH", invent,
-                           UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL | BUC_BLESSED
-                               | BUC_CURSED | BUC_UNCURSED | BUC_UNKNOWN,
+        n = query_category("„Å©„ÅÆÁ®ÆÈ°û„ÅÆ„Ç¢„Ç§„ÉÜ„É†„ÇíÁΩÆ„ÅèÔºü", gi.invent,
+                           (UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL
+                            | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED
+                            | BUC_UNKNOWN | JUSTPICKED | INCLUDE_VENOM),
                            &pick_list, PICK_ANY);
+            /* when paranoid_confirm:A is set, 'A' by itself implies
+               'A'+'a' which will be followed by a confirmation prompt;
+               when that option isn't set, 'A' by itself is rejected
+               by query_categorry() and result here will be n==0 */
         if (!n)
-            goto drop_done;
+            goto drop_done; /* no non-autopick category filters specified */
+
         for (i = 0; i < n; i++) {
-            if (pick_list[i].item.a_int == ALL_TYPES_SELECTED)
+            if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
-            else if (pick_list[i].item.a_int == 'A')
-                drop_everything = TRUE;
-            else
+            } else if (pick_list[i].item.a_int == 'A') {
+                drop_everything = autopick = TRUE;
+            } else if (pick_list[i].item.a_int == 'P') {
+                justpicked_quan = max(0, pick_list[i].count);
+                drop_justpicked = TRUE;
+                drop_everything = FALSE;
                 add_valid_menu_class(pick_list[i].item.a_int);
+            } else {
+                add_valid_menu_class(pick_list[i].item.a_int);
+                drop_everything = FALSE;
+            }
         }
         free((genericptr_t) pick_list);
     } else if (flags.menu_style == MENU_COMBINATION) {
@@ -1117,18 +1304,18 @@ int retry;
         i = ggetobj("drop", drop, 0, TRUE, &ggoresults);
         if (i == -2)
             all_categories = TRUE;
-        if (ggoresults & ALL_FINISHED) {
+        if ((ggoresults & ALL_FINISHED) != 0) {
             n_dropped = i;
             goto drop_done;
         }
     }
 
-    if (drop_everything) {
+    if (autopick) {
         /*
          * Dropping a burning potion of oil while levitating can cause
          * an explosion which might destroy some of hero's inventory,
          * so the old code
-         *      for (otmp = invent; otmp; otmp = otmp2) {
+         *      for (otmp = gi.invent; otmp; otmp = otmp2) {
          *          otmp2 = otmp->nobj;
          *          n_dropped += drop(otmp);
          *      }
@@ -1137,87 +1324,125 @@ int retry;
          * Use the bypass bit to mark items already processed (hence
          * not droppable) and rescan inventory until no unbypassed
          * items remain.
+         *
+         * FIXME?  if something explodes, or even breaks, we probably
+         * ought to halt the traversal or perhaps ask player whether
+         * to halt it.
          */
-        bypass_objlist(invent, FALSE); /* clear bypass bit for invent */
-        while ((otmp = nxt_unbypassed_obj(invent)) != 0)
-            n_dropped += drop(otmp);
+        bypass_objlist(gi.invent, FALSE); /* clear bypass bit for invent */
+        while ((otmp = nxt_unbypassed_obj(gi.invent)) != 0) {
+            if (drop_everything || all_categories || allow_category(otmp))
+                n_dropped += ((drop(otmp) & ECMD_TIME) != 0) ? 1 : 0;
+        }
         /* we might not have dropped everything (worn armor, welded weapon,
            cursed loadstones), so reset any remaining inventory to normal */
-        bypass_objlist(invent, FALSE);
+        bypass_objlist(gi.invent, FALSE);
+    } else if (drop_justpicked && count_justpicked(gi.invent) == 1) {
+        /* drop the just picked item automatically, if only one stack */
+        otmp = find_justpicked(gi.invent);
+        if (otmp)
+            n_dropped += ((menudrop_split(otmp, justpicked_quan)
+                           & ECMD_TIME) != 0) ? 1 : 0;
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
 #if 0 /*JP:T*/
-        n = query_objlist("What would you like to drop?", &invent,
-                          (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
+        n = query_objlist("What would you like to drop?", &gi.invent,
+                          (USE_INVLET | INVORDER_SORT | INCLUDE_VENOM),
+                          &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
 #else
-        n = query_objlist("Ç«ÇÍÇíuÇ´Ç‹Ç∑Ç©ÅH", &invent,
-                          (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
+        n = query_objlist("„Å©„Çå„ÇíÁΩÆ„Åç„Åæ„Åô„ÅãÔºü", &gi.invent,
+                          (USE_INVLET | INVORDER_SORT | INCLUDE_VENOM),
+                          &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
 #endif
         if (n > 0) {
             /*
              * picklist[] contains a set of pointers into inventory, but
              * as soon as something gets dropped, they might become stale
-             * (see the drop_everything code above for an explanation).
-             * Just checking to see whether one is still in the invent
+             * (see the autopick code above for an explanation).
+             * Just checking to see whether one is still in the gi.invent
              * chain is not sufficient validation since destroyed items
              * will be freed and items we've split here might have already
              * reused that memory and put the same pointer value back into
-             * invent.  Ditto for using invlet to validate.  So we start
-             * by setting bypass on all of invent, then check each pointer
-             * to verify that it is in invent and has that bit set.
+             * gi.invent.  Ditto for using invlet to validate.  So we start
+             * by setting bypass on all of gi.invent, then check each pointer
+             * to verify that it is in gi.invent and has that bit set.
              */
-            bypass_objlist(invent, TRUE);
+            bypass_objlist(gi.invent, TRUE);
             for (i = 0; i < n; i++) {
                 otmp = pick_list[i].item.a_obj;
-                for (otmp2 = invent; otmp2; otmp2 = otmp2->nobj)
+                for (otmp2 = gi.invent; otmp2; otmp2 = otmp2->nobj)
                     if (otmp2 == otmp)
                         break;
                 if (!otmp2 || !otmp2->bypass)
                     continue;
                 /* found next selected invent item */
-                cnt = pick_list[i].count;
-                if (cnt < otmp->quan) {
-                    if (welded(otmp)) {
-                        ; /* don't split */
-                    } else if (otmp->otyp == LOADSTONE && otmp->cursed) {
-                        /* same kludge as getobj(), for canletgo()'s use */
-                        otmp->corpsenm = (int) cnt; /* don't split */
-                    } else {
-                        otmp = splitobj(otmp, cnt);
-                    }
-                }
-                n_dropped += drop(otmp);
+                n_dropped += ((menudrop_split(otmp, pick_list[i].count)
+                               & ECMD_TIME) != 0) ? 1 : 0;
             }
-            bypass_objlist(invent, FALSE); /* reset invent to normal */
+            bypass_objlist(gi.invent, FALSE); /* reset gi.invent to normal */
             free((genericptr_t) pick_list);
         }
     }
 
  drop_done:
-    return n_dropped;
+    return (n_dropped ? ECMD_TIME : ECMD_OK);
 }
 
-/* on a ladder, used in goto_level */
-static NEARDATA boolean at_ladder = FALSE;
+staticfn boolean
+u_stuck_cannot_go(const char *updn)
+{
+    if (u.ustuck) {
+        if (u.uswallow || !sticks(gy.youmonst.data)) {
+#if 0 /*JP*/
+            You("are %s, and cannot go %s.",
+                !u.uswallow ? "being held"
+                : digests(u.ustuck->data) ? "swallowed"
+                : "engulfed", updn);
+#else
+            You("%s%s„Åì„Å®„Åå„Åß„Åç„Å™„ÅÑÔºé",
+                !u.uswallow ? "„Å§„Åã„Åæ„Åà„Çâ„Çå„Å¶„ÅÑ„Å¶" 
+                : digests(u.ustuck->data) ? "È£≤„ÅøËæº„Åæ„Çå„Å¶„ÅÑ„Å¶"
+                : "Â∑ª„ÅçËæº„Åæ„Çå„Å¶„ÅÑ„Å¶", updn);
+#endif
+            return TRUE;
+        } else {
+            struct monst *mtmp = u.ustuck;
 
-/* the '>' command */
+            set_ustuck((struct monst *) 0);
+/*JP
+            You("release %s.", mon_nam(mtmp));
+*/
+            You("%s„ÇíÊîæ„Åó„ÅüÔºé", mon_nam(mtmp));
+        }
+    }
+    return FALSE;
+}
+
+/* the #down command */
 int
-dodown()
+dodown(void)
 {
     struct trap *trap = 0;
-    boolean stairs_down = ((u.ux == xdnstair && u.uy == ydnstair)
-                           || (u.ux == sstairs.sx && u.uy == sstairs.sy
-                               && !sstairs.up)),
-            ladder_down = (u.ux == xdnladder && u.uy == ydnladder);
+    stairway *stway;
+    boolean stairs_down, ladder_down;
+
+    set_move_cmd(DIR_DOWN, 0);
 
     if (u_rooted())
-        return 1;
+        return ECMD_TIME;
 
     if (stucksteed(TRUE)) {
-        return 0;
+        return ECMD_OK;
     }
+
+    stairs_down = ladder_down = FALSE;
+    if ((stway = stairway_at(u.ux, u.uy)) != 0 && !stway->up) {
+        stairs_down = !stway->isladder;
+        ladder_down = !stairs_down;
+    }
+
     /* Levitation might be blocked, but player can still use '>' to
        turn off controlled levitation */
     if (HLevitation || ELevitation) {
@@ -1226,63 +1451,65 @@ dodown()
             if (ELevitation & W_ARTI) {
                 struct obj *obj;
 
-                for (obj = invent; obj; obj = obj->nobj) {
+                for (obj = gi.invent; obj; obj = obj->nobj) {
                     if (obj->oartifact
                         && artifact_has_invprop(obj, LEVITATION)) {
-                        if (obj->age < monstermoves)
-                            obj->age = monstermoves;
+                        if (obj->age < svm.moves)
+                            obj->age = svm.moves;
                         obj->age += rnz(100);
                     }
                 }
             }
             if (float_down(I_SPECIAL | TIMEOUT, W_ARTI)) {
-                return 1; /* came down, so moved */
+                return ECMD_TIME; /* came down, so moved */
             } else if (!HLevitation && !ELevitation) {
 /*JP
                 Your("latent levitation ceases.");
 */
-                pline("êˆç›ìIÇ»ïÇóVî\óÕÇ™íÜífÇµÇΩÅD");
-                return 1; /* did something, effectively moved */
+                pline("ÊΩúÂú®ÁöÑ„Å™ÊµÆÈÅäËÉΩÂäõ„Åå‰∏≠Êñ≠„Åó„ÅüÔºé");
+                return ECMD_TIME; /* did something, effectively moved */
             }
         }
         if (BLevitation) {
             ; /* weren't actually floating after all */
         } else if (Blind) {
+            /* glyph_to_cmap() is a macro which expands its argument many
+               times; use this to do part of its work just once */
+            int glyph_at_uxuy = levl[u.ux][u.uy].glyph;
+
             /* Avoid alerting player to an unknown stair or ladder.
              * Changes the message for a covered, known staircase
              * too; staircase knowledge is not stored anywhere.
              */
             if (stairs_down)
-                stairs_down =
-                    (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnstair);
+                stairs_down = (glyph_to_cmap(glyph_at_uxuy) == S_dnstair);
             else if (ladder_down)
-                ladder_down =
-                    (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnladder);
+                ladder_down = (glyph_to_cmap(glyph_at_uxuy) == S_dnladder);
         }
         if (Is_airlevel(&u.uz))
 /*JP
             You("are floating in the %s.", surface(u.ux, u.uy));
 */
-            You("%sÇÃíÜÇ…ïÇÇ¢ÇƒÇ¢ÇÈÅD", surface(u.ux, u.uy));
+            You("%s„ÅÆ‰∏≠„Å´ÊµÆ„ÅÑ„Å¶„ÅÑ„ÇãÔºé", surface(u.ux, u.uy));
         else if (Is_waterlevel(&u.uz))
 #if 0 /*JP:T*/
             You("are floating in %s.",
                 is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
 #else
-            You("%sÇÃíÜÇ…ïÇÇ¢ÇƒÇ¢ÇÈÅD",
-                is_pool(u.ux, u.uy) ? "êÖ" : "ãÛãCÇÃñA");
+            You("%s„ÅÆ‰∏≠„Å´ÊµÆ„ÅÑ„Å¶„ÅÑ„ÇãÔºé",
+                is_pool(u.ux, u.uy) ? "Ê∞¥" : "Á©∫Ê∞ó„ÅÆÊ≥°");
 #endif
         else
 #if 0 /*JP:T*/
-            floating_above(stairs_down ? "stairs" : ladder_down
-                                                    ? "ladder"
-                                                    : surface(u.ux, u.uy));
+            floating_above(stairs_down ? "stairs"
+                           : ladder_down ? "ladder"
+                             : surface(u.ux, u.uy));
 #else
-            floating_above(stairs_down ? "äKíi" : ladder_down
-                                                    ? "ÇÕÇµÇ≤"
-                                                    : surface(u.ux, u.uy));
+            floating_above(stairs_down ? "ÈöéÊÆµ"
+                           : ladder_down ? "„ÅØ„Åó„Åî"
+                             : surface(u.ux, u.uy));
 #endif
-        return 0; /* didn't move */
+        return ECMD_OK; /* didn't move */
     }
 
     if (Upolyd && ceiling_hider(&mons[u.umonnum]) && u.uundetected) {
@@ -1291,12 +1518,12 @@ dodown()
 /*JP
             You("fly out of hiding.");
 */
-            You("âBÇÍÇÈÇÃÇÇ‚ÇﬂÇƒîÚÇ—èoÇµÇΩÅD");
+            You("Èö†„Çå„Çã„ÅÆ„Çí„ÇÑ„ÇÅ„Å¶È£õ„Å≥Âá∫„Åó„ÅüÔºé");
         } else { /* piercer */
 /*JP
             You("drop to the %s.", surface(u.ux, u.uy));
 */
-            You("%sÇ…óéÇøÇΩÅD", surface(u.ux, u.uy));
+            You("%s„Å´ËêΩ„Å°„ÅüÔºé", surface(u.ux, u.uy));
             if (is_pool_or_lava(u.ux, u.uy)) {
                 pooleffects(FALSE);
             } else {
@@ -1305,60 +1532,58 @@ dodown()
                     dotrap(trap, TOOKPLUNGE);
             }
         }
-        return 1; /* came out of hiding; might need '>' again to go down */
+        return ECMD_TIME; /* came out of hiding; need '>' again to go down */
     }
+
+#if 0 /*JP:T*/
+    if (u_stuck_cannot_go("down"))
+#else
+    if (u_stuck_cannot_go("‰∏ã„Çä„Çã"))
+#endif
+        return ECMD_TIME;
 
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
         if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
             dotrap(trap, TOOKPLUNGE);
-            return 1;
+            return ECMD_TIME;
         } else if (!trap || !is_hole(trap->ttyp)
                    || !Can_fall_thru(&u.uz) || !trap->tseen) {
-            if (flags.autodig && !context.nopick && uwep && is_pick(uwep)) {
+            if (flags.autodig && !svc.context.nopick
+                && uwep && is_pick(uwep)) {
                 return use_pick_axe2(uwep);
             } else {
-/*JP
-                You_cant("go down here.");
-*/
-                pline("Ç±Ç±Ç≈ÇÕç~ÇËÇÈÇ±Ç∆Ç™Ç≈Ç´Ç»Ç¢ÅD");
-                return 0;
+#if 0 /*JP:T*/
+                You_cant("go down here%s.",
+                         (trap && trap->ttyp == VIBRATING_SQUARE) ? " yet"
+                                                                  : "");
+#else
+                You_cant("„Åì„Åì„Åß„ÅØ%sÈôç„Çä„Çã„Åì„Å®„Åå„Åß„Åç„Å™„ÅÑÔºé",
+                         (trap && trap->ttyp == VIBRATING_SQUARE) ? "„Åæ„Å†"
+                                                                  : "");
+#endif
+                return ECMD_OK;
             }
         }
-    }
-    if (u.ustuck) {
-#if 0 /*JP*/
-        You("are %s, and cannot go down.",
-            !u.uswallow ? "being held" : is_animal(u.ustuck->data)
-                                             ? "swallowed"
-                                             : "engulfed");
-#else
-        You("%sç~ÇËÇÈÇ±Ç∆Ç™Ç≈Ç´Ç»Ç¢ÅD",
-            !u.uswallow ? "Ç¬Ç©Ç‹Ç¶ÇÁÇÍÇƒÇ¢Çƒ" : is_animal(u.ustuck->data)
-                                             ? "à˘Ç›çûÇ‹ÇÍÇƒÇ¢Çƒ"
-                                             : "ä™Ç´çûÇ‹ÇÍÇƒÇ¢Çƒ");
-#endif
-        return 1;
     }
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
 /*JP
         You("are standing at the gate to Gehennom.");
 */
-        You("ÉQÉwÉiÇÃñÂÇÃëOÇ…óßÇ¡ÇƒÇ¢ÇÈÅD");
+        You("„Ç≤„Éò„Éä„ÅÆÈñÄ„ÅÆÂâç„Å´Á´ã„Å£„Å¶„ÅÑ„ÇãÔºé");
 /*JP
         pline("Unspeakable cruelty and harm lurk down there.");
 */
-        pline("åæótÇ…Ç∑ÇÁÇ≈Ç´Ç»Ç¢écãsÇ∆éSéñÇ™Ç±ÇÃâ∫Ç…êˆÇÒÇ≈Ç¢ÇÈÅD");
+        pline("Ë®ÄËëâ„Å´„Åô„Çâ„Åß„Åç„Å™„ÅÑÊÆãËôê„Å®ÊÉ®‰∫ã„Åå„Åì„ÅÆ‰∏ã„Å´ÊΩú„Çì„Åß„ÅÑ„ÇãÔºé");
 /*JP
-        if (yn("Are you sure you want to enter?") != 'y')
+        if (y_n("Are you sure you want to enter?") != 'y')
 */
-        if (yn("ñ{ìñÇ…ì¸ÇËÇ‹Ç∑Ç©ÅH") != 'y')
-            return 0;
-        else
+        if (y_n("Êú¨ÂΩì„Å´ÂÖ•„Çä„Åæ„Åô„ÅãÔºü") != 'y')
+            return ECMD_OK;
 /*JP
-            pline("So be it.");
+        pline("So be it.");
 */
-            pline("Ç»ÇÁçDÇ´Ç…Ç∑ÇÍÇŒÇÊÇ¢ÅD");
+        pline("„Å™„ÇâÂ•Ω„Åç„Å´„Åô„Çå„Å∞„Çà„ÅÑÔºé");
         u.uevent.gehennom_entered = 1; /* don't ask again */
     }
 
@@ -1366,8 +1591,8 @@ dodown()
 /*JP
         You("are held back by your pet!");
 */
-        You("ÉyÉbÉgÇ…à¯Ç´Ç‡Ç«Ç≥ÇÍÇΩÅI");
-        return 0;
+        You("„Éö„ÉÉ„Éà„Å´Âºï„Åç„ÇÇ„Å©„Åï„Çå„ÅüÔºÅ");
+        return ECMD_OK;
     }
 
     if (trap) {
@@ -1375,152 +1600,150 @@ dodown()
         const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
 #endif
 #if 0 /*JP*/
-        const char *actn = Flying ? "fly" : locomotion(youmonst.data, "jump");
+        const char *actn = u_locomotion("jump");
 #else
         const char *actn = "";
 #endif
 
-        if (youmonst.data->msize >= MZ_HUGE) {
+        if (gy.youmonst.data->msize >= MZ_HUGE) {
             char qbuf[QBUFSZ];
 
 #if 0 /*JP:T*/
             You("don't fit %s easily.", down_or_thru);
             Sprintf(qbuf, "Try to squeeze %s?", down_or_thru);
 #else
-            pline("Ç±Ç±ÇÕã∑Ç≠Çƒä»íPÇ…ÇÕí ÇËî≤ÇØÇÁÇÍÇ»Ç¢ÅD");
-            Sprintf(qbuf, "ëÃÇâüÇµçûÇ›Ç‹Ç∑Ç©?");
+            pline("„Åì„Åì„ÅØÁã≠„Åè„Å¶Á∞°Âçò„Å´„ÅØÈÄö„ÇäÊäú„Åë„Çâ„Çå„Å™„ÅÑÔºé");
+            Sprintf(qbuf, "‰Ωì„ÇíÊäº„ÅóËæº„Åø„Åæ„Åô„ÅãÔºü");
 #endif
-            if (yn(qbuf) == 'y') {
+            if (y_n(qbuf) == 'y') {
                 if (!rn2(3)) {
 #if 0 /*JP*/
                     actn = "manage to squeeze";
 #else
-                    actn = "Ç»ÇÒÇ∆Ç©";
+                    actn = "„Å™„Çì„Å®„Åã";
 #endif
 #if 0 /*JP*/
                     losehp(Maybe_Half_Phys(rnd(4)),
                            "contusion from a small passage", KILLED_BY);
 #else
                     losehp(Maybe_Half_Phys(rnd(4)),
-                           "ã∑Ç¢ìπÇ≈ÇÃë≈ÇøêgÇ≈", KILLED_BY);
+                           "Áã≠„ÅÑÈÅì„Åß„ÅÆÊâì„Å°Ë∫´„Åß", KILLED_BY);
 #endif
                 } else {
 /*JP
                     You("were unable to fit %s.", down_or_thru);
 */
-                    You("í ÇËî≤ÇØÇÁÇÍÇ»Ç¢ÅD");
-                    return 0;
+                    You("ÈÄö„ÇäÊäú„Åë„Çâ„Çå„Å™„ÅÑÔºé");
+                    return ECMD_OK;
                 }
             } else {
-                return 0;
+                return ECMD_OK;
             }
         }
 #if 0 /*JP:T*/
         You("%s %s the %s.", actn, down_or_thru,
             trap->ttyp == HOLE ? "hole" : "trap door");
 #else
-        You("%s%sÅD", actn,
-            trap->ttyp == HOLE ? "åäÇç~ÇËÇΩ" : "óéÇµî‡Çí ÇËî≤ÇØÇΩ");
+        You("%s%sÔºé", actn,
+            trap->ttyp == HOLE ? "Á©¥„ÇíÈôç„Çä„Åü" : "ËêΩ„ÅóÊââ„ÇíÈÄö„ÇäÊäú„Åë„Åü");
 #endif
     }
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
+    } else if (trap && trap->dst.dlevel != -1) {
+        d_level tdst;
+        assign_level(&tdst, &(trap->dst));
+        (void) clamp_hole_destination(&tdst);
+        goto_level(&tdst, FALSE, FALSE, FALSE);
     } else {
-        at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
+        ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
         next_level(!trap);
-        at_ladder = FALSE;
+        ga.at_ladder = FALSE;
     }
-    return 1;
+    return ECMD_TIME;
 }
 
-/* the '<' command */
+/* the #up command - move up a staircase */
 int
-doup()
+doup(void)
 {
+    stairway *stway = stairway_at(u.ux,u.uy);
+
+    set_move_cmd(DIR_UP, 0);
+
     if (u_rooted())
-        return 1;
+        return ECMD_TIME;
 
     /* "up" to get out of a pit... */
     if (u.utrap && u.utraptype == TT_PIT) {
         climb_pit();
-        return 1;
+        return ECMD_TIME;
     }
 
-    if ((u.ux != xupstair || u.uy != yupstair)
-        && (!xupladder || u.ux != xupladder || u.uy != yupladder)
-        && (!sstairs.sx || u.ux != sstairs.sx || u.uy != sstairs.sy
-            || !sstairs.up)) {
+    if (!stway || (stway && !stway->up)) {
 /*JP
         You_cant("go up here.");
 */
-        You("Ç±Ç±Ç≈ÇÕè„ÇÈÇ±Ç∆Ç™Ç≈Ç´Ç»Ç¢ÅD");
-        return 0;
+        You("„Åì„Åì„Åß„ÅØ‰∏ä„Çã„Åì„Å®„Åå„Åß„Åç„Å™„ÅÑÔºé");
+        return ECMD_OK;
     }
     if (stucksteed(TRUE)) {
-        return 0;
+        return ECMD_OK;
     }
-    if (u.ustuck) {
+
 #if 0 /*JP:T*/
-        You("are %s, and cannot go up.",
-            !u.uswallow ? "being held" : is_animal(u.ustuck->data)
-                                             ? "swallowed"
-                                             : "engulfed");
+    if (u_stuck_cannot_go("up"))
 #else
-        You("%sè„ÇÈÇ±Ç∆Ç™Ç≈Ç´Ç»Ç¢ÅD",
-            !u.uswallow ? "Ç¬Ç©Ç‹Ç¶ÇÁÇÍÇƒÇ¢Çƒ" : is_animal(u.ustuck->data)
-                                                     ? "à˘Ç›çûÇ‹ÇÍÇƒÇ¢Çƒ"
-                                                     : "ä™Ç´çûÇ‹ÇÍÇƒÇ¢Çƒ");
+    if (u_stuck_cannot_go("‰∏ä„Åå„Çã"))
 #endif
-        return 1;
-    }
+        return ECMD_TIME;
+
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
 #if 0 /*JP:T*/
         Your("load is too heavy to climb the %s.",
              levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
 #else
-        You("ï®ÇéùÇøÇ∑Ç¨Çƒ%sÇè„ÇÈÇ±Ç∆Ç™Ç≈Ç´Ç»Ç¢ÅD",
-            levl[u.ux][u.uy].typ == STAIRS ? "äKíi" : "ÇÕÇµÇ≤");
+        You("Áâ©„ÇíÊåÅ„Å°„Åô„Åé„Å¶%s„Çí‰∏ä„Çã„Åì„Å®„Åå„Åß„Åç„Å™„ÅÑÔºé",
+            levl[u.ux][u.uy].typ == STAIRS ? "ÈöéÊÆµ" : "„ÅØ„Åó„Åî");
 #endif
-        return 1;
+        return ECMD_TIME;
     }
     if (ledger_no(&u.uz) == 1) {
         if (iflags.debug_fuzzer)
-            return 0;
+            return ECMD_OK;
 /*JP
-        if (yn("Beware, there will be no return!  Still climb?") != 'y')
+        if (y_n("Beware, there will be no return!  Still climb?") != 'y')
 */
-        if (yn("ãCÇÇ¬ÇØÇÎÅCñﬂÇÍÇ»Ç¢ÇºÅIÇªÇÍÇ≈Ç‡è„ÇÈÅH") != 'y')
-            return 0;
+        if (y_n("Ê∞ó„Çí„Å§„Åë„ÇçÔºåÊàª„Çå„Å™„ÅÑ„ÅûÔºÅ„Åù„Çå„Åß„ÇÇ‰∏ä„ÇãÔºü") != 'y')
+            return ECMD_OK;
     }
     if (!next_to_u()) {
 /*JP
         You("are held back by your pet!");
 */
-        You("ÉyÉbÉgÇ…à¯Ç´Ç‡Ç«Ç≥ÇÍÇΩÅI");
-        return 0;
+        You("„Éö„ÉÉ„Éà„Å´Âºï„Åç„ÇÇ„Å©„Åï„Çå„ÅüÔºÅ");
+        return ECMD_OK;
     }
-    at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
+    ga.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
     prev_level(TRUE);
-    at_ladder = FALSE;
-    return 1;
+    ga.at_ladder = FALSE;
+    return ECMD_TIME;
 }
 
-d_level save_dlevel = { 0, 0 };
-
 /* check that we can write out the current level */
-STATIC_OVL int
-currentlevel_rewrite()
+staticfn NHFILE *
+currentlevel_rewrite(void)
 {
-    register int fd;
+    NHFILE *nhfp;
     char whynot[BUFSZ];
 
     /* since level change might be a bit slow, flush any buffered screen
      *  output (like "you fall through a trap door") */
     mark_synch();
 
-    fd = create_levelfile(ledger_no(&u.uz), whynot);
-    if (fd < 0) {
+    nhfp = create_levelfile(ledger_no(&u.uz), whynot);
+    if (!nhfp) {
         /*
          * This is not quite impossible: e.g., we may have
          * exceeded our quota. If that is the case then we
@@ -1529,52 +1752,40 @@ currentlevel_rewrite()
          * writable.
          */
         pline1(whynot);
-        return -1;
+        return (NHFILE *) 0;
     }
 
-#ifdef MFLOPPY
-    if (!savelev(fd, ledger_no(&u.uz), COUNT_SAVE)) {
-        (void) nhclose(fd);
-        delete_levelfile(ledger_no(&u.uz));
-/*JP
-        pline("NetHack is out of disk space for making levels!");
-*/
-        pline("êVÇµÇ¢ÉåÉxÉãÇçÏÇÈÇΩÇﬂÇÃÉfÉBÉXÉNóeó Ç™ë´ÇËÇ»Ç¢ÅI");
-/*JP
-        You("can save, quit, or continue playing.");
-*/
-        You("ÉZÅ[ÉuÇ∑ÇÈÇ©èIóπÇ∑ÇÈÇ©ÅCÇ†ÇÈÇ¢ÇÕÉvÉåÉCÇë±çsÇ≈Ç´ÇÈÅD");
-        return -1;
-    }
-#endif
-    return fd;
+    return nhfp;
 }
 
 #ifdef INSURANCE
 void
-save_currentstate()
+save_currentstate(void)
 {
-    int fd;
+    NHFILE *nhfp;
 
+    program_state.in_checkpoint++;
     if (flags.ins_chkpt) {
         /* write out just-attained level, with pets and everything */
-        fd = currentlevel_rewrite();
-        if (fd < 0)
+        nhfp = currentlevel_rewrite();
+        if (!nhfp)
             return;
-        bufon(fd);
-        savelev(fd, ledger_no(&u.uz), WRITE_SAVE);
-        bclose(fd);
+        if (nhfp->structlevel)
+            bufon(nhfp->fd);
+        nhfp->mode = WRITING;
+        savelev(nhfp,ledger_no(&u.uz));
+        close_nhfile(nhfp);
     }
 
     /* write out non-level state */
     savestateinlock();
+    program_state.in_checkpoint--;
 }
 #endif
 
 /*
 static boolean
-badspot(x, y)
-register xchar x, y;
+badspot(coordxy x, coordxy y)
 {
     return (boolean) ((levl[x][y].typ != ROOM
                        && levl[x][y].typ != AIR
@@ -1586,8 +1797,7 @@ register xchar x, y;
 /* when arriving on a level, if hero and a monster are trying to share same
    spot, move one; extracted from goto_level(); also used by wiz_makemap() */
 void
-u_collide_m(mtmp)
-struct monst *mtmp;
+u_collide_m(struct monst *mtmp)
 {
     coord cc;
 
@@ -1604,11 +1814,11 @@ struct monst *mtmp;
        it was already here.  Randomly move you to an adjacent spot
        or else the monster to any nearby location.  Prior to 3.3.0
        the latter was done unconditionally. */
-    if (!rn2(2) && enexto(&cc, u.ux, u.uy, youmonst.data)
-        && distu(cc.x, cc.y) <= 2)
+    if (!rn2(2) && enexto(&cc, u.ux, u.uy, gy.youmonst.data)
+        && next2u(cc.x, cc.y))
         u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
     else
-        mnexto(mtmp);
+        mnexto(mtmp, RLOC_NOMSG);
 
     if ((mtmp = m_at(u.ux, u.uy)) != 0) {
         /* there was an unconditional impossible("mnexto failed")
@@ -1616,36 +1826,105 @@ struct monst *mtmp;
            with the situation, so only say something when debugging */
         if (wizard)
             pline("(monster in hero's way)");
-        if (!rloc(mtmp, TRUE) || (mtmp = m_at(u.ux, u.uy)) != 0)
+        if (!rloc(mtmp, RLOC_NOMSG) || (mtmp = m_at(u.ux, u.uy)) != 0)
             /* no room to move it; send it away, to return later */
             m_into_limbo(mtmp);
     }
 }
 
-void
-goto_level(newlevel, at_stairs, falling, portal)
-d_level *newlevel;
-boolean at_stairs, falling, portal;
+staticfn void
+familiar_level_msg(void)
 {
-    int fd, l_idx;
-    xchar new_ledger;
+    static const char *const fam_msgs[4] = {
+/*JP
+        "You have a sense of deja vu.",
+*/
+        "Êó¢Ë¶ñÊÑü„Å´„Åä„Åù„Çè„Çå„ÅüÔºé",
+/*JP
+        "You feel like you've been here before.",
+*/
+        "Ââç„Å´„Åì„Åì„Å´Êù•„Åü„Åì„Å®„Åå„ÅÇ„Çã„Çà„ÅÜ„Å™Ê∞ó„Åå„Åó„ÅüÔºé",
+#if 0 /*JP:T*/
+        "This place %s familiar...", 0 /* no message */
+#else
+            "„Åì„ÅÆÂ†¥ÊâÄ„ÅØÊáê„Åã„Åó„ÅÑÔºéÔºéÔºé", 0 /* no message */
+#endif
+    };
+    static const char *const halu_fam_msgs[4] = {
+/*JP
+        "Whoa!  Everything %s different.",
+*/
+        "„Ç™„ÉØ„ÉÉÔºÅ„Åæ„Å£„Åü„ÅèÂ§â„Çè„Å£„Å°„Åæ„Å£„Å¶„ÇãÔºé",
+/*JP
+        "You are surrounded by twisty little passages, all alike.",
+*/
+        "„ÅÇ„Å™„Åü„ÅØ„Åæ„Åå„Çä„Åè„Å≠„Å£„ÅüÈÄöË∑Ø„Å´„Åã„Åì„Åæ„Çå„Å¶„ÅÑ„ÅüÔºéÔºéÔºé",
+#if 0 /*JP:T*/
+        "Gee, this %s like uncle Conan's place...", 0 /* no message */
+#else
+            "„Ç≤„ÉºÔºÅ„Ç≥„Éä„É≥„Åä„Åò„Åï„Çì„ÅÆÂ†¥ÊâÄ„Å´‰ºº„Å¶„ÅÑ„ÇãÔºéÔºéÔºé", 0 /* no message */
+#endif
+    };
+    const char *mesg;
+#if 0 /*JP*/
+    char buf[BUFSZ];
+#endif
+    int which = rn2(4);
+
+    if (Hallucination)
+        mesg = halu_fam_msgs[which];
+    else
+        mesg = fam_msgs[which];
+#if 0 /*JP*//*Êó•Êú¨Ë™û„Åß„ÅØ„Åù„Åì„Åæ„Åß„Åó„Å™„ÅÑ*/
+    if (mesg && strchr(mesg, '%')) {
+        DISABLE_WARNING_FORMAT_NONLITERAL
+        Sprintf(buf, mesg, !Blind ? "looks" : "seems");
+        RESTORE_WARNING_FORMAT_NONLITERAL
+        mesg = buf;
+    }
+#endif
+    if (mesg)
+        pline1(mesg);
+}
+
+void
+goto_level(
+    d_level *newlevel, /* destination */
+    boolean at_stairs, /* True if arriving via stairs/ladder */
+    boolean falling,   /* when falling to level, objects might tag along */
+    boolean portal)    /* True if arriving via magic portal */
+{
+    int l_idx, save_mode;
+    NHFILE *nhfp;
+    xint16 new_ledger;
     boolean cant_go_back, great_effort,
             up = (depth(newlevel) < depth(&u.uz)),
             newdungeon = (u.uz.dnum != newlevel->dnum),
+            leaving_tutorial = FALSE,
             was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
             familiar = FALSE,
             new = FALSE; /* made a new level? */
     struct monst *mtmp;
     char whynot[BUFSZ];
-    char *annotation;
+    int dist = depth(newlevel) - depth(&u.uz);
+    boolean do_fall_dmg = FALSE;
+    schar prev_temperature = svl.level.flags.temperature;
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
-    if (newdungeon && In_endgame(newlevel)) { /* 1st Endgame Level !!! */
-        if (!u.uhave.amulet)
-            return;  /* must have the Amulet */
-        if (!wizard) /* wizard ^V can bypass Earth level */
-            assign_level(newlevel, &earth_level); /* (redundant) */
+    if (newdungeon) {
+        if (In_endgame(newlevel)) { /* 1st Endgame Level !!! */
+            if (!u.uhave.amulet)
+                return;  /* must have the Amulet */
+            if (!wizard) /* wizard ^V can bypass Earth level */
+                assign_level(newlevel, &earth_level); /* (redundant) */
+        } else if (In_tutorial(newlevel)) {
+            tutorial(TRUE); /* entering tutorial */
+        } else if (In_tutorial(&u.uz)) {
+            tutorial(FALSE); /* leaving tutorial */
+            up = FALSE; /* re-enter level 1 as if starting new game */
+            leaving_tutorial = TRUE;
+        }
     }
     new_ledger = ledger_no(newlevel);
     if (new_ledger <= 0)
@@ -1665,15 +1944,22 @@ boolean at_stairs, falling, portal;
      *   -1   11.46  12.50  12.5
      *   -2    5.21   4.17   0.0
      *   -3    2.08   0.0    0.0
+     *
+     * 5.0.0: the chance for the "mysterious force" to kick in goes down
+     * as it kicks in, starting at 25% per climb attempt and dropping off
+     * gradually but substantially.  The drop off is greater when hero is
+     * sent down farther so benefits lawfuls more than chaotics this time.
      */
     if (Inhell && up && u.uhave.amulet && !newdungeon && !portal
         && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
-        if (!rn2(4)) {
+        if (!rn2(4 + svc.context.mysteryforce)) {
             int odds = 3 + (int) u.ualign.type,   /* 2..4 */
-                diff = odds <= 1 ? 0 : rn2(odds); /* paranoia */
+                diff = (odds <= 1) ? 0 : rn2(odds); /* paranoia */
 
             if (diff != 0) {
                 assign_rnd_level(newlevel, &u.uz, diff);
+                /* assign_rnd_level() may have used a value less than diff */
+                diff = newlevel->dlevel - u.uz.dlevel; /* actual descent */
                 /* if inside the tower, stay inside */
                 if (was_in_W_tower && !On_W_tower_level(newlevel))
                     diff = 0;
@@ -1681,18 +1967,23 @@ boolean at_stairs, falling, portal;
             if (diff == 0)
                 assign_level(newlevel, &u.uz);
 
-            new_ledger = ledger_no(newlevel);
-
 /*JP
             pline("A mysterious force momentarily surrounds you...");
 */
-            pline("àÍèuäÔñ≠Ç»óÕÇ™Ç†Ç»ÇΩÇïÔÇÒÇæÅDÅDÅD");
+            pline("‰∏ÄÁû¨Â•áÂ¶ô„Å™Âäõ„Åå„ÅÇ„Å™„Åü„ÇíÂåÖ„Çì„Å†ÔºéÔºéÔºé");
+            /* each time it kicks in, the chance of doing so again may drop;
+               that drops faster, on average, when being sent down farther so
+               while the impact is reduced for everybody compared to earlier
+               versions, it is reduced least for chaotics, most for lawfuls */
+            svc.context.mysteryforce += rn2(diff + 2); /* L:0-4,N:0-3,C:0-2 */
+
             if (on_level(newlevel, &u.uz)) {
-                (void) safe_teleds(FALSE);
+                (void) safe_teleds(TELEDS_NO_FLAGS);
                 (void) next_to_u();
                 return;
-            } else
-                at_stairs = at_ladder = FALSE;
+            }
+            new_ledger = ledger_no(newlevel);
+            at_stairs = ga.at_ladder = FALSE;
         }
     }
 
@@ -1703,19 +1994,26 @@ boolean at_stairs, falling, portal;
 /*JP
         pline("A mysterious force prevents you from descending.");
 */
-        pline("äÔñ≠Ç»óÕÇ™Ç†Ç»ÇΩÇ™ç~ÇËÇÈÇÃÇñWÇ∞ÇΩÅD");
+        pline("Â•áÂ¶ô„Å™Âäõ„Åå„ÅÇ„Å™„Åü„ÅåÈôç„Çä„Çã„ÅÆ„ÇíÂ¶®„Åí„ÅüÔºé");
         return;
     }
 
     if (on_level(newlevel, &u.uz))
         return; /* this can happen */
 
+    if (gl.luacore && nhcb_counts[NHCB_LVL_LEAVE]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_LEAVE]);
+        nhl_pcall_handle(gl.luacore, 1, 0, "goto_level", NHLpa_panic);
+        lua_settop(gl.luacore, 0);
+    }
+
     /* tethered movement makes level change while trapped feasible */
     if (u.utrap && u.utraptype == TT_BURIEDBALL)
         buried_ball_to_punishment(); /* (before we save/leave old level) */
 
-    fd = currentlevel_rewrite();
-    if (fd < 0)
+    nhfp = currentlevel_rewrite();
+    if (!nhfp)
         return;
 
     /* discard context which applies to the level we're leaving;
@@ -1725,7 +2023,7 @@ boolean at_stairs, falling, portal;
     maybe_reset_pick((struct obj *) 0);
     reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
     iflags.travelcc.x = iflags.travelcc.y = 0; /* travel destination cache */
-    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+    svc.context.polearm.hitmon = (struct monst *) 0; /* polearm target */
     /* digging context is level-aware and can actually be resumed if
        hero returns to the previous level without any intervening dig */
 
@@ -1737,12 +2035,11 @@ boolean at_stairs, falling, portal;
         unplacebc();
     reset_utrap(FALSE); /* needed in level_tele */
     fill_pit(u.ux, u.uy);
-    u.ustuck = 0; /* idem */
-    u.uinwater = 0;
+    set_ustuck((struct monst *) 0); /* clear u.ustuck and u.uswallow */
+    set_uinwater(0); /* u.uinwater = 0 */
     u.uundetected = 0; /* not hidden, even if means are available */
-    keepdogs(FALSE);
-    if (u.uswallow) /* idem */
-        u.uswldtim = u.uswallow = 0;
+    if (!iflags.nofollowers)
+        keepdogs(FALSE);
     recalc_mapseen(); /* recalculate map overview before we leave the level */
     /*
      *  We no longer see anything on the level.  Make sure that this
@@ -1758,38 +2055,34 @@ boolean at_stairs, falling, portal;
      * for the level being left, to recover dynamic memory in use and
      * to avoid dangling timers and light sources.
      */
-    cant_go_back = (newdungeon && In_endgame(newlevel));
+    cant_go_back = ((newdungeon && In_endgame(newlevel)) || leaving_tutorial);
     if (!cant_go_back) {
         update_mlstmv(); /* current monsters are becoming inactive */
-        bufon(fd);       /* use buffered output */
+        if (nhfp->structlevel)
+            bufon(nhfp->fd);       /* use buffered output */
+    } else {
+        free_luathemes(leaving_tutorial ? tut_themes : most_themes);
     }
-    savelev(fd, ledger_no(&u.uz),
-            cant_go_back ? FREE_SAVE : (WRITE_SAVE | FREE_SAVE));
-    /* air bubbles and clouds are saved in game-state rather than with the
-       level they're used on; in normal play, you can't leave and return
-       to any endgame level--bubbles aren't needed once you move to the
-       next level so used to be discarded when the next special level was
-       loaded; but in wizard mode you can leave and return, and since they
-       aren't saved with the level and restored upon return (new ones are
-       created instead), we need to discard them to avoid a memory leak;
-       so bubbles are now discarded as we leave the level they're used on */
-    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
-        save_waterlevel(-1, FREE_SAVE);
-    bclose(fd);
+    save_mode = nhfp->mode;
+    nhfp->mode = cant_go_back ? FREEING : (WRITING | FREEING);
+    savelev(nhfp, ledger_no(&u.uz));
+    nhfp->mode = save_mode;
+    close_nhfile(nhfp);
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
         for (l_idx = maxledgerno(); l_idx > 0; --l_idx)
-            delete_levelfile(l_idx);
+            if (!leaving_tutorial || ledger_to_dnum(l_idx) == tutorial_dnum)
+                delete_levelfile(l_idx);
         /* mark #overview data for all dungeon branches as uninteresting */
-        for (l_idx = 0; l_idx < n_dgns; ++l_idx)
-            remdun_mapseen(l_idx);
+        for (l_idx = 0; l_idx < svn.n_dgns; ++l_idx)
+            if (!leaving_tutorial || l_idx == tutorial_dnum)
+                remdun_mapseen(l_idx);
+        /* get rid of mons & objs scheduled to migrate to discarded levels */
+        discard_migrations();
     }
 
     if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
-        assign_graphics(Is_rogue_level(newlevel) ? ROGUESET : PRIMARY);
-#ifdef USE_TILES
-    substitute_tiles(newlevel);
-#endif
+        assign_graphics(Is_rogue_level(newlevel) ? ROGUESET : PRIMARYSET);
     check_gold_symbol();
     /* record this level transition as a potential seen branch unless using
      * some non-standard means of transportation (level teleport).
@@ -1799,7 +2092,7 @@ boolean at_stairs, falling, portal;
     assign_level(&u.uz0, &u.uz);
     assign_level(&u.uz, newlevel);
     assign_level(&u.utolev, newlevel);
-    u.utotype = 0;
+    u.utotype = UTOTYPE_NONE;
     if (!builds_up(&u.uz)) { /* usual case */
         if (dunlev(&u.uz) > dunlev_reached(&u.uz))
             dunlev_reached(&u.uz) = dunlev(&u.uz);
@@ -1808,64 +2101,73 @@ boolean at_stairs, falling, portal;
             || dunlev(&u.uz) < dunlev_reached(&u.uz))
             dunlev_reached(&u.uz) = dunlev(&u.uz);
     }
-    reset_rndmonst(NON_PM); /* u.uz change affects monster generation */
 
+    stairway_free_all();
     /* set default level change destination areas */
     /* the special level code may override these */
-    (void) memset((genericptr_t) &updest, 0, sizeof updest);
-    (void) memset((genericptr_t) &dndest, 0, sizeof dndest);
+    (void) memset((genericptr_t) &svu.updest, 0, sizeof svu.updest);
+    (void) memset((genericptr_t) &svd.dndest, 0, sizeof svd.dndest);
 
-    if (!(level_info[new_ledger].flags & LFILE_EXISTS)) {
+    if (!(svl.level_info[new_ledger].flags & LFILE_EXISTS)) {
         /* entering this level for first time; make it now */
-        if (level_info[new_ledger].flags & (FORGOTTEN | VISITED)) {
+        if (svl.level_info[new_ledger].flags & (VISITED)) {
             impossible("goto_level: returning to discarded level?");
-            level_info[new_ledger].flags &= ~(FORGOTTEN | VISITED);
+            svl.level_info[new_ledger].flags &= ~(VISITED);
         }
         mklev();
         new = TRUE; /* made the level */
+        familiar = bones_include_name(svp.plname);
     } else {
         /* returning to previously visited level; reload it */
-        fd = open_levelfile(new_ledger, whynot);
-        if (tricked_fileremoved(fd, whynot)) {
+        nhfp = open_levelfile(new_ledger, whynot);
+        if (tricked_fileremoved(nhfp, whynot)) {
             /* we'll reach here if running in wizard mode */
             error("Cannot continue this game.");
         }
         reseed_random(rn2);
         reseed_random(rn2_on_display_rng);
-        minit(); /* ZEROCOMP */
-        getlev(fd, hackpid, new_ledger, FALSE);
-        /* when in wizard mode, it is possible to leave from and return to
-           any level in the endgame; above, we discarded bubble/cloud info
-           when leaving Plane of Water or Air so recreate some now */
-        if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
-            restore_waterlevel(-1);
-        (void) nhclose(fd);
+        getlev(nhfp, svh.hackpid, new_ledger);
+        close_nhfile(nhfp);
         oinit(); /* reassign level dependent obj probabilities */
     }
     reglyph_darkroom();
-    u.uinwater = 0;
+    set_uinwater(0); /* u.uinwater = 0 */
     /* do this prior to level-change pline messages */
     vision_reset();         /* clear old level's line-of-sight */
-    vision_full_recalc = 0; /* don't let that reenable vision yet */
+    gv.vision_full_recalc = 0; /* don't let that reenable vision yet */
     flush_screen(-1);       /* ensure all map flushes are postponed */
 
     if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
-        register struct trap *ttrap;
+        struct trap *ttrap;
 
-        for (ttrap = ftrap; ttrap; ttrap = ttrap->ntrap)
+        for (ttrap = gf.ftrap; ttrap; ttrap = ttrap->ntrap)
             if (ttrap->ttyp == MAGIC_PORTAL)
                 break;
 
-        if (!ttrap)
-            panic("goto_level: no corresponding portal!");
-        seetrap(ttrap);
-        u_on_newpos(ttrap->tx, ttrap->ty);
+        if (!ttrap) {
+            if (u.uevent.qexpelled
+                && (Is_qstart(&u.uz0) || Is_qstart(&u.uz))) {
+                /* we're coming back from or going into the quest home level,
+                   after already getting expelled once. The portal back
+                   doesn't exist anymore - see expulsion(). */
+                u_on_rndspot(0);
+            } else {
+                if (!iflags.debug_fuzzer)
+                    impossible("goto_level: no corresponding portal!");
+                u_on_rndspot(0);
+            }
+        } else {
+            seetrap(ttrap);
+            u_on_newpos(ttrap->tx, ttrap->ty);
+        }
     } else if (at_stairs && !In_endgame(&u.uz)) {
         if (up) {
-            if (at_ladder)
-                u_on_newpos(xdnladder, ydnladder);
-            else if (newdungeon)
+            stairway *stway = stairway_find_from(&u.uz0, ga.at_ladder);
+            if (stway) {
+                u_on_newpos(stway->sx, stway->sy);
+                stway->u_traversed = TRUE;
+            } else if (newdungeon)
                 u_on_sstairs(1);
             else
                 u_on_dnstairs();
@@ -1876,18 +2178,20 @@ boolean at_stairs, falling, portal;
 #if 0 /*JP*/
                 pline("%s %s up%s the %s.",
                       great_effort ? "With great effort, you" : "You",
-                      Levitation ? "float" : Flying ? "fly" : "climb",
-                      (Flying && at_ladder) ? " along" : "",
-                      at_ladder ? "ladder" : "stairs");
-#else /* îÚÇÒÇæÇËÇµÇƒÇ¢ÇƒÇ‡Åuè„Ç¡ÇΩÅv */
-                pline("%s%sÇè„Ç¡ÇΩÅD",
-                      great_effort ? "Ç‚Ç¡Ç∆Ç±Ç≥" : "",
-                      at_ladder ? "ÇÕÇµÇ≤" : "äKíi");
+                      u_locomotion("climb"),
+                      (Flying && ga.at_ladder) ? " along" : "",
+                      ga.at_ladder ? "ladder" : "stairs");
+#else /* È£õ„Çì„Å†„Çä„Åó„Å¶„ÅÑ„Å¶„ÇÇ„Äå‰∏ä„Å£„Åü„Äç */
+                pline("%s%s„Çí‰∏ä„Å£„ÅüÔºé",
+                      great_effort ? "„ÇÑ„Å£„Å®„Åì„Åï" : "",
+                      ga.at_ladder ? "„ÅØ„Åó„Åî" : "ÈöéÊÆµ");
 #endif
         } else { /* down */
-            if (at_ladder)
-                u_on_newpos(xupladder, yupladder);
-            else if (newdungeon)
+            stairway *stway = stairway_find_from(&u.uz0, ga.at_ladder);
+            if (stway) {
+                u_on_newpos(stway->sx, stway->sy);
+                stway->u_traversed = TRUE;
+            } else if (newdungeon)
                 u_on_sstairs(0);
             else
                 u_on_upstairs();
@@ -1897,59 +2201,62 @@ boolean at_stairs, falling, portal;
                 if (flags.verbose)
 #if 0 /*JP:T*/
                     You("fly down %s.",
-                        at_ladder ? "along the ladder" : "the stairs");
+                        ga.at_ladder ? "along the ladder" : "the stairs");
 #else
-                    You("%sîÚÇÒÇ≈ç~ÇËÇΩÅD",
-                        at_ladder ? "ÇÕÇµÇ≤Ç…âàÇ¡Çƒ" : "äKíiÇ");
+                    You("%sÈ£õ„Çì„ÅßÈôç„Çä„ÅüÔºé",
+                        ga.at_ladder ? "„ÅØ„Åó„Åî„Å´Ê≤ø„Å£„Å¶" : "ÈöéÊÆµ„Çí");
 #endif
             } else if (near_capacity() > UNENCUMBERED
                        || Punished || Fumbling) {
 /*JP
-                You("fall down the %s.", at_ladder ? "ladder" : "stairs");
+                You("fall down the %s.", ga.at_ladder ? "ladder" : "stairs");
 */
-                You("%sÇì]Ç∞óéÇøÇΩÅD", at_ladder ? "ÇÕÇµÇ≤" : "äKíi");
+                You("%s„ÇíËª¢„ÅíËêΩ„Å°„ÅüÔºé", ga.at_ladder ? "„ÅØ„Åó„Åî" : "ÈöéÊÆµ");
                 if (Punished) {
                     drag_down();
-                    ballrelease(FALSE);
+                    if (!welded(uball))
+                        ballrelease(FALSE);
                 }
                 /* falling off steed has its own losehp() call */
                 if (u.usteed)
                     dismount_steed(DISMOUNT_FELL);
                 else
+#if 0 /*JP:T*/
                     losehp(Maybe_Half_Phys(rnd(3)),
-/*JP
-                           at_ladder ? "falling off a ladder"
-*/
-                           at_ladder ? "ÇÕÇµÇ≤Ç©ÇÁóéÇøÇƒ"
-/*JP
+                           ga.at_ladder ? "falling off a ladder"
                                      : "tumbling down a flight of stairs",
-*/
-                                     : "äKíiÇì]Ç∞óéÇøÇƒ",
                            KILLED_BY);
+#else
+                    losehp(Maybe_Half_Phys(rnd(3)),
+                           ga.at_ladder ? "„ÅØ„Åó„Åî„Åã„ÇâËêΩ„Å°„Å¶"
+                                     : "ÈöéÊÆµ„ÇíËª¢„ÅíËêΩ„Å°„Å¶",
+                           KILLED_BY);
+#endif
 /*JP
                 selftouch("Falling, you");
 */
-                selftouch("óéÇøÇ»Ç™ÇÁÅCÇ†Ç»ÇΩÇÕ");
+                selftouch("ËêΩ„Å°„Å™„Åå„ÇâÔºå„ÅÇ„Å™„Åü„ÅØ");
             } else { /* ordinary descent */
                 if (flags.verbose)
 #if 0 /*JP:T*/
-                    You("%s.", at_ladder ? "climb down the ladder"
+                    You("%s.", ga.at_ladder ? "climb down the ladder"
                                          : "descend the stairs");
 #else
-                    You("%sÇç~ÇËÇΩÅD", at_ladder ? "ÇÕÇµÇ≤"
-                                                  : "äKíi");
+                    You("%s„ÇíÈôç„Çä„ÅüÔºé", ga.at_ladder ? "„ÅØ„Åó„Åî"
+                                         : "ÈöéÊÆµ");
 #endif
             }
         }
     } else { /* trap door or level_tele or In_endgame */
         u_on_rndspot((up ? 1 : 0) | (was_in_W_tower ? 2 : 0));
         if (falling) {
-            if (Punished)
+            if (Punished && !welded(uball))
                 ballfall();
 /*JP
             selftouch("Falling, you");
 */
-            selftouch("óéÇøÇ»Ç™ÇÁÅCÇ†Ç»ÇΩÇÕ");
+            selftouch("ËêΩ„Å°„Å™„Åå„ÇâÔºå„ÅÇ„Å™„Åü„ÅØ");
+            do_fall_dmg = TRUE;
         }
     }
 
@@ -1970,38 +2277,35 @@ boolean at_stairs, falling, portal;
     if ((mtmp = m_at(u.ux, u.uy)) != 0)
         u_collide_m(mtmp);
 
-    initrack();
-
     /* initial movement of bubbles just before vision_recalc */
     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
         movebubbles();
-    else if (Is_firelevel(&u.uz))
+    else if (svl.level.flags.fumaroles)
         fumaroles();
-
-    if (level_info[new_ledger].flags & FORGOTTEN) {
-        forget_map(ALL_MAP); /* forget the map */
-        forget_traps();      /* forget all traps too */
-        familiar = TRUE;
-        level_info[new_ledger].flags &= ~FORGOTTEN;
-    }
 
     /* Reset the screen. */
     vision_reset(); /* reset the blockages */
-    docrt();        /* does a full vision recalc */
+    reset_glyphmap(gm_levelchange);
+    notice_mon_off(); /* not noticing monsters yet! */
+    docrt(); /* does a full vision recalc */
     flush_screen(-1);
 
     /*
      *  Move all plines beyond the screen reset.
      */
 
+    /* deferred arrival message for level teleport looks odd if given
+       after the various messages below, so give it before them;
+       [it might have already been delivered via docrt() -> see_monsters()
+       -> Sting_effects() -> maybe_lvltport_feedback(), in which case
+       'dfr_post_msg' has already been reset to Null];
+       if 'dfr_post_msg' is "you materialize on a different level" then
+       maybe_lvltport_feedback() will deliver it now and then free it */
+    if (gd.dfr_post_msg)
+        maybe_lvltport_feedback(); /* potentially called by Sting_effects() */
+
     /* special levels can have a custom arrival message */
     deliver_splev_message();
-
-    /* give room entrance message, if any */
-    check_special_room(FALSE);
-
-    /* deliver objects traveling with player */
-    obj_delivery(TRUE);
 
     /* Check whether we just entered Gehennom. */
     if (!In_hell(&u.uz0) && Inhell) {
@@ -2009,130 +2313,125 @@ boolean at_stairs, falling, portal;
 /*JP
             You("arrive at the Valley of the Dead...");
 */
-            You("éÄÇÃíJÇ…ìûíBÇµÇΩÅDÅDÅD");
+            You("Ê≠ª„ÅÆË∞∑„Å´Âà∞ÈÅî„Åó„ÅüÔºéÔºéÔºé");
 /*JP
             pline_The("odor of burnt flesh and decay pervades the air.");
 */
-            pline("è≈Ç∞ÇÈéÄì˜Ç‚ïÖì˜ÇÃà´èLÇ™ÇΩÇæÇÊÇ¡ÇƒÇ¢ÇÈÅD");
+            pline("ÁÑ¶„Åí„ÇãÊ≠ªËÇâ„ÇÑËÖêËÇâ„ÅÆÊÇ™Ëá≠„Åå„Åü„Å†„Çà„Å£„Å¶„ÅÑ„ÇãÔºé");
 #ifdef MICRO
             display_nhwindow(WIN_MESSAGE, FALSE);
 #endif
+            Soundeffect(se_groans_and_moans, 25);
 /*JP
             You_hear("groans and moans everywhere.");
 */
-            You_hear("ÇªÇ±Ç©ÇµÇ±Ç©ÇÁÇÃÇ§ÇﬂÇ´ê∫Ç‚Ç§Ç»ÇËê∫Çï∑Ç¢ÇΩÅD");
-        } else
-/*JP
-            pline("It is hot here.  You smell smoke...");
-*/
-            pline("Ç±Ç±ÇÕèãÇ¢ÅDâåÇÃìıÇ¢Ç™Ç∑ÇÈÅDÅDÅD");
-        u.uachieve.enter_gehennom = 1;
+            You_hear("„Åù„Åì„Åã„Åó„Åì„Åã„Çâ„ÅÆ„ÅÜ„ÇÅ„ÅçÂ£∞„ÇÑ„ÅÜ„Å™„ÇäÂ£∞„ÇíËÅû„ÅÑ„ÅüÔºé");
+        }
+
+        record_achievement(ACH_HELL); /* reached Gehennom */
     }
     /* in case we've managed to bypass the Valley's stairway down */
     if (Inhell && !Is_valley(&u.uz))
         u.uevent.gehennom_entered = 1;
 
-    if (familiar) {
-        static const char *const fam_msgs[4] = {
-/*JP
-            "You have a sense of deja vu.",
-*/
-            "ä˘éãä¥Ç…Ç®ÇªÇÌÇÍÇΩÅD",
-/*JP
-            "You feel like you've been here before.",
-*/
-            "ëOÇ…Ç±Ç±Ç…óàÇΩÇ±Ç∆Ç™Ç†ÇÈÇÊÇ§Ç»ãCÇ™ÇµÇΩÅD",
-#if 0 /*JP:T*/
-            "This place %s familiar...", 0 /* no message */
-#else
-            "Ç±ÇÃèÍèäÇÕâ˘Ç©ÇµÇ¢ÅDÅDÅD", 0 /* no message */
-#endif
-        };
-        static const char *const halu_fam_msgs[4] = {
-/*JP
-            "Whoa!  Everything %s different.",
-*/
-            "ÉIÉèÉbÅIÇ‹Ç¡ÇΩÇ≠ïœÇÌÇ¡ÇøÇ‹Ç¡ÇƒÇÈÅD",
-/*JP
-            "You are surrounded by twisty little passages, all alike.",
-*/
-            "Ç†Ç»ÇΩÇÕÇ‹Ç™ÇËÇ≠ÇÀÇ¡ÇΩí òHÇ…Ç©Ç±Ç‹ÇÍÇƒÇ¢ÇΩÅDÅDÅD",
-#if 0 /*JP:T*/
-            "Gee, this %s like uncle Conan's place...", 0 /* no message */
-#else
-            "ÉQÅ[ÅIÉRÉiÉìÇ®Ç∂Ç≥ÇÒÇÃèÍèäÇ…éóÇƒÇ¢ÇÈÅDÅDÅD", 0 /* no message */
-#endif
-        };
-        const char *mesg;
-#if 0 /*JP*/
-        char buf[BUFSZ];
-#endif
-        int which = rn2(4);
-
-        if (Hallucination)
-            mesg = halu_fam_msgs[which];
-        else
-            mesg = fam_msgs[which];
-#if 0 /*JP:ì˙ñ{åÍÇ≈ÇÕÇªÇ±Ç‹Ç≈ÇµÇ»Ç¢*/
-        if (mesg && index(mesg, '%')) {
-            Sprintf(buf, mesg, !Blind ? "looks" : "seems");
-            mesg = buf;
-        }
-#endif
-        if (mesg)
-            pline1(mesg);
-    }
+    if (familiar)
+        familiar_level_msg();
 
     /* special location arrival messages/events */
     if (In_endgame(&u.uz)) {
-        if (new &&on_level(&u.uz, &astral_level))
+        if (newdungeon)
+            record_achievement(ACH_ENDG); /* reached endgame */
+        if (new && on_level(&u.uz, &astral_level)) {
             final_level(); /* guardian angel,&c */
-        else if (newdungeon && u.uhave.amulet)
+            record_achievement(ACH_ASTR); /* reached Astral level */
+        } else if (newdungeon && u.uhave.amulet) {
             resurrect(); /* force confrontation with Wizard */
+        }
     } else if (In_quest(&u.uz)) {
         onquest(); /* might be reaching locate|goal level */
-    } else if (In_V_tower(&u.uz)) {
-        if (newdungeon && In_hell(&u.uz0))
-/*JP
-            pline_The("heat and smoke are gone.");
-*/
-            pline("îMÇ∆âåÇËÇÕè¡Ç¶Ç≥Ç¡ÇΩÅD");
     } else if (Is_knox(&u.uz)) {
         /* alarm stops working once Croesus has died */
-        if (new || !mvitals[PM_CROESUS].died) {
+        if (new || !svm.mvitals[PM_CROESUS].died) {
 /*JP
             You("have penetrated a high security area!");
 */
-            You("ç≈çÇã@ñßÇÃèÍèäÇ÷ì•Ç›çûÇÒÇæÅI");
+            You("ÊúÄÈ´òÊ©üÂØÜ„ÅÆÂ†¥ÊâÄ„Å∏Ë∏è„ÅøËæº„Çì„Å†ÔºÅ");
+            Soundeffect(se_alarm, 100);
 /*JP
             pline("An alarm sounds!");
 */
-            pline("åxïÒÇ™Ç»Ç¡ÇΩÅI");
+            pline("Ë≠¶Â†±„Åå„Å™„Å£„ÅüÔºÅ");
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (DEADMONSTER(mtmp))
                     continue;
                 mtmp->msleeping = 0;
             }
         }
+    } else if (In_mines(&u.uz)) {
+        if (newdungeon)
+            record_achievement(ACH_MINE);
+    } else if (In_sokoban(&u.uz)) {
+        if (newdungeon)
+            record_achievement(ACH_SOKO);
     } else {
-        if (new && Is_rogue_level(&u.uz))
+        if (new && Is_rogue_level(&u.uz)) {
 /*JP
             You("enter what seems to be an older, more primitive world.");
 */
-            You("å√Ç≠Ç≥Ç≠ÅCÇ∏Ç¢Ç‘ÇÒíPèÉÇ»ê¢äEÇ…å©Ç¶ÇÈïîâÆÇ…ì¸Ç¡ÇΩÅD");
+            You("Âè§„Åè„Åï„ÅèÔºå„Åö„ÅÑ„Å∂„ÇìÂçòÁ¥î„Å™‰∏ñÁïå„Å´Ë¶ã„Åà„ÇãÈÉ®Â±ã„Å´ÂÖ•„Å£„ÅüÔºé");
+        } else if (new && Is_bigroom(&u.uz)) {
+            record_achievement(ACH_BGRM);
+        }
         /* main dungeon message from your quest leader */
 /*JP
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
 */
-        if (!In_quest(&u.uz0) && at_dgn_entrance("ÉNÉGÉXÉg")
+        if (!In_quest(&u.uz0) && at_dgn_entrance("„ÇØ„Ç®„Çπ„Éà")
             && !(u.uevent.qcompleted || u.uevent.qexpelled
-                 || quest_status.leader_is_dead)) {
+                 || svq.quest_status.leader_is_dead)) {
+            /* [TODO: copy of same TODO below; if an achievement for
+               receiving quest call from leader gets added, that should
+               come after logging new level entry] */
             if (!u.uevent.qcalled) {
                 u.uevent.qcalled = 1;
-                com_pager(2); /* main "leader needs help" message */
-            } else {          /* reminder message */
-                com_pager(Role_if(PM_ROGUE) ? 4 : 3);
+                /* main "leader needs help" message */
+                com_pager("quest_portal");
+            } else { /* reminder message */
+                com_pager(Role_if(PM_ROGUE) ? "quest_portal_demand"
+                                            : "quest_portal_again");
             }
+        }
+    }
+
+    temperature_change_msg(prev_temperature);
+
+    /* this was originally done earlier; moved here to be logged after
+       any achievement related to entering a dungeon branch
+       [TODO: if an achievement for receiving quest call from leader
+       gets added, that should come after this rather than take place
+       where the message is delivered above] */
+    if (new) {
+        char dloc[QBUFSZ];
+        /* Astral is excluded as a major event here because entry to it
+           is already one such due to that being an achievement;
+           for the quest, listing the start, locate, and goal levels would
+           seem reasonable but all quest levels are included for simplicity--
+           level 2 (or 3 if hero level teleports after obtaining permission
+           to enter) is useful to show since it indicates that hero has
+           actually entered the quest rather than just received permission
+           to do so, and listing the goal level could be used to figure out
+           whether level 5 is the end or there's another level (ESP reveals
+           the same thing, but is part of normal game play as opposed to
+           #chronicle leaking information that hero hasn't discovered yet) */
+        boolean major = ((In_endgame(&u.uz) && !Is_astralevel(&u.uz))
+                         || In_quest(&u.uz));
+
+        (void) describe_level(dloc, 2);
+        livelog_printf(major ? LL_ACHIEVE : LL_DEBUG, "entered %s", dloc);
+
+        if (Role_if(PM_TOURIST)) {
+            more_experienced(level_difficulty(), 0);
+            newexplevel();
         }
     }
 
@@ -2140,29 +2439,104 @@ boolean at_stairs, falling, portal;
 #ifdef INSURANCE
     save_currentstate();
 #endif
+    notice_mon_on();
+    notice_all_mons(TRUE);
 
-    if ((annotation = get_annotation(&u.uz)) != 0)
-/*JP
-        You("remember this level as %s.", annotation);
-*/
-        You("Ç±ÇÃäKÇ™%sÇ≈Ç†ÇÈÇ±Ç∆ÇévÇ¢èoÇµÇΩÅD", annotation);
+    print_level_annotation();
+    /* give room entrance message, if any */
+    check_special_room(FALSE);
+    /* deliver objects traveling with player */
+    obj_delivery(TRUE);
 
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
+    /* shop repair is normally done when shopkeepers move, but we may
+       need to catch up for lost time here; do this before maybe dying
+       so bones map will include it */
+    if (!new)
+        fix_shop_damage();
+
+    /* fall damage? */
+    if (do_fall_dmg) {
+        int dmg = d(max(dist, 1), 6);
+
+        dmg = Maybe_Half_Phys(dmg);
+/*JP
+        losehp(dmg, "falling down a mine shaft", KILLED_BY);
+*/
+        losehp(dmg, "Á∏¶Á©¥„ÇíËêΩ„Å°„Å¶", KILLED_BY);
+    }
+
     (void) pickup(1);
+    return;
 }
 
-STATIC_OVL void
-final_level()
+/* give a message when entering a Gehennom level other than the Valley;
+   also given if restoring a game in that situation */
+void
+hellish_smoke_mesg(void)
 {
-    struct monst *mtmp;
+    if (svl.level.flags.temperature)
+#if 0 /*JP:T*/
+        pline("It is %s here.",
+              svl.level.flags.temperature > 0 ? "hot" : "cold");
+#else
+        pline("„Åì„Åì„ÅØ%s„ÅÑÔºé",
+              svl.level.flags.temperature > 0 ? "ÁÜ±" : "ÂØí");
+#endif
 
-    /* reset monster hostility relative to player */
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        reset_hostility(mtmp);
+    if (In_hell(&u.uz) && svl.level.flags.temperature > 0)
+#if 0 /*JP:T*/
+        You("%s smoke...",
+              olfaction(gy.youmonst.data) ? "smell" : "sense");
+#else
+        You("ÁÖô%s„ÇíÊÑü„Åò„ÅüÔºéÔºéÔºé",
+              olfaction(gy.youmonst.data) ? "„ÅÆ„Å´„Åä„ÅÑ" : "");
+#endif
+}
+
+/* give a message when the level temperature is different from previous */
+staticfn void
+temperature_change_msg(schar prev_temperature)
+{
+    if (prev_temperature != svl.level.flags.temperature) {
+        if (svl.level.flags.temperature)
+            hellish_smoke_mesg();
+        else if (prev_temperature > 0)
+#if 0 /*JP:T*/
+            pline_The("heat %s gone.",
+                      In_hell(&u.uz0)
+                      ? "and smoke are" : "is");
+#else
+            pline("Êöë„Åï%s„ÇíÊÑü„Åò„Å™„Åè„Å™„Å£„ÅüÔºé",
+                      In_hell(&u.uz0)
+                      ? "„Å®ÁÖô" : "");
+#endif
+        else if (prev_temperature < 0)
+/*JP
+            You("are out of the cold.");
+*/
+            You("ÂØí„Åè„Å™„Åè„Å™„Å£„ÅüÔºé");
     }
+}
+
+/* usually called from goto_level(); might be called from Sting_effects() */
+void
+maybe_lvltport_feedback(void)
+{
+    if (gd.dfr_post_msg
+        && !strncmpi(gd.dfr_post_msg, "You materialize", 15)) {
+        /* "You materialize on a different level." */
+        pline("%s", gd.dfr_post_msg);
+        free((genericptr_t) gd.dfr_post_msg), gd.dfr_post_msg = 0;
+    }
+}
+
+staticfn void
+final_level(void)
+{
+    /* reset monster hostility relative to player */
+    iter_mons(reset_hostility);
 
     /* create some player-monsters */
     create_mplayers(rn1(4, 3), TRUE);
@@ -2171,51 +2545,40 @@ final_level()
     gain_guardian_angel();
 }
 
-static char *dfr_pre_msg = 0,  /* pline() before level change */
-            *dfr_post_msg = 0; /* pline() after level change */
-
 /* change levels at the end of this turn, after monsters finish moving */
 void
-schedule_goto(tolev, at_stairs, falling, portal_flag, pre_msg, post_msg)
-d_level *tolev;
-boolean at_stairs, falling;
-int portal_flag;
-const char *pre_msg, *post_msg;
+schedule_goto(
+    d_level *tolev,
+    int utotype_flags,
+    const char *pre_msg, const char *post_msg)
 {
-    int typmask = 0100; /* non-zero triggers `deferred_goto' */
-
-    /* destination flags (`goto_level' args) */
-    if (at_stairs)
-        typmask |= 1;
-    if (falling)
-        typmask |= 2;
-    if (portal_flag)
-        typmask |= 4;
-    if (portal_flag < 0)
-        typmask |= 0200; /* flag for portal removal */
-    u.utotype = typmask;
+    /* UTOTYPE_DEFERRED is used, so UTOTYPE_NONE can trigger deferred_goto() */
+    u.utotype = utotype_flags | UTOTYPE_DEFERRED;
     /* destination level */
     assign_level(&u.utolev, tolev);
 
     if (pre_msg)
-        dfr_pre_msg = dupstr(pre_msg);
+        gd.dfr_pre_msg = dupstr(pre_msg);
     if (post_msg)
-        dfr_post_msg = dupstr(post_msg);
+        gd.dfr_post_msg = dupstr(post_msg);
 }
 
 /* handle something like portal ejection */
 void
-deferred_goto()
+deferred_goto(void)
 {
     if (!on_level(&u.uz, &u.utolev)) {
-        d_level dest;
+        d_level dest, oldlev;
         int typmask = u.utotype; /* save it; goto_level zeroes u.utotype */
 
         assign_level(&dest, &u.utolev);
-        if (dfr_pre_msg)
-            pline1(dfr_pre_msg);
-        goto_level(&dest, !!(typmask & 1), !!(typmask & 2), !!(typmask & 4));
-        if (typmask & 0200) { /* remove portal */
+        assign_level(&oldlev, &u.uz);
+        if (gd.dfr_pre_msg)
+            pline1(gd.dfr_pre_msg);
+        goto_level(&dest, !!(typmask & UTOTYPE_ATSTAIRS),
+                   !!(typmask & UTOTYPE_FALLING),
+                   !!(typmask & UTOTYPE_PORTAL));
+        if (typmask & UTOTYPE_RMPORTAL) { /* remove portal */
             struct trap *t = t_at(u.ux, u.uy);
 
             if (t) {
@@ -2223,14 +2586,14 @@ deferred_goto()
                 newsym(u.ux, u.uy);
             }
         }
-        if (dfr_post_msg)
-            pline1(dfr_post_msg);
+        if (gd.dfr_post_msg && !on_level(&u.uz, &oldlev))
+            pline1(gd.dfr_post_msg);
     }
-    u.utotype = 0; /* our caller keys off of this */
-    if (dfr_pre_msg)
-        free((genericptr_t) dfr_pre_msg), dfr_pre_msg = 0;
-    if (dfr_post_msg)
-        free((genericptr_t) dfr_post_msg), dfr_post_msg = 0;
+    u.utotype = UTOTYPE_NONE; /* our caller keys off of this */
+    if (gd.dfr_pre_msg)
+        free((genericptr_t) gd.dfr_pre_msg), gd.dfr_pre_msg = 0;
+    if (gd.dfr_post_msg)
+        free((genericptr_t) gd.dfr_post_msg), gd.dfr_post_msg = 0;
 }
 
 /*
@@ -2238,17 +2601,24 @@ deferred_goto()
  * corpse is gone.
  */
 boolean
-revive_corpse(corpse)
-struct obj *corpse;
+revive_corpse(struct obj *corpse)
 {
     struct monst *mtmp, *mcarry;
     boolean is_uwep, chewed;
-    xchar where;
+    xint16 where;
     char cname[BUFSZ];
     struct obj *container = (struct obj *) 0;
     int container_where = 0;
+    int montype;
+    boolean is_zomb;
+    coordxy corpsex, corpsey;
 
     where = corpse->where;
+    montype = corpse->corpsenm;
+    /* treat buried auto-reviver (troll, Rider?) like a zombie
+       so that it can dig itself out of the ground if it revives */
+    is_zomb = (mons[montype].mlet == S_ZOMBIE
+               || (where == OBJ_BURIED && is_reviver(&mons[montype])));
     is_uwep = (corpse == uwep);
     chewed = (corpse->oeaten != 0);
 #if 0 /*JP:T*/
@@ -2257,18 +2627,22 @@ struct obj *corpse;
                                CXN_SINGULAR));
 #else
     Strcpy(cname, corpse_xname(corpse,
-                               chewed ? "éïå^ÇÃÇ¬Ç¢ÇΩ" : (const char *) 0,
+                               chewed ? "Ê≠ØÂûã„ÅÆ„Å§„ÅÑ„Åü" : (const char *) 0,
                                CXN_SINGULAR));
 #endif
     mcarry = (where == OBJ_MINVENT) ? corpse->ocarry : 0;
+    /* mcarry is NULL for (where == OBJ_BURIED and OBJ_CONTAINED) now */
+
+    (void) get_obj_location(corpse, &corpsex, &corpsey,
+                            CONTAINED_TOO | BURIED_TOO);
 
     if (where == OBJ_CONTAINED) {
         struct monst *mtmp2;
 
         container = corpse->ocontainer;
-        mtmp2 = get_container_location(container, &container_where, (int *) 0);
-        /* container_where is the outermost container's location even if
-         * nested */
+        mtmp2 = get_container_location(container, &container_where,
+                                       (int *) 0);
+        /* container_where is outermost container's location even if nested */
         if (container_where == OBJ_MINVENT && mtmp2)
             mcarry = mtmp2;
     }
@@ -2281,80 +2655,142 @@ struct obj *corpse;
 /*JP
                 pline_The("%s writhes out of your grasp!", cname);
 */
-                pline_The("%sÇÕÇ‡Ç™Ç¢ÇΩÅI", cname);
+                pline_The("%s„ÅØ„ÇÇ„Åå„ÅÑ„ÅüÔºÅ", cname);
             else
 /*JP
                 You_feel("squirming in your backpack!");
 */
-                pline("îwïâÇ¢ë‹Ç≈âΩÇ©Ç™Ç‡Ç™Ç¢ÇƒÇ¢ÇÈÇÊÇ§Ç»ãCÇ™ÇµÇΩÅI");
+                pline("ËÉåË≤†„ÅÑË¢ã„Åß‰Ωï„Åã„Åå„ÇÇ„Åå„ÅÑ„Å¶„ÅÑ„Çã„Çà„ÅÜ„Å™Ê∞ó„Åå„Åó„ÅüÔºÅ");
             break;
 
         case OBJ_FLOOR:
-            if (cansee(mtmp->mx, mtmp->my))
+            if (cansee(corpsex, corpsey) || canseemon(mtmp)) {
+                const char *effect = "";
+
+                if (mtmp->data == &mons[PM_DEATH])
+/*JP
+                    effect = " in a whirl of spectral skulls";
+*/
+                    effect = "ÂπΩÈúä„ÅÆ„Çà„ÅÜ„Å™È†≠ËìãÈ™®„ÅåÊ∏¶Â∑ª„Åè‰∏≠„Åß";
+                else if (mtmp->data == &mons[PM_PESTILENCE])
+/*JP
+                    effect = " in a churning pillar of flies";
+*/
+                    effect = "Ê∏¶Â∑ª„ÅèË†Ö„ÅÆÊü±„ÅÆ‰∏≠„Åß";
+                else if (mtmp->data == &mons[PM_FAMINE])
+/*JP
+                    effect = " in a ring of withered crops";
+*/
+                    effect = "ÊûØ„Çå„Åü‰ΩúÁâ©„ÅÆËº™„ÅÆ‰∏≠„Åß";
+
+                if (canseemon(mtmp)) {
 #if 0 /*JP:T*/
-                pline("%s rises from the dead!",
-                      chewed ? Adjmonnam(mtmp, "bite-covered")
-                             : Monnam(mtmp));
+                    pline("%s rises from the dead%s!",
+                          chewed ? Adjmonnam(mtmp, "bite-covered")
+                                 : Monnam(mtmp),
+                          effect);
 #else
-                pline("%sÇ™ëhÇ¡ÇΩÅI",
-                      chewed ? Adjmonnam(mtmp, "éïå^ÇÃÇ¬Ç¢ÇΩ")
-                             : Monnam(mtmp));
+                    pline("%s%s„ÅåËòá„Å£„ÅüÔºÅ",
+                          effect,
+                          chewed ? Adjmonnam(mtmp, "Ê≠ØÂûã„ÅÆ„Å§„ÅÑ„Åü")
+                                 : Monnam(mtmp));
 #endif
+                } else {
+/*JP
+                    pline("%s disappears%s!", The(cname), effect);
+*/
+                    pline("%s%s„ÅØÊ∂à„Åà„ÅüÔºÅ", effect, cname);
+                }
+            }
             break;
 
         case OBJ_MINVENT: /* probably a nymph's */
             if (cansee(mtmp->mx, mtmp->my)) {
-                if (canseemon(mcarry))
+                if (mcarry && canseemon(mcarry))
 #if 0 /*JP:T*/
-                    pline("Startled, %s drops %s as it revives!",
-                          mon_nam(mcarry), an(cname));
+                    pline("Startled, %s drops %s as it %s!",
+                          mon_nam(mcarry), an(cname),
+                          canspotmon(mtmp) ? "revives" : "disappears");
 #else
-                    pline("%sÇ™ê∂Ç´Ç©Ç¶Ç¡ÇΩÇÃÇ…Ç—Ç¡Ç≠ÇËÇµÇƒÅC%sÇÕ%sÇóéÇµÇΩÅI",
-                          cname, mon_nam(mcarry), cname);
+                    pline("%s„ÅØÔºå%s„Åå%s„ÅÆ„Å´„Å≥„Å£„Åè„Çä„Åó„Å¶Ôºå%s„ÇíËêΩ„Åó„ÅüÔºÅ",
+                          mon_nam(mcarry), cname,
+                          canspotmon(mtmp) ? "Áîü„Åç„Åã„Åà„Å£„Åü" : "Ê∂à„Åà„Åü",
+                          cname);
 #endif
-                else
+                else if (canspotmon(mtmp))
 #if 0 /*JP:T*/
                     pline("%s suddenly appears!",
                           chewed ? Adjmonnam(mtmp, "bite-covered")
                                  : Monnam(mtmp));
 #else
-                    pline("%sÇ™ìÀëRåªÇÌÇÍÇΩÅI",
-                          chewed ? Adjmonnam(mtmp, "éïå^ÇÃÇ¬Ç¢ÇΩ")
+                    pline("%s„ÅåÁ™ÅÁÑ∂Áèæ„Çè„Çå„ÅüÔºÅ",
+                          chewed ? Adjmonnam(mtmp, "Ê≠ØÂûã„ÅÆ„Å§„ÅÑ„Åü")
                                  : Monnam(mtmp));
 #endif
             }
             break;
         case OBJ_CONTAINED: {
             char sackname[BUFSZ];
+            /* Could use x_monnam(..., AUGMENT_IT) but that'd say "someone"
+               for humanoid monsters, which seems like a distinction the hero
+               doesn't have knowledge to make here. */
+            const char *mnam = canspotmon(mtmp) ? Amonnam(mtmp) : Something;
 
-            if (container_where == OBJ_MINVENT && cansee(mtmp->mx, mtmp->my)
-                && mcarry && canseemon(mcarry) && container) {
+            if (!container) {
+                impossible("reviving corpse from non-existent container");
+            } else if (mcarry && canseemon(mcarry)) {
 /*JP
-                pline("%s writhes out of %s!", Amonnam(mtmp),
+                pline("%s writhes out of %s!", mnam, yname(container));
 */
-                pline("%sÇÕ%sÇ©ÇÁì¶ÇÍÇÊÇ§Ç∆Ç‡Ç™Ç¢ÇΩÅI", Amonnam(mtmp),
-                      yname(container));
-            } else if (container_where == OBJ_INVENT && container) {
+                pline("%s„ÅØ%s„Åã„ÇâÈÄÉ„Çå„Çà„ÅÜ„Å®„ÇÇ„Åå„ÅÑ„ÅüÔºÅ", mnam, yname(container));
+            } else if (container_where == OBJ_INVENT) {
                 Strcpy(sackname, an(xname(container)));
 #if 0 /*JP:T*/
-                pline("%s %s out of %s in your pack!",
-                      Blind ? Something : Amonnam(mtmp),
+                pline("%s %s out of %s in your pack!", mnam,
                       locomotion(mtmp->data, "writhes"), sackname);
 #else
-                pline("%sÇÕë‹ÇÃíÜÇ≈%sÇ©ÇÁì¶ÇÍÇÊÇ§Ç∆Ç‡Ç™Ç¢ÇΩÅI",
-                      Blind ? Something : Amonnam(mtmp),
+                pline("%s„ÅØË¢ã„ÅÆ‰∏≠„Åß%s„Åã„ÇâÈÄÉ„Çå„Çà„ÅÜ„Å®„ÇÇ„Åå„ÅÑ„ÅüÔºÅ", mnam,
                       sackname);
 #endif
-            } else if (container_where == OBJ_FLOOR && container
-                       && cansee(mtmp->mx, mtmp->my)) {
+            } else if (container_where == OBJ_FLOOR
+                       && cansee(corpsex, corpsey)) {
                 Strcpy(sackname, an(xname(container)));
 /*JP
-                pline("%s escapes from %s!", Amonnam(mtmp), sackname);
+                pline("%s escapes from %s!", mnam, sackname);
 */
-                pline("%sÇÕ%sÇ©ÇÁì¶ÇÍÇΩÅI", Amonnam(mtmp), sackname);
+                pline("%s„ÅØ%s„Åã„ÇâÈÄÉ„Çå„ÅüÔºÅ", mnam, sackname);
             }
             break;
         }
+        case OBJ_BURIED:
+            if (is_zomb) {
+                maketrap(mtmp->mx, mtmp->my, PIT);
+                if (cansee(mtmp->mx, mtmp->my)) {
+                    struct trap *ttmp;
+
+                    ttmp = t_at(mtmp->mx, mtmp->my);
+                    if (ttmp)
+                        ttmp->tseen = TRUE;
+#if 0 /*JP:T*/
+                    pline("%s claws itself out of the ground!",
+                          canspotmon(mtmp) ? Amonnam(mtmp) : Something);
+#else
+                    pline("%s„ÅåÂú∞Èù¢„Åã„ÇâÈÄô„ÅÑÂá∫„Åó„Å¶„Åç„ÅüÔºÅ",
+                          canspotmon(mtmp) ? Amonnam(mtmp) : Something);
+#endif
+                    newsym(mtmp->mx, mtmp->my);
+                } else if (mdistu(mtmp) < 5*5) {
+                    Soundeffect(se_scratching, 50);
+/*JP
+                    You_hear("scratching noises.");
+*/
+                    You_hear("„Å≤„Å£„Åã„Åè„Çà„ÅÜ„Å™Èü≥„ÅåËÅû„Åì„Åà„ÅüÔºé");
+                }
+                fill_pit(mtmp->mx, mtmp->my);
+                break;
+            }
+            FALLTHROUGH;
+            /*FALLTHRU*/
         default:
             /* we should be able to handle the other cases... */
             impossible("revive_corpse: lost corpse @ %d", where);
@@ -2368,39 +2804,38 @@ struct obj *corpse;
 /* Revive the corpse via a timeout. */
 /*ARGSUSED*/
 void
-revive_mon(arg, timeout)
-anything *arg;
-long timeout UNUSED;
+revive_mon(anything *arg, long timeout UNUSED)
 {
     struct obj *body = arg->a_obj;
     struct permonst *mptr = &mons[body->corpsenm];
     struct monst *mtmp;
-    xchar x, y;
+    coordxy x, y;
 
     /* corpse will revive somewhere else if there is a monster in the way;
        Riders get a chance to try to bump the obstacle out of their way */
-    if ((mptr->mflags3 & M3_DISPLACES) != 0 && body->where == OBJ_FLOOR
-        && get_obj_location(body, &x, &y, 0) && (mtmp = m_at(x, y)) != 0) {
+    if (is_displacer(mptr) && body->where == OBJ_FLOOR
+        && get_obj_location(body, &x, &y, 0) && (mtmp = m_at(x, y)) != 0 &&
+        svl.level.flags.stasis_until < svm.moves) {
         boolean notice_it = canseemon(mtmp); /* before rloc() */
         char *monname = Monnam(mtmp);
 
-        if (rloc(mtmp, TRUE)) {
+        if (rloc(mtmp, RLOC_NOMSG)) {
             if (notice_it && !canseemon(mtmp))
 /*JP
                 pline("%s vanishes.", monname);
 */
-                pline("%sÇÕè¡Ç¶ÇΩÅD", monname);
+                pline("%s„ÅØÊ∂à„Åà„ÅüÔºé", monname);
             else if (!notice_it && canseemon(mtmp))
 #if 0 /*JP:T*/
                 pline("%s appears.", Monnam(mtmp)); /* not pre-rloc monname */
 #else
-                pline("%sÇ™åªÇÍÇΩÅD", Monnam(mtmp)); /* not pre-rloc monname */
+                pline("%s„ÅåÁèæ„Çå„ÅüÔºé", Monnam(mtmp)); /* not pre-rloc monname */
 #endif
             else if (notice_it && dist2(mtmp->mx, mtmp->my, x, y) > 2)
 #if 0 /*JP:T*/
                 pline("%s teleports.", monname); /* saw it and still see it */
 #else
-                pline("%sÇÕèuä‘à⁄ìÆÇµÇΩÅD", monname); /* saw it and still see it */
+                pline("%s„ÅØÁû¨ÈñìÁßªÂãï„Åó„ÅüÔºé", monname); /* saw it and still see it */
 #endif
         }
     }
@@ -2412,48 +2847,107 @@ long timeout UNUSED;
 
         if (is_rider(mptr) && rn2(99)) { /* Rider usually tries again */
             action = REVIVE_MON;
-            for (when = 3L; when < 67L; when++)
-                if (!rn2(3))
-                    break;
+            when = rider_revival_time(body, TRUE);
         } else { /* rot this corpse away */
+            if (!obj_has_timer(body, ROT_CORPSE))
 /*JP
-            You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
+                You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
 */
-            You("îYÇ›éñÇ™%så∏Ç¡ÇΩãCÇ™ÇµÇΩÅD", is_rider(mptr) ? "Ç∆ÇƒÇ‡" : "");
+                You("ÊÇ©„Åø‰∫ã„Åå%sÊ∏õ„Å£„ÅüÊ∞ó„Åå„Åó„ÅüÔºé", is_rider(mptr) ? "„Å®„Å¶„ÇÇ" : "");
             action = ROT_CORPSE;
-            when = 250L - (monstermoves - body->age);
+            when = (long) d(5, 50) - (svm.moves - body->age);
             if (when < 1L)
                 when = 1L;
         }
-        (void) start_timer(when, TIMER_OBJECT, action, arg);
+        if (!obj_has_timer(body, action))
+            (void) start_timer(when, TIMER_OBJECT, action, arg);
     }
 }
 
-int
-donull()
+/* Timeout callback. Revive the corpse as a zombie. */
+void
+zombify_mon(anything *arg, long timeout)
 {
-    return 1; /* Do nothing, but let other things happen */
+    struct obj *body = arg->a_obj;
+    int zmon = zombie_form(&mons[body->corpsenm]);
+
+    if (zmon != NON_PM && !(svm.mvitals[zmon].mvflags & G_GENOD)) {
+        if (has_omid(body))
+            free_omid(body);
+        if (has_omonst(body))
+            free_omonst(body);
+
+        set_corpsenm(body, zmon);
+        revive_mon(arg, timeout);
+    } else {
+        rot_corpse(arg, timeout);
+    }
 }
 
-STATIC_PTR int
-wipeoff(VOID_ARGS)
+/* return TRUE if hero properties are dangerous to hero */
+staticfn boolean
+danger_uprops(void)
 {
-    if (u.ucreamed < 4)
-        u.ucreamed = 0;
-    else
-        u.ucreamed -= 4;
-    if (Blinded < 4)
-        Blinded = 0;
-    else
-        Blinded -= 4;
-    if (!Blinded) {
+    return (Stoned || Slimed || Strangled || Sick);
+}
+
+boolean
+cmd_safety_prevention(const char *ucverb, const char *cmddesc,
+                      const char *act, int *flagcounter)
+{
+    if (flags.safe_wait && !iflags.menu_requested && !gm.multi) {
+        char buf[QBUFSZ];
+
+        buf[0] = '\0';
+        if (iflags.cmdassist || !(*flagcounter)++)
+            Sprintf(buf, "  Use '%s' prefix to force %s.",
+                    visctrl(cmd_from_func(do_reqmenu)), cmddesc);
+
+        if (monster_nearby()) {
+            Norep("%s%s", act, buf);
+            return TRUE;
+        } else if (danger_uprops()) {
+            Norep("%s doesn't feel like a good idea right now.", ucverb);
+            return TRUE;
+        }
+    }
+    *flagcounter = 0;
+    return FALSE;
+}
+
+/* '.' command: do nothing == rest; also the
+   ' ' command iff 'rest_on_space' option is On */
+int
+donull(void)
+{
+    if (cmd_safety_prevention("Waiting", "a no-op (to rest)",
+                          "Are you waiting to get hit?",
+                          &gd.did_nothing_flag))
+        return ECMD_OK;
+    return ECMD_TIME; /* Do nothing, but let other things happen */
+}
+
+staticfn int
+wipeoff(void)
+{
+    unsigned udelta = u.ucreamed;
+    long ldelta = BlindedTimeout;
+
+    if (udelta > 4)
+        udelta = 4;
+    u.ucreamed -= udelta; /*u.ucreamed -= min(u.ucreamed,4);*/
+    if (ldelta > 4L)
+        ldelta = 4L;
+    incr_itimeout(&HBlinded, -ldelta); /*HBlinded -= min(BlindedTimeout,4L);*/
+
+    if (!HBlinded) {
 /*JP
         pline("You've got the glop off.");
 */
-        You("%sÇ©ÇÁÉlÉoÉlÉoÇ™Ç∆ÇÍÇΩÅD", body_part(FACE));
+        You("%s„Åã„Çâ„Éç„Éê„Éç„Éê„Åå„Å®„Çå„ÅüÔºé", body_part(FACE));
         u.ucreamed = 0;
         if (!gulp_blnd_check()) {
-            Blinded = 1;
+            set_itimeout(&HBlinded, 1L);
             make_blinded(0L, TRUE);
         }
         return 0;
@@ -2461,14 +2955,15 @@ wipeoff(VOID_ARGS)
 /*JP
         Your("%s feels clean now.", body_part(FACE));
 */
-        Your("%sÇÕÇ´ÇÍÇ¢Ç…Ç»Ç¡ÇΩÅD", body_part(FACE));
+        Your("%s„ÅØ„Åç„Çå„ÅÑ„Å´„Å™„Å£„ÅüÔºé", body_part(FACE));
         return 0;
     }
     return 1; /* still busy */
 }
 
+/* the #wipe command - wipe off your face */
 int
-dowipe()
+dowipe(void)
 {
     if (u.ucreamed) {
         static NEARDATA char buf[39];
@@ -2476,51 +2971,79 @@ dowipe()
 /*JP
         Sprintf(buf, "wiping off your %s", body_part(FACE));
 */
-        Sprintf(buf, "%sÇê@Ç¢ÇƒÇ¢ÇÈ", body_part(FACE));
+        Sprintf(buf, "%s„ÇíÊã≠„ÅÑ„Å¶„ÅÑ„Çã", body_part(FACE));
         set_occupation(wipeoff, buf, 0);
         /* Not totally correct; what if they change back after now
          * but before they're finished wiping?
          */
-        return 1;
+        return ECMD_TIME;
     }
 /*JP
     Your("%s is already clean.", body_part(FACE));
 */
-    Your("%sÇÕâòÇÍÇƒÇ¢Ç»Ç¢ÅD", body_part(FACE));
-    return 1;
+    Your("%s„ÅØÊ±ö„Çå„Å¶„ÅÑ„Å™„ÅÑÔºé", body_part(FACE));
+    return ECMD_TIME;
+}
+
+/* common wounded legs feedback */
+void
+legs_in_no_shape(const char *for_what, /* jumping, kicking, riding */
+                 boolean by_steed)
+{
+    if (by_steed && u.usteed) {
+/*JP
+        pline("%s is in no shape for %s.", Monnam(u.usteed), for_what);
+*/
+        pline("%s„ÅØ%sÁä∂ÊÖã„Åß„ÅØ„Å™„ÅÑÔºé", Monnam(u.usteed), for_what);
+    } else {
+        long wl = (EWounded_legs & BOTH_SIDES);
+        const char *bp = body_part(LEG);
+
+        if (wl == BOTH_SIDES)
+            bp = makeplural(bp);
+#if 0 /*JP:T*/
+        Your("%s%s %s in no shape for %s.",
+             (wl == LEFT_SIDE) ? "left " : (wl == RIGHT_SIDE) ? "right " : "",
+             bp, (wl == BOTH_SIDES) ? "are" : "is", for_what);
+#else
+        Your("%s%s„ÅØ%sÁä∂ÊÖã„Åß„ÅØ„Å™„ÅÑÔºé",
+             (wl == LEFT_SIDE) ? "Â∑¶" : (wl == RIGHT_SIDE) ? "Âè≥" : "",
+             bp, for_what);
+#endif
+    }
 }
 
 void
-set_wounded_legs(side, timex)
-register long side;
-register int timex;
+set_wounded_legs(long side, int timex)
 {
     /* KMH -- STEED
      * If you are riding, your steed gets the wounded legs instead.
      * You still call this function, but don't lose hp.
      * Caller is also responsible for adjusting messages.
      */
-
-    if (!Wounded_legs) {
+    disp.botl = TRUE;
+    if (!Wounded_legs)
         ATEMP(A_DEX)--;
-        context.botl = 1;
-    }
 
-    if (!Wounded_legs || (HWounded_legs & TIMEOUT))
-        HWounded_legs = timex;
-    EWounded_legs = side;
-    (void) encumber_msg();
+    if (!Wounded_legs || (HWounded_legs & TIMEOUT) < (long) timex)
+        set_itimeout(&HWounded_legs, (long) timex);
+    /* the leg being wounded and its timeout might differ from one
+       attack to the next, but we don't track the legs separately;
+       5.0: both legs will ultimately heal together; this used to use
+       direct assignment instead of bitwise-OR so getting wounded in
+       one leg mysteriously healed the other */
+    EWounded_legs |= side;
+    encumber_msg();
 }
 
 void
-heal_legs(how)
-int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
+heal_legs(
+    int how) /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
     if (Wounded_legs) {
-        if (ATEMP(A_DEX) < 0) {
+        disp.botl = TRUE;
+        if (ATEMP(A_DEX) < 0)
             ATEMP(A_DEX)++;
-            context.botl = 1;
-        }
 
         /* when mounted, wounded legs applies to the steed;
            during petrification countdown, "your limbs turn to stone"
@@ -2536,7 +3059,9 @@ int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
                misleading since legs are being fully healed */
             Your("%s %s better.", legs, vtense(legs, "feel"));
 #else
-            Your("%sÇÕâÒïúÇµÇΩÅD", body_part(LEG));
+            Your("%s%s„ÅØÂõûÂæ©„Åó„ÅüÔºé",
+                 (EWounded_legs & BOTH_SIDES) == BOTH_SIDES ? "‰∏°" : "",
+                 body_part(LEG));
 #endif
         }
 
@@ -2553,7 +3078,7 @@ int how; /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
            more when steed becomes healthy, then possible floor
            feedback, then able to carry less when back on foot]. */
         if (how == 0)
-            (void) encumber_msg();
+            encumber_msg();
     }
 }
 
