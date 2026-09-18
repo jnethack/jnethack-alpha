@@ -1,5 +1,6 @@
-/* NetHack 3.6	vmstty.c	$NHDT-Date: 1432512790 2015/05/25 00:13:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 5.0	vmstty.c	$NHDT-Date: 1596498309 2020/08/03 23:45:09 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */
 
@@ -7,6 +8,13 @@
 #include "hack.h"
 #include "wintty.h"
 #include "tcap.h"
+
+#ifdef VMSVSI
+#include <lib$routines.h>
+#include <smg$routines.h>
+#include <starlet.h>
+#include <elfdef.h>
+#endif
 
 #include <descrip.h>
 #include <iodef.h>
@@ -24,27 +32,32 @@
 #define TT$M_NOBRDCST 0x00020000    /* disable broadcast messages, but  */
 #define TT2$M_BRDCSTMBX 0x00000010  /* catch them in associated mailbox */
 #define TT2$M_APP_KEYPAD 0x00800000 /* application vs numeric keypad mode */
-#endif                              /* __GNUC__ */
+#endif /* __GNUC__ */
 #ifdef USE_QIO_INPUT
 #include <ssdef.h>
 #endif
 #include <errno.h>
 #include <signal.h>
 
+
+#ifndef VMSVSI
 unsigned long lib$disable_ctrl(), lib$enable_ctrl();
 unsigned long sys$assign(), sys$dassgn(), sys$qiow();
+#endif
 #ifndef USE_QIO_INPUT
+#ifndef VMSVSI
 unsigned long smg$create_virtual_keyboard(), smg$delete_virtual_keyboard(),
     smg$read_keystroke(), smg$cancel_input();
-#else
-static short FDECL(parse_function_key, (int));
 #endif
-static void NDECL(setctty);
-static void NDECL(resettty);
+#else
+static short parse_function_key(int);
+#endif
+static void setctty(void);
+static void resettty(void);
 
 #define vms_ok(sts) ((sts) &1)
 #define META(c) ((c) | 0x80) /* 8th bit */
-#define CTRL(c) ((c) &0x1F)
+#define CTRL(c) ((c) & 0x1F)
 #define CMASK(c) (1 << CTRL(c))
 #define LIB$M_CLI_CTRLT CMASK('T') /* 0x00100000 */
 #define LIB$M_CLI_CTRLY CMASK('Y') /* 0x02000000 */
@@ -103,11 +116,11 @@ static unsigned long tt_char_restore = 0, tt_char_active = 0,
 static unsigned long ctrl_mask = 0;
 
 #ifdef DEBUG
-extern int NDECL(nh_vms_getchar);
+extern int nh_vms_getchar(void);
 
 /* rename the real vms_getchar and interpose this one in front of it */
 int
-vms_getchar()
+vms_getchar(void)
 {
     static int althack = 0, altprefix;
     char *nhalthack;
@@ -134,7 +147,7 @@ vms_getchar()
 #endif /*DEBUG*/
 
 int
-vms_getchar()
+vms_getchar(void)
 {
     short key;
 #ifdef USE_QIO_INPUT
@@ -170,16 +183,16 @@ vms_getchar()
         } else if (kb_buf == ESC || kb_buf == CSI || kb_buf == SS3) {
             switch (parse_function_key((int) kb_buf)) {
             case SMG$K_TRM_UP:
-                key = Cmd.move_N;
+                key = gc.Cmd.dirchars[2];
                 break;
             case SMG$K_TRM_DOWN:
-                key = Cmd.move_S;
+                key = gc.Cmd.dirchars[6];
                 break;
             case SMG$K_TRM_LEFT:
-                key = Cmd.move_W;
+                key = gc.Cmd.dirchars[0];
                 break;
             case SMG$K_TRM_RIGHT:
-                key = Cmd.move_E;
+                key = gc.Cmd.dirchars[4];
                 break;
             default:
                 key = ESC;
@@ -200,16 +213,16 @@ vms_getchar()
         smg$read_keystroke(&kb, &key);
         switch (key) {
         case SMG$K_TRM_UP:
-            key = Cmd.move_N;
+            key = gc.Cmd.move_N;
             break;
         case SMG$K_TRM_DOWN:
-            key = Cmd.move_S;
+            key = gc.Cmd.move_S;
             break;
         case SMG$K_TRM_LEFT:
-            key = Cmd.move_W;
+            key = gc.Cmd.move_W;
             break;
         case SMG$K_TRM_RIGHT:
-            key = Cmd.move_E;
+            key = gc.Cmd.move_E;
             break;
         case '\r':
             key = '\n';
@@ -221,10 +234,10 @@ vms_getchar()
         }
     } else {
         /* abnormal input--either SMG didn't initialize properly or
-           vms_getchar() has been called recursively (via SIGINT handler).
+         * vms_getchar() has been called recursively (via SIGINT handler).
          */
         if (kb != 0)               /* must have been a recursive call */
-            smg$cancel_input(&kb); /*  from an interrupt handler	   */
+            smg$cancel_input(&kb); /*  from an interrupt handler      */
         key = getchar();
     }
     --recurse;
@@ -247,7 +260,7 @@ vms_getchar()
  * for two reasons:
  *    1) retain support for arrow keys, and
  *    2) treat other VTxxx function keys as <esc> for aborting
- *	various NetHack prompts.
+ *      various NetHack prompts.
  * The second reason is compelling; otherwise remaining chars of
  * an escape sequence get treated as inappropriate user commands.
  *
@@ -257,32 +270,30 @@ vms_getchar()
 /*=
      -- Summary of VTxxx-style keyboards and transmitted escape sequences. --
 Keypad codes are prefixed by 7 bit (\033 O) or 8 bit SS3:
-        keypad:  PF1 PF2 PF3 PF4       codes:	P   Q	R   S
-                  7   8   9   -			w   x	y   m
-                  4   5   6   .			t   u	v   n
-                  1   2   3  :en-:		q   r	s  : :
-                 ...0...  ,  :ter:	       ...p...	l  :M:
+        keypad:  PF1 PF2 PF3 PF4       codes:   P   Q   R   S
+                  7   8   9   -                 w   x   y   m
+                  4   5   6   .                 t   u   v   n
+                  1   2   3  :en-:              q   r   s  : :
+                 ...0...  ,  :ter:             ...p...  l  :M:
 Arrows are prefixed by either SS3 or CSI (either 7 or 8 bit), depending on
 whether the terminal is in application or numeric mode (ditto for PF keys):
-        arrows: <up> <dwn> <lft> <rgt>		A   B	D   C
-Additional function keys (vk201/vk401) generate CSI nn ~ (nn is 1 or 2
-digits):
+        arrows: <up> <dwn> <lft> <rgt>          A   B   D   C
+Additional function keys (vk201/vk401) generate CSI nn ~ (nn is 1 or 2 digits):
     vk201 keys:  F6 F7 F8 F9 F10   F11 F12 F13 F14  Help Do   F17 F18 F19 F20
    'nn' digits:  17 18 19 20 21    23  24  25  26    28  29   31  32  33  34
-     alternate:  ^C		   ^[  ^H  ^J		(when in VT100 mode)
-   edit keypad: <fnd> <ins> <rmv>     digits:	1   2	3
-                <sel> <prv> <nxt>		4   5	6
+     alternate:  ^C                ^[  ^H  ^J           (when in VT100 mode)
+   edit keypad: <fnd> <ins> <rmv>     digits:   1   2   3
+                <sel> <prv> <nxt>               4   5   6
 VT52 mode:  arrows and PF keys send ESCx where x is in A-D or P-S.
 =*/
 
 static const char *arrow_or_PF = "ABCDPQRS", /* suffix char */
-    *smg_keypad_codes = "PQRSpqrstuvwxyMmlnABDC";
+                  *smg_keypad_codes = "PQRSpqrstuvwxyMmlnABDC";
 /* PF1..PF4,KP0..KP9,enter,dash,comma,dot,up-arrow,down,left,right */
 /* Ultimate return value is (index into smg_keypad_codes[] + 256). */
 
 static short
-parse_function_key(c)
-register int c;
+parse_function_key(int c)
 {
     struct _rd_iosb iosb;
     unsigned long sts;
@@ -308,15 +319,17 @@ register int c;
     } else
         sts = SS$_NORMAL;
     if (vms_ok(sts) || sts == SS$_TIMEOUT) {
-        register int cnt = iosb.trm_offset + iosb.trm_siz + inc;
-        register char *p = seq_buf;
+        int cnt = iosb.trm_offset + iosb.trm_siz + inc;
+        char *p = seq_buf;
+
         if (c == ESC) /* check for 7-bit vt100/ANSI, or vt52 */
             if (*p == '[' || *p == 'O')
                 c = META(CTRL(*p++)), cnt--;
             else if (strchr(arrow_or_PF, *p))
                 c = SS3; /*CSI*/
         if (cnt > 0 && (c == SS3 || (c == CSI && strchr(arrow_or_PF, *p)))) {
-            register char *q = strchr(smg_keypad_codes, *p);
+            char *q = strchr(smg_keypad_codes, *p);
+
             if (q)
                 result = 256 + (q - smg_keypad_codes);
             p++, --cnt; /* one more char consumed */
@@ -334,6 +347,7 @@ register int c;
                 }; /* note: there are several missing nn in CSI nn ~ values */
             int nn;
             char *q;
+
             *(p + cnt) = '\0'; /* terminate string */
             q = strchr(p, '~');
             if (q && sscanf(p, "%d~", &nn) == 1) {
@@ -353,7 +367,7 @@ register int c;
 #endif /* USE_QIO_INPUT */
 
 static void
-setctty()
+setctty(void)
 {
     struct _sm_iosb iosb;
     unsigned long status;
@@ -373,7 +387,9 @@ setctty()
     }
 }
 
-static void resettty() /* atexit() routine */
+/* atexit() routine */
+static void
+resettty(void)
 {
     if (settty_needed) {
         bombing = TRUE; /* don't clear screen; preserve traceback info */
@@ -389,7 +405,7 @@ static void resettty() /* atexit() routine */
  * (for initial startup and for returning from '!' or ^Z).
  */
 void
-gettty()
+gettty(void)
 {
     static char dev_tty[] = "TT:";
     static $DESCRIPTOR(tty_dsc, dev_tty);
@@ -440,18 +456,18 @@ gettty()
 
 /* reset terminal to original state */
 void
-settty(s)
-const char *s;
+settty(const char *s)
 {
     if (!bombing)
-        end_screen();
+        term_end_screen();
     if (s)
         raw_print(s);
     if (settty_needed) {
         disable_broadcast_trapping();
 #if 0  /* let SMG's exit handler do the cleanup (as per doc) */
 /* #ifndef USE_QIO_INPUT */
-	if (kb)  smg$delete_virtual_keyboard(&kb),  kb = 0;
+        if (kb)
+            smg$delete_virtual_keyboard(&kb),  kb = 0;
 #endif /* 0 (!USE_QIO_INPUT) */
         if (ctrl_mask)
             (void) lib$enable_ctrl(&ctrl_mask, 0);
@@ -468,8 +484,7 @@ const char *s;
 
 /* same as settty, with no clearing of the screen */
 void
-shuttty(s)
-const char *s;
+shuttty(const char *s)
 {
     bombing = TRUE;
     settty(s);
@@ -477,7 +492,7 @@ const char *s;
 }
 
 void
-setftty()
+setftty(void)
 {
     unsigned long mask = LIB$M_CLI_CTRLT | LIB$M_CLI_CTRLY;
 
@@ -498,25 +513,31 @@ setftty()
     sg.sm.tt2_char = tt2_char_active;
     setctty();
 
-    start_screen();
+    term_start_screen();
     settty_needed = TRUE;
 }
 
-void intron() /* enable kbd interupts if enabled when game started */
+/* enable kbd interrupts if enabled when game started */
+void
+intron(void)
 {
     intr_char = CTRL('C');
 }
 
-void introff() /* disable kbd interrupts if required*/
+/* disable kbd interrupts if required*/
+void
+introff(void)
 {
     intr_char = 0;
 }
 
 #ifdef TIMED_DELAY
 
-extern unsigned long FDECL(lib$emul, (const long *, const long *,
-                                      const long *, long *));
+#ifndef VMSVSI
+extern unsigned long lib$emul(const long *, const long *, const long *,
+                              long *);
 extern unsigned long sys$schdwk(), sys$hiber();
+#endif
 
 #define VMS_UNITS_PER_SECOND 10000000L /* hundreds of nanoseconds, 1e-7 */
 /* constant for conversion from milliseconds to VMS delta time (negative) */
@@ -525,8 +546,7 @@ static const long mseconds_to_delta = VMS_UNITS_PER_SECOND / 1000L * -1L;
 /* sleep for specified number of milliseconds (note: the timer used
    generally only has 10-millisecond resolution at the hardware level...) */
 void
-msleep(mseconds)
-unsigned mseconds; /* milliseconds */
+msleep(unsigned mseconds) /* milliseconds */
 {
     long pid = 0L, zero = 0L, msec, qtime[2];
 
@@ -557,7 +577,40 @@ VA_DECL(const char *, s)
     VA_END();
 #ifndef SAVE_ON_FATAL_ERROR
     /* prevent vmsmain's exit handler byebye() from calling hangup() */
-    sethanguphandler((void FDECL((*), (int) )) SIG_DFL);
+/*    sethanguphandler((void (*)(int) )) SIG_DFL; */
+    sethanguphandler((SIG_RET_TYPE) SIG_DFL);
 #endif
     exit(EXIT_FAILURE);
 }
+
+#ifdef SIGWINCH
+/* called by resize_tty(wintty.c) after receiving a SIGWINCH signal;
+   terminal size has changed and we should update LI and CO (from termcap) */
+void
+getwindowsz(void)
+{
+    /*
+     * gettty() has code to do this, but it can't be used directly because
+     * it fetches terminal state in order to reset that upon termination.
+     * We need to avoid clobbering other saved state with values used by
+     * game-in-progress.  For now, do nothing.
+     */
+    return;
+}
+#endif
+
+#ifdef ENHANCED_SYMBOLS
+/*
+ * set in term_start_screen() and allows
+ * OS-specific changes that may be
+ * required for support of utf8.
+ * Currently a placeholder for VMS.
+ */
+void
+tty_utf8graphics_fixup(void)
+{
+    return;
+}
+#endif  /* ENHANCED_SYMBOLS */
+
+/*vmstty.c */

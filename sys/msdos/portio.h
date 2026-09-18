@@ -1,4 +1,4 @@
-/* NetHack 3.6	portio.h	$NHDT-Date: 1432512791 2015/05/25 00:13:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* NetHack 5.0	portio.h	$NHDT-Date: 1596498273 2020/08/03 23:44:33 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.10 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */
@@ -44,6 +44,7 @@
 #define READ_ABSOLUTE_WORD(x) *(x)
 #define WRITE_ABSOLUTE(x, y) *(x) = (y)
 #define WRITE_ABSOLUTE_WORD(x, y) *(x) = (y)
+#define WRITE_ABSOLUTE_DWORD(x, y) *(x) = (y)
 #endif
 
 #if defined(__GO32__) || defined(__DJGPP__)
@@ -57,6 +58,8 @@
     _farpokeb(_go32_conventional_mem_selector(), (unsigned) x, (y))
 #define WRITE_ABSOLUTE_WORD(x, y) \
     _farpokew(_go32_conventional_mem_selector(), (unsigned) x, (y))
+#define WRITE_ABSOLUTE_DWORD(x, y) \
+    _farpokel(_go32_conventional_mem_selector(), (unsigned) x, (y))
 #endif
 
 #ifdef OBSOLETE /* old djgpp V1.x way of mapping 1st MB */
@@ -66,6 +69,7 @@
 #define READ_ABSOLUTE_WORD(x) *(x)
 #define WRITE_ABSOLUTE(x, y) *(x) = (y)
 #define WRITE_ABSOLUTE_WORD(x, y) *(x) = (y)
+#define WRITE_ABSOLUTE_DWORD(x, y) *(x) = (y)
 #endif
 #endif /* MK_PTR */
 

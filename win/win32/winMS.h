@@ -1,4 +1,4 @@
-/* NetHack 3.6	winMS.h	$NHDT-Date: 1434804346 2015/06/20 12:45:46 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.41 $ */
+/* NetHack 5.0	winMS.h	$NHDT-Date: 1596498367 2020/08/03 23:46:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,11 +20,22 @@
 #endif
 #endif
 
+#undef Protection /* We have a global name space collision.  No source file
+                     using win32api.h should be using the Protection macro
+                     from youprop.h.
+                     A better fix would be to ensure we include all window
+                     header files before we start clobbering the global name
+                     space with NetHack specific macros. */
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <windowsx.h>
 #include <commctrl.h>
 #include <tchar.h>
 #include "hack.h"
+#include "color.h"
+
+#define TEXT_BUFFER_SIZE 4096
 
 /* Create an array to keep track of the various windows */
 
@@ -32,8 +43,19 @@
 #define MAXWINDOWS 15
 #endif
 
-#define NHW_RIP 32
-#define NHW_INVEN 33
+struct window_tracking_data {
+    genericptr_t address;
+    int isstatic;
+};
+
+/* these are only in MSWIN_GRAPHICS, not the core */
+enum mswin_window_types {
+    NHW_MAIN = (NHW_LAST_TYPE + 1),
+    NHW_INVEN,
+    NHW_RIP,
+    NHW_SPLASH
+};
+extern struct window_tracking_data windowdata[MAXWINDOWS];
 
 #ifndef TILE_X
 #define TILE_X 16
@@ -94,6 +116,8 @@ typedef struct mswin_nhwindow_app {
         regNetHackMode; /* NetHack mode means no Windows keys in some places
                            */
 
+    COLORREF regMapColors[CLR_MAX];
+
     LONG regMainMinX;
     LONG regMainMinY;
     LONG regMainMaxX;
@@ -118,12 +142,9 @@ typedef struct mswin_nhwindow_app {
     LPTRANSPARENTBLT lpfnTransparentBlt; /* transparent blt function */
 } NHWinApp, *PNHWinApp;
 
-#define E extern
-
-E PNHWinApp GetNHApp(void);
-E struct window_procs mswin_procs;
-
-#undef E
+extern PNHWinApp GetNHApp(void);
+extern struct window_procs mswin_procs;
+extern void free_winmain_stuff(void);
 
 /* Some prototypes */
 void mswin_init_nhwindows(int *argc, char **argv);
@@ -135,55 +156,50 @@ void mswin_suspend_nhwindows(const char *);
 void mswin_resume_nhwindows(void);
 winid mswin_create_nhwindow(int type);
 void mswin_clear_nhwindow(winid wid);
-void mswin_display_nhwindow(winid wid, BOOLEAN_P block);
+void mswin_display_nhwindow(winid wid, boolean block);
 void mswin_destroy_nhwindow(winid wid);
 void mswin_curs(winid wid, int x, int y);
 void mswin_putstr(winid wid, int attr, const char *text);
 void mswin_putstr_ex(winid wid, int attr, const char *text, int);
-void mswin_display_file(const char *filename, BOOLEAN_P must_exist);
-void mswin_start_menu(winid wid);
-void mswin_add_menu(winid wid, int glyph, const ANY_P *identifier,
-                    CHAR_P accelerator, CHAR_P group_accel, int attr,
-                    const char *str, BOOLEAN_P presel);
+void mswin_display_file(const char *filename, boolean must_exist);
+void mswin_start_menu(winid wid, unsigned long mbehavior);
+void mswin_add_menu(winid wid, const glyph_info *glyphinfo,
+                    const ANY_P *identifier,
+                    char accelerator, char group_accel, int attr,
+                    int clr, const char *str, unsigned int itemflags);
 void mswin_end_menu(winid wid, const char *prompt);
 int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected);
-void mswin_update_inventory(void);
 void mswin_mark_synch(void);
 void mswin_wait_synch(void);
 void mswin_cliparound(int x, int y);
-void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph);
+void mswin_print_glyph(winid wid, coordxy x, coordxy y,
+                       const glyph_info *glyph, const glyph_info *bkglyph);
 void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);
+void mswin_raw_print_flush(void);
 int mswin_nhgetch(void);
-int mswin_nh_poskey(int *x, int *y, int *mod);
+int mswin_nh_poskey(coordxy *x, coordxy *y, int *mod);
 void mswin_nhbell(void);
 int mswin_doprev_message(void);
-char mswin_yn_function(const char *question, const char *choices, CHAR_P def);
+char mswin_yn_function(const char *question, const char *choices, char def);
 void mswin_getlin(const char *question, char *input);
 int mswin_get_ext_cmd(void);
 void mswin_number_pad(int state);
 void mswin_delay_output(void);
-void mswin_change_color(void);
+void mswin_change_color(int color, long rgb, int reverse);
 char *mswin_get_color_string(void);
-void mswin_start_screen(void);
-void mswin_end_screen(void);
 void mswin_outrip(winid wid, int how, time_t when);
 void mswin_preference_update(const char *pref);
-char *mswin_getmsghistory(BOOLEAN_P init);
-void mswin_putmsghistory(const char *msg, BOOLEAN_P);
+char *mswin_getmsghistory(boolean init);
+void mswin_putmsghistory(const char *msg, boolean);
 
-#ifdef STATUS_VIA_WINDOWPORT
 void mswin_status_init(void);
 void mswin_status_finish(void);
 void mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt,
                               boolean enable);
-void mswin_status_update(int idx, genericptr_t ptr, int chg, int percent);
-
-#ifdef STATUS_HILITES
-void mswin_status_threshold(int fldidx, int thresholdtype, anything threshold,
-                            int behavior, int under, int over);
-#endif /* STATUS_HILITES */
-#endif /*STATUS_VIA_WINDOWPORT*/
+void mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
+void mswin_update_inventory(int);
+win_request_info *mswin_ctrl_nhwindow(winid, int, win_request_info *);
 
 /* helper function */
 HWND mswin_hwnd_from_winid(winid wid);
@@ -201,6 +217,9 @@ void mswin_write_reg(void);
 
 void mswin_get_window_placement(int type, LPRECT rt);
 void mswin_update_window_placement(int type, LPRECT rt);
+void mswin_apply_window_style(HWND hwnd);
+
+//boolean mswin_player_selection_window(void);
 
 int NHMessageBox(HWND hWnd, LPCTSTR text, UINT type);
 
@@ -222,17 +241,19 @@ extern COLORREF status_fg_color;
 extern COLORREF message_bg_color;
 extern COLORREF message_fg_color;
 
-#define SYSCLR_TO_BRUSH(x) ((HBRUSH)((x) + 1))
+#define SYSCLR_TO_BRUSH(x) ((HBRUSH)(((intptr_t) x) + 1))
 
 /* unicode stuff */
 #define NH_CODEPAGE (SYMHANDLING(H_IBM) ? GetOEMCP() : GetACP())
 #ifdef _UNICODE
+#define nh_stprintf swprintf
 #define NH_W2A(w, a, cb) \
     (WideCharToMultiByte(NH_CODEPAGE, 0, (w), -1, (a), (cb), NULL, NULL), (a))
 
 #define NH_A2W(a, w, cb) \
     (MultiByteToWideChar(NH_CODEPAGE, 0, (a), -1, (w), (cb)), (w))
 #else
+#define nh_stprintf snprintf
 #define NH_W2A(w, a, cb) (strncpy((a), (w), (cb)))
 
 #define NH_A2W(a, w, cb) (strncpy((w), (a), (cb)))

@@ -1,4 +1,5 @@
-/* NetHack 3.6	mail.h	$NHDT-Date: 1432512777 2015/05/25 00:12:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* NetHack 5.0	mail.h	$NHDT-Date: 1596498544 2020/08/03 23:49:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
+/*      Copyright (c) 2015 by Kenneth Lorber              */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* used by ckmailstatus() to pass information to the mail-daemon in newmail()

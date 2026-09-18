@@ -1,4 +1,4 @@
-/* NetHack 3.6	amirip.c	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.6	amirip.c	$NHDT-Date: 1450453302 2015/12/18 15:41:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland 1991,1992,1993,1995,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -43,22 +43,21 @@ static struct RastPort *rp;
 #include <proto/diskfont.h>
 #endif
 
-static char *load_list[] = { "tomb.iff", 0 };
 static BitMapHeader tomb_bmhd;
-static struct BitMap *tbmp[1] = { 0 };
+static struct BitMap *tombimg = NULL;
 
-static int cols[2] = { 154, 319 }; /* X location of center of columns */
+static const int cols_base[2] = { 154, 319 }; /* X location of center of columns */
+static int cols[2]; /* cols_base[] + xoff, computed per call */
 static int cno = 0; /* current column */
 #define TEXT_TOP (65 + yoff)
 
-static xoff, yoff; /* image centering */
+static int xoff, yoff; /* image centering */
 
 /* terrible kludge */
 /* this is why prototypes should have ONLY types in them! */
 #undef red
 #undef green
 #undef blue
-#undef index
 #ifdef _DCC
 #include <clib/graphics_protos.h>
 #include <clib/intuition_protos.h>
@@ -101,19 +100,16 @@ int wh; /* was local in outrip, but needed for SCALE macro */
 int cmap_white, cmap_black;
 
 void
-amii_outrip(tmpwin, how, when)
-winid tmpwin;
-int how;
-time_t when;
+amii_outrip(winid tmpwin, int how, time_t when)
 {
     int just_return = 0;
     int done, rtxth;
+
     struct IntuiMessage *imsg;
     int i;
-    register char *dpx;
+    char *dpx;
     char buf[200];
     int line, tw, ww;
-    char *errstr = NULL;
     long year;
 
     if (!WINVERS_AMIV || HackScreen->RastPort.BitMap->Depth < 4)
@@ -142,9 +138,7 @@ time_t when;
         SetFont(rp, HackFont);
 #endif
 
-    tomb_bmhd = ReadImageFiles(load_list, tbmp, &errstr);
-    if (errstr)
-        goto cleanup;
+    tomb_bmhd = ReadImageFile("tomb.iff", &tombimg);
     if (tomb_bmhd.w > ww || tomb_bmhd.h > wh)
         goto cleanup;
 
@@ -152,16 +146,16 @@ time_t when;
     xoff = GENOFF(ww, tomb_bmhd.w);
     yoff = GENOFF(wh, tomb_bmhd.h);
     for (i = 0; i < SIZE(cols); i++)
-        cols[i] += xoff;
+        cols[i] = cols_base[i] + xoff;
 
     cmap_white = search_cmap(0, 0, 0);
     cmap_black = search_cmap(15, 15, 15);
 
-    BltBitMap(*tbmp, 0, 0, rp->BitMap, xoff, yoff, tomb_bmhd.w, tomb_bmhd.h,
+    BltBitMap(tombimg, 0, 0, rp->BitMap, xoff, yoff, tomb_bmhd.w, tomb_bmhd.h,
               0xc0, 0xff, NULL);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how);
+    formatkiller(buf, sizeof buf, how, FALSE);
 
     tw = TextLength(rp, buf, STONE_LINE_LEN) + 40;
 
@@ -186,21 +180,21 @@ time_t when;
     SetDrMd(rp, JAM1);
 
     /* Put name on stone */
-    Sprintf(buf, "%s", plname);
+    Sprintf(buf, "%s", svp.plname);
     buf[STONE_LINE_LEN] = 0;
     tomb_text(buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au", done_money);
+    Sprintf(buf, "%ld Au", gd.done_money);
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     tomb_text(buf);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how);
+    formatkiller(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {
-        register int i, i0;
+        int i, i0;
         char tmpchar;
 
         if ((i0 = strlen(dpx)) > STONE_LINE_LEN) {
@@ -281,8 +275,7 @@ cleanup:
     }
     LoadRGB4(&HackScreen->ViewPort, sysflags.amii_curmap, amii_numcolors);
 
-    if (tbmp[0])
-        FreeImageFiles(load_list, tbmp);
+    FreeImageFile(&tombimg);
     if (just_return)
         return;
     /* fall back to the straight-ASCII version */
@@ -290,8 +283,7 @@ cleanup:
 }
 
 static void
-tomb_text(p)
-char *p;
+tomb_text(char *p)
 {
     char buf[STONE_LINE_LEN * 2];
     int l;

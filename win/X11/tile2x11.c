@@ -1,12 +1,14 @@
-/* $NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
+/* $NHDT-Date: 1546081295 2018/12/29 11:01:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $ */
+/*      Copyright (c) 2017 by Pasi Kallinen                       */
+/* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * Convert the given input files into an output file that is expected
  * by nethack.
  *
  * Assumptions:
- * 	+ Two dimensional byte arrays are in row order and are not padded
- *	  between rows (x11_colormap[][]).
+ *      + Two dimensional byte arrays are in row order and are not padded
+ *        between rows (x11_colormap[][]).
  */
 #include "hack.h" /* for MAX_GLYPH */
 #include "tile.h"
@@ -20,15 +22,18 @@ unsigned char tile_bytes[TILE_X * TILE_Y * (MAX_GLYPH + TILES_PER_ROW)];
 unsigned char *curr_tb = tile_bytes;
 unsigned char x11_colormap[MAXCOLORMAPSIZE][3];
 
+extern void monst_globals_init(void);
+extern void objects_globals_init(void);
+
 /* Look up the given pixel and return its colormap index. */
 static unsigned char
-pix_to_colormap(pix)
-pixel pix;
+pix_to_colormap(pixel pix)
 {
-    unsigned i;
+    unsigned long i;
 
     for (i = 0; i < header.ncolors; i++) {
-        if (pix.r == ColorMap[CM_RED][i] && pix.g == ColorMap[CM_GREEN][i]
+        if (pix.r == ColorMap[CM_RED][i]
+            && pix.g == ColorMap[CM_GREEN][i]
             && pix.b == ColorMap[CM_BLUE][i])
             break;
     }
@@ -43,9 +48,8 @@ pixel pix;
 
 /* Convert the tiles in the file to our format of bytes. */
 static unsigned long
-convert_tiles(tb_ptr, total)
-unsigned char **tb_ptr; /* pointer to a tile byte pointer */
-unsigned long total;    /* total tiles so far */
+convert_tiles(unsigned char **tb_ptr, /* pointer to a tile byte pointer */
+              unsigned long total)    /* total tiles so far */
 {
     unsigned char *tb = *tb_ptr;
     unsigned long count = 0;
@@ -73,7 +77,7 @@ unsigned long total;    /* total tiles so far */
 
 /* Merge the current text colormap (ColorMap) with ours (x11_colormap). */
 static void
-merge_text_colormap()
+merge_text_colormap(void)
 {
     unsigned i, j;
 
@@ -91,7 +95,7 @@ merge_text_colormap()
 
         if (j == header.ncolors) { /* couldn't find it */
 #ifdef PRINT_COLORMAP
-            printf("color %2d: %3d %3d %3d\n", header.ncolors,
+            Fprintf(stdout, "color %2d: %3d %3d %3d\n", header.ncolors,
                    ColorMap[CM_RED][i], ColorMap[CM_GREEN][i],
                    ColorMap[CM_BLUE][i]);
 #endif
@@ -106,8 +110,7 @@ merge_text_colormap()
 
 /* Open the given file, read & merge the colormap, convert the tiles. */
 static void
-process_file(fname)
-char *fname;
+process_file(char *fname)
 {
     unsigned long count;
 
@@ -117,17 +120,17 @@ char *fname;
     }
     merge_text_colormap();
     count = convert_tiles(&curr_tb, header.ntiles);
-    Fprintf(stderr, "%s: %lu tiles\n", fname, count);
+    Fprintf(stdout, "%s: %lu tiles\n", fname, count);
     header.ntiles += count;
     fclose_text_file();
 }
 
 #ifdef USE_XPM
 static int
-xpm_write(fp)
-FILE *fp;
+xpm_write(FILE *fp)
 {
-    int i, j, n;
+    unsigned long i, j;
+    unsigned n;
 
     if (header.ncolors > 64) {
         Fprintf(stderr, "Sorry, only configured for up to 64 colors\n");
@@ -136,13 +139,13 @@ FILE *fp;
     }
 
     Fprintf(fp, "/* XPM */\n");
-    Fprintf(fp, "static char* nhtiles[] = {\n");
+    Fprintf(fp, "static char *nhtiles[] = {\n");
     Fprintf(fp, "\"%lu %lu %lu %d\",\n", header.tile_width * header.per_row,
             (header.tile_height * header.ntiles) / header.per_row,
             header.ncolors, 1 /* char per color */);
     for (i = 0; i < header.ncolors; i++)
         Fprintf(fp, "\"%c  c #%02x%02x%02x\",\n",
-                i + '0', /* just one char per color */
+                (char) (i + '0'), /* just one char per color */
                 x11_colormap[i][0], x11_colormap[i][1], x11_colormap[i][2]);
 
     n = 0;
@@ -162,9 +165,7 @@ FILE *fp;
 #endif /* USE_XPM */
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char *argv[])
 {
     FILE *fp;
     int i;
@@ -177,9 +178,15 @@ char **argv;
     header.per_row = TILES_PER_ROW;
 
     if (argc == 1) {
-        Fprintf(stderr, "usage: %s txt_file1 [txt_file2 ...]\n", argv[0]);
+        Fprintf(stderr,
+                "usage: %s txt_file1 [txt_file2 ...] [-grayscale txt_fileN]\n",
+                argv[0]);
         exit(1);
     }
+
+    /* without this, the comparisons check uninitialized data and won't pass */
+    objects_globals_init();
+    monst_globals_init();
 
     fp = fopen(OUTNAME, "w");
     if (!fp) {
@@ -190,9 +197,16 @@ char **argv;
     /* don't leave garbage at end of partial row */
     (void) memset((genericptr_t) tile_bytes, 0, sizeof(tile_bytes));
 
-    for (i = 1; i < argc; i++)
+    for (i = 1; i < argc; i++) {
+        if (!strncmp(argv[i], "-grayscale", 10)) {
+            set_grayscale(TRUE);
+            if (i < (argc - 1)) i++;
+        } else {
+            set_grayscale(FALSE);
+        }
         process_file(argv[i]);
-    Fprintf(stderr, "Total tiles: %ld\n", header.ntiles);
+    }
+    Fprintf(stdout, "Total tiles: %ld\n", header.ntiles);
 
     /* round size up to the end of the row */
     if ((header.ntiles % header.per_row) != 0) {
@@ -226,3 +240,6 @@ char **argv;
     fclose(fp);
     return 0;
 }
+
+/*tile2X11.c*/
+

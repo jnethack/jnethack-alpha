@@ -1,6 +1,9 @@
 #
 # Nethack configuration file.
-# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# $NHDT-Date: 1524689294 2018/04/25 20:48:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.7 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
+
 #
 # Naming this file $(HOME)/.nethackrc (for UNIX) or setting the environment
 # variable NETHACKOPTIONS to point to its full path name elsewhere tells
@@ -81,3 +84,8 @@ OPTIONS=catname:Ghisteslwchlohm
 #	   048 035 064 042			   \
 #	   047 045 092 124 124 092 045 047         \
 #	   047 064 092 064 064 064 092 064 047
+
+# CRASHREPORTURL must be set in syscf to enable these options.
+# These identify you in crash reports
+#OPTIONS=crash_name:Your Name
+#OPTIONS=crash_email:user@example.com

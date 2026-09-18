@@ -1,32 +1,31 @@
-/* NetHack 3.6	mhfont.c	$NHDT-Date: 1432512812 2015/05/25 00:13:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* NetHack 5.0	mhfont.c	$NHDT-Date: 1596498349 2020/08/03 23:45:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.29 $ */
+/* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* font management and such */
 
+#include "win10.h"
+#include "winos.h"
 #include "mhfont.h"
 
+/* font table - 64 fonts ought to be enough */
 #define MAXFONTS 64
 
-/* font table - 64 fonts ought to be enough */
-static struct font_table_entry {
-    int code;
-    HFONT hFont;
-} font_table[MAXFONTS];
+static cached_font font_table[MAXFONTS];
 static int font_table_size = 0;
-HFONT version_splash_font;
 
 #define NHFONT_CODE(win, attr) (((attr & 0xFF) << 8) | (win_type & 0xFF))
 
 static void __cdecl font_table_cleanup(void);
 
-void
-mswin_init_splashfonts(HWND hWnd)
+HFONT
+mswin_create_splashfont(HWND hWnd)
 {
     HDC hdc = GetDC(hWnd);
+    double scale = win10_monitor_scale(hWnd);
     LOGFONT lgfnt;
     ZeroMemory(&lgfnt, sizeof(lgfnt));
-    lgfnt.lfHeight = -80;                      // height of font
+    lgfnt.lfHeight = -(int)(80 * scale);       // height of font
     lgfnt.lfWidth = 0;                         // average character width
     lgfnt.lfEscapement = 0;                    // angle of escapement
     lgfnt.lfOrientation = 0;                   // base-line orientation angle
@@ -40,19 +39,25 @@ mswin_init_splashfonts(HWND hWnd)
     lgfnt.lfQuality = DEFAULT_QUALITY;           // output quality
     lgfnt.lfPitchAndFamily = DEFAULT_PITCH;      // pitch and family
     NH_A2W("Times New Roman", lgfnt.lfFaceName, LF_FACESIZE);
-    version_splash_font = CreateFontIndirect(&lgfnt);
+    HFONT font = CreateFontIndirect(&lgfnt);
     ReleaseDC(hWnd, hdc);
+
+    return font;
 }
 
-void
-mswin_destroy_splashfonts()
+BOOL 
+mswin_font_supports_unicode(HFONT hFont)
 {
-    DeleteObject(version_splash_font);
+    for (int i = 0; i < font_table_size; i++)
+        if (font_table[i].hFont == hFont)
+            return font_table[i].supportsUnicode;
+
+    return FALSE;
 }
 
-/* create font based on window type, charater attributes and
+/* create font based on window type, character attributes and
    window device context */
-HGDIOBJ
+cached_font *
 mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 {
     HFONT fnt = NULL;
@@ -74,7 +79,7 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
             break;
 
     if (!replace && font_index < font_table_size)
-        return font_table[font_index].hFont;
+        return &font_table[font_index];
 
     switch (win_type) {
     case NHW_STATUS:
@@ -88,7 +93,7 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
         lgfnt.lfWeight =
             (attr == ATR_BOLD) ? FW_BOLD : FW_NORMAL; // font weight
         lgfnt.lfItalic = FALSE;            // italic attribute option
-        lgfnt.lfUnderline = FALSE;         // underline attribute option
+        lgfnt.lfUnderline = (attr == ATR_ULINE); // underline attribute option
         lgfnt.lfStrikeOut = FALSE;         // strikeout attribute option
         lgfnt.lfCharSet = mswin_charset(); // character set identifier
         lgfnt.lfOutPrecision = OUT_DEFAULT_PRECIS;   // output precision
@@ -198,19 +203,29 @@ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 
     font_table[font_index].code = NHFONT_CODE(win_type, attr);
     font_table[font_index].hFont = fnt;
-    return fnt;
+    font_table[font_index].supportsUnicode = winos_font_support_cp437(fnt);
+
+    HGDIOBJ savedFont = SelectObject(hdc, fnt);
+    SIZE size;
+    GetTextExtentPoint32A(hdc, " ", 1, &size);
+    SelectObject(hdc, savedFont);
+
+    font_table[font_index].height = size.cy;
+    font_table[font_index].width = size.cx;
+
+    return &font_table[font_index];
 }
 
 UINT
-mswin_charset()
+mswin_charset(void)
 {
     CHARSETINFO cis;
     if (SYMHANDLING(H_IBM))
-        if (TranslateCharsetInfo((DWORD *) GetOEMCP(), &cis, TCI_SRCCODEPAGE))
+        if (TranslateCharsetInfo((DWORD *) (uintptr_t) GetOEMCP(), &cis, TCI_SRCCODEPAGE))
             return cis.ciCharset;
         else
             return OEM_CHARSET;
-    else if (TranslateCharsetInfo((DWORD *) GetACP(), &cis, TCI_SRCCODEPAGE))
+    else if (TranslateCharsetInfo((DWORD *) (uintptr_t) GetACP(), &cis, TCI_SRCCODEPAGE))
         return cis.ciCharset;
     else
         return ANSI_CHARSET;

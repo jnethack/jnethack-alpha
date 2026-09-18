@@ -1,10 +1,11 @@
-/* NetHack 3.6	unixunix.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
+/* NetHack 5.0	unixunix.c	$NHDT-Date: 1711213894 2024/03/23 17:11:34 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* This file collects some Unix dependencies */
 
-#include "hack.h" /* mainly for index() which depends on BSD */
+#include "hack.h" /* mainly for strchr() which depends on BSD */
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -13,13 +14,16 @@
 #endif
 #include <signal.h>
 
+static int veryold(int);
+static int eraseoldlocks(void);
+
 #ifdef _M_UNIX
-extern void NDECL(sco_mapon);
-extern void NDECL(sco_mapoff);
+extern void sco_mapon(void);
+extern void sco_mapoff(void);
 #endif
 #ifdef __linux__
-extern void NDECL(linux_mapon);
-extern void NDECL(linux_mapoff);
+extern void linux_mapon(void);
+extern void linux_mapoff(void);
 #endif
 
 #ifndef NHSTDC
@@ -28,18 +32,18 @@ extern int errno;
 
 static struct stat buf;
 
-/* see whether we should throw away this xlock file */
+/* see whether we should throw away this xlock file;
+   if yes, close it, otherwise leave it open */
 static int
-veryold(fd)
-int fd;
+veryold(int fd)
 {
     time_t date;
 
     if (fstat(fd, &buf))
-        return (0); /* cannot get status */
+        return 0; /* cannot get status */
 #ifndef INSURANCE
-    if (buf.st_size != sizeof(int))
-        return (0); /* not an xlock file */
+    if (buf.st_size != sizeof (int))
+        return 0; /* not an xlock file */
 #endif
 #if defined(BSD) && !defined(POSIX_TYPES)
     (void) time((long *) (&date));
@@ -49,10 +53,10 @@ int fd;
     if (date - buf.st_mtime < 3L * 24L * 60L * 60L) { /* recent */
         int lockedpid; /* should be the same size as hackpid */
 
-        if (read(fd, (genericptr_t) &lockedpid, sizeof(lockedpid))
-            != sizeof(lockedpid))
+        if (read(fd, (genericptr_t) &lockedpid, sizeof lockedpid)
+            != sizeof lockedpid)
             /* strange ... */
-            return (0);
+            return 0;
 
 /* From: Rick Adams <seismo!rick> */
 /* This will work on 4.1cbsd, 4.2bsd and system 3? & 5. */
@@ -62,37 +66,47 @@ int fd;
            by more than one machine! -pem */
         if (!(kill(lockedpid, 0) == -1 && errno == ESRCH))
 #endif
-            return (0);
+            return 0;
     }
-    (void) close(fd);
-    return (1);
+    /* this used to close the file upon success, leave it open upon failure;
+       that was supposed to simplify the caller's usage but ended up making
+       that be more complicated; always leave the file open so that caller
+       can close it unconditionally */
+    /*(void) close(fd);*/
+    return 1;
 }
 
 static int
-eraseoldlocks()
+eraseoldlocks(void)
 {
-    register int i;
+    int i;
 
+#if defined(HANGUPHANDLING)
     program_state.preserve_locks = 0; /* not required but shows intent */
     /* cannot use maxledgerno() here, because we need to find a lock name
      * before starting everything (including the dungeon initialization
      * that sets astral_level, needed for maxledgerno()) up
      */
+#endif
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(lock, i);
-        (void) unlink(fqname(lock, LEVELPREFIX, 0));
+        set_levelfile_name(gl.lock, i);
+        (void) unlink(fqname(gl.lock, LEVELPREFIX, 0));
     }
-    set_levelfile_name(lock, 0);
-    if (unlink(fqname(lock, LEVELPREFIX, 0)))
-        return (0); /* cannot remove it */
-    return (1);     /* success! */
+    set_levelfile_name(gl.lock, 0);
+    if (unlink(fqname(gl.lock, LEVELPREFIX, 0)))
+        return 0; /* cannot remove it */
+    return 1;     /* success! */
 }
 
 void
-getlock()
+getlock(void)
 {
-    register int i = 0, fd, c;
+#ifndef SELF_RECOVER
+    static const char destroy_old_game_prompt[] =
+    "There is already a game in progress under your name.  Destroy old game?";
+#endif
+    int i = 0, fd, c, too_old;
     const char *fq_lock;
 
 #ifdef TTY_GRAPHICS
@@ -114,22 +128,22 @@ getlock()
         error("%s", "");
     }
 
-    /* default value of lock[] is "1lock" where '1' gets changed to
+    /* default value of gl.lock[] is "1lock" where '1' gets changed to
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
-    if (!locknum)
-        Sprintf(lock, "%u%s", (unsigned) getuid(), plname);
+    if (!gl.locknum)
+        Sprintf(gl.lock, "%u%s", (unsigned) getuid(), svp.plname);
 
-    regularize(lock);
-    set_levelfile_name(lock, 0);
+    regularize(gl.lock);
+    set_levelfile_name(gl.lock, 0);
 
-    if (locknum) {
-        if (locknum > 25)
-            locknum = 25;
+    if (gl.locknum) {
+        if (gl.locknum > 25)
+            gl.locknum = 25;
 
         do {
-            lock[0] = 'a' + i++;
-            fq_lock = fqname(lock, LEVELPREFIX, 0);
+            gl.lock[0] = 'a' + i++;
+            fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
 
             if ((fd = open(fq_lock, 0)) == -1) {
                 if (errno == ENOENT)
@@ -139,16 +153,17 @@ getlock()
                 error("Cannot open %s", fq_lock);
             }
 
-            if (veryold(fd) /* closes fd if true */
-                && eraseoldlocks())
-                goto gotlock;
+            /* veryold() no longer conditionally closes fd */
+            too_old = veryold(fd);
             (void) close(fd);
-        } while (i < locknum);
+            if (too_old && eraseoldlocks())
+                goto gotlock;
+        } while (i < gl.locknum);
 
         unlock_file(HLOCK);
         error("Too many hacks running now.");
     } else {
-        fq_lock = fqname(lock, LEVELPREFIX, 0);
+        fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
         if ((fd = open(fq_lock, 0)) == -1) {
             if (errno == ENOENT)
                 goto gotlock; /* no such file */
@@ -157,17 +172,37 @@ getlock()
             error("Cannot open %s", fq_lock);
         }
 
-        if (veryold(fd) /* closes fd if true */ && eraseoldlocks())
-            goto gotlock;
+        /* veryold() no longer conditionally closes fd */
+        too_old = veryold(fd);
         (void) close(fd);
+        if (too_old && eraseoldlocks())
+            goto gotlock;
 
+        /* drop the "perm" lock while the user decides */
+        unlock_file(HLOCK);
         if (iflags.window_inited) {
-            c = yn("There is already a game in progress under your name.  "
-                   "Destroy old game?");
+#ifdef SELF_RECOVER
+            c = yn_function(
+             "Old game in progress. Destroy [y], Recover [r], or Cancel [n]?",
+                            "ynr", 'n', FALSE);
+#else
+            /* this is a candidate for paranoid_confirmation */
+            c = y_n(destroy_old_game_prompt);
+#endif
         } else {
-            (void) printf(
-                "\nThere is already a game in progress under your name.");
-            (void) printf("  Destroy old game? [yn] ");
+#ifdef SELF_RECOVER
+            (void) raw_printf(
+        "\nThere is already a game in progress under your name.  Do what?\n");
+            (void) raw_printf("\n  y - Destroy old game");
+            (void) raw_printf("\n  r - Try to recover it");
+            (void) raw_printf("\n  n - Cancel");
+            (void) raw_printf("\n\n  => ");
+            (void) fflush(stdout);
+            do {
+                c = getchar();
+            } while (!strchr("rRyYnN", c) && c != -1);
+#else
+            (void) raw_printf("\n%s [yn] ", destroy_old_game_prompt);
             (void) fflush(stdout);
             if ((c = getchar()) != EOF) {
                 int tmp;
@@ -177,11 +212,24 @@ getlock()
                 while ((tmp = getchar()) != '\n' && tmp != EOF)
                     ; /* eat rest of line and newline */
             }
+#endif
         }
-        if (c == 'y' || c == 'Y') {
-            if (eraseoldlocks())
+#ifdef SELF_RECOVER
+        if (c == 'r' || c == 'R') {
+            if (recover_savefile() && program_state.in_self_recover) {
+                set_levelfile_name(gl.lock, 0);
+                fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
                 goto gotlock;
-            else {
+            } else {
+                unlock_file(HLOCK);
+                error("Couldn't recover old game.");
+            }
+        } else
+#endif
+        if (c == 'y' || c == 'Y') {
+            if (eraseoldlocks()) {
+                goto gotlock;
+            } else {
                 unlock_file(HLOCK);
                 error("Couldn't destroy old game.");
             }
@@ -191,29 +239,67 @@ getlock()
         }
     }
 
-gotlock:
+ gotlock:
     fd = creat(fq_lock, FCMASK);
     unlock_file(HLOCK);
     if (fd == -1) {
         error("cannot creat lock file (%s).", fq_lock);
+        /*NOTREACHED*/
     } else {
-        if (write(fd, (genericptr_t) &hackpid, sizeof(hackpid))
-            != sizeof(hackpid)) {
+        if (write(fd, (genericptr_t) &svh.hackpid, sizeof svh.hackpid)
+            != sizeof svh.hackpid) {
             error("cannot write lock (%s)", fq_lock);
+            /*NOTREACHED*/
         }
         if (close(fd) == -1) {
             error("cannot close lock (%s)", fq_lock);
+            /*NOTREACHED*/
         }
     }
 }
 
-void regularize(s) /* normalize file name - we don't like .'s, /'s, spaces */
-register char *s;
+/* caller couldn't find a regular save file but did find a panic one */
+void
+ask_about_panic_save(void)
 {
-    register char *lp;
+#ifdef CHECK_PANIC_SAVE
+    static const char Instead_prompt[] = "Start a new game instead?";
+    int c = '\0';
 
-    while ((lp = index(s, '.')) || (lp = index(s, '/'))
-           || (lp = index(s, ' ')))
+    pline("There is no regular save file but there is a panic one.");
+    pline("It might be recoverable with demi-divine intervention.");
+    if (iflags.window_inited) {
+        c = yn_function(Instead_prompt, "yn\033q", 'n', FALSE);
+    } else {
+        raw_printf("%s [yn] (n) ", Instead_prompt);
+        (void) fflush(stdout);
+        do {
+            c = getchar();
+            if (c == EOF || c == '\033' || c == '\0')
+                break;
+            c = lowc(c);
+        } while (!strchr("ynq\n", c));
+    }
+    if (c != 'y') {
+        /* caller successfully called getlock() and made <levelfile>.0 */
+        delete_levelfile(0);
+        unlock_file(HLOCK); /* just in case, release 'perm' */
+        if (iflags.window_inited)
+            exit_nhwindows((char *) 0);
+        nh_terminate(EXIT_SUCCESS);
+    }
+#endif
+    return; /* proceed with new game */
+}
+
+/* normalize file name - we don't like .'s, /'s, spaces */
+void
+regularize(char *s)
+{
+    char *lp;
+
+    while ((lp = strchr(s, '.')) != 0 || (lp = strchr(s, '/')) != 0
+           || (lp = strchr(s, ' ')) != 0)
         *lp = '_';
 #if defined(SYSV) && !defined(AIX_31) && !defined(SVR4) && !defined(LINUX) \
     && !defined(__APPLE__)
@@ -242,8 +328,7 @@ register char *s;
 #include <poll.h>
 
 void
-msleep(msec)
-unsigned msec; /* milliseconds */
+msleep(unsigned msec) /* milliseconds */
 {
     struct pollfd unused;
     int msecs = msec; /* poll API is signed */
@@ -256,13 +341,15 @@ unsigned msec; /* milliseconds */
 
 #ifdef SHELL
 int
-dosh()
+dosh(void)
 {
-    register char *str;
+    char *str;
+
 #ifdef SYSCF
     if (!sysopt.shellers || !sysopt.shellers[0]
         || !check_user_string(sysopt.shellers)) {
-        Norep("Unknown command '!'.");
+        /* FIXME: should no longer assume a particular command keystroke */
+        Norep("Unavailable command '!'.");
         return 0;
     }
 #endif
@@ -280,10 +367,10 @@ dosh()
 
 #if defined(SHELL) || defined(DEF_PAGER) || defined(DEF_MAILREADER)
 int
-child(wt)
-int wt;
+child(int wt)
 {
-    register int f;
+    int f;
+
     suspend_nhwindows((char *) 0); /* also calls end_screen() */
 #ifdef _M_UNIX
     sco_mapon();
@@ -297,13 +384,13 @@ int wt;
 #ifdef CHDIR
         (void) chdir(getenv("HOME"));
 #endif
-        return (1);
+        return 1;
     }
     if (f == -1) { /* cannot fork */
         pline("Fork failed.  Try again.");
-        return (0);
+        return 0;
     }
-/* fork succeeded; wait for child to exit */
+    /* fork succeeded; wait for child to exit */
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
     (void) signal(SIGQUIT, SIG_IGN);
@@ -325,47 +412,48 @@ int wt;
         wait_synch();
     }
     resume_nhwindows();
-    return (0);
+    return 0;
 }
-#endif
+#endif /* SHELL || DEF_PAGER || DEF_MAILREADER */
 
 #ifdef GETRES_SUPPORT
 
-extern int FDECL(nh_getresuid, (uid_t *, uid_t *, uid_t *));
-extern uid_t NDECL(nh_getuid);
-extern uid_t NDECL(nh_geteuid);
-extern int FDECL(nh_getresgid, (gid_t *, gid_t *, gid_t *));
-extern gid_t NDECL(nh_getgid);
-extern gid_t NDECL(nh_getegid);
+extern int nh_getresuid(uid_t *, uid_t *, uid_t *);
+extern uid_t nh_getuid(void);
+extern uid_t nh_geteuid(void);
+extern int nh_getresgid(gid_t *, gid_t *, gid_t *);
+extern gid_t nh_getgid(void);
+extern gid_t nh_getegid(void);
 
-int(getresuid)(ruid, euid, suid)
-uid_t *ruid, *euid, *suid;
+/* the following several functions assume __STDC__ where parentheses
+   around the name of a function-like macro prevent macro expansion */
+
+int (getresuid)(uid_t *ruid, *euid, *suid)
 {
     return nh_getresuid(ruid, euid, suid);
 }
 
-uid_t(getuid)()
+uid_t (getuid)(void)
 {
     return nh_getuid();
 }
 
-uid_t(geteuid)()
+uid_t (geteuid)(void)
 {
     return nh_geteuid();
 }
 
-int(getresgid)(rgid, egid, sgid)
-gid_t *rgid, *egid, *sgid;
+int (getresgid)(gid_t *rgid, *egid, *sgid)
 {
     return nh_getresgid(rgid, egid, sgid);
 }
 
-gid_t(getgid)()
+gid_t (getgid)(void)
 {
     return nh_getgid();
 }
 
-gid_t(getegid)()
+gid_t (getegid)(void)
 {
     return nh_getegid();
 }
@@ -377,13 +465,17 @@ gid_t(getegid)()
 boolean
 file_exists(const char *path)
 {
+    struct stat sb;
+
     /* Just see if it's there - trying to figure out if we can actually
      * execute it in all cases is too hard - we really just want to
-     * catch typos in SYSCF. */
-    struct stat sb;
+     * catch typos in SYSCF.
+     */
     if (stat(path, &sb)) {
         return FALSE;
     }
     return TRUE;
 }
 #endif
+
+/*unixunix.c*/

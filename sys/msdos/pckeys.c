@@ -1,4 +1,4 @@
-/* NetHack 3.6	pckeys.c	$NHDT-Date: 1432512792 2015/05/25 00:13:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 5.0	pckeys.c	$NHDT-Date: 1596498270 2020/08/03 23:44:30 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,11 +9,15 @@
 #include "hack.h"
 
 #ifdef MSDOS
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 #include "wintty.h"
 #include "pcvideo.h"
 
-boolean FDECL(pckeys, (unsigned char, unsigned char));
+boolean pckeys(unsigned char, unsigned char);
+static void userpan(boolean);
+static void overview(boolean);
+static void traditional(boolean);
+static void refresh(void);
 
 extern struct WinDesc *wins[MAXWIN]; /* from wintty.c */
 extern boolean inmap;                /* from video.c */
@@ -28,15 +32,13 @@ extern boolean inmap;                /* from video.c */
  *
  */
 boolean
-pckeys(scancode, shift)
-unsigned char scancode;
-unsigned char shift;
+pckeys(unsigned char scancode, unsigned char shift)
 {
     boolean opening_dialog;
 
-    opening_dialog = pl_character[0] ? FALSE : TRUE;
-#ifdef SIMULATE_CURSOR
+    opening_dialog = svp.pl_character[0] ? FALSE : TRUE;
     switch (scancode) {
+#ifdef SIMULATE_CURSOR
     case 0x3d: /* F3 = toggle cursor type */
         HideCursor();
         cursor_type += 1;
@@ -47,25 +49,24 @@ unsigned char shift;
 #endif
     case 0x74: /* Control-right_arrow = scroll horizontal to right */
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
-            vga_userpan(1);
+            userpan(1);
         break;
-
     case 0x73: /* Control-left_arrow = scroll horizontal to left */
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
-            vga_userpan(0);
+            userpan(0);
         break;
     case 0x3E: /* F4 = toggle overview mode */
         if (iflags.tile_view && !opening_dialog && !Is_rogue_level(&u.uz)) {
             iflags.traditional_view = FALSE;
-            vga_overview(iflags.over_view ? FALSE : TRUE);
-            vga_refresh();
+            overview(iflags.over_view ? FALSE : TRUE);
+            refresh();
         }
         break;
     case 0x3F: /* F5 = toggle traditional mode */
         if (iflags.tile_view && !opening_dialog && !Is_rogue_level(&u.uz)) {
             iflags.over_view = FALSE;
-            vga_traditional(iflags.traditional_view ? FALSE : TRUE);
-            vga_refresh();
+            traditional(iflags.traditional_view ? FALSE : TRUE);
+            refresh();
         }
         break;
     default:
@@ -73,7 +74,59 @@ unsigned char shift;
     }
     return TRUE;
 }
-#endif /* USE_TILES */
+
+static void
+userpan(boolean on)
+{
+#ifdef SCREEN_VGA
+    if (iflags.usevga)
+        vga_userpan(on);
+#endif
+#ifdef SCREEN_VESA
+    if (iflags.usevesa)
+        vesa_userpan(on);
+#endif
+}
+
+static void
+overview(boolean on)
+{
+#ifdef SCREEN_VGA
+    if (iflags.usevga)
+        vga_overview(on);
+#endif
+#ifdef SCREEN_VESA
+    if (iflags.usevesa)
+        vesa_overview(on);
+#endif
+}
+
+static void
+traditional(boolean on)
+{
+#ifdef SCREEN_VGA
+    if (iflags.usevga)
+        vga_traditional(on);
+#endif
+#ifdef SCREEN_VESA
+    if (iflags.usevesa)
+        vesa_traditional(on);
+#endif
+}
+
+static void
+refresh(void)
+{
+#ifdef SCREEN_VGA
+    if (iflags.usevga)
+        vga_refresh();
+#endif
+#ifdef SCREEN_VESA
+    if (iflags.usevesa)
+        vesa_refresh();
+#endif
+}
+#endif /* TILES_IN_GLYPHMAP */
 #endif /* MSDOS */
 
 /*pckeys.c*/

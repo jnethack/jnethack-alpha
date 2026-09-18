@@ -1,11 +1,11 @@
 #!/bin/sh
-# NetHack 3.6  nethack.sh	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $
+# NetHack 5.0  nethack.sh	$NHDT-Date: 1596498294 2020/08/03 23:44:54 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.21 $
+# Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
+# NetHack may be freely redistributed.  See license for details.
 
 HACKDIR=/usr/games/lib/nethackdir
 export HACKDIR
 HACK=$HACKDIR/nethack
-# NB: MAXNROFPLAYERS is deprecated in favor of MAXPLAYERS in SYSCF.
-MAXNROFPLAYERS=4
 
 # Since Nethack.ad is installed in HACKDIR, add it to XUSERFILESEARCHPATH
 case "x$XUSERFILESEARCHPATH" in
@@ -17,7 +17,7 @@ esac
 export XUSERFILESEARCHPATH
 
 # Get font dir added, but only once (and only if there's an xset to be found).
-test -n "$DISPLAY" -a -e $HACKDIR/fonts.dir && xset p >/dev/null 2>&1 && (
+test -n "$DISPLAY" -a -f $HACKDIR/fonts.dir && xset p >/dev/null 2>&1 && (
 	xset fp- $HACKDIR >/dev/null 2>&1;
 	xset fp+ $HACKDIR
 )
@@ -65,11 +65,4 @@ fi
 
 
 cd $HACKDIR
-case $1 in
-	-s*)
-		exec $HACK "$@"
-		;;
-	*)
-		exec $HACK "$@" $MAXNROFPLAYERS
-		;;
-esac
+exec $HACK "$@"

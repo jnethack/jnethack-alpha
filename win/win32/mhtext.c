@@ -1,5 +1,5 @@
-/* NetHack 3.6	mhtext.c	$NHDT-Date: 1432512813 2015/05/25 00:13:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* NetHack 5.0	mhtext.c	$NHDT-Date: 1596498362 2020/08/03 23:46:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
+/* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
@@ -24,10 +24,9 @@ static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
 
 HWND
-mswin_init_text_window()
+mswin_init_text_window(void)
 {
     HWND ret;
-    PNHTextWindow data;
     RECT rt;
 
     /* get window position */
@@ -37,7 +36,7 @@ mswin_init_text_window()
         mswin_get_window_placement(NHW_TEXT, &rt);
     }
 
-    /* create text widnow object */
+    /* create text window object */
     ret = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_NHTEXT),
                        GetNHApp()->hMainWnd, NHTextWndProc);
     if (!ret)
@@ -51,22 +50,9 @@ mswin_init_text_window()
 
     /* Set window caption */
     SetWindowText(ret, "Text");
-    if (!GetNHApp()->bWindowsLocked) {
-        DWORD style;
-        style = GetWindowLong(ret, GWL_STYLE);
-        style |= WS_CAPTION;
-        SetWindowLong(ret, GWL_STYLE, style);
-        SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE
-                                                | SWP_NOZORDER
-                                                | SWP_FRAMECHANGED);
-    }
 
-    /* create and set window data */
-    data = (PNHTextWindow) malloc(sizeof(NHTextWindow));
-    if (!data)
-        panic("out of memory");
-    ZeroMemory(data, sizeof(NHTextWindow));
-    SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR) data);
+    mswin_apply_window_style(ret);
+
     return ret;
 }
 
@@ -90,38 +76,43 @@ mswin_display_text_window(HWND hWnd)
 INT_PTR CALLBACK
 NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    HWND control;
-    HDC hdc;
-    PNHTextWindow data;
-    TCHAR title[MAX_LOADSTRING];
+    PNHTextWindow data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-    data = (PNHTextWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
     switch (message) {
-    case WM_INITDIALOG:
+    case WM_INITDIALOG: {
+        data = (PNHTextWindow)malloc(sizeof(NHTextWindow));
+        if (!data)
+            panic("out of memory");
+
+        ZeroMemory(data, sizeof(NHTextWindow));
+        SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
+        windowdata[NHW_TEXT].address = (genericptr_t) data; // for cleanup at the end
+
+        HWND control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+        HDC hdc = GetDC(control);
+        cached_font * font = mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE);
         /* set text control font */
-        control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+        
         if (!control) {
             panic("cannot get text view window");
         }
 
-        hdc = GetDC(control);
-        SendMessage(control, WM_SETFONT,
-                    (WPARAM) mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE),
-                    0);
+        SendMessage(control, WM_SETFONT, (WPARAM) font->hFont, 0);
         ReleaseDC(control, hdc);
 
         /* subclass edit control */
         editControlWndProc =
-            (WNDPROC) GetWindowLongPtr(control, GWLP_WNDPROC);
-        SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR) NHEditHookWndProc);
+            (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
+        SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)NHEditHookWndProc);
 
         SetFocus(control);
 
         /* Even though the dialog has no caption, you can still set the title
            which shows on Alt-Tab */
+        TCHAR title[MAX_LOADSTRING];
         LoadString(GetNHApp()->hApp, IDS_APP_TITLE, title, MAX_LOADSTRING);
         SetWindowText(hWnd, title);
-        return FALSE;
+    } break;
 
     case WM_MSNH_COMMAND:
         onMSNHCommand(hWnd, wParam, lParam);
@@ -184,9 +175,13 @@ NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 free(data->window_text);
             free(data);
             SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) 0);
+            windowdata[NHW_TEXT].address = 0;
         }
         break;
+
     }
+
+
     return FALSE;
 }
 
@@ -206,13 +201,20 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             text_size = strlen(msg_data->text) + 4;
             data->window_text =
                 (TCHAR *) malloc(text_size * sizeof(data->window_text[0]));
-            ZeroMemory(data->window_text,
-                       text_size * sizeof(data->window_text[0]));
+            if (data->window_text) {
+                ZeroMemory(data->window_text,
+                           text_size * sizeof(data->window_text[0]));
+            }
         } else {
+            TCHAR *was = data->window_text;
+
             text_size =
                 _tcslen(data->window_text) + strlen(msg_data->text) + 4;
             data->window_text = (TCHAR *) realloc(
                 data->window_text, text_size * sizeof(data->window_text[0]));
+            if (!data->window_text) {
+                free(was);
+            }
         }
         if (!data->window_text)
             break;
@@ -221,6 +223,13 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         _tcscat(data->window_text, TEXT("\r\n"));
         break;
     }
+
+        case MSNH_MSG_RANDOM_INPUT: {
+            PostMessage(GetDlgItem(hWnd, IDC_TEXT_CONTROL), 
+            WM_MSNH_COMMAND, MSNH_MSG_RANDOM_INPUT, 0);
+        }
+        break;
+
     }
 }
 
@@ -239,26 +248,42 @@ LayoutText(HWND hWnd)
     /* get window coordinates */
     GetClientRect(hWnd, &clrt);
 
-    /* set window placements */
-    GetWindowRect(btn_ok, &rt);
-    sz_ok.cx = clrt.right - clrt.left;
-    sz_ok.cy = rt.bottom - rt.top;
-    pt_ok.x = clrt.left;
-    pt_ok.y = clrt.bottom - sz_ok.cy;
+    if( !GetNHApp()->regNetHackMode ) {
+        /* set window placements */
+        GetWindowRect(btn_ok, &rt);
+        sz_ok.cx = clrt.right - clrt.left;
+        sz_ok.cy = rt.bottom - rt.top;
+        pt_ok.x = clrt.left;
+        pt_ok.y = clrt.bottom - sz_ok.cy;
 
-    pt_elem.x = clrt.left;
-    pt_elem.y = clrt.top;
-    sz_elem.cx = clrt.right - clrt.left;
-    sz_elem.cy = pt_ok.y;
+        pt_elem.x = clrt.left;
+        pt_elem.y = clrt.top;
+        sz_elem.cx = clrt.right - clrt.left;
+        sz_elem.cy = pt_ok.y;
 
-    MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE);
-    MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE);
+        MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE);
+        MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE);
+    } else {
+        sz_ok.cx = sz_ok.cy = 0;
+
+        pt_ok.x = pt_ok.y = 0;
+        pt_elem.x = clrt.left;
+        pt_elem.y = clrt.top;
+
+        sz_elem.cx = clrt.right - clrt.left;
+        sz_elem.cy = clrt.bottom - clrt.top;
+
+        ShowWindow(btn_ok, SW_HIDE);
+        MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
+    }
+    mswin_apply_window_style(text);
 }
 
 /* Edit box hook */
 LRESULT CALLBACK
 NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    HWND hWndParent = GetParent(hWnd);
     HDC hDC;
     RECT rc;
 
@@ -286,8 +311,7 @@ NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 && (si.nPos + (int) si.nPage) <= (si.nMax - si.nMin))
                 SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
             else
-                PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0),
-                            0);
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDOK, 0), 0);
             return 0;
         }
         case VK_NEXT:
@@ -327,6 +351,20 @@ NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SETFOCUS:
         HideCaret(hWnd);
         return 0;
+
+    case WM_MSNH_COMMAND:
+        if (wParam == MSNH_MSG_RANDOM_INPUT) {
+            char c = randomkey();
+            if (c == '\n')
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDOK, 0), 0);
+            else if (c == '\033')
+                PostMessage(hWndParent, WM_COMMAND, MAKELONG(IDCANCEL, 0), 0);
+            else
+                PostMessage(hWnd, WM_CHAR, c, 0);
+            return 0;
+        }
+        break;
+
     }
 
     if (editControlWndProc)

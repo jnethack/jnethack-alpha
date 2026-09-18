@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  setup.sh	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $
+# NetHack 5.0  setup.sh	$NHDT-Date: 1596498296 2020/08/03 23:44:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.17 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -23,6 +23,11 @@ x)      hints=/dev/null
         ;;
 *)      hints=$prefix/$1
 	hfile=$1
+	    # sanity check
+	if [ ! -f "$hints" ]; then
+	    echo "Cannot find hints file $hfile"
+	    exit 1
+	fi
         ;;
 esac
 

@@ -1,5 +1,6 @@
-/* NetHack 3.6	ioctl.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	ioctl.c	$NHDT-Date: 1596498280 2020/08/03 23:44:40 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* This cannot be part of hack.tty.c (as it was earlier) since on some
@@ -63,25 +64,28 @@ struct termio termio;
 #include <signal.h>
 #endif
 
-#if defined(TIOCGWINSZ)                                    \
-    && (defined(BSD) || defined(ULTRIX) || defined(AIX_31) \
-        || defined(_BULL_SOURCE) || defined(SVR4))
+/* AVOID_WIN_IOCTL can be uncommented in unixconf.h
+ * to force USE_WIN_IOTCL to remain undefined,
+ * instead of the restricted explicit opt-in
+ * logic that used to be here.
+ */
+#if defined(TIOCGWINSZ) && !defined(AVOID_WIN_IOCTL)
 #define USE_WIN_IOCTL
 #include "tcap.h" /* for LI and CO */
 #endif
 
 #ifdef _M_UNIX
-extern void NDECL(sco_mapon);
-extern void NDECL(sco_mapoff);
+extern void sco_mapon(void);
+extern void sco_mapoff(void);
 #endif
 #ifdef __linux__
-extern void NDECL(linux_mapon);
-extern void NDECL(linux_mapoff);
+extern void linux_mapon(void);
+extern void linux_mapoff(void);
 #endif
 
 #ifdef AUX
 void
-catch_stp()
+catch_stp(void)
 {
     signal(SIGTSTP, SIG_DFL);
     dosuspend();
@@ -89,7 +93,7 @@ catch_stp()
 #endif /* AUX */
 
 void
-getwindowsz()
+getwindowsz(void)
 {
 #ifdef USE_WIN_IOCTL
     /*
@@ -112,7 +116,7 @@ getwindowsz()
 }
 
 void
-getioctls()
+getioctls(void)
 {
 #ifdef BSD_JOB_CONTROL
     (void) ioctl(fileno(stdin), (int) TIOCGLTC, (char *) &ltchars);
@@ -135,7 +139,7 @@ getioctls()
 }
 
 void
-setioctls()
+setioctls(void)
 {
 #ifdef BSD_JOB_CONTROL
     (void) ioctl(fileno(stdin), (int) TIOCSLTC, (char *) &ltchars);
@@ -154,7 +158,7 @@ setioctls()
 
 #ifdef SUSPEND /* No longer implies BSD */
 int
-dosuspend()
+dosuspend(void)
 {
 #ifdef SYSCF
     /* NB: check_user_string() is port-specific. */

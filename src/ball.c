@@ -1,5 +1,6 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1446808438 2015/11/06 11:13:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 5.0	ball.c	$NHDT-Date: 1596498150 2020/08/03 23:42:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Ball & Chain
@@ -7,14 +8,21 @@
 
 #include "hack.h"
 
-STATIC_DCL int NDECL(bc_order);
-STATIC_DCL void NDECL(litter);
+staticfn int bc_order(void);
+staticfn void litter(void);
+staticfn void placebc_core(void);
+staticfn void unplacebc_core(void);
+staticfn boolean check_restriction(int);
+
+static int bcrestriction = 0;
+#ifdef BREADCRUMBS
+static struct breadcrumbs bcpbreadcrumbs = {0}, bcubreadcrumbs = {0};
+#endif
 
 void
-ballrelease(showmsg)
-boolean showmsg;
+ballrelease(boolean showmsg)
 {
-    if (carried(uball)) {
+    if (carried(uball) && !welded(uball)) {
         if (showmsg)
             pline("Startled, you drop the iron ball.");
         if (uwep == uball)
@@ -23,25 +31,31 @@ boolean showmsg;
             setuswapwep((struct obj *) 0);
         if (uquiver == uball)
             setuqwep((struct obj *) 0);
-        ;
-        if (uwep != uball)
-            freeinv(uball);
+        /* [this used to test 'if (uwep != uball)' but that always passes
+           after the setuwep() above] */
+        freeinv(uball); /* remove from inventory but don't place on floor */
+        encumber_msg();
     }
 }
 
+/* ball&chain might hit hero when falling through a trap door */
 void
-ballfall()
+ballfall(void)
 {
     boolean gets_hit;
+
+    if (!uball || (uball && carried(uball) && welded(uball)))
+        return;
 
     gets_hit = (((uball->ox != u.ux) || (uball->oy != u.uy))
                 && ((uwep == uball) ? FALSE : (boolean) rn2(5)));
     ballrelease(TRUE);
     if (gets_hit) {
         int dmg = rn1(7, 25);
+
         pline_The("iron ball falls on your %s.", body_part(HEAD));
         if (uarmh) {
-            if (is_metallic(uarmh)) {
+            if (hard_helmet(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
                 dmg = 3;
             } else if (flags.verbose)
@@ -102,8 +116,8 @@ ballfall()
  *
  *  Should not be called while swallowed except on waterlevel.
  */
-void
-placebc()
+staticfn void
+placebc_core(void)
 {
     if (!uchain || !uball) {
         impossible("Where are your ball and chain?");
@@ -112,9 +126,9 @@ placebc()
 
     (void) flooreffects(uchain, u.ux, u.uy, ""); /* chain might rust */
 
-    if (carried(uball)) /* the ball is carried */
+    if (carried(uball)) { /* the ball is carried */
         u.bc_order = BCPOS_DIFFER;
-    else {
+    } else {
         /* ball might rust -- already checked when carried */
         (void) flooreffects(uball, u.ux, u.uy, "");
         place_object(uball, u.ux, u.uy);
@@ -126,10 +140,11 @@ placebc()
     u.bglyph = u.cglyph = levl[u.ux][u.uy].glyph; /* pick up glyph */
 
     newsym(u.ux, u.uy);
+    bcrestriction = 0;
 }
 
-void
-unplacebc()
+staticfn void
+unplacebc_core(void)
 {
     if (u.uswallow) {
         if (Is_waterlevel(&u.uz)) {
@@ -149,23 +164,194 @@ unplacebc()
         obj_extract_self(uball);
         if (Blind && (u.bc_felt & BC_BALL)) /* drop glyph */
             levl[uball->ox][uball->oy].glyph = u.bglyph;
-
+        maybe_unhide_at(uball->ox, uball->oy);
         newsym(uball->ox, uball->oy);
     }
     obj_extract_self(uchain);
     if (Blind && (u.bc_felt & BC_CHAIN)) /* drop glyph */
         levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+    maybe_unhide_at(uchain->ox, uchain->oy);
 
     newsym(uchain->ox, uchain->oy);
     u.bc_felt = 0; /* feel nothing */
 }
 
+staticfn boolean
+check_restriction(int restriction)
+{
+    boolean ret = FALSE;
+
+    if (!bcrestriction || (restriction == override_restriction))
+        ret = TRUE;
+    else
+        ret = (bcrestriction == restriction) ? TRUE : FALSE;
+    return ret;
+}
+
+#ifndef BREADCRUMBS
+void
+placebc(void)
+{
+    if (!check_restriction(0)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, "placebc denied, restriction in effect");
+        paniclog("placebc", panicbuf);
+#endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+
+void
+unplacebc(void)
+{
+    if (bcrestriction) {
+        impossible("unplacebc denied, restriction in place");
+        return;
+    }
+    unplacebc_core();
+}
+
+int
+unplacebc_and_covet_placebc(void)
+{
+    int restriction = 0;
+
+    if (bcrestriction) {
+        impossible("unplacebc_and_covet_placebc denied, already restricted");
+    } else {
+        restriction = bcrestriction = rnd(400);
+        unplacebc_core();
+    }
+    return restriction;
+}
+
+void
+lift_covet_and_placebc(int pin)
+{
+    if (!check_restriction(pin)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, "lift_covet_and_placebc denied, %s",
+                (pin != bcrestriction) ? "pin mismatch"
+                                       : "restriction in effect");
+        paniclog("placebc", panicbuf);
+#endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+
+#else  /* BREADCRUMBS */
+
+void
+Placebc(const char *funcnm, int linenum)
+{
+    if (!check_restriction(0)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, "Placebc denied to %s:%d, restricted by %s:%d",
+                funcnm, linenum,
+                bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        paniclog("Placebc", panicbuf);
+#endif
+        return;
+    }
+    if ((uchain && uchain->where != OBJ_FREE)
+                   && bcpbreadcrumbs.in_effect) {
+        impossible("Placebc collision at %s:%d, already placed by %s:%d",
+                   funcnm, linenum,
+                   bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        return;
+    }
+    bcpbreadcrumbs.in_effect = TRUE;
+    bcubreadcrumbs.in_effect = FALSE;
+    bcpbreadcrumbs.funcnm = funcnm;
+    bcpbreadcrumbs.linenum = linenum;
+    placebc_core();
+}
+
+void
+Unplacebc(const char *funcnm, int linenum)
+{
+
+    if (bcrestriction) {
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf, "Unplacebc from %s:%d, when restricted to %s:%d",
+                funcnm, linenum,
+                bcubreadcrumbs.funcnm, bcubreadcrumbs.linenum);
+        paniclog("Unplacebc", panicbuf);
+    }
+    bcpbreadcrumbs.in_effect = FALSE;
+    bcubreadcrumbs.in_effect = TRUE;
+    bcubreadcrumbs.funcnm = funcnm;
+    bcubreadcrumbs.linenum = linenum;
+    unplacebc_core();
+}
+
+int
+Unplacebc_and_covet_placebc(const char *funcnm, int linenum)
+{
+    int restriction = 0;
+
+    if (bcrestriction) {
+        impossible(
+          "Unplacebc_and_covet_placebc denied to %s:%d, restricted by %s:%d",
+                   funcnm, linenum,
+                   bcubreadcrumbs.funcnm, bcubreadcrumbs.linenum);
+    } else {
+        restriction = bcrestriction = rnd(400);
+        bcpbreadcrumbs.in_effect = FALSE;
+        bcubreadcrumbs.in_effect = TRUE;
+        bcubreadcrumbs.funcnm = funcnm;
+        bcubreadcrumbs.linenum = linenum;
+        unplacebc_core();
+    }
+    return restriction;
+}
+
+void
+Lift_covet_and_placebc(int pin, char *funcnm, int linenum)
+{
+    if (!check_restriction(pin)) {
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
+        char panicbuf[BUFSZ];
+
+        Sprintf(panicbuf,
+                "Lift_covet_and_placebc denied to %s:%d, restricted by %s:%d",
+                funcnm, linenum,
+                bcpbreadcrumbs.funcnm, bcpbreadcrumbs.linenum);
+        paniclog("Lift_covet_and_placebc", panicbuf);
+#endif
+        return;
+    }
+    if (uchain && uchain->where != OBJ_FREE) {
+        impossible("bc already placed?");
+        return;
+    }
+    placebc_core();
+}
+#endif /* BREADCRUMBS */
+
 /*
  *  Return the stacking of the hero's ball & chain.  This assumes that the
  *  hero is being punished.
  */
-STATIC_OVL int
-bc_order()
+staticfn int
+bc_order(void)
 {
     struct obj *obj;
 
@@ -173,7 +359,7 @@ bc_order()
         || u.uswallow)
         return BCPOS_DIFFER;
 
-    for (obj = level.objects[uball->ox][uball->oy]; obj;
+    for (obj = svl.level.objects[uball->ox][uball->oy]; obj;
          obj = obj->nexthere) {
         if (obj == uchain)
             return BCPOS_CHAIN;
@@ -191,8 +377,7 @@ bc_order()
  *  Set up the ball and chain variables so that the ball and chain are "felt".
  */
 void
-set_bc(already_blind)
-int already_blind;
+set_bc(int already_blind)
 {
     int ball_on_floor = !carried(uball);
 
@@ -249,9 +434,8 @@ int already_blind;
  *  Should not be called while swallowed.
  */
 void
-move_bc(before, control, ballx, bally, chainx, chainy)
-int before, control;
-xchar ballx, bally, chainx, chainy; /* only matter !before */
+move_bc(int before, int control, coordxy ballx, coordxy bally,
+        coordxy chainx, coordxy chainy)
 {
     if (Blind) {
         /*
@@ -342,9 +526,11 @@ xchar ballx, bally, chainx, chainy; /* only matter !before */
             }
 
             remove_object(uchain);
+            maybe_unhide_at(uchain->ox, uchain->oy);
             newsym(uchain->ox, uchain->oy);
             if (!carried(uball)) {
                 remove_object(uball);
+                maybe_unhide_at(uball->ox, uball->oy);
                 newsym(uball->ox, uball->oy);
             }
         } else {
@@ -369,31 +555,28 @@ xchar ballx, bally, chainx, chainy; /* only matter !before */
     }
 }
 
-/* return TRUE if the caller needs to place the ball and chain down again
- *
- *  Should not be called while swallowed.  Should be called before movement,
- *  because we might want to move the ball or chain to the hero's old
- * position.
- *
- * It is called if we are moving.  It is also called if we are teleporting
- * *if* the ball doesn't move and we thus must drag the chain.  It is not
- * called for ordinary teleportation.
- *
- * allow_drag is only used in the ugly special case where teleporting must
- * drag the chain, while an identical-looking movement must drag both the ball
- * and chain.
- */
+/* return TRUE if the caller needs to place the ball and chain down again */
 boolean
-drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, cause_delay,
-          allow_drag)
-xchar x, y;
-int *bc_control;
-xchar *ballx, *bally, *chainx, *chainy;
-boolean *cause_delay;
-boolean allow_drag;
+drag_ball(coordxy x, coordxy y, int *bc_control,
+          coordxy *ballx, coordxy *bally, coordxy *chainx, coordxy *chainy,
+          boolean *cause_delay, boolean allow_drag)
 {
     struct trap *t = (struct trap *) 0;
     boolean already_in_rock;
+
+    /*
+     * Should not be called while swallowed.  Should be called before
+     * movement, because we might want to move the ball or chain to the
+     * hero's old position.
+     *
+     * It is called if we are moving.  It is also called if we are
+     * teleporting *if* the ball doesn't move and we thus must drag the
+     * chain.  It is not called for ordinary teleportation.
+     *
+     * 'allow_drag' is only used in the ugly special case where teleporting
+     * must drag the chain, while an identical-looking movement must drag
+     * both the ball and chain.
+     */
 
     *ballx = uball->ox;
     *bally = uball->oy;
@@ -409,7 +592,8 @@ boolean allow_drag;
 
     /* only need to move the chain? */
     if (carried(uball) || distmin(x, y, uball->ox, uball->oy) <= 2) {
-        xchar oldchainx = uchain->ox, oldchainy = uchain->oy;
+        coordxy oldchainx = uchain->ox, oldchainy = uchain->oy;
+
         *bc_control = BC_CHAIN;
         move_bc(1, *bc_control, *ballx, *bally, *chainx, *chainy);
         if (carried(uball)) {
@@ -420,26 +604,29 @@ boolean allow_drag;
             }
             return TRUE;
         }
+
 #define CHAIN_IN_MIDDLE(chx, chy) \
     (distmin(x, y, chx, chy) <= 1 \
      && distmin(chx, chy, uball->ox, uball->oy) <= 1)
 #define IS_CHAIN_ROCK(x, y)      \
-    (IS_ROCK(levl[x][y].typ)     \
+    (IS_OBSTRUCTED(levl[x][y].typ)     \
      || (IS_DOOR(levl[x][y].typ) \
          && (levl[x][y].doormask & (D_CLOSED | D_LOCKED))))
-/* Don't ever move the chain into solid rock.  If we have to, then instead
- * undo the move_bc() and jump to the drag ball code.  Note that this also
- * means the "cannot carry and drag" message will not appear, since unless we
- * moved at least two squares there is no possibility of the chain position
- * being in solid rock.
- */
-#define SKIP_TO_DRAG                                               \
-    {                                                              \
+    /*
+     * Don't ever move the chain into solid rock.  If we have to, then
+     * instead undo the move_bc() and jump to the drag ball code.  Note
+     * that this also means the "cannot carry and drag" message will not
+     * appear, since unless we moved at least two squares there is no
+     * possibility of the chain position being in solid rock.
+     */
+#define SKIP_TO_DRAG \
+    do {                                                           \
         *chainx = oldchainx;                                       \
         *chainy = oldchainy;                                       \
         move_bc(0, *bc_control, *ballx, *bally, *chainx, *chainy); \
         goto drag;                                                 \
-    }
+    } while (0)
+
         if (IS_CHAIN_ROCK(u.ux, u.uy) || IS_CHAIN_ROCK(*chainx, *chainy)
             || IS_CHAIN_ROCK(uball->ox, uball->oy))
             already_in_rock = TRUE;
@@ -447,7 +634,7 @@ boolean allow_drag;
             already_in_rock = FALSE;
 
         switch (dist2(x, y, uball->ox, uball->oy)) {
-        /* two spaces diagonal from ball, move chain inbetween */
+        /* two spaces diagonal from ball, move chain in-between */
         case 8:
             *chainx = (uball->ox + x) / 2;
             *chainy = (uball->oy + y) / 2;
@@ -462,10 +649,10 @@ boolean allow_drag;
          *    0
          */
         case 5: {
-            xchar tempx, tempy, tempx2, tempy2;
+            coordxy tempx, tempy, tempx2, tempy2;
 
-            /* find position closest to current position of chain */
-            /* no effect if current position is already OK */
+            /* find position closest to current position of chain;
+               no effect if current position is already OK */
             if (abs(x - uball->ox) == 1) {
                 tempx = x;
                 tempx2 = uball->ox;
@@ -527,7 +714,7 @@ boolean allow_drag;
         }
 
         /* ball is two spaces horizontal or vertical from player; move*/
-        /* chain inbetween *unless* current chain position is OK */
+        /* chain in-between *unless* current chain position is OK */
         case 4:
             if (CHAIN_IN_MIDDLE(uchain->ox, uchain->oy))
                 break;
@@ -556,7 +743,8 @@ boolean allow_drag;
                     SKIP_TO_DRAG;
                 break;
             }
-        /* fall through */
+            FALLTHROUGH;
+        /* FALLTHRU */
         case 1:
         case 0:
             /* do nothing if possible */
@@ -583,11 +771,11 @@ boolean allow_drag;
         return TRUE;
     }
 
-drag:
+ drag:
 
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
         You("cannot %sdrag the heavy iron ball.",
-            invent ? "carry all that and also " : "");
+            gi.invent ? "carry all that and also " : "");
         nomul(0);
         return FALSE;
     }
@@ -598,8 +786,7 @@ drag:
              || !is_pool(uball->ox, uball->oy)
              || levl[uball->ox][uball->oy].typ == POOL))
         || ((t = t_at(uchain->ox, uchain->oy))
-            && (t->ttyp == PIT || t->ttyp == SPIKED_PIT || t->ttyp == HOLE
-                || t->ttyp == TRAPDOOR))) {
+            && (is_pit(t->ttyp) || is_hole(t->ttyp)))) {
         if (Levitation) {
             You_feel("a tug from the iron ball.");
             if (t)
@@ -610,11 +797,13 @@ drag:
             You("are jerked back by the iron ball!");
             if ((victim = m_at(uchain->ox, uchain->oy)) != 0) {
                 int tmp;
+                int dieroll = rnd(20);
 
                 tmp = -2 + Luck + find_mac(victim);
                 tmp += omon_adj(victim, uball, TRUE);
-                if (tmp >= rnd(20))
-                    (void) hmon(victim, uball, HMON_DRAGGED);
+
+                if (tmp >= dieroll)
+                    (void) hmon(victim, uball, HMON_DRAGGED, dieroll);
                 else
                     miss(xname(uball), victim);
 
@@ -650,7 +839,7 @@ drag:
         *ballx = *chainx = x;
         *bally = *chainy = y;
     } else {
-        xchar newchainx = u.ux, newchainy = u.uy;
+        coordxy newchainx = u.ux, newchainy = u.uy;
 
         /*
          * Generally, chain moves to hero's previous location and ball
@@ -690,8 +879,7 @@ drag:
  *  Should not be called while swallowed.
  */
 void
-drop_ball(x, y)
-xchar x, y;
+drop_ball(coordxy x, coordxy y)
 {
     if (Blind) {
         /* get the order */
@@ -701,26 +889,28 @@ xchar x, y;
     }
 
     if (x != u.ux || y != u.uy) {
+        static const char pullmsg[] = "The ball pulls you out of the ";
         struct trap *t;
-        const char *pullmsg = "The ball pulls you out of the %s!";
+        long side;
 
-        if (u.utrap && u.utraptype != TT_INFLOOR
-            && u.utraptype != TT_BURIEDBALL) {
+        if (u.utrap
+            && u.utraptype != TT_INFLOOR && u.utraptype != TT_BURIEDBALL) {
             switch (u.utraptype) {
             case TT_PIT:
-                pline(pullmsg, "pit");
+                pline("%s%s!", pullmsg, "pit");
                 break;
             case TT_WEB:
-                pline(pullmsg, "web");
+                pline("%s%s!", pullmsg, "web");
+                Soundeffect(se_destroy_web, 30);
                 pline_The("web is destroyed!");
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
-                pline(pullmsg, "lava");
+                pline("%s%s!", pullmsg, hliquid("lava"));
                 break;
-            case TT_BEARTRAP: {
-                register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
-                pline(pullmsg, "bear trap");
+            case TT_BEARTRAP:
+                side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
+                pline("%s%s!", pullmsg, "bear trap");
                 set_wounded_legs(side, rn1(1000, 500));
                 if (!u.usteed) {
                     Your("%s %s is severely damaged.",
@@ -732,8 +922,7 @@ xchar x, y;
                 }
                 break;
             }
-            }
-            u.utrap = 0;
+            reset_utrap(TRUE);
             fill_pit(u.ux, u.uy);
         }
 
@@ -742,15 +931,15 @@ xchar x, y;
         if (!Levitation && !MON_AT(x, y) && !u.utrap
             && (is_pool(x, y)
                 || ((t = t_at(x, y))
-                    && (t->ttyp == PIT || t->ttyp == SPIKED_PIT
-                        || t->ttyp == TRAPDOOR || t->ttyp == HOLE)))) {
+                    && (is_pit(t->ttyp)
+                        || is_hole(t->ttyp))))) {
             u.ux = x;
             u.uy = y;
         } else {
             u.ux = x - u.dx;
             u.uy = y - u.dy;
         }
-        vision_full_recalc = 1; /* hero has moved, recalculate vision later */
+        gv.vision_full_recalc = 1; /* hero has moved, recalc vision later */
 
         if (Blind) {
             /* drop glyph under the chain */
@@ -767,31 +956,34 @@ xchar x, y;
         newsym(u.ux0, u.uy0); /* clean up old position */
         if (u.ux0 != u.ux || u.uy0 != u.uy) {
             spoteffects(TRUE);
-            sokoban_guilt();
         }
     }
 }
 
-STATIC_OVL void
-litter()
+/* ball&chain cause hero to randomly lose stuff from inventory */
+staticfn void
+litter(void)
 {
-    struct obj *otmp = invent, *nextobj;
+    struct obj *otmp, *nextobj = 0;
     int capacity = weight_cap();
 
-    while (otmp) {
+    for (otmp = gi.invent; otmp; otmp = nextobj) {
         nextobj = otmp->nobj;
-        if ((otmp != uball) && (rnd(capacity) <= (int) otmp->owt)) {
+        if (otmp != uball && rnd(capacity) <= (int) otmp->owt) {
             if (canletgo(otmp, "")) {
-                pline("%s you down the stairs.", Yobjnam2(otmp, "follow"));
-                dropx(otmp);
+                You("drop %s and %s %s down the stairs with you.",
+                    yname(otmp), (otmp->quan == 1L) ? "it" : "they",
+                    otense(otmp, "fall"));
+                setnotworn(otmp);
+                freeinv(otmp);
+                hitfloor(otmp, FALSE);
             }
         }
-        otmp = nextobj;
     }
 }
 
 void
-drag_down()
+drag_down(void)
 {
     boolean forward;
     uchar dragchance = 3;
@@ -806,8 +998,11 @@ drag_down()
      */
     forward = carried(uball) && (uwep == uball || !uwep || !rn2(3));
 
-    if (carried(uball))
+    if (carried(uball) && !welded(uball))
         You("lose your grip on the iron ball.");
+
+    cls();  /* previous level is still displayed although you
+               went down the stairs. Avoids bug C343-20 */
 
     if (forward) {
         if (rn2(6)) {
@@ -818,6 +1013,7 @@ drag_down()
         }
     } else {
         if (rn2(2)) {
+            Soundeffect(se_iron_ball_hits_you, 25);
             pline_The("iron ball smacks into you!");
             losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
                    KILLED_BY_AN);
@@ -832,6 +1028,77 @@ drag_down()
             litter();
         }
     }
+}
+
+void
+bc_sanity_check(void)
+{
+    int otyp, freeball, freechain;
+    const char *onam;
+
+    if (Punished && (!uball || !uchain)) {
+        impossible("Punished without %s%s%s?",
+                   !uball ? "iron ball" : "",
+                   (!uball && !uchain) ? " and " : "",
+                   !uchain ? "attached chain" : "");
+    } else if (!Punished && (uball || uchain)) {
+        impossible("Attached %s%s%s without being Punished?",
+                   uchain ? "chain" : "",
+                   (uchain && uball) ? " and " : "",
+                   uball ? "iron ball" : "");
+    }
+    /* ball is free when swallowed, when changing levels or during air bubble
+       management on Plane of Water (both of which start and end in between
+       sanity checking cycles, so shouldn't be relevant), other times? */
+    freechain = (!uchain || uchain->where == OBJ_FREE);
+    freeball = (!uball || uball->where == OBJ_FREE
+                /* lie to simplify the testing logic */
+                || (freechain && uball->where == OBJ_INVENT));
+    if (uball && (uball->otyp != HEAVY_IRON_BALL
+                  || (uball->where != OBJ_FLOOR
+                      && uball->where != OBJ_INVENT
+                      && uball->where != OBJ_FREE)
+                  || (freeball ^ freechain)
+                  || (uball->owornmask & W_BALL) == 0L
+                  || (uball->owornmask & ~(W_BALL | W_WEAPONS)) != 0L)) {
+        otyp = uball->otyp;
+        onam = safe_typename(otyp);
+        impossible("uball: type %d (%s), where %d, wornmask=0x%08lx",
+                   otyp, onam, uball->where, uball->owornmask);
+    }
+    /* similar check to ball except can't be in inventory */
+    if (uchain && (uchain->otyp != IRON_CHAIN
+                   || (uchain->where != OBJ_FLOOR
+                       && uchain->where != OBJ_FREE)
+                   || (freechain ^ freeball)
+                   /* [could simplify this to owornmask != W_CHAIN] */
+                   || (uchain->owornmask & W_CHAIN) == 0L
+                   || (uchain->owornmask & ~W_CHAIN) != 0L)) {
+        otyp = uchain->otyp;
+        onam = safe_typename(otyp);
+        impossible("uchain: type %d (%s), where %d, wornmask=0x%08lx",
+                   otyp, onam, uchain->where, uchain->owornmask);
+    }
+    if (uball && uchain && !(freeball && freechain)) {
+        int bx, by, cx, cy, bdx, bdy, cdx, cdy;
+
+        /* non-free chain should be under or next to the hero;
+           non-free ball should be on or next to the chain or else carried */
+        cx = uchain->ox, cy = uchain->oy;
+        cdx = cx - u.ux, cdy = cy - u.uy;
+        cdx = abs(cdx), cdy = abs(cdy);
+        if (uball->where == OBJ_INVENT) /* carried(uball) */
+            bx = u.ux, by = u.uy; /* get_obj_location() */
+        else
+            bx = uball->ox, by = uball->oy;
+        bdx = bx - cx, bdy = by - cy;
+        bdx = abs(bdx), bdy = abs(bdy);
+        if (cdx > 1 || cdy > 1 || bdx > 1 || bdy > 1)
+            impossible(
+                     "b&c distance: you@<%d,%d>, chain@<%d,%d>, ball@<%d,%d>",
+                       u.ux, u.uy, cx, cy, bx, by);
+    }
+    /* [check bc_order too?] */
 }
 
 /*ball.c*/

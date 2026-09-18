@@ -1,4 +1,4 @@
-/* NetHack 3.6	vidtxt.c	$NHDT-Date: 1432512791 2015/05/25 00:13:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 5.0	vidtxt.c	$NHDT-Date: 1596498278 2020/08/03 23:44:38 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.12 $ */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */
@@ -18,20 +18,19 @@
 #include "wintty.h"
 
 #include <dos.h>
-#include <ctype.h>
 
 #if defined(_MSC_VER)
 #if _MSC_VER >= 700
 #pragma warning(disable : 4018) /* signed/unsigned mismatch */
 #pragma warning(disable : 4127) /* conditional expression is constant */
-#pragma warning(disable : 4131) /* old style declarator */
+/* #pragma warning(disable : 4131) */ /* old style declarator */
 #pragma warning(disable : 4305) /* prevents complaints with MK_FP */
 #pragma warning(disable : 4309) /* initializing */
 #pragma warning(disable : 4759) /* prevents complaints with MK_FP */
 #endif
 #endif
 
-/* void FDECL(txt_xputc,(char, int)); */ /* write out character (and
+/* void txt_xputc(char, int);*/ /* write out character (and
                                             attribute) */
 
 extern int attrib_text_normal;  /* text mode normal attribute */
@@ -39,8 +38,16 @@ extern int attrib_gr_normal;    /* graphics mode normal attribute */
 extern int attrib_text_intense; /* text mode intense attribute */
 extern int attrib_gr_intense;   /* graphics mode intense attribute */
 
+#if defined(SCREEN_BIOS) && !defined(PC9800)
+static unsigned char cursor_info = 0,
+                     cursor_start_scanline = 6, cursor_end_scanline = 7;
+
+static void get_cursinfo(unsigned char *start, unsigned char *end,
+                         unsigned char *flg);
+#endif
+
 void
-txt_get_scr_size()
+txt_get_scr_size(void)
 {
     union REGS regs;
 
@@ -81,6 +88,7 @@ txt_get_scr_size()
 
     LI = regs.h.dl + 1;
     CO = regs.h.ah;
+
 #endif /* PC9800 */
 }
 
@@ -98,10 +106,10 @@ txt_get_scr_size()
 #include <unistd.h>
 #endif
 
-void FDECL(txt_gotoxy, (int, int));
+void txt_gotoxy(int, int);
 
 #if defined(SCREEN_BIOS) && !defined(PC9800)
-void FDECL(txt_get_cursor, (int *, int *));
+void txt_get_cursor(int *, int *);
 #endif
 
 #ifdef SCREEN_DJGPPFAST
@@ -112,7 +120,7 @@ extern int g_attribute; /* Current attribute to use */
 extern int monoflag;    /* 0 = not monochrome, else monochrome */
 
 void
-txt_backsp()
+txt_backsp(void)
 {
 #ifdef PC9800
     union REGS regs;
@@ -134,7 +142,7 @@ txt_backsp()
 }
 
 void
-txt_nhbell()
+txt_nhbell(void)
 {
     union REGS regs;
 
@@ -146,7 +154,7 @@ txt_nhbell()
 }
 
 void
-txt_clear_screen()
+txt_clear_screen(void)
 /* djgpp provides ScreenClear(), but in version 1.09 it is broken
  * so for now we just use the BIOS Routines
  */
@@ -178,8 +186,8 @@ txt_clear_screen()
 #endif
 }
 
-void txt_cl_end(col, row) /* clear to end of line */
-int col, row;
+/* clear to end of line */
+void txt_cl_end(int col, int row)
 {
     union REGS regs;
 #ifndef PC9800
@@ -213,7 +221,7 @@ int col, row;
 #endif
 }
 
-void txt_cl_eos() /* clear to end of screen */
+void txt_cl_eos(void) /* clear to end of screen */
 {
     union REGS regs;
 #ifndef PC9800
@@ -235,24 +243,24 @@ void txt_cl_eos() /* clear to end of screen */
 #else
     txt_get_cursor(&col, &row);
     txt_cl_end(col, row); /* clear to end of line */
-    txt_gotoxy(0, (row < (LI - 1) ? row + 1 : (LI - 1)));
-    regs.h.dl = (char) (CO - 1); /* X  of lower right */
-    regs.h.dh = (char) (LI - 1); /* Y  of lower right */
-    regs.h.cl = 0;               /* X  of upper left */
-                                 /* Y (row)  of upper left */
-    regs.h.ch = (char) (row < (LI - 1) ? row + 1 : (LI - 1));
-    regs.x.cx = 0;
-    regs.x.ax = 0;
-    regs.x.bx = 0;
-    regs.h.bh = (char) attrib_text_normal;
-    regs.h.ah = SCROLL;
-    (void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or initialize window */
+    if (row < LI - 1) {
+        txt_gotoxy(0, (row < (LI - 1) ? row + 1 : (LI - 1)));
+        regs.h.dl = (char) (CO - 1); /* X  of lower right */
+        regs.h.dh = (char) (LI - 1); /* Y  of lower right */
+        regs.h.cl = 0;               /* X  of upper left */
+                                     /* Y (row)  of upper left */
+        regs.h.ch = (char) (row < (LI - 1) ? row + 1 : (LI - 1));
+        regs.x.ax = 0;
+        regs.x.bx = 0;
+        regs.h.bh = (char) attrib_text_normal;
+        regs.h.ah = SCROLL;
+        (void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or initialize window */
+    }
 #endif
 }
 
 void
-txt_startup(wid, hgt)
-int *wid, *hgt;
+txt_startup(int *wid, int *hgt)
 {
     txt_get_scr_size();
     *wid = CO;
@@ -261,6 +269,9 @@ int *wid, *hgt;
     attrib_gr_normal = attrib_text_normal;
     attrib_gr_intense = attrib_text_intense;
     g_attribute = attrib_text_normal; /* Give it a starting value */
+    get_cursinfo(&cursor_start_scanline,
+                 &cursor_end_scanline,
+                 &cursor_info);
 }
 
 /*
@@ -288,9 +299,7 @@ int *wid, *hgt;
  */
 
 void
-txt_xputs(s, col, row)
-const char *s;
-int col, row;
+txt_xputs(const char *s, int col, int row)
 {
     char c;
 
@@ -306,9 +315,8 @@ int col, row;
     }
 }
 
-void txt_xputc(ch, attr) /* write out character (and attribute) */
-char ch;
-int attr;
+/* write out character (and attribute) */
+void txt_xputc(char ch, int attr)
 {
 #ifdef PC9800
     union REGS regs;
@@ -341,8 +349,8 @@ int attr;
     switch (ch) {
     case '\n':
 #if 0
-			col = 0;
-			++row;
+                col = 0;
+                ++row;
 #endif
         break;
     default:
@@ -389,10 +397,11 @@ int attr;
 
 #if defined(SCREEN_BIOS) && !defined(PC9800)
 /*
+ * get cursor position 
+ *
  * This is implemented as a macro under DJGPPFAST.
  */
-void txt_get_cursor(x, y) /* get cursor position */
-int *x, *y;
+void txt_get_cursor(int *x, int *y)
 {
     union REGS regs;
 
@@ -403,12 +412,66 @@ int *x, *y;
     (void) int86(VIDEO_BIOS, &regs, &regs); /* Get Cursor Position */
     *x = regs.h.dl;
     *y = regs.h.dh;
+    if (!cursor_info) {
+        cursor_start_scanline = regs.h.ch;
+        cursor_end_scanline = regs.h.cl;
+        cursor_info = 1;
+    }
+}
+
+void txt_hide_cursor(void)
+{
+    union REGS regs;
+
+        regs.x.dx = 0;
+        regs.h.ah = SETCURTYP;  /* set cursor type */
+        regs.h.ch = 0x3F;       /* starting scanline */
+        regs.h.cl = 0;          /* ending scanline */
+        regs.x.bx = 0;
+        (void) int86(VIDEO_BIOS, &regs, &regs);
+}
+
+void txt_show_cursor(void)
+{
+    union REGS regs;
+
+    regs.x.dx = 0;
+    regs.h.ah = SETCURTYP;  /* set cursor type */
+    if (cursor_info) {
+        regs.h.ch = cursor_start_scanline;  /* starting scanline */
+        regs.h.cl = cursor_end_scanline;    /* ending scanline */
+    } else {
+        regs.h.ch = 6;  /* starting scanline */
+        regs.h.cl = 7;  /* ending scanline */
+    }
+    regs.x.bx = 0;
+    (void) int86(VIDEO_BIOS, &regs, &regs);
+}
+
+static void
+get_cursinfo(uchar *start, uchar *end, uchar *flg)
+{
+    union REGS regs;
+
+    regs.x.dx = 0;
+    regs.h.ah = GETCURPOS; /* get cursor position */
+    regs.x.cx = 0;
+    regs.x.bx = 0;
+    (void) int86(VIDEO_BIOS, &regs, &regs); /* Get Cursor Position */
+
+    if (regs.h.ch != 0x3f) {
+        *start = regs.h.ch;
+        *end = regs.h.cl;
+    } else {
+        *start = 6;
+        *end = 7;
+    }
+    *flg = 1;
 }
 #endif /* SCREEN_BIOS && !PC9800 */
 
 void
-txt_gotoxy(x, y)
-int x, y;
+txt_gotoxy(int x, int y)
 {
 #ifdef SCREEN_BIOS
     union REGS regs;
@@ -444,7 +507,7 @@ int x, y;
 
 #ifdef MONO_CHECK
 int
-txt_monoadapt_check()
+txt_monoadapt_check(void)
 {
     union REGS regs;
 

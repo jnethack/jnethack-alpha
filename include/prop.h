@@ -1,86 +1,96 @@
-/* NetHack 3.6	prop.h	$NHDT-Date: 1437877163 2015/07/26 02:19:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
-/* Copyright (c) 1989 Mike Threepoint				  */
+/* NetHack 5.0	prop.h	$NHDT-Date: 1702274027 2023/12/11 05:53:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
+/* Copyright (c) 1989 Mike Threepoint                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef PROP_H
 #define PROP_H
 
-/*** What the properties are ***/
+/*** What the properties are ***
+ *
+ * note:  propertynames[] array in timeout.c has string values for these.
+ *        Property #0 is not used.
+ */
 /* Resistances to troubles */
-#define FIRE_RES 1
-#define COLD_RES 2
-#define SLEEP_RES 3
-#define DISINT_RES 4
-#define SHOCK_RES 5
-#define POISON_RES 6
-#define ACID_RES 7
-#define STONE_RES 8
-/* note: for the first eight properties, MR_xxx == (1 << (xxx_RES - 1)) */
-#define DRAIN_RES 9
-#define SICK_RES 10
-#define INVULNERABLE 11
-#define ANTIMAGIC 12
-/* Troubles */
-#define STUNNED 13
-#define CONFUSION 14
-#define BLINDED 15
-#define DEAF 16
-#define SICK 17
-#define STONED 18
-#define STRANGLED 19
-#define VOMITING 20
-#define GLIB 21
-#define SLIMED 22
-#define HALLUC 23
-#define HALLUC_RES 24
-#define FUMBLING 25
-#define WOUNDED_LEGS 26
-#define SLEEPY 27
-#define HUNGER 28
-/* Vision and senses */
-#define SEE_INVIS 29
-#define TELEPAT 30
-#define WARNING 31
-#define WARN_OF_MON 32
-#define WARN_UNDEAD 33
-#define SEARCHING 34
-#define CLAIRVOYANT 35
-#define INFRAVISION 36
-#define DETECT_MONSTERS 37
-/* Appearance and behavior */
-#define ADORNED 38
-#define INVIS 39
-#define DISPLACED 40
-#define STEALTH 41
-#define AGGRAVATE_MONSTER 42
-#define CONFLICT 43
-/* Transportation */
-#define JUMPING 44
-#define TELEPORT 45
-#define TELEPORT_CONTROL 46
-#define LEVITATION 47
-#define FLYING 48
-#define WWALKING 49
-#define SWIMMING 50
-#define MAGICAL_BREATHING 51
-#define PASSES_WALLS 52
-/* Physical attributes */
-#define SLOW_DIGESTION 53
-#define HALF_SPDAM 54
-#define HALF_PHDAM 55
-#define REGENERATION 56
-#define ENERGY_REGENERATION 57
-#define PROTECTION 58
-#define PROT_FROM_SHAPE_CHANGERS 59
-#define POLYMORPH 60
-#define POLYMORPH_CONTROL 61
-#define UNCHANGING 62
-#define FAST 63
-#define REFLECTING 64
-#define FREE_ACTION 65
-#define FIXED_ABIL 66
-#define LIFESAVED 67
-#define LAST_PROP (LIFESAVED)
+enum prop_types {
+    FIRE_RES          =  1,
+    COLD_RES          =  2,
+    SLEEP_RES         =  3,
+    DISINT_RES        =  4,
+    SHOCK_RES         =  5,
+    POISON_RES        =  6,
+    ACID_RES          =  7,
+    STONE_RES         =  8,
+    /* note: the first eight properties above are equivalent to MR_xxx bits
+     * MR_FIRE through MR_STONE, and can be directly converted to them: */
+#define res_to_mr(r) \
+    ((FIRE_RES <= (r) && (r) <= STONE_RES) ? (uchar) (1 << ((r) - 1)) : 0x00)
+    DRAIN_RES         =  9,
+    SICK_RES          = 10,
+    INVULNERABLE      = 11,
+    ANTIMAGIC         = 12,
+    /* Troubles */
+    STUNNED           = 13,
+    CONFUSION         = 14,
+    BLINDED           = 15,
+    DEAF              = 16,
+    SICK              = 17,
+    STONED            = 18,
+    STRANGLED         = 19,
+    VOMITING          = 20,
+    GLIB              = 21,
+    SLIMED            = 22,
+    HALLUC            = 23,
+    HALLUC_RES        = 24,
+    FUMBLING          = 25,
+    WOUNDED_LEGS      = 26,
+    SLEEPY            = 27,
+    HUNGER            = 28,
+    /* Vision and senses */
+    SEE_INVIS         = 29,
+    TELEPAT           = 30,
+    WARNING           = 31,
+    WARN_OF_MON       = 32,
+    WARN_UNDEAD       = 33,
+    SEARCHING         = 34,
+    CLAIRVOYANT       = 35,
+    INFRAVISION       = 36,
+    DETECT_MONSTERS   = 37,
+    BLND_RES          = 38,
+    /* Appearance and behavior */
+    ADORNED           = 39,
+    INVIS             = 40,
+    DISPLACED         = 41,
+    STEALTH           = 42,
+    AGGRAVATE_MONSTER = 43,
+    CONFLICT          = 44,
+    /* Transportation */
+    JUMPING           = 45,
+    TELEPORT          = 46,
+    TELEPORT_CONTROL  = 47,
+    LEVITATION        = 48,
+    FLYING            = 49,
+    WWALKING          = 50,
+    SWIMMING          = 51,
+    MAGICAL_BREATHING = 52,
+    PASSES_WALLS      = 53,
+    /* Physical attributes */
+    SLOW_DIGESTION    = 54,
+    HALF_SPDAM        = 55,
+    HALF_PHDAM        = 56,
+    REGENERATION      = 57,
+    ENERGY_REGENERATION = 58,
+    PROTECTION        = 59,
+    PROT_FROM_SHAPE_CHANGERS = 60,
+    POLYMORPH         = 61,
+    POLYMORPH_CONTROL = 62,
+    UNCHANGING        = 63,
+    FAST              = 64,
+    REFLECTING        = 65,
+    FREE_ACTION       = 66,
+    FIXED_ABIL        = 67,
+    LIFESAVED         = 68,
+    LAST_PROP = LIFESAVED
+};
 
 /*** Where the properties come from ***/
 /* Definitions were moved here from obj.h and you.h */
@@ -100,7 +110,7 @@ struct prop {
 #define W_WEP 0x00000100L     /* Wielded weapon */
 #define W_QUIVER 0x00000200L  /* Quiver for (f)iring ammo */
 #define W_SWAPWEP 0x00000400L /* Secondary weapon */
-#define W_WEAPON (W_WEP | W_SWAPWEP | W_QUIVER)
+#define W_WEAPONS (W_WEP | W_SWAPWEP | W_QUIVER)
 #define W_ART 0x00001000L     /* Carrying artifact (not really worn) */
 #define W_ARTI 0x00002000L    /* Invoked artifact  (not really worn) */
 /* Amulets, rings, tools, and other items */
@@ -123,14 +133,14 @@ struct prop {
     long intrinsic;
 /* Timed properties */
 #define TIMEOUT 0x00ffffffL     /* Up to 16 million turns */
-                                /* Permanent properties */
-#define FROMEXPER 0x01000000L   /* Gain/lose with experience, for role */
-#define FROMRACE 0x02000000L    /* Gain/lose with experience, for race */
+/* Permanent properties */
+#define FROMEXPER   0x01000000L /* Gain/lose with experience, for role */
+#define FROMRACE    0x02000000L /* Gain/lose with experience, for race */
 #define FROMOUTSIDE 0x04000000L /* By corpses, prayer, thrones, etc. */
-#define INTRINSIC (FROMOUTSIDE | FROMRACE | FROMEXPER)
+#define INTRINSIC   (FROMOUTSIDE | FROMRACE | FROMEXPER)
 /* Control flags */
-#define FROMFORM 0x10000000L  /* Polyd; conferred by monster form */
-#define I_SPECIAL 0x20000000L /* Property is controllable */
+#define FROMFORM    0x10000000L /* Polyd; conferred by monster form */
+#define I_SPECIAL   0x20000000L /* Property is controllable */
 };
 
 /*** Definitions for backwards compatibility ***/

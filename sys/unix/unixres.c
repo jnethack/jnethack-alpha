@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixres.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 5.0	unixres.c	$NHDT-Date: 1596498298 2020/08/03 23:44:58 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Slash'EM development team, 2001. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,8 +6,8 @@
  * will hide privileges from the caller if so desired.
  *
  * Currently supported UNIX variants:
- *	Linux version 2.1.44 and above
- *	FreeBSD (versions unknown)
+ *      Linux version 2.1.44 and above
+ *      FreeBSD (versions unknown)
  *
  * Note: SunOS and Solaris have no mechanism for retrieving the saved id,
  * so temporarily dropping privileges on these systems is sufficient to
@@ -24,8 +24,7 @@
 #include <dlfcn.h>
 
 static int
-real_getresuid(ruid, euid, suid)
-uid_t *ruid, *euid, *suid;
+real_getresuid(uid_t *ruid, uid_t *euid, uid_t *suid)
 {
     int (*f)(uid_t *, uid_t *, uid_t *); /* getresuid signature */
 
@@ -33,12 +32,11 @@ uid_t *ruid, *euid, *suid;
     if (!f)
         return -1;
 
-    return f(ruid, euid, suid);
+    return (*f)(ruid, euid, suid);
 }
 
 static int
-real_getresgid(rgid, egid, sgid)
-gid_t *rgid, *egid, *sgid;
+real_getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid)
 {
     int (*f)(gid_t *, gid_t *, gid_t *); /* getresgid signature */
 
@@ -46,7 +44,7 @@ gid_t *rgid, *egid, *sgid;
     if (!f)
         return -1;
 
-    return f(rgid, egid, sgid);
+    return (*f)(rgid, egid, sgid);
 }
 
 #else
@@ -55,8 +53,7 @@ gid_t *rgid, *egid, *sgid;
 #ifdef SYS_getresuid
 
 static int
-real_getresuid(ruid, euid, suid)
-uid_t *ruid, *euid, *suid;
+real_getresuid(uid_t *ruid, uid_t *euid, uid_t *suid)
 {
     return syscall(SYS_getresuid, ruid, euid, suid);
 }
@@ -68,12 +65,12 @@ uid_t *ruid, *euid, *suid;
 #endif /* SVR4 */
 
 static int
-real_getresuid(ruid, euid, suid)
-uid_t *ruid, *euid, *suid;
+real_getresuid(uid_t *ruid, uid_t *euid, uid_t *suid)
 {
     int retval;
     int pfd[2];
     struct stat st;
+
     if (pipe(pfd))
         return -1;
     retval = fstat(pfd[0], &st);
@@ -92,8 +89,7 @@ uid_t *ruid, *euid, *suid;
 #ifdef SYS_getresgid
 
 static int
-real_getresgid(rgid, egid, sgid)
-gid_t *rgid, *egid, *sgid;
+real_getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid)
 {
     return syscall(SYS_getresgid, rgid, egid, sgid);
 }
@@ -101,12 +97,12 @@ gid_t *rgid, *egid, *sgid;
 #else /* SYS_getresgid */
 
 static int
-real_getresgid(rgid, egid, sgid)
-gid_t *rgid, *egid, *sgid;
+real_getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid)
 {
     int retval;
     int pfd[2];
     struct stat st;
+
     if (pipe(pfd))
         return -1;
     retval = fstat(pfd[0], &st);
@@ -131,8 +127,7 @@ static unsigned int hiding_privileges = 0;
  */
 
 int
-hide_privileges(flag)
-boolean flag;
+hide_privileges(boolean flag)
 {
     if (flag)
         hiding_privileges++;
@@ -142,27 +137,29 @@ boolean flag;
 }
 
 int
-nh_getresuid(ruid, euid, suid)
-uid_t *ruid, *euid, *suid;
+nh_getresuid(uid_t *ruid, uid_t *euid, uid_t *suid)
 {
     int retval = real_getresuid(ruid, euid, suid);
+
     if (!retval && hiding_privileges)
         *euid = *suid = *ruid;
     return retval;
 }
 
 uid_t
-nh_getuid()
+nh_getuid(void)
 {
     uid_t ruid, euid, suid;
+
     (void) real_getresuid(&ruid, &euid, &suid);
     return ruid;
 }
 
 uid_t
-nh_geteuid()
+nh_geteuid(void)
 {
     uid_t ruid, euid, suid;
+
     (void) real_getresuid(&ruid, &euid, &suid);
     if (hiding_privileges)
         euid = ruid;
@@ -170,27 +167,29 @@ nh_geteuid()
 }
 
 int
-nh_getresgid(rgid, egid, sgid)
-gid_t *rgid, *egid, *sgid;
+nh_getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid)
 {
     int retval = real_getresgid(rgid, egid, sgid);
+
     if (!retval && hiding_privileges)
         *egid = *sgid = *rgid;
     return retval;
 }
 
 gid_t
-nh_getgid()
+nh_getgid(void)
 {
     gid_t rgid, egid, sgid;
+
     (void) real_getresgid(&rgid, &egid, &sgid);
     return rgid;
 }
 
 gid_t
-nh_getegid()
+nh_getegid(void)
 {
     gid_t rgid, egid, sgid;
+
     (void) real_getresgid(&rgid, &egid, &sgid);
     if (hiding_privileges)
         egid = rgid;
@@ -201,8 +200,7 @@ nh_getegid()
 
 #ifdef GNOME_GRAPHICS
 int
-hide_privileges(flag)
-boolean flag;
+hide_privileges(boolean flag)
 {
     return 0;
 }

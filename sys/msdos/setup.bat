@@ -1,10 +1,10 @@
 @echo off
-REM    NetHack 3.6 setup.bat   $NHDT-Date: 1432512792 2015/05/25 00:13:12 $ $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
-REM    Copyright (c) NetHack PC Development Team 1990 - 2012
+REM    NetHack 5.0 setup.bat   $NHDT-Date: 1596498274 2020/08/03 23:44:34 $ $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.18 $
+REM    Copyright (c) NetHack PC Development Team 1990 - 2019
 REM    NetHack may be freely redistributed.  See license for details.
 
 echo.
-echo   Copyright (c) NetHack PC Development Team 1990 - 2012
+echo   Copyright (c) NetHack PC Development Team 1990 - 2019
 echo   NetHack may be freely redistributed.  See license for details.
 echo.
 REM setup batch file for msdos, see Install.dos for details.
@@ -16,10 +16,9 @@ goto err_set
 echo Checking to see if directories are set up properly ...
 if not exist ..\..\include\hack.h  goto err_dir
 if not exist ..\..\src\hack.c      goto err_dir
-if not exist ..\..\dat\wizard.des  goto err_dir
+if not exist ..\..\dat\wizard1.lua  goto err_dir
 if not exist ..\..\util\makedefs.c goto err_dir
 if not exist ..\..\win\tty\wintty.c goto err_dir
-if not exist ..\share\lev_yacc.c   goto err_dir
 echo Directories OK.
 
 if not exist ..\..\binary\* mkdir ..\..\binary
@@ -31,17 +30,13 @@ if exist ..\..\dat\data~1.bas goto long1b
 goto err_long
 :long1a
 echo Changing some long-named distribution file names:
-echo "Copying ..\..\dat\data.base -> ..\..\dat\data.bas"
-copy ..\..\dat\data.base ..\..\dat\data.bas
-if exist ..\..\dat\data.old del /Q ..\..\dat\data.old
-ren ..\..\dat\data.base data.old
+echo "Renaming ..\..\dat\data.base -> ..\..\dat\data.bas"
+ren ..\..\dat\data.base data.bas
 goto long1ok
 :long1b
 echo Changing some long-named distribution file names:
-echo "Copying ..\..\dat\data~1.bas -> ..\..\dat\data.bas"
-copy ..\..\dat\data~1.bas ..\..\dat\data.bas
-if exist ..\..\dat\data.old del /Q ..\..\dat\data.old
-ren ..\..\dat\data~1.bas data.old
+echo "Renaming ..\..\dat\data~1.bas -> ..\..\dat\data.bas"
+ren ..\..\dat\data~1.bas data.bas
 :long1ok
 
 if exist ..\..\include\patchlev.h goto long2ok
@@ -49,16 +44,12 @@ if exist ..\..\include\patchlevel.h goto long2a
 if exist ..\..\include\patchl~1.h goto long2b
 goto err_long
 :long2a
-echo "Copying ..\..\include\patchlevel.h -> ..\..\include\patchlev.h"
-copy ..\..\include\patchlevel.h ..\..\include\patchlev.h
-if exist ..\..\include\patchlev.old del /Q ..\..\include\patchlev.old
-ren ..\..\include\patchlevel.h patchlev.old
+echo "Renaming ..\..\include\patchlevel.h -> ..\..\include\patchlev.h"
+ren ..\..\include\patchlevel.h patchlev.h
 goto long2ok
 :long2b
-echo "Copying ..\..\include\patchl~1.h -> ..\..\include\patchlev.h"
-copy ..\..\include\patchl~1.h ..\..\include\patchlev.h
-if exist ..\..\include\patchlev.old del /Q ..\..\include\patchlev.old
-ren ..\..\include\patchl~1.h patchlev.old
+echo "Renaming ..\..\include\patchl~1.h -> ..\..\include\patchlev.h"
+ren ..\..\include\patchl~1.h patchlev.h
 :long2ok
 
 REM Missing guidebook is not fatal to the build process
@@ -67,21 +58,30 @@ if exist ..\..\doc\guidebook.txt goto long3a
 if exist ..\..\doc\guideb~1.txt goto long3b
 goto warn3long
 :long3a
-echo "Copying ..\..\doc\guidebook.txt -> ..\..\doc\guideboo.txt"
-copy ..\..\doc\guidebook.txt ..\..\doc\guideboo.txt
-if exist ..\..\doc\guideboo.old del /Q ..\..\doc\guideboo.old
-ren ..\..\doc\guidebook.txt guideboo.old
+echo "Copying ..\..\doc\guidebook.txt -> ..\..\doc\guidebk.txt"
+ren ..\..\doc\guidebook.txt guidebk.txt
 goto long3ok
 :long3b
-echo "Copying ..\..\doc\guideb~1.txt -> ..\..\doc\guideboo.txt"
-copy ..\..\doc\guideb~1.txt ..\..\doc\guideboo.txt
-if exist ..\..\doc\guideboo.old del /Q ..\..\doc\guideboo.old
-ren ..\..\doc\guideb~1.txt guideboo.old
+echo "Copying ..\..\doc\guideb~1.txt -> ..\..\doc\guidebk.txt"
+ren ..\..\doc\guideb~1.txt guidebk.txt
 goto long3ok
 :warn3long
-echo "Warning - There is no NetHack Guidebook (..\..\doc\guideboo.txt)"
+echo "Warning - There is no NetHack Guidebook (..\..\doc\guidebk.txt)"
 echo "          included in your distribution.  Build will proceed anyway."
 :long3ok
+
+if exist ..\..\sys\share\posixreg.c goto long4ok
+if exist ..\..\sys\share\posixregex.c goto long4a
+if exist ..\..\sys\share\posixr~1.c goto long4b
+goto err_long
+:long4a
+echo "Renaming ..\..\sys\share\posixregex.c -> ..\..\sys\share\posixreg.c"
+ren ..\..\sys\share\posixregex.c posixreg.c
+goto long4ok
+:long4b
+echo "Renaming ..\..\sys\share\posixr~1.c -> ..\..\sys\share\posixreg.c"
+ren ..\..\sys\share\posixr~1.c posixreg.c
+:long4ok
 
 if "%1"=="GCC"   goto ok_gcc
 if "%1"=="gcc"   goto ok_gcc
@@ -125,8 +125,9 @@ echo distribution.
 echo The following files need to exist under the names on the
 echo right in order to build NetHack:
 echo.
-echo  ..\..\dat\data.base        needs to be copied to ..\..\dat\data.bas
-echo  ..\..\include\patchlevel.h needs to be copied to ..\..\include\patchlev.h
+echo  ..\..\dat\data.base           needs to be copied to ..\..\dat\data.bas
+echo  ..\..\include\patchlevel.h    needs to be copied to ..\..\include\patchlev.h
+echo  ..\..\sys\share\posixregex.c  needs to be copied to ..\..\sys\share\posixreg.c
 echo.
 echo setup.bat was unable to perform the necessary changes because at least
 echo one of the files doesn't exist under its short name, and the 

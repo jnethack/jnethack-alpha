@@ -1,5 +1,6 @@
-/* NetHack 3.6	unixconf.h	$NHDT-Date: 1447755973 2015/11/17 10:26:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 5.0	unixconf.h	$NHDT-Date: 1711213886 2024/03/23 17:11:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifdef UNIX
@@ -36,7 +37,9 @@
 #define NETWORK        /* if running on a networked system */
                        /* e.g. Suns sharing a playground through NFS */
 /* #define SUNOS4 */   /* SunOS 4.x */
-/* #define LINUX */    /* Another Unix clone */
+#ifdef __linux__
+#define LINUX    /* Another Unix clone */
+#endif
 /* #define CYGWIN32 */ /* Unix on Win32 -- use with case sensitive defines */
 /* #define GENIX */    /* Yet Another Unix Clone */
 /* #define HISX */     /* Bull Unix for XPS Machines */
@@ -52,9 +55,6 @@
                         * particular, it should NOT be defined for the UNIXPC
                         * unless you remove the use of the shared library in
                         * the Makefile */
-#define TEXTCOLOR      /* Use System V r3.2 terminfo color support
-                        * and/or ANSI color support on termcap systems
-                        * and/or X11 color */
 #define POSIX_JOB_CONTROL /* use System V / Solaris 2.x / POSIX job control
                            * (e.g., VSUSP) */
 #define POSIX_TYPES /* use POSIX types for system calls and termios */
@@ -65,26 +65,8 @@
                      * Linux, Solaris 2.x
                      */
 
-/* #define OPENWINBUG */  /* avoid a problem using OpenWindows 3.0 for
-                             X11 on SunOS 4.1.x, x>= 2.  Do not define
-                             for other X11 implementations. */
-/* #define PYRAMID_BUG */ /* avoid a bug on the Pyramid */
-/* #define BSD_43_BUG */  /* for real 4.3BSD cc's without schain botch fix */
-/* #define MICROPORT_BUG */     /* problems with large arrays in structs */
-/* #define MICROPORT_286_BUG */ /* changes needed in termcap.c to get it to
-                                   run with Microport Sys V/AT version 2.4.
-                                   By Jay Maynard */
-/* #define AIXPS_2BUG */ /* avoid a problem with little_to_big() optimization
-                            */
-
 /* #define RANDOM */ /* if neither random/srandom nor lrand48/srand48
                         is available from your system */
-
-/* see sys/unix/snd86unx.shr for more information on these */
-/* #define UNIX386MUSIC */ /* play real music through speaker on systems
-                              with music driver installed */
-/* #define VPIX_MUSIC */   /* play real music through speaker on systems
-                              with built-in VPIX support */
 
 /*
  * The next two defines are intended mainly for the Andrew File System,
@@ -106,13 +88,15 @@
 /*
  * Define DEF_PAGER as your default pager, e.g. "/bin/cat" or "/usr/ucb/more"
  * If defined, it can be overridden by the environment variable PAGER.
- * Hack will use its internal pager if DEF_PAGER is not defined.
- * (This might be preferable for security reasons.)
+ * NetHack will use its internal pager if DEF_PAGER is not defined _or_
+ * if DLB is defined since an external pager won't know how to access the
+ * contents of the dlb container file.
+ * (Note: leaving DEF_PAGER undefined is preferable for security reasons.)
  */
-/* #define DEF_PAGER ".../mydir/mypager" */
+/* #define DEF_PAGER "/usr/bin/less" */
 
 /*
- * Define PORT_HELP to be the name of the port-specfic help file.
+ * Define PORT_HELP to be the name of the port-specific help file.
  * This file is found in HACKDIR.
  * Normally, you shouldn't need to change this.
  * There is currently no port-specific help for Unix systems.
@@ -130,6 +114,26 @@
  */
 /* #define TIMED_DELAY */ /* usleep() */
 #endif
+#if defined(MACOS) && !defined(TIMED_DELAY)
+#define TIMED_DELAY
+#endif
+
+/*
+ * At start of game, if there are lock and level files for current
+ * character in the playground directory, ask whether to recover them
+ * (into a save file).
+ */
+/* #define SELF_RECOVER */
+
+/*
+ * At start of game, if there is no save file to restore or lock and
+ * level files to recover but there is a panic save file for the current
+ * character, tell the player that it exists and ask whether to start a
+ * new game.  Does not attempt to rename and restore the panic save file.
+ */
+#define CHECK_PANIC_SAVE
+
+/* #define AVOID_WIN_IOCTL */ /* ensure USE_WIN_IOCTL remains undefined */
 
 /*
  * If you define MAIL, then the player will be notified of new mail
@@ -188,8 +192,29 @@
 #endif
 #endif
 
+/* If SIMPLE_MAIL is defined, the mail spool file format is
+   "sender:message", one mail per line, and mails are
+   read within game, from demon-delivered mail scrolls.
+   The mail spool file will be deleted once the player
+   has read the message. */
+/* #define SIMPLE_MAIL */
+
+#ifndef MAILCKFREQ
+/* How often mail spool file is checked for new messages, in turns */
 #define MAILCKFREQ 50
+#endif
+
 #endif /* MAIL */
+
+/* If SERVER_ADMIN_MSG is defined and the file exists, players get
+   a message from the user defined in the file.  The file format
+   is "sender:message" all in one line. */
+/* #define SERVER_ADMIN_MSG "adminmsg" */
+#ifndef SERVER_ADMIN_MSG_CKFREQ
+/* How often admin message file is checked for new messages, in turns */
+#define SERVER_ADMIN_MSG_CKFREQ 25
+#endif
+
 
 /*
  * Some terminals or terminal emulators send two character sequence "ESC c"
@@ -207,7 +232,9 @@
 /* #define COMPRESS_OPTIONS "-q" */
 #endif
 
+#ifndef FCMASK
 #define FCMASK 0660 /* file creation mask */
+#endif
 
 /* fcntl(2) is a POSIX-portable call for manipulating file descriptors.
  * Comment out the USE_FCNTL if for some reason you have a strange
@@ -258,8 +285,11 @@
 #endif
 #endif
 #endif
+
+#ifndef NOSUSPEND
 #if defined(BSD_JOB_CONTROL) || defined(POSIX_JOB_CONTROL) || defined(AUX)
-#define SUSPEND /* let ^Z suspend the game */
+#define SUSPEND /* let ^Z suspend the game (push to background) */
+#endif
 #endif
 
 /*
@@ -272,9 +302,17 @@
 
 #if defined(BSD) || defined(ULTRIX)
 #include <sys/time.h>
-#else
-#include <time.h>
 #endif
+
+/* these might be needed for include/system.h;
+   default comes from system's time.h */
+/* #define NEED_TIME_DECL 1 */
+/* #define NEED_LOCALTIME_DECL 1 */
+/* #define NEED_CTIME_DECL 1 */
+/* these might be needed for src/hacklib.c;
+   default is 'time_t *' */
+/* #define TIME_type long * */
+/* #define LOCALTIME_type long * */
 
 #define HLOCK "perm" /* an empty file used for locking purposes */
 
@@ -284,10 +322,7 @@
 #define SHELL /* do not delete the '!' command */
 #endif
 
-#include "system.h"
-
 #if defined(POSIX_TYPES) || defined(__GNUC__)
-#include <stdlib.h>
 #include <unistd.h>
 #endif
 
@@ -305,20 +340,25 @@
 #include <memory.h>
 #endif
 #else         /* therefore SYSV */
+#ifdef NOT_C99
 #ifndef index /* some systems seem to do this for you */
 #define index strchr
 #endif
 #ifndef rindex
 #define rindex strrchr
 #endif
-#endif
+#endif  /* NOT_C99 */
+#endif  /* SYSV */
 
 /* Use the high quality random number routines. */
-#if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) \
-    || defined(RANDOM) || defined(__APPLE__)
-#define Rand() random()
-#else
-#define Rand() lrand48()
+/* the high quality random number routines */
+#ifndef USE_ISAAC64
+# if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) \
+    || defined(RANDOM) || defined(MACOS)
+#  define Rand() random()
+# else
+#  define Rand() lrand48()
+# endif
 #endif
 
 #ifdef TIMED_DELAY
@@ -329,6 +369,16 @@
 #define msleep(k) napms(k)
 #endif
 #endif
+
+/* Relevant for some systems:  some older versions
+   of curses (the run-time library optionally used by nethack's tty
+   interface in addition to its curses interface) supply 'has_colors()'
+   but corresponding <curses.h> doesn't declare it.  has_colors() is used
+   in unixtty.c by init_sco_cons() and init_linux_cons().  If the compiler
+   complains about has_colors() not being declared, try uncommenting
+   NEED_HAS_COLORS_DECL.  If the linker complains about has_colors not
+   being found, switch to ncurses() or update to newer version of curses. */
+/* #define NEED_HAS_COLORS_DECL */
 
 #ifdef hc /* older versions of the MetaWare High-C compiler define this */
 #ifdef __HC__
@@ -360,6 +410,24 @@
 #endif /* BSD || SVR4 */
 #endif /* LINUX */
 #endif /* GNOME_GRAPHICS */
+
+#if defined(MACOS) && !defined(LIBNH)
+# define RUNTIME_PASTEBUF_SUPPORT
+#endif
+
+/*
+ * /dev/random is blocking on Linux, so there we default to /dev/urandom which
+ * should still be good enough.
+ * BSD systems usually have /dev/random that is supposed to be used.
+ * OSX is based on NetBSD kernel and has both /dev/random and /dev/urandom.
+ */
+#ifdef LINUX
+# define DEV_RANDOM "/dev/urandom"
+#else
+# if defined(BSD) || defined(MACOS)
+#  define DEV_RANDOM "/dev/random"
+# endif
+#endif
 
 #endif /* UNIXCONF_H */
 #endif /* UNIX */

@@ -1,5 +1,6 @@
-/* NetHack 3.6	vmsfiles.c	$NHDT-Date: 1432512790 2015/05/25 00:13:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* NetHack 5.0	vmsfiles.c	$NHDT-Date: 1685522046 2023/05/31 08:34:06 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -7,14 +8,19 @@
  *  routines or substitute for ones where we want behavior modification.
  */
 #include "config.h"
-#include <ctype.h>
 
-/* lint supression due to lack of extern.h */
-int FDECL(vms_link, (const char *, const char *));
-int FDECL(vms_unlink, (const char *));
-int FDECL(vms_creat, (const char *, unsigned int));
-boolean FDECL(same_dir, (const char *, const char *));
-int FDECL(c__translate, (int));
+#ifdef VMSVSI
+#include <descrip.h>
+#include <lib$routines.h>
+#include <starlet.h>
+#endif
+
+/* lint suppression due to lack of extern.h */
+int vms_link(const char *, const char *);
+int vms_unlink(const char *);
+int vms_creat(const char *, unsigned int);
+boolean same_dir(const char *, const char *);
+int c__translate(int);
 
 #include <rms.h>
 #if 0
@@ -26,16 +32,18 @@ int FDECL(c__translate, (int));
 #ifndef C$$TRANSLATE /* don't rely on VAXCRTL's internal routine */
 #define C$$TRANSLATE(status) (errno = EVMSERR, vaxc$errno = (status))
 #endif
-extern unsigned long sys$parse(), sys$search(), sys$enter(), sys$remove();
-extern int VDECL(lib$match_cond, (int, int, ...));
 
-#define vms_success(sts) ((sts) &1)          /* odd, */
+#ifndef VMSVSI
+extern unsigned long sys$parse(), sys$search(), sys$enter(), sys$remove();
+extern int lib$match_cond(int, int, ...);
+#endif
+
+#define vms_success(sts) ((sts) & 1)         /* odd, */
 #define vms_failure(sts) (!vms_success(sts)) /* even */
 
-/* vms_link() -- create an additional directory for an existing file */
+/* vms_link() -- create an additional directory entry for an existing file */
 int
-vms_link(file, new)
-const char *file, *new;
+vms_link(const char *file, const char *new)
 {
     struct FAB fab;
     struct NAM nam;
@@ -82,8 +90,7 @@ const char *file, *new;
    (because the file won't be deleted, just made inaccessible!).
  */
 int
-vms_unlink(file)
-const char *file;
+vms_unlink(const char *file)
 {
     struct FAB fab;
     struct NAM nam;
@@ -114,19 +121,17 @@ const char *file;
  */
 #undef creat
 int
-vms_creat(file, mode)
-const char *file;
-unsigned int mode;
+vms_creat(const char *file, unsigned int mode)
 {
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
 
-    if (index(file, ';')) {
+    if (strchr(file, ';')) {
         /* assumes remove or delete, not vms_unlink */
         if (!unlink(file)) {
             (void) sleep(1);
             (void) unlink(file);
         }
-    } else if (!index(file, '.')) {
+    } else if (!strchr(file, '.')) {
         /* force some punctuation to be present */
         file = strcat(strcpy(filnambuf, file), ".");
     }
@@ -140,15 +145,12 @@ unsigned int mode;
  */
 #undef open
 int
-vms_open(file, flags, mode)
-const char *file;
-int flags;
-unsigned int mode;
+vms_open(const char *file, int flags, unsigned int mode)
 {
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
     int fd;
 
-    if (!index(file, '.') && !index(file, ';')) {
+    if (!strchr(file, '.') && !strchr(file, ';')) {
         /* force some punctuation to be present to make sure that
            the file name can't accidentally match a logical name */
         file = strcat(strcpy(filnambuf, file), ";0");
@@ -164,13 +166,12 @@ unsigned int mode;
 /* do likewise for fopen() */
 #undef fopen
 FILE *
-vms_fopen(file, mode)
-const char *file, *mode;
+vms_fopen(const char *file, const char *mode)
 {
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
     FILE *fp;
 
-    if (!index(file, '.') && !index(file, ';')) {
+    if (!strchr(file, '.') && !strchr(file, ';')) {
         /* force some punctuation to be present to make sure that
            the file name can't accidentally match a logical name */
         file = strcat(strcpy(filnambuf, file), ";0");
@@ -190,8 +191,7 @@ const char *file, *mode;
    the command line).  This version doesn't handle Unix-style file specs.
  */
 boolean
-same_dir(d1, d2)
-const char *d1, *d2;
+same_dir(const char *d1, const char *d2)
 {
     if (!d1 || !*d1 || !d2 || !*d2)
         return FALSE;
@@ -208,30 +208,30 @@ const char *d1, *d2;
         f2.fab$b_fns = strlen(f2.fab$l_fna = (char *) d2);
         f1.fab$l_nam = (genericptr_t) &n1; /* link nam to fab */
         f2.fab$l_nam = (genericptr_t) &n2;
-        n1.nam$b_nop = n2.nam$b_nop =
-            NAM$M_NOCONCEAL; /* want true device name */
+        /* want true device name */
+        n1.nam$b_nop = n2.nam$b_nop = NAM$M_NOCONCEAL;
 
-        return (
-            vms_success(sys$parse(&f1)) && vms_success(sys$parse(&f2))
-            && n1.nam$t_dvi[0] == n2.nam$t_dvi[0]
-            && !strncmp(&n1.nam$t_dvi[1], &n2.nam$t_dvi[1], n1.nam$t_dvi[0])
-            && !memcmp((genericptr_t) n1.nam$w_did,
-                       (genericptr_t) n2.nam$w_did,
-                       sizeof n1.nam$w_did)); /*{ short nam$w_did[3]; }*/
+        return (vms_success(sys$parse(&f1)) && vms_success(sys$parse(&f2))
+                && n1.nam$t_dvi[0] == n2.nam$t_dvi[0]
+                && !strncmp(&n1.nam$t_dvi[1], &n2.nam$t_dvi[1],
+                            n1.nam$t_dvi[0])
+                && !memcmp((genericptr_t) n1.nam$w_did,
+                           (genericptr_t) n2.nam$w_did,
+                           sizeof n1.nam$w_did)); /*{ short nam$w_did[3]; }*/
     }
 }
 
 /*
  * c__translate -- substitute for VAXCRTL routine C$$TRANSLATE.
  *
- *	Try to convert a VMS status code into its Unix equivalent,
- *	then set `errno' to that value; use EVMSERR if there's no
- *	appropriate translation; set `vaxc$errno' to the original
- *	status code regardless.
+ *      Try to convert a VMS status code into its Unix equivalent,
+ *      then set `errno' to that value; use EVMSERR if there's no
+ *      appropriate translation; set `vaxc$errno' to the original
+ *      status code regardless.
  *
- *	These translations match only a subset of VAXCRTL's lookup
- *	table, but work even if the severity has been adjusted or
- *	the inhibit-message bit has been set.
+ *      These translations match only a subset of VAXCRTL's lookup
+ *      table, but work even if the severity has been adjusted or
+ *      the inhibit-message bit has been set.
  */
 #include <errno.h>
 #include <ssdef.h>
@@ -246,42 +246,50 @@ const char *d1, *d2;
 #define CASE2(V, W) CASE1(V) : CASE1(W)
 
 int
-c__translate(code)
-int code;
+c__translate(int code)
 {
-    register int trans;
+    int trans;
 
+/* clang-format off */
+/* *INDENT-OFF* */
     switch ((code & 0x0FFFFFF8) >> 3) { /* strip upper 4 and bottom 3 bits */
-        CASE2(RMS$_PRV, SS$_NOPRIV) : VALUE(EPERM); /* not owner */
-        CASE2(RMS$_DNF, RMS$_DIR)
-            : CASE2(RMS$_FNF, RMS$_FND)
-            : CASE1(SS$_NOSUCHFILE)
-            : VALUE(ENOENT); /* no such file or directory */
-        CASE2(RMS$_IFI, RMS$_ISI) : VALUE(EIO); /* i/o error */
-        CASE1(RMS$_DEV)
-            : CASE2(SS$_NOSUCHDEV, SS$_DEVNOTMOUNT)
-            : VALUE(ENXIO); /* no such device or address codes */
-        CASE1(RMS$_DME)
-            : /* CASE1(LIB$INSVIRMEM): */
-              CASE2(SS$_VASFULL, SS$_INSFWSL)
-            : VALUE(ENOMEM);               /* not enough core */
-        CASE1(SS$_ACCVIO) : VALUE(EFAULT); /* bad address */
-        CASE2(RMS$_DNR, SS$_DEVASSIGN)
-            : CASE2(SS$_DEVALLOC, SS$_DEVALRALLOC)
-            : CASE2(SS$_DEVMOUNT, SS$_DEVACTIVE)
-            : VALUE(EBUSY); /* mount device busy codes to name a few */
-        CASE2(RMS$_FEX, SS$_FILALRACC) : VALUE(EEXIST); /* file exists */
-        CASE2(RMS$_IDR, SS$_BADIRECTORY)
-            : VALUE(ENOTDIR);                /* not a directory */
-        CASE1(SS$_NOIOCHAN) : VALUE(EMFILE); /* too many open files */
-        CASE1(RMS$_FUL)
-            : CASE2(SS$_DEVICEFULL, SS$_EXDISKQUOTA)
-            : VALUE(ENOSPC); /* no space left on disk codes */
-        CASE2(RMS$_WLK, SS$_WRITLCK)
-            : VALUE(EROFS); /* read-only file system */
+    CASE2(RMS$_PRV, SS$_NOPRIV):
+        VALUE(EPERM); /* not owner */
+    CASE2(RMS$_DNF, RMS$_DIR):
+    CASE2(RMS$_FNF, RMS$_FND):
+    CASE1(SS$_NOSUCHFILE):
+        VALUE(ENOENT); /* no such file or directory */
+    CASE2(RMS$_IFI, RMS$_ISI):
+        VALUE(EIO); /* i/o error */
+    CASE1(RMS$_DEV):
+    CASE2(SS$_NOSUCHDEV, SS$_DEVNOTMOUNT):
+        VALUE(ENXIO); /* no such device or address codes */
+    CASE1(RMS$_DME):
+ /* CASE1(LIB$INSVIRMEM): */
+    CASE2(SS$_VASFULL, SS$_INSFWSL):
+        VALUE(ENOMEM); /* not enough core */
+    CASE1(SS$_ACCVIO):
+        VALUE(EFAULT); /* bad address */
+    CASE2(RMS$_DNR, SS$_DEVASSIGN):
+    CASE2(SS$_DEVALLOC, SS$_DEVALRALLOC):
+    CASE2(SS$_DEVMOUNT, SS$_DEVACTIVE):
+        VALUE(EBUSY); /* mount device busy codes to name a few */
+    CASE2(RMS$_FEX, SS$_FILALRACC):
+        VALUE(EEXIST); /* file exists */
+    CASE2(RMS$_IDR, SS$_BADIRECTORY):
+        VALUE(ENOTDIR); /* not a directory */
+    CASE1(SS$_NOIOCHAN):
+        VALUE(EMFILE); /* too many open files */
+    CASE1(RMS$_FUL):
+    CASE2(SS$_DEVICEFULL, SS$_EXDISKQUOTA):
+        VALUE(ENOSPC); /* no space left on disk codes */
+    CASE2(RMS$_WLK, SS$_WRITLCK):
+        VALUE(EROFS); /* read-only file system */
     default:
         VALUE(EVMSERR);
     };
+/* clang-format on */
+/* *INDENT-ON* */
 
     errno = trans;
     vaxc$errno = code;
@@ -296,12 +304,11 @@ static char base_name[NAM$C_MAXRSS + 1];
 
 /* return a copy of the 'base' portion of a filename */
 char *
-vms_basename(name)
-const char *name;
+vms_basename(const char *name, boolean keep_suffix)
 {
     unsigned len;
-    char *base, *base_p;
-    register const char *name_p;
+    char *base, *base_p, *xtra_p;
+    const char *name_p;
 
     /* skip directory/path */
     if ((name_p = strrchr(name, ']')) != 0)
@@ -315,10 +322,14 @@ const char *name;
     if (!*name)
         name = "."; /* this should never happen */
 
-    /* find extension/version and derive length of basename */
-    if ((name_p = strchr(name, '.')) == 0 || name_p == name)
-        name_p = strchr(name, ';');
-    len = (name_p && name_p > name) ? name_p - name : strlen(name);
+    /* find extension/version and derive length of basename;
+       for 'keep_suffix', this won't be accurate if version number is
+       present and delimited by dot instead of semi-colon, but normal
+       usage is for DEBUGFILES and that uses compiler supplied name */
+    name_p = strrchr(name, ';');
+    if (!keep_suffix && (xtra_p = strrchr(name, '.')) != 0)
+        name_p = xtra_p;
+    len = (name_p && name_p > name) ? name_p - name : (unsigned) strlen(name);
 
     /* return a lowercase copy of the name in a private static buffer */
     base = strncpy(base_name, name, len);

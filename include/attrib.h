@@ -1,20 +1,22 @@
-/* NetHack 3.6	attrib.h	$NHDT-Date: 1432512779 2015/05/25 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
-/* Copyright 1988, Mike Stephenson				  */
+/* NetHack 5.0	attrib.h	$NHDT-Date: 1596498527 2020/08/03 23:48:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* Copyright 1988, Mike Stephenson                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/*	attrib.h - Header file for character class processing. */
+/*      attrib.h - Header file for character class processing. */
 
 #ifndef ATTRIB_H
 #define ATTRIB_H
 
-#define A_STR 0
-#define A_INT 1
-#define A_WIS 2
-#define A_DEX 3
-#define A_CON 4
-#define A_CHA 5
+enum attrib_types {
+    A_STR = 0,
+    A_INT,
+    A_WIS,
+    A_DEX,
+    A_CON,
+    A_CHA,
 
-#define A_MAX 6 /* used in rn2() selection of attrib */
+    A_MAX /* used in rn2() selection of attrib */
+};
 
 #define ABASE(x) (u.acurr.a[x])
 #define ABON(x) (u.abon.a[x])
@@ -38,10 +40,8 @@ struct attribs {
     schar a[A_MAX];
 };
 
-#define ATTRMAX(x)                                        \
-    ((x == A_STR && Upolyd && strongmonst(youmonst.data)) \
-         ? STR18(100)                                     \
-         : urace.attrmax[x])
-#define ATTRMIN(x) (urace.attrmin[x])
+#define ATTRMAX(x) \
+    ((x == A_STR && Upolyd) ? uasmon_maxStr() : gu.urace.attrmax[x])
+#define ATTRMIN(x) (gu.urace.attrmin[x])
 
 #endif /* ATTRIB_H */

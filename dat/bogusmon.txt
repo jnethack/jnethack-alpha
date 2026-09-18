@@ -1,3 +1,7 @@
+# NetHack 5.0  bogusmon.txt       $NHDT-Date: 1596498237 2020/08/03 23:43:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $
+# Copyright (c) 2016 by Pasi Kallinen
+# NetHack may be freely redistributed.  See license for details.
+#
 # Hallucinatory monsters
 #
 #
@@ -50,6 +54,7 @@ evil overlord
 newsgroup troll
 ninja pirate zombie robot
 octarine dragon
+plaid unicorn
 gonzo journalist
 lag monster
 loan shark
@@ -73,6 +78,41 @@ small megabat
 uberhulk
 tofurkey
 +Dudley
+shrinking violet
+shallow one
+spherical cow
+electric giraffe
+steam dragon
+omnibus
+slinky
+maxotaur
+millitaur
+octahedron
+dungeon core
+quale
+holloway
+chiasmus
+giant tetrapod
+voussoir
+barking spider
+frog cloud
+toothsayer
+third eye
+owlpug
+pugasus
+acorn
+red dot
+robot chicken
+doozer
+poison cackler
+lhurgoyf
+phelddagrif
+tiktaalik
+weremoustache
+rapier tapir
+choplet
+pommelbug
+quest sprout
 
 # Quendor (Zork, &c.)
 grue
@@ -119,6 +159,7 @@ were-rabbit
 
 # Discworld
 Luggage
+vampiric watermelon
 
 # Lord of the Rings
 Ent
@@ -181,6 +222,9 @@ Dalek
 microscopic space fleet
 Ravenous Bugblatter Beast of Traal
 
+# The Tough Guide to Fantasyland
+leathery-winged avian
+
 # TMNT
 teenage mutant ninja turtle
 
@@ -212,6 +256,9 @@ questing beast
 # Movie
 Predator
 
+# Harry Potter
+dementor
+
 # common pest
 mother-in-law
 
@@ -230,6 +277,8 @@ velociraptor
 corpulent porpoise
 quokka
 potoo
+lemming
+dhole
 
 # european cryptids
 wolpertinger
@@ -243,6 +292,7 @@ dahu
 dropbear
 wild haggis
 jackalope
+flying monkey
 flying pig
 hippocampus
 hippogriff
@@ -266,6 +316,8 @@ netsplit
 wiki
 peer
 COBOL
+wire shark
+stray tab
 
 # bugs
 bohrbug
@@ -297,6 +349,7 @@ gazebo
 gray goo
 magnetic monopole
 first category perpetual motion device
+big dumb object
 
 # Ultima
 +Lord British
@@ -316,6 +369,7 @@ bold face
 boustrophedon
 ligature
 rebus
+dinkus
 
 # Their actual character
 apostrophe golem
@@ -325,6 +379,10 @@ voluptuous ampersand
 +Bob the angry flower
 +Strong Bad
 +Magical Trevor
+
+# Girl Genius
+smakken
+mimmoth
 
 # KoL
 one-winged dewinged stab-bat
@@ -342,9 +400,6 @@ little green man
 
 # Portal
 weighted Companion Cube
-
-# /b/
-/b/tard
 
 # South Park
 manbearpig
@@ -378,8 +433,8 @@ Greater Hell Beast
 # Dungeon Crawl Stone Soup
 +Sigmund
 lernaean hydra
-+Ijyb
-+Gloorx Vloq
+-Ijyb
+=Gloorx Vloq
 +Blork the orc
 
 # Wil Wheaton, John Scalzi
@@ -413,6 +468,12 @@ womble
 
 # Fraggle Rock
 fraggle
+
+# Harry Harrison
+stainless steel rat
+
+# The Culture
+antagonistic undecagonstring
 
 # Spoonerism
 mock role
@@ -465,6 +526,7 @@ geriatric snake
 gnat ant
 giant bath
 grant beetle
+greater snake
 grind bug
 giant mango
 glossy golem

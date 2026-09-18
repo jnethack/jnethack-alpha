@@ -1,5 +1,6 @@
-/* NetHack 3.6	config1.h	$NHDT-Date: 1432512781 2015/05/25 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
+/* NetHack 5.0	config1.h	$NHDT-Date: 1596498530 2020/08/03 23:48:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
+/*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef CONFIG1_H
@@ -27,33 +28,40 @@
 
 #ifdef MSDOS
 #undef UNIX
+#ifndef CROSSCOMPILE
+#define SHORT_FILENAMES
+#endif
+/* this is not fully-implemented yet for msdos */
+#ifdef ENHANCED_SYMBOLS
+#undef ENHANCED_SYMBOLS
+#endif
 #endif
 
 /*
  * Mac Stuff.
  */
 #if defined(__APPLE__) && defined(__MACH__)
-#define MACOSX
+#define MACOS
 #endif
 
 #ifdef macintosh /* Auto-defined symbol for MPW compilers (sc and mrc) */
-#define MAC
+#define MACOS9
 #endif
 
 #ifdef THINK_C /* Think C auto-defined symbol */
-#define MAC
+#define MACOS9
 #define NEED_VARARGS
 #endif
 
 #ifdef __MWERKS__ /* defined by Metrowerks' Codewarrior compiler */
 #ifndef __BEOS__  /* BeOS */
-#define MAC
+#define MACOS9
 #endif
 #define NEED_VARARGS
 #define USE_STDARG
 #endif
 
-#if defined(MAC) || defined(__BEOS__)
+#if defined(MACOS9) || defined(__BEOS__)
 #define DLB
 #undef UNIX
 #endif
@@ -87,7 +95,7 @@
 #undef UNIX
 #define DLB
 #define HACKDIR "NetHack:"
-#define NO_MACRO_CPATH
+
 #endif
 
 /*
@@ -141,23 +149,39 @@
 #define _GNU_SOURCE
 #endif
 
+#ifdef __vms
+#ifndef VMS
+#define VMS
+#endif
+#endif
+
 #ifdef VMS /* really old compilers need special handling, detected here */
 #undef UNIX
 #ifdef __DECC
 #ifndef __DECC_VER /* buggy early versions want widened prototypes */
-#define NOTSTDC    /* except when typedefs are involved		*/
+#define NOTSTDC    /* except when typedefs are involved            */
+        /* [25 or so years later...  That was probably uchar widening to */
+        /* 'unsigned int' rather than anything to do with typedefs.  pr] */
 #define USE_VARARGS
-#else
+#else              /* __DECC_VER not defined */
+#if __DECC_VER >= 70000000
+#define VMSVSI
+#endif /* _DECC_VER >= 70000000 */
+#ifndef VMSVSI
 #define NHSTDC
 #define USE_STDARG
 #define POSIX_TYPES
-#define _DECC_V4_SOURCE /* avoid some incompatible V5.x changes */
+#ifndef _DECC_V4_SOURCE /* only def here if not already def'd on comd line */
+#define _DECC_V4_SOURCE /* avoid some incompatible V5.x (and later) changes */
 #endif
+#endif /* !VMSVSI */
+#endif /*__DECC_VER*/
 #undef __HIDE_FORBIDDEN_NAMES /* need non-ANSI library support functions */
+#ifndef VMSVSI
 #ifdef VAXC    /* DEC C in VAX C compatibility mode; 'signed' works   */
 #define signed /* but causes diagnostic about VAX C not supporting it */
 #endif
-#else
+#else /*!__DECC*/
 #ifdef VAXC /* must use CC/DEFINE=ANCIENT_VAXC for vaxc v2.2 or older */
 #define signed
 #ifdef ANCIENT_VAXC /* vaxc v2.2 and earlier [lots of warnings to come] */
@@ -182,6 +206,7 @@
 #undef USE_STDARG
 #endif
 #endif
+#endif /* !VMSVSI */
 #endif /*VMS*/
 
 #ifdef vax
@@ -199,10 +224,10 @@
 /* Because:
  * #define FOO => FOO={} => defined( ) => (-1 != - - 1) => 1
  * #define FOO 1 or on command-line -DFOO
- *	=> defined(1) => (-1 != - 1 - 1) => 1
+ *      => defined(1) => (-1 != - 1 - 1) => 1
  * if FOO isn't defined, FOO=0. But some compilers default to 0 instead of 1
  * for -DFOO, oh well.
- *	=> defined(0) => (-1 != - 0 - 1) => 0
+ *      => defined(0) => (-1 != - 0 - 1) => 0
  *
  * But:
  * defined("") => (-1 != - "" - 1)
