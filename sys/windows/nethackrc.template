@@ -58,7 +58,7 @@ OPTIONS=!autopickup
 OPTIONS=boulder:0
 
 # Disable the prompt for a tutorial
-#OPTIONS=!tutorial
+OPTIONS=!tutorial
 
 # Disable game tips
 #OPTIONS=!tips
