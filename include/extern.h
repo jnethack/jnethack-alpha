@@ -3568,6 +3568,9 @@ extern void vault_gd_watching(unsigned int);
 /* ### version.c ### */
 
 extern char *version_string(char *, size_t bufsz) NONNULL NONNULLARG1;
+#if 1 /*JP*/
+extern char *version_string_j(char *, size_t) NONNULL NONNULLARG1;
+#endif
 extern char *getversionstring(char *, size_t bufsz) NONNULL NONNULLARG1;
 extern char *status_version(char *, size_t, boolean) NONNULL NONNULLARG1;
 extern int doversion(void);

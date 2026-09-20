@@ -56,6 +56,9 @@ SYSSRC = ../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c
 SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 	$(TARGETPFX)unixunix.o $(TARGETPFX)unixres.o
+# JP
+JSRC = ../japanese/jconj.c ../japanese/jlib.c
+JOBJ = $(TARGETPFX)jconj.o $(TARGETPFX)jlib.o
 #
 # for Systos
 # SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -557,10 +560,10 @@ CHAINOBJ = $(TARGETPFX)wc_chainin.o $(TARGETPFX)wc_chainout.o \
 	$(TARGETPFX)wc_trace.o
 
 # .c files for this version (for date.h)
-VERSOURCES = $(HACKCSRC) $(HACKLIBSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
+VERSOURCES = $(HACKCSRC) $(HACKLIBSRC) $(SYSSRC) $(JSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
 
 # .c files for all versions using this Makefile (for lint and tags)
-CSOURCES = $(HACKCSRC) $(HACKLIBSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
+CSOURCES = $(HACKCSRC) $(HACKLIBSRC) $(SYSCSRC) $(JSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 
 
 # all .h files except date.h, which would
@@ -632,7 +635,7 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)wield.o $(TARGETPFX)windows.o $(TARGETPFX)wizard.o \
 	$(TARGETPFX)wizcmds.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
 	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
-	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) \
+	$(REGEXOBJ) $(RANDOBJ) $(JOBJ) $(SYSOBJ) $(WINOBJ) \
 	$(HINTOBJ) $(SNDLIBOBJ) $(UUIDOBJ) \
 	$(TARGETPFX)version.o 
 
@@ -1310,6 +1313,10 @@ qt_xcmd.moc: $(QTn_H) ../win/Qt/qt_xcmd.h
 	$(MOCPATH) -o $@ ../win/Qt/qt_xcmd.h
 qt_yndlg.moc: $(QTn_H) ../win/Qt/qt_yndlg.h
 	$(MOCPATH) -o $@ ../win/Qt/qt_yndlg.h
+$(TARGETPFX)jconj.o: ../japanese/jconj.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../japanese/jconj.c
+$(TARGETPFX)jlib.o: ../japanese/jlib.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../japanese/jlib.c
 # DEPENDENCIES MUST END AT END OF FILE
 # IF YOU PUT STUFF HERE IT WILL GO AWAY
 # see make depend above

@@ -64,6 +64,10 @@
                      * For example, platforms using the GNU libraries,
                      * Linux, Solaris 2.x
                      */
+#if 1 /*JP*/
+#define POSIX_ICONV /* use POSIX iconv functions */
+#define ICUTF8      /* ソースがUTF-8なので内部コードもUTF-8 */
+#endif
 
 /* #define RANDOM */ /* if neither random/srandom nor lrand48/srand48
                         is available from your system */
