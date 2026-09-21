@@ -819,7 +819,11 @@ nhl_text(lua_State *L)
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
         while (lua_gettop(L) > 0) {
+#if 0 /*JP:T*/
             char *ostr = dupstr(luaL_checkstring(L, 1));
+#else
+            char *ostr = dupstr(utf8toic(luaL_checkstring(L, 1)));
+#endif
             char *ptr, *str = ostr;
             char *lstr = str + strlen(str) - 1;
 
