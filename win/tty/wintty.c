@@ -2636,7 +2636,11 @@ tty_display_file(
                 if (strchr(buf, '\t') != 0)
                     (void) tabexpand(buf);
                 empty = FALSE;
+#if 0 /*JP:T*/
                 tty_putstr(datawin, 0, buf);
+#else
+                tty_putstr(datawin, 0, utf8toic(buf));
+#endif
                 if (wins[datawin]->flags & WIN_CANCELLED)
                     break;
             }
