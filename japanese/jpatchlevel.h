@@ -7,7 +7,7 @@
 #define JPATCHLEVEL_H
 
 #define JVERSION_MAJOR	0
-#define JVERSION_MINOR	1
+#define JVERSION_MINOR	2
 #define JPATCHLEVEL	0
 #define JEDITLEVEL	0
 
