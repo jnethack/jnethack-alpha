@@ -65,6 +65,11 @@ main(int argc, char *argv[])
 
     early_init(argc, argv);
 
+#if 1 /*JP*/
+    /* iconvの初期化のために一度は呼び出す必要がある */
+    setkcode('U');
+#endif
+
 #if defined(__APPLE__)
     {
 /* special hack to change working directory to a resource fork when

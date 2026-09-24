@@ -674,7 +674,7 @@ dump_everything(
        but we only have access to the one it finished under */
     putstr(0, 0, getversionstring(pbuf, sizeof pbuf));
 #if 1 /*JP*/
-    putstr(0, 0, version_string_j(pbuf));
+    putstr(0, 0, version_string_j(pbuf, sizeof pbuf));
 #endif
     putstr(0, 0, "");
 
